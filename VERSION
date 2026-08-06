@@ -6,10 +6,10 @@ Download=
 Changes=Fixed missing info file when importing laps into the telemetry viewer, New Setup Engineer in the "Setup Workbench"
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
-Version=7.1.4.0-release
-Date=07/31/26
-Download=https://cutt.ly/byuDM3Nk;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ID6Bpeiz/Releases/Simulator%20Controller%207.1.4.0-release.zip;https://www.dropbox.com/scl/fi/l1d2i0svsc2db1xzj4urs/Simulator-Controller-7.1.4.0-release.zip?rlkey=wgrow1pxhfpqfoxr2zf20peit&st=hn5kahoi&dl=1;http://%master%/Releases/Simulator Controller 7.1.4.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.1.4.0-release.zip
-Changes=Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach, Full customizeable suspension sample in "Setup Workbench", Fixed transfer of issues to the workarea of "Setup Workbench", Optimized recommendations for bottom out issues in "Setup Workbench", Added suspension deflection to standard telemetry files, Optimized handling of analyzer settings in "Setup Workbench", Increased resolution of telmetry files, Fixed saving of reverted instructions, Fixed hiding of basic page in "Simulator Setup"
+Version=7.1.5.0-release
+Date=08/07/26
+Download=https://cutt.ly/uyo4mIod;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cC-CiRg8/Releases/Simulator%20Controller%207.1.5.0-release.zip;https://www.dropbox.com/scl/fi/pafe1bch2jpbhvd8dn1xa/Simulator-Controller-7.1.5.0-release.zip?rlkey=zg2b3xv1ms2p33zjwrii5otlc&st=dkneba7t&dl=1;http://%master%/Releases/Simulator Controller 7.1.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.1.5.0-release.zip
+Changes=Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list, Optimized loading of large telemetry files, Second Monitor Reader supports suspension deflection
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Components]
 Media.6.9.0.Path=Resources
@@ -25,4 +25,4 @@ Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 Type=Development
 [Version]
 Development=7.2.0.0-dev
-Release=7.1.4.0-release
+Release=7.1.5.0-release

@@ -349,9 +349,13 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 					while (index := browserGui["telemetryListView"].GetNext(index))
 						if FileExist(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
-								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+								   . browserGui["telemetryListView"].GetText(index) . ".telemetry") {
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
 										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+
+							infos.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
+									 . browserGui["telemetryListView"].GetText(index) . ".telemetry.info")
+						}
 						else {
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
 										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")

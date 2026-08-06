@@ -402,6 +402,8 @@ class SetupWorkbench extends ConfigurationItem {
 			if this.TelemetryViewer
 				this.TelemetryViewer.shutdownCollector()
 
+			deleteDirectory(kTempDirectory . "Setup Workbench\Telemetry")
+
 			return false
 		})
 	}
@@ -4300,6 +4302,7 @@ class SetupEngineer extends ConfigurationItem {
 
 	updateTelemetries() {
 		local selected := this.TelemetriesListView.GetNext(0)
+		local telemetries := []
 		local info, lapTime, name
 
 		if selected
@@ -4307,14 +4310,20 @@ class SetupEngineer extends ConfigurationItem {
 
 		this.TelemetriesListView.Delete()
 
-		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F" {
-			SplitPath(A_LoopFileName, , , , &name)
+		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F"
+			telemetries.Push(A_LoopFileFullPath)
+
+		loop Files, kTempDirectory . "Setup Workbench\Telemetry\Imported\*.telemetry", "F"
+			telemetries.Push(A_LoopFileFullPath)
+
+		do(telemetries, (fileName) {
+			SplitPath(fileName, , , , &name)
 
 			this.TelemetriesListView.Opt("-Redraw")
 
 			try {
-				if FileExist(A_LoopFileFullPath . ".info") {
-					info := readMultiMap(A_LoopFileFullPath . ".info")
+				if FileExist(fileName . ".info") {
+					info := readMultiMap(fileName . ".info")
 
 					lapTime := getMultiMapValue(info, "Lap", "LapTime", translate("-"))
 				}
@@ -4334,7 +4343,7 @@ class SetupEngineer extends ConfigurationItem {
 			finally {
 				this.TelemetriesListView.Opt("+Redraw")
 			}
-		}
+		})
 
 		this.updateState()
 	}
@@ -4658,6 +4667,9 @@ class SetupEngineer extends ConfigurationItem {
 
 		if selected {
 			fileName := (kTempDirectory . "Setup Workbench\Telemetry\" . selected . ".telemetry")
+
+			if !FileExist(fileName)
+				fileName := (kTempDirectory . "Setup Workbench\Telemetry\Imported\" . selected . ".telemetry")
 
 			this.Window.Block()
 

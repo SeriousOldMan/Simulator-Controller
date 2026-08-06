@@ -20,6 +20,8 @@ Please note, that it is possible to describe and edit several issues at once. "S
 
 Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Workbench". This state can be retrieved again, when you hold down the Control key, while starting "Setup Workbench". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
 
+Important: If you are new to car racing or in general feel not comfortable to describe your handling issues, several other and to some extent automatic ways to detect and work on handling issues are available. These are described further down below.
+
 ### Real-time Issue Analyzer
 
 "Setup Workbench" provides a special tool, which analyzes the telemetry data while you are driving to detect over- or understeering corner by corner. Handling issues can then be autmatically generated from this information. To start the analyzer, choose the "Analyzer..." item from the "Problem..." menu. The following window appears:
@@ -210,9 +212,62 @@ The Telemetry Viewer supports two different sources for telemetry data. One, whi
 
 Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 
+### Setup Engineer
+
+The fourth tool available to detect and mitigate car setup issues is the so-called *Setup Engineer*, which is using GPT technology to analyze your telemetry data and derive a very detaild performance and handling analysis. Before you can use the Setup Engineer, you must configure a GPT service provider using this dialog, which can be openend by clicking on the settings button in the upper right corner of the main window of "Setup Workbench".
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.JPG)
+
+Here cou can choose a GPT service and a suitable LLM for the Setup Engineer. The choice are similar to the GPT configuration of the Driving Coach. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for more information about the available GPT provider.
+
+Please note that a high end LLM is required for the Setup Engineer. It must be capable to work with huge amounts of nuerical data, must be able to thousands of numerical calculations and must be able to follow several related goals at once. At the time of this writing, only models in the category of OpenAIs GPT 5.4 (not mini or nano) and beyond show good results. And of course, using models of this category is not cheap - one run of the Setup Engineer with GPT 5.4 costs around 20-30 cent.
+
+Beside configuring a GPT provider, you can identify a special folder in the first field. The Setup Engineer will store text files containing a description of all its actions in this folder.
+
+And also similar to the Driving Coach, you can modify the special instructions send to the LLM together with the telemetry data:
+
+Below you find all instruction categories and the supported variables:
+
+| Instruction | What              | Description |
+|-------------|-------------------|-------------|
+| Character   | Scope             | This instruction is used always and must define the profession and the personality of the Setup Engineer. The default instruction creates an engineer specialized in car handling and car physics. |
+| Simulation  | Scope             | This instruction is also supplied always and identifies the chosen simulator, car and track. |
+|             | %simulator%       | The name of the used simulator.                                                 |
+|             | %car%             | The name of the used car.                                                       |
+|             | %track%           | The name of the used track.                                                     |
+| Handling    | Scope             | This instruction is used only when you have decided to supply the identified handling issues beside the telemetry data to the LLM. |
+|             | %handling%        | This variable is substituted with a JSON representation of the issues. |
+| Review      | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data. |
+
+#### Acquiring telemetry data
+
+The Setup Engineer works on numerical telemetry data. Therefore it is necessary to run a few laps and collect telemetry data using the integrated telemetry system (see above). You must have choosen a specific car and also a specific track before using the Setup Engineer and the recorded telemetry data must originate from this combination, of course. Otherwise the results would be more tha questionable.
+
+Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database.
+
+#### Creating a lap review
+
+One you have a decent lap recorded, choose "Engineer..." from the "Problems..." menu. The following window appears:
+
+*Bild*
+
+Choose the lap you want to be analyzed and also decide, if you want your currently identified issues from the *Characteristics* pane of the main window to be taken into account. And you can decide, how many samples of the high resolution telemetry file will be made available to the LLM. This needs a little explanation:
+
+Depending on the provider, telemetry data will be recorded recorded with a high sampling rate, for example 20 Hz. For a typical lap with a lap time around two minutes, this will produce over 7000 samples. Each sample consists of around 20 numerical data points. Providing all this data to a LLM will overflow the context window and may even trigger rate limits for most providers. And even if that is not the case, the number of consumed tokens will be very large and therefore the costs of the request will be high. Taken all this into account the system will the resolution telemetry data to the configured number of samples per lap. Start with the default of 1000 samples and increase only, if really needed.
+
+Once you have choosen your settings, click on the button with the engineer icon. It will take some time for the LLM to analyze the data. Once completed, a review based on the telemetry data and, if supplied, on the supplied issues will be presented in the lower area of the window.
+
+*Bild*
+
+The structure, content and quality of the review strongly depends on the configured LLM, so it will need several runs at the beginning until you get good results. As mentioned above, don't waste your time with small or outdated models.
+
+#### Applying setup changes
+
+For the time being setup changes that are mentioned in the lap review created by the Setup Engineer must be applied manually. This will change with a future release.
+
 ## Understanding the Recommendations
 
-Since "Setup Workbench" has no knowledge about the concrete settings in the current car setup, all recommendations are of reltive nature. When you get the recommendation for a reduction of "Camber Rear Left" by -1, this does not mean that you have to reduce the rear left camber by exactly 1 click or by 0.1 degree. It rather means, that a reduction of the camber will have a large, when not the largest impact in the set of recommendations. To be precise, a recommendation with a value of 1.0 or -1.0 is four times as important than a recommendation with a value of 0.25. This is a hint for you where to start with your incremental tests when applying the recommended setup changes to your car.
+Since "Setup Workbench" has no knowledge about the concrete settings in the current car setup, all recommendations are of relative nature. When you get the recommendation for a reduction of "Camber Rear Left" by -1, this does not mean that you have to reduce the rear left camber by exactly 1 click or by 0.1 degree. It rather means, that a reduction of the camber will have a large, when not the largest impact in the set of recommendations. To be precise, a recommendation with a value of 1.0 or -1.0 is four times as important than a recommendation with a value of 0.25. This is a hint for you where to start with your incremental tests when applying the recommended setup changes to your car.
 
 ### Meaning of the setup values
 

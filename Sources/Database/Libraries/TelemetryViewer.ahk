@@ -1608,6 +1608,8 @@ class TelemetryViewer {
 			local telemetry := false
 			local name, directory, dataFile, file, size, lap
 
+			DirCreate(this.TelemetryDirectory . "Imported")
+
 			if info {
 				info := readMultiMap(info)
 
@@ -1618,8 +1620,6 @@ class TelemetryViewer {
 
 				theLapTime := getMultiMapValue(info, "Info", "LapTime")
 				theSectorTimes := getMultiMapValue(info, "Info", "SectorTimes")
-
-				DirCreate(this.TelemetryDirectory . "Imported")
 
 				if getMultiMapValue(info, "Info", "Lap", false) {
 					FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
@@ -1633,13 +1633,16 @@ class TelemetryViewer {
 
 					fileName := (this.TelemetryDirectory . "Imported\" . name . ".telemetry")
 				}
+
+				writeMultiMap(fileName . ".info", info)
 			}
 
 			if (fileName && (fileName != "")) {
 				SplitPath(fileName, , &directory, , &fileName)
 
 				if (normalizeDirectoryPath(directory) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
-					dataFile := temporaryFileName("Lap Telemetry", "telemetry")
+					dataFile := (this.TelemetryDirectory . "Imported\" . fileName . ".telemetry")
+					; dataFile := temporaryFileName("Lap Telemetry", "telemetry")
 
 					try {
 						telemetry := sessionDB.readTelemetry(simulator, car, track, fileName, &size)

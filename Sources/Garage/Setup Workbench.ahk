@@ -4492,7 +4492,7 @@ class SetupEngineer extends ConfigurationItem {
 															   , "The name of the setting that should be altered."
 															   , "String")
 									, LLMTool.Function.Parameter("increment"
-															   , "The relative increment to the setting by so called clicks. +1 corresponds to an increase of one click and -1 to the decrease of the setting by one click."
+															   , "The relative increment to the setting by clicks. +1 corresponds to an increase of one click and -1 to the decrease of the setting by one click."
 															   , "Integer")]
 								   , ObjBindMethod(this, "changeSetting"))]
 		else
@@ -4787,12 +4787,12 @@ class SetupEngineer extends ConfigurationItem {
 			setupEditor := this.Workbench.SetupEditors[1]
 
 			withBlockedWindows(() {
-				withTask(ProgressTask(StrReplace(translate("Optimizing Setup..."), "...", "")), () {
+				withTask(ProgressTask(StrReplace(translate("Optimizing setup..."), "...", "")), () {
 					this.updateSettings(this.Review)
-
-					WinActivate(setupEditor.Window)
 				})
 			})
+
+			WinActivate(setupEditor.Window)
 		}
 		catch Any as exception {
 			logError(exception)
@@ -4866,13 +4866,39 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	updateSettings(review) {
+		local calls
+
 		static report := true
+
+		printCall(call) {
+			local arguments := call[2].Clone()
+
+			loop arguments.Length
+				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
+
+			arguments := values2String(", ", arguments*)
+
+			if (StrLen(arguments) > 80)
+				arguments := (SubStr(arguments, 1, 80) . translate("..."))
+
+			return ("Call: " . call[1].Name . "(" . arguments . ")")
+		}
 
 		try {
 			if (this.Connector || this.startInteraction()) {
 				this.iMode := "Optimize"
 
-				this.Connector.Ask(review)
+				this.Connector.Ask(review, , , &calls := [])
+
+				if this.Diary
+					try {
+						FileAppend(translate("-- Update setup --------") . "`n`n"
+								 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
+					}
+					catch Any as exception {
+						logError(exception)
+					}
 			}
 		}
 		catch Any as exception {

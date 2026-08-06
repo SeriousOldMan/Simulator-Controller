@@ -129,6 +129,8 @@ class SetupWorkbench extends ConfigurationItem {
 	iTelemetryViewer := false
 	iSetupEngineer := false
 
+	iSetupEditors := []
+
 	iSetup := false
 
 	iKnowledgeBase := false
@@ -360,6 +362,12 @@ class SetupWorkbench extends ConfigurationItem {
 	SetupEngineer {
 		Get {
 			return this.iSetupEngineer
+		}
+	}
+
+	SetupEditors {
+		Get {
+			return this.iSetupEditors
 		}
 	}
 
@@ -1970,6 +1978,14 @@ class SetupWorkbench extends ConfigurationItem {
 			%editorClass%(this).editSetup(this.Setup)
 	}
 
+	openedSetupEditor(setupEditor) {
+		this.SetupEditors.Push(setupEditor)
+	}
+
+	closedSetupEditor(setupEditor) {
+		this.iSetupEditors := remove(this.iSetupEditors, setupEditor)
+	}
+
 	editSettings() {
 		local window := this.Window
 		local configuration
@@ -2782,9 +2798,14 @@ class SetupEditor extends ConfigurationItem {
 			window.Resize("Initialize", w, h)
 
 		this.loadSetup()
+
+		this.Workbench.openedSetupEditor(this)
 	}
 
 	close() {
+		if this.Workbench
+			this.Workbench.closedSetupEditor(this)
+
 		this.destroy()
 
 		if this.Setup {
@@ -2894,6 +2915,18 @@ class SetupEditor extends ConfigurationItem {
 
 	chooseSetup() {
 		throw "Virtual method SetupEditor.chooseSetup must be implemented in a subclass..."
+	}
+
+	getSettings() {
+		local settings := []
+		local setup := this.Setup
+		local ignore, setting
+msgbox 1
+		for ignore, setting in this.Workbench.Settings
+			if (setup.valueAvailable(setting, true) && setup.valueAvailable(setting, false))
+				settings.Push(setting)
+
+		return settings
 	}
 
 	getLabel(setting) {
@@ -3935,7 +3968,7 @@ class FileSetupComparator extends SetupComparator {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SetupEngineer extends ConfigurationItem {
-	iSetupWorkbench := false
+	iWorkbench := false
 
 	iWindow := false
 
@@ -3944,6 +3977,7 @@ class SetupEngineer extends ConfigurationItem {
 
 	iUpdateTask := false
 
+	iReview := false
 	iContent := ""
 
 	iOptions := CaseInsenseMap()
@@ -3956,6 +3990,8 @@ class SetupEngineer extends ConfigurationItem {
 	iInstructions := CaseInsenseWeakMap()
 
 	iDiary := false
+
+	iMode := "Review"
 
 	iIssues := false
 	iResolution := 1000
@@ -4018,9 +4054,9 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	SetupWorkbench {
+	Workbench {
 		Get {
-			return this.iSetupWorkbench
+			return this.iWorkbench
 		}
 	}
 
@@ -4044,19 +4080,19 @@ class SetupEngineer extends ConfigurationItem {
 
 	Simulator {
 		Get {
-			return this.SetupWorkbench.SelectedSimulator[false]
+			return this.Workbench.SelectedSimulator[false]
 		}
 	}
 
 	Car {
 		Get {
-			return this.SetupWorkbench.SelectedCar[false]
+			return this.Workbench.SelectedCar[false]
 		}
 	}
 
 	Track {
 		Get {
-			return this.SetupWorkbench.SelectedTrack[false]
+			return this.Workbench.SelectedTrack[false]
 		}
 	}
 
@@ -4118,7 +4154,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			if isSet(type) {
 				if (type == true)
-					instructions := ["Character", "Simulation", "Handling", "Review"]
+					instructions := ["Character", "Simulation", "Handling", "Review", "Optimize"]
 				else
 					instructions := (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -4149,9 +4185,21 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
+	Mode {
+		Get {
+			return this.iMode
+		}
+	}
+
 	Diary {
 		Get {
 			return this.iDiary
+		}
+	}
+
+	Review {
+		Get {
+			return this.iReview
 		}
 	}
 
@@ -4168,7 +4216,7 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	__New(setupWorkbench, configuration) {
-		this.iSetupWorkbench := setupWorkbench
+		this.iWorkbench := setupWorkbench
 
 		super.__New(configuration)
 
@@ -4248,8 +4296,11 @@ class SetupEngineer extends ConfigurationItem {
 		})
 		engineerGui.Add("Text", "x184 yp+4 w80 Y:Move(0.1)", translate("Samples"))
 
-		engineerGui.Add("Button", "x432 ys w48 h48 X:Move Y:Move(0.1) vanalyzeButton").OnEvent("Click", (*) => this.analyzeTelemetry())
+		engineerGui.Add("Button", "x382 ys w48 h48 X:Move Y:Move(0.1) vanalyzeButton").OnEvent("Click", (*) => this.analyzeTelemetry())
 		setButtonIcon(engineerGui["analyzeButton"], kIconsDirectory . "Assistant.ico", 1, "W42 H42")
+
+		engineerGui.Add("Button", "x432 yp w48 h48 X:Move Y:Move(0.1) vsetupButton").OnEvent("Click", (*) => this.optimizeSetup())
+		setButtonIcon(engineerGui["setupButton"], kIconsDirectory . "Car Setup.ico", 1, "W42 H42")
 
 		engineerGui.Add("Text", "x16 yp+52 w80 h21 Y:Move(0.1)", translate("Review"))
 		engineerGui.Add("Text", "x96 yp+7 w" . (480 - 96) . " 0x10 Y:Move(0.1) W:Grow")
@@ -4285,8 +4336,8 @@ class SetupEngineer extends ConfigurationItem {
 		if this.iUpdateTask
 			this.iUpdateTask.stop()
 
-		if this.SetupWorkbench
-			this.SetupWorkbench.closedSetupEngineer()
+		if this.Workbench
+			this.Workbench.closedSetupEngineer()
 
 		this.Window.Destroy()
 	}
@@ -4298,6 +4349,8 @@ class SetupEngineer extends ConfigurationItem {
 			this.Window["analyzeButton"].Enabled := false
 		else
 			this.Window["analyzeButton"].Enabled := true
+
+		this.Window["setupButton"].Enabled := (this.Review && this.Workbench.SetupEditors.Length == 1)
 	}
 
 	updateTelemetries() {
@@ -4379,7 +4432,7 @@ class SetupEngineer extends ConfigurationItem {
 		local simulator := this.Simulator
 		local car := this.Car
 		local track := this.Track
-		local workbench, issues, characteristicLabels, ignore, characteristic, widgets
+		local workbench, issues, characteristicLabels, ignore, characteristic, widgets, setupEditor
 
 		switch category, false {
 			case "Character":
@@ -4391,7 +4444,7 @@ class SetupEngineer extends ConfigurationItem {
 										  , track: SessionDatabase.getTrackName(simulator, track)})
 			case "Handling":
 				if this.Issues {
-					workbench := this.SetupWorkbench
+					workbench := this.Workbench
 					issues := []
 
 					characteristicLabels := toMap(getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
@@ -4407,7 +4460,17 @@ class SetupEngineer extends ConfigurationItem {
 					return substituteVariables(this.Instructions["Handling"], {handling: JSON.print(issues, "  ")})
 				}
 			case "Review":
-				return this.Instructions["Review"]
+				if (this.Mode = "Review")
+					return this.Instructions["Review"]
+			case "Optimize":
+				if (this.Mode = "Optimize") {
+					try {
+						setupEditor := this.Workbench.SetupEditors[1]
+
+						return substituteVariables(this.Instructions["Optimize"]
+												 , {settings: values2String("`n", setupEditor.getSettings()*)})
+					}
+				}
 		}
 
 		return false
@@ -4419,7 +4482,10 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	getTools() {
-		return []
+		if (this.Mode = "Optimize")
+			return []
+		else
+			return []
 	}
 
 	startInteraction() {
@@ -4466,6 +4532,9 @@ class SetupEngineer extends ConfigurationItem {
 			this.Connector.MaxTokens := this.Options["Setup Engineer.MaxTokens"]
 			this.Connector.Temperature := this.Options["Setup Engineer.Temperature"]
 
+			this.Connector.History := false
+			this.Connector.MaxHistory := 0
+
 			for ignore, instruction in this.Instructions[true] {
 				this.Instructions[instruction] := this.Options["Setup Engineer.Instructions." . instruction]
 
@@ -4483,8 +4552,11 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	restartInteraction() {
-		if this.Connector
+		if this.Connector {
 			this.Connector.Restart()
+
+			this.Connector.History := false
+		}
 	}
 
 	createTelemetry(telemetry) {
@@ -4683,14 +4755,37 @@ class SetupEngineer extends ConfigurationItem {
 					})
 				})
 
-				if review
+				if review {
+					this.iReview := review
+
 					this.showReview(review, true)
+				}
 				else
 					this.showReview(translate("No detailed review available."), false)
 			}
 			finally {
 				this.Window.Unblock()
 			}
+		}
+	}
+
+	optimizeSetup() {
+		local setupEditor
+
+		try {
+			setupEditor := this.Workbench.SetupEditors[1]
+
+			withBlockedWindows(() {
+				withTask(ProgressTask(StrReplace(translate("Optimizing setup..."), "...", "")), () {
+					this.updateSettings(this.Review)
+
+					WinActivate(setupEditor.Window)
+				})
+			})
+
+		}
+		catch Any as exception {
+			logError(exception)
 		}
 	}
 
@@ -4701,6 +4796,8 @@ class SetupEngineer extends ConfigurationItem {
 
 		try {
 			if (this.Connector || this.startInteraction()) {
+				this.iMode := "Review"
+
 				answer := this.Connector.Ask(this.createTelemetry(telemetry))
 
 				if answer
@@ -4734,6 +4831,33 @@ class SetupEngineer extends ConfigurationItem {
 		}
 
 		return answer
+	}
+
+	updateSettings(review) {
+		static report := true
+
+		try {
+			if (this.Connector || this.startInteraction()) {
+				this.iMode := "Optimize"
+
+				this.Connector.Ask(review)
+			}
+		}
+		catch Any as exception {
+			if report {
+				report := false
+
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration")
+														   , {service: this.Options["Setup Engineer.Service"]}))
+
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot connect to GPT service (%service%) - please check the configuration...")
+												  , {service: this.Options["Setup Engineer.Service"]})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
 	}
 }
 
@@ -4792,9 +4916,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		Get {
 			if qualified
 				return ["Instructions.Character", "Instructions.Simulation"
-					  , "Instructions.Handling", "Instructions.Review"]
+					  , "Instructions.Handling", "Instructions.Review", "Instructions.Optimize"]
 			else
-				return ["Character", "Simulation", "Handling", "Review"]
+				return ["Character", "Simulation", "Handling", "Review", "Optimize"]
 		}
 	}
 

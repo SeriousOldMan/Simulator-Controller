@@ -173,7 +173,7 @@ Another valuable tool to improve your lap times is the integrated Telemetry View
 
 As long as the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background while you are driving. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Setup Workbench\Telemetry* folder which is located in your user *Documents* folder.
+Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Setup Workbench\Telemetry* folder which is located in your user *Documents* folder. When you import laps from the session database, they will be stored in *Simulator Controller\Temp\Setup Workbench\Telemetry\Imported*.
 
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
@@ -216,7 +216,7 @@ Good to know: If you use the "Open..." button in the dialog, which let's you bro
 
 The fourth tool available to detect and mitigate car setup issues is the so-called *Setup Engineer*, which is using GPT technology to analyze your telemetry data and derive a very detaild performance and handling analysis. Before you can use the Setup Engineer, you must configure a GPT service provider using this dialog, which can be openend by clicking on the settings button in the upper right corner of the main window of "Setup Workbench".
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.JPG)
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.jpg)
 
 Here cou can choose a GPT service and a suitable LLM for the Setup Engineer. The choice are similar to the GPT configuration of the Driving Coach. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for more information about the available GPT provider.
 
@@ -249,15 +249,15 @@ Good to know: It is also possible to use laps recorded in other sessions by load
 
 One you have a decent lap recorded, choose "Engineer..." from the "Problems..." menu. The following window appears:
 
-*Bild*
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%201.jpg)
 
 Choose the lap you want to be analyzed and also decide, if you want your currently identified issues from the *Characteristics* pane of the main window to be taken into account. And you can decide, how many samples of the high resolution telemetry file will be made available to the LLM. This needs a little explanation:
 
-Depending on the provider, telemetry data will be recorded recorded with a high sampling rate, for example 20 Hz. For a typical lap with a lap time around two minutes, this will produce over 7000 samples. Each sample consists of around 20 numerical data points. Providing all this data to a LLM will overflow the context window and may even trigger rate limits for most providers. And even if that is not the case, the number of consumed tokens will be very large and therefore the costs of the request will be high. Taken all this into account the system will the resolution telemetry data to the configured number of samples per lap. Start with the default of 1000 samples and increase only, if really needed.
+Depending on the provider, telemetry data will be recorded with a high sampling rate, for example 20 Hz. For a typical lap with a lap time around two minutes, this will produce over 7000 samples. Each sample consists of around 20 numerical data points. Providing all this data to a LLM will overflow the context window and may even trigger rate limits for most providers. And even if that is not the case, the number of consumed tokens will be very large and therefore the costs of the request will be high. Taken all this into account the system will the resolution telemetry data to the configured number of samples per lap. Start with the default of 1000 samples and increase only, if really needed.
 
 Once you have choosen your settings, click on the button with the engineer icon. It will take some time for the LLM to analyze the data. Once completed, a review based on the telemetry data and, if supplied, on the supplied issues will be presented in the lower area of the window.
 
-*Bild*
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 
 The structure, content and quality of the review strongly depends on the configured LLM, so it will need several runs at the beginning until you get good results. As mentioned above, don't waste your time with small or outdated models.
 

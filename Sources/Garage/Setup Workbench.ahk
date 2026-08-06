@@ -4765,7 +4765,7 @@ class SetupEngineer extends ConfigurationItem {
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local telemetry := analyzer.createTelemetry(0, fileName)
 
-						analysis := this.analyzeTelemetry(telemetry)
+						analysis := this.createAnalysis(telemetry)
 					})
 				})
 
@@ -4791,7 +4791,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			withBlockedWindows(() {
 				withTask(ProgressTask(StrReplace(translate("Optimizing setup..."), "...", "")), () {
-					this.updateSettings(this.Analysis)
+					this.applyChanges(this.Analysis)
 				})
 			})
 
@@ -4824,7 +4824,7 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	analyseTelemetry(telemetry) {
+	createAnalysis(telemetry) {
 		local answer := false
 
 		static report := true
@@ -4868,7 +4868,7 @@ class SetupEngineer extends ConfigurationItem {
 		return answer
 	}
 
-	updateSettings(analysis) {
+	applyChanges(analysis) {
 		local calls
 
 		static report := true

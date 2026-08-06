@@ -1898,6 +1898,8 @@ class SetupWorkbench extends ConfigurationItem {
 				characteristicsMenu.Disable(label)
 		}
 
+		characteristicsMenu.Add()
+
 		label := translate("Engineer...")
 
 		characteristicsMenu.Add(label, (*) => this.openSetupEngineer())
@@ -3973,11 +3975,11 @@ class SetupEngineer extends ConfigurationItem {
 	iWindow := false
 
 	iTelemetriesListView := false
-	iReviewViewer := false
+	iAnalysisViewer := false
 
 	iUpdateTask := false
 
-	iReview := false
+	iAnalysis := false
 	iContent := ""
 
 	iOptions := CaseInsenseMap()
@@ -3991,7 +3993,7 @@ class SetupEngineer extends ConfigurationItem {
 
 	iDiary := false
 
-	iMode := "Review"
+	iMode := "Analysis"
 
 	iIssues := false
 	iResolution := 1000
@@ -4036,7 +4038,7 @@ class SetupEngineer extends ConfigurationItem {
 
 				this.iRedraw := false
 
-				this.iEngineer.ReviewViewer.Resized()
+				this.iEngineer.AnalysisViewer.Resized()
 
 				this.iEngineer.windowResized()
 
@@ -4072,9 +4074,9 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	ReviewViewer {
+	AnalysisViewer {
 		Get {
-			return this.iReviewViewer
+			return this.iAnalysisViewer
 		}
 	}
 
@@ -4154,7 +4156,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			if isSet(type) {
 				if (type == true)
-					instructions := ["Character", "Simulation", "Handling", "Review", "Optimize"]
+					instructions := ["Character", "Simulation", "Handling", "Analysis", "Optimize"]
 				else
 					instructions := (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -4197,9 +4199,9 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	Review {
+	Analysis {
 		Get {
-			return this.iReview
+			return this.iAnalysis
 		}
 	}
 
@@ -4302,10 +4304,10 @@ class SetupEngineer extends ConfigurationItem {
 		engineerGui.Add("Button", "x432 yp w48 h48 X:Move Y:Move(0.1) vsetupButton").OnEvent("Click", (*) => this.optimizeSetup())
 		setButtonIcon(engineerGui["setupButton"], kIconsDirectory . "Car Setup.ico", 1, "W42 H42")
 
-		engineerGui.Add("Text", "x16 yp+52 w80 h21 Y:Move(0.1)", translate("Review"))
+		engineerGui.Add("Text", "x16 yp+52 w80 h21 Y:Move(0.1)", translate("Analysis"))
 		engineerGui.Add("Text", "x96 yp+7 w" . (480 - 96) . " 0x10 Y:Move(0.1) W:Grow")
 
-		this.iReviewViewer := engineerGui.Add("HTMLViewer", "x16 yp+17 w464 h400 W:Grow Y:Move(0.1) H:Grow(0.9) Border vreviewViewer")
+		this.iAnalysisViewer := engineerGui.Add("HTMLViewer", "x16 yp+17 w464 h400 W:Grow Y:Move(0.1) H:Grow(0.9) Border vanalysisViewer")
 
 		engineerGui.Add(SetupEngineer.EngineerResizer(this))
 
@@ -4329,7 +4331,7 @@ class SetupEngineer extends ConfigurationItem {
 
 		this.iUpdateTask.start()
 
-		this.showReview(translate("Choose a lap for a detailed analysis."), false)
+		this.showAnalysis(translate("Choose a lap for a detailed analysis."), false)
 	}
 
 	close() {
@@ -4350,7 +4352,7 @@ class SetupEngineer extends ConfigurationItem {
 		else
 			this.Window["analyzeButton"].Enabled := true
 
-		this.Window["setupButton"].Enabled := (this.Review && this.Workbench.SetupEditors.Length == 1)
+		this.Window["setupButton"].Enabled := (this.Analysis && this.Workbench.SetupEditors.Length == 1)
 	}
 
 	updateTelemetries() {
@@ -4402,7 +4404,7 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	windowResized() {
-		this.showReview(this.iContent, InStr(this.iContent, "`n"))
+		this.showAnalysis(this.iContent, InStr(this.iContent, "`n"))
 	}
 
 	loadInstructions(configuration) {
@@ -4459,9 +4461,9 @@ class SetupEngineer extends ConfigurationItem {
 
 					return substituteVariables(this.Instructions["Handling"], {handling: JSON.print(issues, "  ")})
 				}
-			case "Review":
-				if (this.Mode = "Review")
-					return this.Instructions["Review"]
+			case "Analysis":
+				if (this.Mode = "Analysis")
+					return this.Instructions["Analysis"]
 			case "Optimize":
 				if (this.Mode = "Optimize") {
 					try {
@@ -4612,8 +4614,8 @@ class SetupEngineer extends ConfigurationItem {
 		return result
 	}
 
-	showReview(content, review := false) {
-		local height := (this.ReviewViewer.getHeight() - 4)
+	showAnalysis(content, analysis := false) {
+		local height := (this.AnalysisViewer.getHeight() - 4)
 		local html := ""
 		local document, height
 
@@ -4677,8 +4679,8 @@ class SetupEngineer extends ConfigurationItem {
 
 		this.iContent := content
 
-		if !review {
-			width := this.ReviewViewer.getWidth() - 10
+		if !analysis {
+			width := this.AnalysisViewer.getWidth() - 10
 
 			document := "
 			(
@@ -4702,7 +4704,7 @@ class SetupEngineer extends ConfigurationItem {
 			)"
 		}
 		else {
-			width := this.ReviewViewer.getWidth() - 20
+			width := this.AnalysisViewer.getWidth() - 20
 
 			document := "
 			(
@@ -4729,20 +4731,21 @@ class SetupEngineer extends ConfigurationItem {
 
 		content := StrReplace(content, "%", "\%")
 
-		this.ReviewViewer.document.open()
-		this.ReviewViewer.document.write(substituteVariables(document, {fontColor: this.Window.Theme.TextColor
-																	  , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-																	  , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-																	  , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-																	  , CSS: getCSS()
-																	  , width: width, height: height, html: content
-																	  , backColor: this.Window.AltBackColor}))
-		this.ReviewViewer.document.close()
+		this.AnalysisViewer.document.open()
+		this.AnalysisViewer.document.write(substituteVariables(document
+															 , {fontColor: this.Window.Theme.TextColor
+															  , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+															  , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+															  , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+															  , CSS: getCSS()
+															  , width: width, height: height, html: content
+															  , backColor: this.Window.AltBackColor}))
+		this.AnalysisViewer.document.close()
 	}
 
 	analyzeTelemetry() {
 		local selected := this.TelemetriesListView.GetNext(0)
-		local review := false
+		local analysis := false
 		local fileName
 
 		if selected
@@ -4762,17 +4765,17 @@ class SetupEngineer extends ConfigurationItem {
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
 						local telemetry := analyzer.createTelemetry(0, fileName)
 
-						review := this.reviewTelemetry(telemetry)
+						analysis := this.analyzeTelemetry(telemetry)
 					})
 				})
 
-				if review {
-					this.iReview := review
+				if analysis {
+					this.iAnalysis := analysis
 
-					this.showReview(review, true)
+					this.showAnalysis(analysis, true)
 				}
 				else
-					this.showReview(translate("No detailed review available."), false)
+					this.showAnalysis(translate("No detailed analysis available."), false)
 			}
 			finally {
 				this.Window.Unblock()
@@ -4788,7 +4791,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			withBlockedWindows(() {
 				withTask(ProgressTask(StrReplace(translate("Optimizing setup..."), "...", "")), () {
-					this.updateSettings(this.Review)
+					this.updateSettings(this.Analysis)
 				})
 			})
 
@@ -4821,14 +4824,14 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	reviewTelemetry(telemetry) {
+	analyseTelemetry(telemetry) {
 		local answer := false
 
 		static report := true
 
 		try {
 			if (this.Connector || this.startInteraction()) {
-				this.iMode := "Review"
+				this.iMode := "Analysis"
 
 				answer := this.Connector.Ask(this.createTelemetry(telemetry))
 
@@ -4855,7 +4858,7 @@ class SetupEngineer extends ConfigurationItem {
 		if answer {
 			if this.Diary
 				try {
-					FileAppend(translate("-- Review --------") . "`n`n" . translate("Lap:") . A_Space . telemetry.Name . "`n`n" . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n" . answer . "`n`n", this.Diary, "UTF-16")
+					FileAppend(translate("-- Analysis --------") . "`n`n" . translate("Lap:") . A_Space . telemetry.Name . "`n`n" . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n" . answer . "`n`n", this.Diary, "UTF-16")
 				}
 				catch Any as exception {
 					logError(exception)
@@ -4865,7 +4868,7 @@ class SetupEngineer extends ConfigurationItem {
 		return answer
 	}
 
-	updateSettings(review) {
+	updateSettings(analysis) {
 		local calls
 
 		static report := true
@@ -4875,6 +4878,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			loop arguments.Length
 				if !arguments.Has(A_Index)
+					arguments[A_Index] := ""
 					arguments[A_Index] := ""
 
 			arguments := values2String(", ", arguments*)
@@ -4889,11 +4893,11 @@ class SetupEngineer extends ConfigurationItem {
 			if (this.Connector || this.startInteraction()) {
 				this.iMode := "Optimize"
 
-				this.Connector.Ask(review, , , &calls := [])
+				this.Connector.Ask(analysis, , , &calls := [])
 
 				if this.Diary
 					try {
-						FileAppend(translate("-- Update setup --------") . "`n`n"
+						FileAppend(translate("-- Setup Changes --------") . "`n`n"
 								 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
 					}
 					catch Any as exception {
@@ -4974,9 +4978,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		Get {
 			if qualified
 				return ["Instructions.Character", "Instructions.Simulation"
-					  , "Instructions.Handling", "Instructions.Review", "Instructions.Optimize"]
+					  , "Instructions.Handling", "Instructions.Analysis", "Instructions.Optimize"]
 			else
-				return ["Character", "Simulation", "Handling", "Review", "Optimize"]
+				return ["Character", "Simulation", "Handling", "Analysis", "Optimize"]
 		}
 	}
 

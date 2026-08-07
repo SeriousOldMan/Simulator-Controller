@@ -4910,7 +4910,6 @@ class SetupEngineer extends ConfigurationItem {
 			loop arguments.Length
 				if !arguments.Has(A_Index)
 					arguments[A_Index] := ""
-					arguments[A_Index] := ""
 
 			arguments := values2String(", ", arguments*)
 

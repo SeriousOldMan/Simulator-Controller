@@ -4465,8 +4465,8 @@ class SetupEngineer extends ConfigurationItem {
 				if (this.Mode = "Analysis") {
 					steerLock := getCarSteerLock(simulator, car)
 					steerRatio := getCarSteerRatio(simulator, car)
-					wheelbase := getCarSteerWheelbase(simulator, car)
-					trackWidth := getCarSteerTrackWidth(simulator, car)
+					wheelbase := getCarWheelbase(simulator, car)
+					trackWidth := getCarTrackWidth(simulator, car)
 
 					if (steerLock || steerRatio || wheelbase || trackWidth)
 						return substituteVariables(this.Instructions["Geometry"]

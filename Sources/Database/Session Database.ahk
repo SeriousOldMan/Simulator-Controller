@@ -165,6 +165,8 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			driver := "John Doe (JD)"
 			lapTime := "-"
 			sectorTimes := ["-"]
+			
+			return false
 		}
 	}
 

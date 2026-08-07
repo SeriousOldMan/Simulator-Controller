@@ -1350,7 +1350,7 @@ class LLMConnector {
 							Sleep(10)
 					}
 
-				loop (isDebug() ? 240 : 120)
+				loop 600
 					try
 						if FileExist(this.AnswerFile) {
 							Sleep(500)

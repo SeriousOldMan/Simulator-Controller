@@ -387,10 +387,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 		options := this.Options
 
-		options["Driving Coach.Archive"] := getMultiMapValue(configuration, "Driving Coach Conversations", "Archive", kTempDirectory . "Conversations")
+		options["Driving Coach.Archive"] := getMultiMapValue(configuration, "Driving Coach Conversations", "Archive", kTempDirectory . "Driving Coach\Conversations")
 
 		if (!options["Driving Coach.Archive"] || (Trim(options["Driving Coach.Archive"]) = ""))
-			options["Driving Coach.Archive"] := (kTempDirectory . "Conversations")
+			options["Driving Coach.Archive"] := (kTempDirectory . "Driving Coach\Conversations")
 
 		options["Driving Coach.Service"] := getMultiMapValue(configuration, "Driving Coach Service", "Service", getMultiMapValue(configuration, "Driving Coach", "Service", false))
 		options["Driving Coach.Model"] := getMultiMapValue(configuration, "Driving Coach Service", "Model", false)

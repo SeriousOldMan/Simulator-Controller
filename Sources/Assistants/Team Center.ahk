@@ -3057,10 +3057,14 @@ class TeamCenter extends ConfigurationItem {
 
 			lapTime := lap.LapTime
 			sectorTimes := lap.SectorsTime
+			
+			return true
 		}
 		else {
 			lapTime := "-"
 			sectorTimes := ["-"]
+			
+			return false
 		}
 	}
 

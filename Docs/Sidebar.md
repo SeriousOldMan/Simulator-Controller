@@ -153,6 +153,7 @@
   - [Describing Setup Issues](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#describing-setup-issues)
     - [Issue Analyzer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#real-time-issue-analyzer)
     - [Telemetry Viewer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Telemetry-Viewer)
+    - [Setup Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Setup-Engineer)
   - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#understanding-the-recommendations)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works)
   - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups)

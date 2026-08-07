@@ -980,6 +980,9 @@ class Straight extends Section {
 class Telemetry {
 	iTelemetryAnalyzer := false
 
+	iName := false
+	iFileName := false
+
 	iLap := false
 	iData := []
 
@@ -1000,6 +1003,23 @@ class Telemetry {
 	TelemetryAnalyzer {
 		Get {
 			return this.iTelemetryAnalyzer
+		}
+	}
+
+	Name {
+		Get {
+			if this.iName
+				return this.iName
+			else if this.Lap
+				return (translate("Lap") . A_Space . this.Lap)
+			else
+				return translate("Unknown")
+		}
+	}
+
+	FileName {
+		Get {
+			return this.iFileName
 		}
 	}
 
@@ -1116,12 +1136,15 @@ class Telemetry {
 		}
 	}
 
-	__New(analyzer, lap, data, driver := false, lapTime := false, sectorTimes := false) {
+	__New(analyzer, name, fileName, lap, data, driver := false, lapTime := false, sectorTimes := false) {
 		local maxG := kUndefined
 		local maxSpeed := kUndefined
 		local ignore, section
 
 		this.iTelemetryAnalyzer := analyzer
+
+		this.iName := name
+		this.iFileName := fileName
 
 		this.iLap := lap
 		this.iData := this.smoothChannels(data, ["Steering"])
@@ -1799,7 +1822,11 @@ class TelemetryAnalyzer {
 	}
 
 	createTelemetry(lap, fileName, driver := false, lapTime := false, sectorTimes := false) {
-		return Telemetry(this, lap, this.loadData(fileName), driver, lapTime, sectorTimes)
+		local name
+
+		SplitPath(fileName, , , , &name)
+
+		return Telemetry(this, name, fileName, lap, this.loadData(fileName), driver, lapTime, sectorTimes)
 	}
 
 	analyzeHandling(telemetries, steerLock, steerRatio, wheelBase, trackWidth, thresholds := false) {

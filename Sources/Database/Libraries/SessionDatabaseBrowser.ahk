@@ -26,7 +26,7 @@
 browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, newSourceType, force
-	local userTelemetries, communityTelemetries, info, command, fileNames
+	local userTelemetries, communityTelemetries, info, command, fileNames, date
 
 	static sessionDB := false
 
@@ -207,10 +207,13 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 								driverName := false
 
 							lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+							date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+								   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
 						}
 						else {
 							driverName := false
 							lapTime := translate("-")
+							date := translate("-")
 						}
 
 						if !driverName
@@ -219,10 +222,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						if !driverName
 							driverName := SessionDatabase.getName("Creator")
 
-						browserGui["telemetryListView"].Add("", name, driverName
-															  , lapTimeDisplayValue(lapTime)
-															  , FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-															  . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+						browserGui["telemetryListView"].Add("", name, driverName, lapTimeDisplayValue(lapTime), date)
 					}
 				}
 				else {
@@ -349,9 +349,13 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 					while (index := browserGui["telemetryListView"].GetNext(index))
 						if FileExist(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
-								   . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+								   . browserGui["telemetryListView"].GetText(index) . ".telemetry") {
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
 										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")
+
+							infos.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "User")
+									 . browserGui["telemetryListView"].GetText(index) . ".telemetry.info")
+						}
 						else {
 							fileNames.Push(sessionDB.getTelemetryDirectory(simulator, car, track, "Community")
 										 . browserGui["telemetryListView"].GetText(index) . ".telemetry")

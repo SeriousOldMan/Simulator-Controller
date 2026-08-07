@@ -235,9 +235,15 @@ Below you find all instruction categories and the supported variables:
 |             | %simulator%       | The name of the used simulator.                                                 |
 |             | %car%             | The name of the used car.                                                       |
 |             | %track%           | The name of the used track.                                                     |
+| Geometry    | Scope             | If available, additional geometry information will be supplied using this instruction. Each variable will be placed on its own line and must include the label, like: "Steer Lock: 480". This makes it possible to supress (white out) missing information.<br><br>The supplied geometry information may be used by the LLM to derive the slip angle using the Ackermann equations. |
+|             | %steerLock%       | Steer lock of the car.                                                     |
+|             | %steerRatio%      | Steer lock of the car.                                                     |
+|             | %trackWidth%      | Average track width of both axles.                                         |
+|             | %wheelbase%       | Wheelbase of the car.                                                      |
 | Handling    | Scope             | This instruction is used only when you have decided to supply the identified handling issues beside the telemetry data to the LLM. |
 |             | %handling%        | This variable is substituted with a JSON representation of the issues. |
-| Review      | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data. |
+| Analyse     | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data. |
+| Optimize    | Scope             | Once an analysis has been created, this instruction tells the LLM how to use a supplied function/tool to apply the recommended setup changes to a setup file. |
 
 #### Acquiring telemetry data
 

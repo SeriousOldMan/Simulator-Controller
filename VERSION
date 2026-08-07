@@ -1,7 +1,7 @@
 [Development]
 Version=7.2.0.0-dev
 Target=7.2.0.0-release
-Date=08/06/26
+Date=08/07/26
 Download=
 Changes=Fixed missing info file when importing laps into the telemetry viewer, New Setup Engineer in the "Setup Workbench"
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3

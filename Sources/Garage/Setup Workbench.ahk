@@ -4156,7 +4156,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			if isSet(type) {
 				if (type == true)
-					instructions := ["Character", "Simulation", "Handling", "Analysis", "Optimize"]
+					instructions := ["Character", "Simulation", "Geometry", "Handling", "Analysis", "Optimize"]
 				else
 					instructions := (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -4282,7 +4282,7 @@ class SetupEngineer extends ConfigurationItem {
 
 		engineerGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iTelemetriesListView := engineerGui.Add("ListView", "x16 yp+10 w464 h120 H:Grow(0.1) W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Lap Time"], translate))
+		this.iTelemetriesListView := engineerGui.Add("ListView", "x16 yp+10 w464 h120 H:Grow(0.1) W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Lap", "Driver", "Lap Time", "Date"], translate))
 		this.iTelemetriesListView.OnEvent("Click", selectTelemetry)
 		this.iTelemetriesListView.OnEvent("DoubleClick", selectTelemetry)
 		this.iTelemetriesListView.OnEvent("ItemSelect", selectTelemetry)
@@ -4298,7 +4298,7 @@ class SetupEngineer extends ConfigurationItem {
 		})
 		engineerGui.Add("Text", "x184 yp+4 w80 Y:Move(0.1)", translate("Samples"))
 
-		engineerGui.Add("Button", "x382 ys w48 h48 X:Move Y:Move(0.1) vanalyzeButton").OnEvent("Click", (*) => this.analyzeTelemetry())
+		engineerGui.Add("Button", "x382 ys-4 w48 h48 X:Move Y:Move(0.1) vanalyzeButton").OnEvent("Click", (*) => this.analyzeTelemetry())
 		setButtonIcon(engineerGui["analyzeButton"], kIconsDirectory . "Assistant.ico", 1, "W42 H42")
 
 		engineerGui.Add("Button", "x432 yp w48 h48 X:Move Y:Move(0.1) vsetupButton").OnEvent("Click", (*) => this.optimizeSetup())
@@ -4358,7 +4358,7 @@ class SetupEngineer extends ConfigurationItem {
 	updateTelemetries() {
 		local selected := this.TelemetriesListView.GetNext(0)
 		local telemetries := []
-		local info, lapTime, name
+		local info, lapTime, name, driver, date
 
 		if selected
 			selected := this.TelemetriesListView.GetText(selected)
@@ -4381,14 +4381,30 @@ class SetupEngineer extends ConfigurationItem {
 					info := readMultiMap(fileName . ".info")
 
 					lapTime := getMultiMapValue(info, "Lap", "LapTime", translate("-"))
+
+					if getMultiMapValue(info, "Telemetry", "Driver", false)
+						driver := SessionDatabase.getDriverName(this.Simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+					else
+						driver := false
+
+					if !driver
+						driver := getMultiMapValue(info, "Telemetry", "Driver")
+
+					if !driver
+						driver := SessionDatabase.getName("Creator")
+
+					date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+						   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
 				}
 				else {
 					info := false
 
 					lapTime := translate("-")
+					driver := translate("-")
+					date := translate("-")
 				}
 
-				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, lapTimeDisplayValue(lapTime))
+				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, driver, lapTimeDisplayValue(lapTime), date)
 
 				this.TelemetriesListView.ModifyCol()
 
@@ -4435,6 +4451,7 @@ class SetupEngineer extends ConfigurationItem {
 		local car := this.Car
 		local track := this.Track
 		local workbench, issues, characteristicLabels, ignore, characteristic, widgets, setupEditor
+		local steerLock, steerRatio, trackWidth, wheelbase
 
 		switch category, false {
 			case "Character":
@@ -4444,8 +4461,22 @@ class SetupEngineer extends ConfigurationItem {
 										 , {simulator: SessionDatabase.getSimulatorName(simulator)
 										  , car: SessionDatabase.getCarName(simulator, car)
 										  , track: SessionDatabase.getTrackName(simulator, track)})
+			case "Geometry":
+				if (this.Mode = "Analysis") {
+					steerLock := getCarSteerLock(simulator, car)
+					steerRatio := getCarSteerRatio(simulator, car)
+					wheelbase := getCarSteerWheelbase(simulator, car)
+					trackWidth := getCarSteerTrackWidth(simulator, car)
+
+					if (steerLock || steerRatio || wheelbase || trackWidth)
+						return substituteVariables(this.Instructions["Geometry"]
+												 , {steerLock: (steerLock ? ("Steer Lock: " . steerLock . " Degrees") : "")
+												  , steerRatio: (steerRatio ? ("Steer Ratio: " . steerRatio) : "")
+												  , trackWidth: (trackWidth ? ("Track Width: " . trackWidth . " cm") : "")
+												  , wheelbase: (wheelbase ? ("Wheelbase: " . wheelbase . " cm") : "")})
+				}
 			case "Handling":
-				if this.Issues {
+				if ((this.Mode = "Analysis") && this.Issues) {
 					workbench := this.Workbench
 					issues := []
 
@@ -4901,7 +4932,7 @@ class SetupEngineer extends ConfigurationItem {
 								 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
 					}
 					catch Any as exception {
-						logError(exception)
+						logError(exception, true)
 					}
 			}
 		}
@@ -4977,10 +5008,10 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 	Instructions[qualified := true] {
 		Get {
 			if qualified
-				return ["Instructions.Character", "Instructions.Simulation"
+				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Geometry"
 					  , "Instructions.Handling", "Instructions.Analysis", "Instructions.Optimize"]
 			else
-				return ["Character", "Simulation", "Handling", "Analysis", "Optimize"]
+				return ["Character", "Simulation", "Geometry", "Handling", "Analysis", "Optimize"]
 		}
 	}
 

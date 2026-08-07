@@ -265,10 +265,11 @@ Additional to the choices described above data about the car geometry will be ma
 
 Once you have choosen your settings, click on the button with the engineer icon. It will take some time for the LLM to analyze the data. Once completed, a review based on the telemetry data and, if supplied, on the supplied issues will be presented in the lower area of the window.
 
-
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 
 The structure, content and quality of the review strongly depends on the configured LLM, so it will need several runs at the beginning until you get good results. As mentioned above, don't waste your time with small or outdated models.
+
+[Here](https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/Docs/Telemetry%20Analysis.html) is an example of a high quality analysis created with GPT 5.5.
 
 #### Applying recommendations
 

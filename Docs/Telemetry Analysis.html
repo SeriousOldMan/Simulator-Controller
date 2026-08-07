@@ -1,0 +1,302 @@
+﻿<html>
+	<meta charset='utf-8'>
+	<head>
+		<style>
+			.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #FFFFFF; }
+			.rowStyle { font-size: 11px; color: #000000; background-color: #E0E0E0; }
+			.oddRowStyle { font-size: 11px; color: #000000; background-color: #C0C0C0; }
+			table, th, td {
+	border-collapse: collapse;
+	padding: .3em .5em;
+}
+
+th, td {
+	color: #000000;
+}
+
+th, caption {
+	font-size: 12px;
+	background-color: #B0B0B0;
+	color: #000000;
+	border: thin solid #B0B0B0;
+}
+
+td {
+	font-size: 12px;
+	border-left: thin solid #B0B0B0;
+	border-right: thin solid #B0B0B0;
+}
+
+tfoot {
+	border-bottom: thin solid #B0B0B0;
+}
+
+caption {
+	font-size: 1.5em;
+	border-radius: .5em .5em 0 0;
+	padding: .5em 0 0 0
+}
+
+table tbody tr:nth-child(even) {
+	background-color: #E0E0E0;
+}
+
+table tbody tr:nth-child(odd) {
+	background-color: #E0E0E0;
+}
+
+h1, h2, h3, h4, h5, p, ul, ol {
+	font-family: Arial;
+	color: #000000;
+}
+		</style>
+	</head>
+  <body>
+    <h2>Telemetry Analysis – Lexus RC F LMGT3 at Sebring</h2>
+
+    <h3>Lap Overview</h3>
+    <ul>
+      <li><strong>Lap distance:</strong> ~5.80 km</li>
+      <li><strong>Lap time from telemetry:</strong> ~123.1 s</li>
+      <li><strong>Main reported issue confirmed:</strong> slow-corner apex understeer</li>
+      <li><strong>Secondary issue confirmed:</strong> mild fast-corner entry instability / over-rotation under braking</li>
+    </ul>
+
+    <p>
+      Using the supplied steering geometry, the estimated front road-wheel angle is:
+      <br />
+      <strong>Front wheel angle ≈ Steering input × (505 / 2) / 17 = Steering input × 14.85°</strong>
+    </p>
+
+    <p>
+      Several slow and medium-speed corners show the driver using substantially more steering angle than the lateral acceleration and speed should require. That is a strong indication that the front tyres are saturating at or near apex: the car is being asked to turn, but it is not generating the expected rotation.
+    </p>
+
+    <h3>Key Handling Evidence</h3>
+
+    <table border="1" cellspacing="0" cellpadding="6">
+      <thead>
+        <tr>
+          <th>Distance Range</th>
+          <th>Corner Phase</th>
+          <th>Telemetry Observation</th>
+          <th>Handling Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>~470–515 m</td>
+          <td>Slow/medium apex</td>
+          <td>
+            Speed ~149–157 km/h, Lat G up to ~2.0, steering around -0.21 input,
+            estimated front angle ~3.1°.
+          </td>
+          <td>
+            Steering demand is high for the achieved rotation. Clear apex understeer, especially as the driver waits before returning to throttle.
+          </td>
+        </tr>
+        <tr>
+          <td>~900–950 m</td>
+          <td>Slow corner apex and exit</td>
+          <td>
+            Speed ~95–103 km/h, steering around -0.39 to -0.40 input,
+            estimated front angle ~5.8–5.9°. Throttle applied while still carrying large steering lock.
+          </td>
+          <td>
+            Strong slow-corner understeer. The car needs a lot of lock and still does not rotate cleanly. TC also activates briefly on exit, suggesting power application is compounding the push.
+          </td>
+        </tr>
+        <tr>
+          <td>~1950–1985 m</td>
+          <td>Hairpin / very slow corner</td>
+          <td>
+            Steering peaks around +0.55 to +0.58 input, estimated front angle ~8.2–8.6°.
+            Lat G reaches ~1.9. Throttle application produces TC activity.
+          </td>
+          <td>
+            The car is near the front-grip limit. Initial rotation is acceptable, but on-throttle it tends to push wide and rely on TC.
+          </td>
+        </tr>
+        <tr>
+          <td>~2745–2765 m</td>
+          <td>Slow apex</td>
+          <td>
+            Speed ~78–85 km/h, steering around +0.44 to +0.45 input,
+            Lat G ~1.3–1.55.
+          </td>
+          <td>
+            Too much steering for the achieved lateral load. This is a classic slow-apex understeer signature.
+          </td>
+        </tr>
+        <tr>
+          <td>~3235–3260 m</td>
+          <td>Long slow/medium corner</td>
+          <td>
+            Speed ~106–110 km/h, steering ~+0.36 to +0.40 input,
+            Lat G ~1.5–1.77, throttle mostly zero until exit.
+          </td>
+          <td>
+            Front-limited mid-corner balance. The car is not rotating even before throttle is applied, so this is not only power-understeer.
+          </td>
+        </tr>
+        <tr>
+          <td>~331–423 m</td>
+          <td>Fast entry / braking</td>
+          <td>
+            Heavy braking from ~243 km/h down to ~174 km/h while lateral load builds.
+            ABS appears during the braking phase. Rear suspension unload is visible.
+          </td>
+          <td>
+            Mild fast-entry over-rotation risk. The rear is becoming light under trail braking, especially over Sebring bumps.
+          </td>
+        </tr>
+        <tr>
+          <td>~3895–3975 m</td>
+          <td>Fast-to-medium entry</td>
+          <td>
+            Brake pressure high, speed drops from ~230 km/h to ~136 km/h,
+            ABS active, steering angle increases while the car is still decelerating.
+          </td>
+          <td>
+            Entry stability is marginal. The car is rotating while braking, which matches the reported occasional fast-entry oversteer.
+          </td>
+        </tr>
+        <tr>
+          <td>~5170–5215 m</td>
+          <td>High-speed braking entry</td>
+          <td>
+            Braking from ~250 km/h with lateral load already above 1.3–1.4 G.
+            ABS active and rear suspension unloads.
+          </td>
+          <td>
+            Rear stability under combined braking and turning is the weak point in faster entries.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Handling Summary</h3>
+
+    <p>
+      The car is primarily <strong>front-limited in slow and medium-speed apexes</strong>. The driver often reaches large steering inputs while the car is either coasting or only lightly on throttle, which means the understeer is not purely caused by power application. It is a genuine mechanical/apex balance issue.
+    </p>
+
+    <p>
+      The secondary problem is <strong>mild fast-entry oversteer</strong>, mostly during heavy trail braking. The telemetry shows high brake pressure, ABS activity, lateral load, and rear unloading occurring together. This makes the rear of the car nervous when the driver turns in while still braking hard.
+    </p>
+
+    <p>
+      Therefore, the setup direction should be:
+    </p>
+
+    <ul>
+      <li><strong>Add front mechanical grip / rotation for slow apexes.</strong></li>
+      <li><strong>Do not make the rear much looser on entry.</strong></li>
+      <li><strong>Stabilise the rear under braking using brake bias and damping rather than simply adding rear grip everywhere.</strong></li>
+    </ul>
+
+    <h3>Recommended Setup Changes</h3>
+
+    <h4>Priority 1 – Reduce Slow Apex Understeer</h4>
+    <ol>
+      <li>
+        <strong>Soften the front anti-roll bar by 1 click.</strong>
+        <br />
+        This should improve front compliance and front grip in the slow and medium-speed apexes. It is the safest first change because the main problem is mechanical front saturation.
+      </li>
+
+      <li>
+        <strong>Add a small amount of front negative camber.</strong>
+        <br />
+        Suggested change: <strong>+0.1° to +0.2° more negative front camber</strong>, if tyre temperatures allow.
+        <br />
+        The telemetry shows repeated high lateral-load corners where the front outside tyre appears to be the limiting axle. More camber should help the loaded front tyre during sustained apex load.
+      </li>
+
+      <li>
+        <strong>If the car still pushes on throttle, reduce power differential locking slightly.</strong>
+        <br />
+        Suggested change: <strong>1 click less power lock</strong>, or equivalent.
+        <br />
+        Several exits show throttle being applied with significant steering angle and occasional TC activity. Less power locking can help the car finish rotation instead of driving both rear tyres straight and pushing the front wide.
+      </li>
+    </ol>
+
+    <h4>Priority 2 – Control Fast Entry Oversteer</h4>
+    <ol>
+      <li>
+        <strong>Move brake bias slightly forward.</strong>
+        <br />
+        Suggested change: <strong>+0.2% to +0.4% forward brake bias</strong>.
+        <br />
+        This should calm the rear during the heavy braking zones where ABS and lateral load overlap. Avoid going too far forward, because excessive front bias will worsen trail-brake understeer.
+      </li>
+
+      <li>
+        <strong>Reduce rear rebound damping by 1 click.</strong>
+        <br />
+        Sebring is bumpy, and the rear appears to unload during heavy braking entries. Slightly softer rear rebound lets the rear tyres follow the surface better and should improve braking stability without adding much steady-state understeer.
+      </li>
+
+      <li>
+        <strong>If entry oversteer remains, add a very small amount of rear toe-in.</strong>
+        <br />
+        Suggested change: <strong>+0.01° to +0.02° rear toe-in per side</strong>.
+        <br />
+        Use this only if needed, because rear toe-in will also make the car slightly more reluctant to rotate at apex.
+      </li>
+    </ol>
+
+    <h3>Changes I Would Avoid Initially</h3>
+    <ul>
+      <li>
+        <strong>Do not stiffen the rear anti-roll bar yet.</strong>
+        <br />
+        It would help rotation, but it risks making the existing fast-entry oversteer worse.
+      </li>
+      <li>
+        <strong>Do not reduce rear wing as a first step.</strong>
+        <br />
+        The car already shows rear instability during high-speed braking entries. Reducing rear aero would likely make that worse.
+      </li>
+      <li>
+        <strong>Do not make a large rake increase initially.</strong>
+        <br />
+        More rake could improve front response, but at Sebring it may also make the rear more nervous over bumps and under braking.
+      </li>
+    </ul>
+
+    <h3>Suggested Test Plan</h3>
+    <ol>
+      <li>
+        Apply:
+        <ul>
+          <li>Front ARB softer by 1 click</li>
+          <li>Brake bias +0.2% forward</li>
+          <li>Rear rebound softer by 1 click</li>
+        </ul>
+      </li>
+      <li>
+        Run 3–5 laps and focus on the slow apexes around ~900 m, ~2750 m, ~3230 m, and ~5350 m.
+      </li>
+      <li>
+        If apex understeer is improved but exit push remains, reduce power diff locking by 1 click.
+      </li>
+      <li>
+        If fast-entry oversteer is still present, add another +0.1% to +0.2% brake bias forward or add minimal rear toe-in.
+      </li>
+    </ol>
+
+    <h3>Driver Note</h3>
+    <p>
+      The data also shows several places where throttle is applied while steering angle is still very high. With this setup balance, that tends to create power-understeer and TC intervention. Once the setup gives more rotation, try to unwind steering slightly earlier before going fully to throttle, especially in the slow hairpin-type corners.
+    </p>
+
+    <h3>Final Recommendation</h3>
+    <p>
+      The best first setup direction is:
+      <strong>more front mechanical grip at apex, plus slightly calmer rear behaviour under braking</strong>.
+      I would start with a <strong>softer front ARB, slightly forward brake bias, and softer rear rebound</strong>. Then fine-tune with front camber and power differential if the slow-corner push remains.
+    </p>
+  </body>
+</html>

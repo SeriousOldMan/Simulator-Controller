@@ -1690,7 +1690,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		lapTime := "-"
 		sectorTimes := ["-"]
-		
+
 		return false
 	}
 
@@ -4668,7 +4668,7 @@ class SetupEngineer extends ConfigurationItem {
 	showAnalysis(content, analysis := false) {
 		local height := (this.AnalysisViewer.getHeight() - 4)
 		local html := ""
-		local document, height
+		local document, height, ignore, tag
 
 		getCSS() {
 			local script
@@ -4781,6 +4781,9 @@ class SetupEngineer extends ConfigurationItem {
 		}
 
 		content := StrReplace(content, "%", "\%")
+
+		for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
+			content := StrReplace(content, tag, "")
 
 		this.AnalysisViewer.document.open()
 		this.AnalysisViewer.document.write(substituteVariables(document

@@ -4156,7 +4156,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			if isSet(type) {
 				if (type == true)
-					instructions := ["Character", "Simulation", "Geometry", "Handling", "Analysis", "Optimize"]
+					instructions := ["Character", "Simulation", "Geometry", "Handling", "Analysis", "Recommendations"]
 				else
 					instructions := (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -4301,7 +4301,7 @@ class SetupEngineer extends ConfigurationItem {
 		engineerGui.Add("Button", "x382 ys-4 w48 h48 X:Move Y:Move(0.1) vanalyzeButton").OnEvent("Click", (*) => this.analyzeTelemetry())
 		setButtonIcon(engineerGui["analyzeButton"], kIconsDirectory . "Assistant.ico", 1, "W42 H42")
 
-		engineerGui.Add("Button", "x432 yp w48 h48 X:Move Y:Move(0.1) vsetupButton").OnEvent("Click", (*) => this.optimizeSetup())
+		engineerGui.Add("Button", "x432 yp w48 h48 X:Move Y:Move(0.1) vsetupButton").OnEvent("Click", (*) => this.recommendSetup())
 		setButtonIcon(engineerGui["setupButton"], kIconsDirectory . "Car Setup.ico", 1, "W42 H42")
 
 		engineerGui.Add("Text", "x16 yp+52 w80 h21 Y:Move(0.1)", translate("Analysis"))
@@ -4495,12 +4495,12 @@ class SetupEngineer extends ConfigurationItem {
 			case "Analysis":
 				if (this.Mode = "Analysis")
 					return this.Instructions["Analysis"]
-			case "Optimize":
-				if (this.Mode = "Optimize") {
+			case "Recommendations":
+				if (this.Mode = "Recommendations") {
 					try {
 						setupEditor := this.Workbench.SetupEditors[1]
 
-						return substituteVariables(this.Instructions["Optimize"]
+						return substituteVariables(this.Instructions["Recommendations"]
 												 , {settings: values2String("`n", setupEditor.getSettings()*)})
 					}
 					catch Any as exception {
@@ -4518,7 +4518,27 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	getTools() {
-		if (this.Mode = "Optimize")
+		changeSetting(arguments*) {
+			local setupEditor, name, increment
+
+			try {
+				name := arguments[1]
+				increment := arguments[2]
+
+				setupEditor := this.Workbench.SetupEditors[1]
+
+				loop Abs(increment)
+					if (increment < 0)
+						setupEditor.decreaseSetting(name)
+					else
+						setupEditor.increaseSetting(name)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		}
+
+		if (this.Mode = "Recommendations")
 			return [LLMTool.Function("change_setting"
 								   , "Call this function to change the value of a setting in the car setup."
 								   , [LLMTool.Function.Parameter("name"
@@ -4527,7 +4547,7 @@ class SetupEngineer extends ConfigurationItem {
 									, LLMTool.Function.Parameter("increment"
 															   , "The relative increment to the setting by clicks. +1 corresponds to an increase of one click and -1 to the decrease of the setting by one click."
 															   , "Integer")]
-								   , ObjBindMethod(this, "changeSetting"))]
+								   , changeSetting)]
 		else
 			return []
 	}
@@ -4793,10 +4813,8 @@ class SetupEngineer extends ConfigurationItem {
 			try {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Analyzing lap..."), "...", "")), () {
-						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
-						local telemetry := analyzer.createTelemetry(0, fileName)
-
-						analysis := this.createAnalysis(telemetry)
+						analysis := this.createAnalysis(TelemetryAnalyzer(this.Simulator
+																		, this.Track).createTelemetry(0, fileName))
 					})
 				})
 
@@ -4814,41 +4832,19 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	optimizeSetup() {
+	recommendSetup() {
 		local setupEditor
 
 		try {
 			setupEditor := this.Workbench.SetupEditors[1]
 
 			withBlockedWindows(() {
-				withTask(ProgressTask(StrReplace(translate("Optimizing setup..."), "...", "")), () {
-					this.applyChanges(this.Analysis)
+				withTask(ProgressTask(StrReplace(translate("Applying recommendations..."), "...", "")), () {
+					this.applyRecommendations(this.Analysis)
 				})
 			})
 
 			WinActivate(setupEditor.Window)
-		}
-		catch Any as exception {
-			logError(exception)
-		}
-	}
-
-	changeSetting(arguments*) {
-		local setupEditor, name, increment
-
-		try {
-			name := arguments[1]
-			increment := arguments[2]
-
-			setupEditor := this.Workbench.SetupEditors[1]
-
-			if (increment < 0) {
-				loop Abs(increment)
-					setupEditor.decreaseSetting(name)
-			}
-			else
-				loop Abs(increment)
-					setupEditor.increaseSetting(name)
 		}
 		catch Any as exception {
 			logError(exception)
@@ -4899,7 +4895,7 @@ class SetupEngineer extends ConfigurationItem {
 		return answer
 	}
 
-	applyChanges(analysis) {
+	applyRecommendations(analysis) {
 		local calls
 
 		static report := true
@@ -4921,13 +4917,13 @@ class SetupEngineer extends ConfigurationItem {
 
 		try {
 			if (this.Connector || this.startInteraction()) {
-				this.iMode := "Optimize"
+				this.iMode := "Recommendations"
 
 				this.Connector.Ask(analysis, , , &calls := [])
 
 				if this.Diary
 					try {
-						FileAppend(translate("-- Setup Changes --------") . "`n`n"
+						FileAppend(translate("-- Recommendations --------") . "`n`n"
 								 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
 					}
 					catch Any as exception {
@@ -5008,9 +5004,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		Get {
 			if qualified
 				return ["Instructions.Character", "Instructions.Simulation", "Instructions.Geometry"
-					  , "Instructions.Handling", "Instructions.Analysis", "Instructions.Optimize"]
+					  , "Instructions.Handling", "Instructions.Analysis", "Instructions.Recommendations"]
 			else
-				return ["Character", "Simulation", "Geometry", "Handling", "Analysis", "Optimize"]
+				return ["Character", "Simulation", "Geometry", "Handling", "Analysis", "Recommendations"]
 		}
 	}
 

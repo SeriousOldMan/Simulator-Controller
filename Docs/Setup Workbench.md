@@ -251,7 +251,7 @@ The Setup Engineer works on numerical telemetry data. Therefore it is necessary 
 
 Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database.
 
-#### Creating a lap review
+#### Creating a lap analysis
 
 One you have a decent lap recorded, choose "Engineer..." from the "Problems..." menu. The following window appears:
 
@@ -261,13 +261,16 @@ Choose the lap you want to be analyzed and also decide, if you want your current
 
 Depending on the provider, telemetry data will be recorded with a high sampling rate, for example 20 Hz. For a typical lap with a lap time around two minutes, this will produce over 7000 samples. Each sample consists of around 20 numerical data points. Providing all this data to a LLM will overflow the context window and may even trigger rate limits for most providers. And even if that is not the case, the number of consumed tokens will be very large and therefore the costs of the request will be high. Taken all this into account the system will the resolution telemetry data to the configured number of samples per lap. Start with the default of 1000 samples and increase only, if really needed.
 
+Additional to the choices described above data about the car geometry will be made available to the LLM. This information, which will be taken from the settings of the issue analyzer, may be used to calculate the slip angle using the Ackermann equations, for example.
+
 Once you have choosen your settings, click on the button with the engineer icon. It will take some time for the LLM to analyze the data. Once completed, a review based on the telemetry data and, if supplied, on the supplied issues will be presented in the lower area of the window.
+
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 
 The structure, content and quality of the review strongly depends on the configured LLM, so it will need several runs at the beginning until you get good results. As mentioned above, don't waste your time with small or outdated models.
 
-#### Applying setup changes
+#### Applying recommendations
 
 If the Setup Engineer identified reasonable changes to the car setup, you can of course apply them manually. But you can also ask the Setup Engineer to do it for you. For this, you have to open a [*Setup Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups) (exactly one) and then you click on the button with the tools in the Setup Engineer window. The LLM, which is required to handle tool calling properly, is then asked to apply its own recommendations to the setup currently loaded in the *Setup Editor*. But always double check the result, only the most capable LLMs will manage to do this without any errors.
 
@@ -328,6 +331,8 @@ During the first phase, the rule engine analyses all given problems and their "I
 			(Prove: changeSetting(Bumpstop.Rate, [Rear.Left, Rear.Right], 0.5, ?Understeer.Corner.Exit.Fast.Correction))
 
 As you can see, these rules define the changes to be applied to the setup settings to compensate for a specific problem, fast corner exit understeer in this example. It is self-explanatory, that a lot of settings might be influenced by many applicable rules at the same time. The generic rule set of "Setup Workbench" will handle this by computing the resulting setting as the best possible compromise for all resulting changes.
+
+A totally different story is the Setup Engineer, which will rely on the anylytical capabilities of the configured LLM. The telemetry data is supplied to the LLM in the user prompt as a large CSV table. Additional information and instructions how to use the telemetry data are supplied as system instructions to the LLM. These [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Setup-Engineer) can be modified to suite your needs.
 
 ## Managing Car Setups
 

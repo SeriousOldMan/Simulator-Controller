@@ -1686,12 +1686,12 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	getLapInformation(lapNumber, &driver, &lapTime, &sectorTimes) {
-		local lap
-
 		driver := SessionDatabase.getName("Creator")
 
 		lapTime := "-"
 		sectorTimes := ["-"]
+		
+		return false
 	}
 
 	clearCharacteristics() {
@@ -4408,8 +4408,8 @@ class SetupEngineer extends ConfigurationItem {
 
 				this.TelemetriesListView.ModifyCol()
 
-				this.TelemetriesListView.ModifyCol(1, "AutoHdr")
-				this.TelemetriesListView.ModifyCol(2, "AutoHdr")
+				loop 4
+					this.TelemetriesListView.ModifyCol(A_Index, "AutoHdr")
 			}
 			finally {
 				this.TelemetriesListView.Opt("+Redraw")
@@ -4814,7 +4814,7 @@ class SetupEngineer extends ConfigurationItem {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Analyzing lap..."), "...", "")), () {
 						analysis := this.createAnalysis(TelemetryAnalyzer(this.Simulator
-																		, this.Track).createTelemetry(0, fileName))
+																		, this.Track).createTelemetry(false, fileName))
 					})
 				})
 

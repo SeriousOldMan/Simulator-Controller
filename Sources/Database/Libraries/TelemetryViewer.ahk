@@ -1360,6 +1360,37 @@ class TelemetryViewer {
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
 
+	getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
+		local info
+
+		if !isNumber(lap) {
+			driver := lap[2]
+			lapTime := ((lap[3] != "-") ? lap[3] : false)
+			sectorTimes := lap[4]
+		}
+		else if (!this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+			  && fileName && FileExist(fileName . ".info")) {
+			info := readMultiMap(fileName . ".info")
+
+			driver := getMultiMapValue(info, "Lap", "Driver"
+										   , getMultiMapValue(info, "Info", "Driver", false))
+
+			lapTime := getMultiMapValue(info, "Lap", "LapTime"
+											, getMultiMapValue(info, "Info", "LapTime", false))
+			sectorTimes := getMultiMapValue(info, "Lap", "SectorTimes"
+												, getMultiMapValue(info, "Info", "SectorTimes", false))
+		}
+
+		if !driver
+			driver := SessionDatabase.getName("Creator")
+
+		if !lapTime
+			lapTime := translate("-")
+
+		if !sectorTimes
+			sectorTimes := ["-"]
+	}
+
 	createTelemetry(simulator, track, lap) {
 		local fileName := this.SelectedLap[true]
 		local driver, lapTime, sectorTimes, telemetry, index, section
@@ -1376,19 +1407,13 @@ class TelemetryViewer {
 		else if isDebug()
 			logMessage(kLogDebug, "Cache miss in TelemetryViewer.createTelemetryChart...")
 
-		if isNumber(lap)
-			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-		else {
-			driver := lap[2]
-			lapTime := ((lap[3] != "-") ? lap[3] : false)
-			sectorTimes := lap[4]
-		}
+		this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes)
 
 		if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 			sectorTimes := false
 
-		telemetry := TelemetryAnalyzer(simulator, track).createTelemetry(0, fileName
-																		  , driver, lapTime, sectorTimes)
+		telemetry := TelemetryAnalyzer(simulator, track).createTelemetry(false, fileName
+																			  , driver, lapTime, sectorTimes)
 
 		this.TelemetryCache[fileName] := telemetry
 
@@ -1616,10 +1641,13 @@ class TelemetryViewer {
 				if driver
 					theDriver := driver
 				else
-					theDriver := getMultiMapValue(info, "Info", "Driver")
+					theDriver := getMultiMapValue(info, "Lap", "Driver"
+													  , getMultiMapValue(info, "Info", "Driver", false))
 
-				theLapTime := getMultiMapValue(info, "Info", "LapTime")
-				theSectorTimes := getMultiMapValue(info, "Info", "SectorTimes")
+				theLapTime := getMultiMapValue(info, "Lap", "LapTime"
+												   , getMultiMapValue(info, "Info", "LapTime", false))
+				theSectorTimes := getMultiMapValue(info, "Lap", "SectorTimes"
+													   , getMultiMapValue(info, "Info", "SectorTimes", false))
 
 				if getMultiMapValue(info, "Info", "Lap", false) {
 					FileCopy(fileName, this.TelemetryDirectory . "Imported\Lap " . getMultiMapValue(info, "Info", "Lap") . ".telemetry", 1)
@@ -1678,9 +1706,9 @@ class TelemetryViewer {
 					if FileExist(telemetry . ".info") {
 						info := readMultiMap(telemetry . ".info")
 
-						theDriver := getMultiMapValue(info, "Info", "Driver", false)
-						theLapTime := getMultiMapValue(info, "Info", "LapTime", false)
-						theSectorTimes := getMultiMapValue(info, "Info", "SectorTimes", false)
+						theDriver := getMultiMapValue(info, "Lap", "Driver", getMultiMapValue(info, "Info", "Driver", false))
+						theLapTime := getMultiMapValue(info, "Lap", "LapTime", getMultiMapValue(info, "Info", "LapTime", false))
+						theSectorTimes := getMultiMapValue(info, "Lap", "SectorTimes", getMultiMapValue(info, "Info", "SectorTimes", false))
 					}
 					else
 						info := false
@@ -1745,13 +1773,17 @@ class TelemetryViewer {
 	}
 
 	saveLap(lap := false, prompt := true) {
+		local fileName := false
 		local simulator, car, track
 		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver, lapTime, sectorTimes
+		local dbFileName
 
 		this.Manager.getSessionInformation(&simulator, &car, &track)
 
-		if !lap
+		if !lap {
 			lap := this.SelectedLap
+			fileName := this.SelectedLap[true]
+		}
 
 		if lap {
 			if (simulator && car && track) {
@@ -1764,7 +1796,7 @@ class TelemetryViewer {
 				dirName := ""
 
 			if isNumber(lap) {
-				this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+				this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes)
 
 				fileName := (dirName . "\Lap " . lap . translate(" (") . driver . ((lapTime != "-") ? (" - " . lapTime) : "") . translate(")"))
 			}
@@ -1827,7 +1859,9 @@ class TelemetryViewer {
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 
 							if isNumber(lap) {
-								this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+								dbFileName := (sessionDB.getTelemetryDirectory(simulator, car, track) . fileName . ".telemetry")
+
+								this.getLapInformation(lap, dbFileName, &driver, &lapTime, &sectorTimes)
 
 								setMultiMapValue(info, "Lap", "Driver", driver)
 
@@ -1970,26 +2004,19 @@ class TelemetryViewer {
 	showSectionInfo(x, y, open := true) {
 		local fileName := this.SelectedLap[true]
 		local referenceTelemetry := false
-		local simulator, car, track, analyzer, telemetry, section, lap, referenceLap, driver, lapTime, sectorTimes
+		local simulator, car, track, analyzer, telemetry, section, referenceLap, driver, lapTime, sectorTimes
 
 		try {
 			this.Manager.getSessionInformation(&simulator, &car, &track)
 
 			analyzer := TelemetryAnalyzer(simulator, track)
-			lap := this.SelectedLap
 
-			if isNumber(lap)
-				this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-			else {
-				driver := lap[2]
-				lapTime := ((lap[3] != "-") ? lap[3] : false)
-				sectorTimes := lap[4]
-			}
+			this.getLapInformation(this.SelectedLap, fileName, &driver, &lapTime, &sectorTimes)
 
 			if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 				sectorTimes := false
 
-			if this.TelemetryCache.Has(this.SelectedLap[true]) {
+			if this.TelemetryCache.Has(fileName) {
 				if isDebug()
 					logMessage(kLogDebug, "Cache hit in TelemetryViewer.showSectionInfo...")
 
@@ -1999,7 +2026,7 @@ class TelemetryViewer {
 				if isDebug()
 					logMessage(kLogDebug, "Cache miss in TelemetryViewer.showSectionInfo...")
 
-				telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+				telemetry := analyzer.createTelemetry(false, fileName, driver, lapTime, sectorTimes)
 
 				this.TelemetryCache[fileName] := telemetry
 			}
@@ -2009,7 +2036,7 @@ class TelemetryViewer {
 					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 						analyzer.requireTrackSections(telemetry)
 
-						telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+						telemetry := analyzer.createTelemetry(false, fileName, driver, lapTime, sectorTimes)
 
 						this.TelemetryCache[fileName] := telemetry
 					})
@@ -2019,23 +2046,17 @@ class TelemetryViewer {
 			referenceLap := this.SelectedReferenceLap
 
 			if referenceLap {
-				if isNumber(referenceLap)
-					this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-				else {
-					driver := referenceLap[2]
-					lapTime := ((referenceLap[3] != "-") ? referenceLap[3] : false)
-					sectorTimes := referenceLap[4]
-				}
+				fileName := this.SelectedReferenceLap[true]
+
+				this.getLapInformation(referenceLap, fileName, &driver, &lapTime, &sectorTimes)
 
 				if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 					sectorTimes := false
 
-				fileName := this.SelectedReferenceLap[true]
-
-				if this.TelemetryCache.Has(this.SelectedLap[true])
+				if this.TelemetryCache.Has(fileName)
 					referenceTelemetry := this.TelemetryCache[fileName]
 				else {
-					referenceTelemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+					referenceTelemetry := analyzer.createTelemetry(false, fileName, driver, lapTime, sectorTimes)
 
 					this.TelemetryCache[fileName] := referenceTelemetry
 				}
@@ -2067,18 +2088,12 @@ class TelemetryViewer {
 				return lapTime
 		}
 
-		if isNumber(lap) {
-			this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+		this.getLapInformation(lap, false, &driver, &lapTime, &sectorTimes)
 
+		if isNumber(lap)
 			theLap := lap
-		}
-		else {
+		else
 			theLap := lap[1]
-
-			lapTime := lap[3]
-			driver := lap[2]
-			sectorTimes := lap[4]
-		}
 
 		if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 			sectorTimes := false
@@ -3711,18 +3726,12 @@ class TrackMap {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Scanning track..."), "...", "")), () {
 						local trackMap := this.TrackMap
+						local lap := this.TelemetryViewer.SelectedLap
 						local fileName := this.TelemetryViewer.SelectedLap[true]
 						local analyzer := TelemetryAnalyzer(this.Simulator, this.Track)
-						local lap := this.TelemetryViewer.SelectedLap
 						local driver, lapTime, sectorTimes, telemetry, index, section
 
-						if isNumber(lap)
-							this.TelemetryViewer.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-						else {
-							driver := lap[2]
-							lapTime := ((lap[3] != "-") ? lap[3] : false)
-							sectorTimes := lap[4]
-						}
+						this.TelemetryViewer.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes)
 
 						if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 							sectorTimes := false
@@ -3737,7 +3746,7 @@ class TrackMap {
 							if isDebug()
 								logMessage(kLogDebug, "Cache miss in TelemetryMap.createGui.autoSections...")
 
-							telemetry := analyzer.createTelemetry(0, fileName, driver, lapTime, sectorTimes)
+							telemetry := analyzer.createTelemetry(false, fileName, driver, lapTime, sectorTimes)
 						}
 
 						removeMultiMapValues(trackMap, "Sections")

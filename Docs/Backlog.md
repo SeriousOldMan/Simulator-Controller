@@ -23,7 +23,7 @@
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
-  3. Engineer's Diary with change history, lap times after change, notes and so on
+  3. Support notes and so on for the "Setup Workbench" diary
   4. Support for *Asseto Corsa EVO* setup files
   
 #### Strategy Workbench

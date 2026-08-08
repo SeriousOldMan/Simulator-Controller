@@ -274,7 +274,11 @@ class LMUSetupEditor extends FileSetupEditor {
 
 			if Application("Le Mans Ultimate", kSimulatorConfiguration).isRunning()
 				LMURESTProvider.GarageData().refreshSetups()
+
+			return true
 		}
+		else
+			return false
 	}
 }
 

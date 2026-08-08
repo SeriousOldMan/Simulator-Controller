@@ -202,7 +202,11 @@ class ACSetupEditor extends FileSetupEditor {
 			FileAppend(text, fileName)
 
 			this.Setup.FileName := fileName
+
+			return true
 		}
+		else
+			return false
 	}
 }
 

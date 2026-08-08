@@ -1,5 +1,4 @@
-﻿;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Setup Workbench                 ;;;
+﻿;;;   Modular Simulator Controller System - Setup Workbench                 ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
 ;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
@@ -117,6 +116,8 @@ class SetupWorkbench extends ConfigurationItem {
 	iSelectedCar := true
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
+
+	iDiary := false
 
 	iCharacteristics := []
 	iSettings := []
@@ -237,6 +238,12 @@ class SetupWorkbench extends ConfigurationItem {
 	SimulatorSettings {
 		Get {
 			return this.iSimulatorSettings
+		}
+	}
+
+	Diary {
+		Get {
+			return this.iDiary
 		}
 	}
 
@@ -379,7 +386,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
-		local definition, ignore, fileName
+		local definition, ignore, fileName, diaryFolder
 
 		if simulator {
 			this.iSelectedSimulator := SessionDatabase.getSimulatorName(simulator)
@@ -404,6 +411,11 @@ class SetupWorkbench extends ConfigurationItem {
 
 		super.__New(kSimulatorConfiguration)
 
+		diaryFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
+									  , "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
+
+		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . translate("Diary ") . A_Now . ".txt")
+
 		SetupWorkbench.Instance := this
 
 		OnExit((*) {
@@ -422,10 +434,14 @@ class SetupWorkbench extends ConfigurationItem {
 
 		chooseSimulator(*) {
 			workbench.loadSimulator((workbenchGui["simulatorDropDown"].Text = translate("Generic")) ? true : workbenchGui["simulatorDropDown"].Text)
+
+			workbench.logDiary("Selection")
 		}
 
 		chooseCar(*) {
 			workbench.loadCar((workbenchGui["carDropDown"].Text = translate("All")) ? true : workbenchGui["carDropDown"].Text)
+
+			workbench.logDiary("Selection")
 		}
 
 		chooseTrack(*) {
@@ -440,6 +456,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 				workbench.loadTrack(tracks[inList(trackNames, workbenchGui["trackDropDown"].Text)])
 			}
+
+			workbench.logDiary("Selection")
 		}
 
 		chooseWeather(*) {
@@ -685,6 +703,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.loadTrack(track, false)
 				this.loadWeather(weather, false)
 
+				this.logDiary("Selection")
+
 				characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
 
 				characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
@@ -722,6 +742,8 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 		else
 			this.loadSimulator(true, true)
+
+		this.logDiary("Selection")
 
 		return false
 	}
@@ -1403,6 +1425,108 @@ class SetupWorkbench extends ConfigurationItem {
 		this.iDefinition := this.iOriginalDefinition.Clone()
 	}
 
+	logDiary(type, arguments*) {
+		if this.Diary
+			switch type, false {
+				case "Selection":
+					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Selection")}) . "`n`n"
+							 . translate("Simulator:") . A_Space . this.SelectedSimulator[true] . "`n"
+							 . translate("Car:") . A_Space . this.SelectedCar[true] . "`n"
+							 . translate("Track:") . A_Space . this.SelectedTrack[true] . "`n`n", this.Diary, "UTF-16")
+				case "Characteristics":
+					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Characteristics")}) . "`n`n"
+							 . arguments[1] . "`n`n", this.Diary, "UTF-16")
+				case "Load":
+					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Load")}) . "`n`n"
+							 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n", this.Diary, "UTF-16")
+				case "Save":
+					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
+							 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
+							 . arguments[3] . "`n`n", this.Diary, "UTF-16")
+			}
+	}
+
+	logLoad(editor, setup) {
+		this.logDiary("Load", setup.Name, setup.FileName)
+	}
+
+	logSave(editor, setup) {
+		local categories := getMultiMapValues(this.Definition, "Workbench.Categories")
+		local categoriesLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		local settingsList := []
+		local ignore, setting, handler, unit, originalValue, modifiedValue, value
+		local candidate, settings
+
+		for ignore, setting in editor.getSettings() {
+			handler := editor.createSettingHandler(setting)
+
+			if handler {
+				unit := editor.getUnit(setting)
+
+				originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+				if (originalValue != modifiedValue) {
+					if (isNumber(originalValue) && isNumber(modifiedValue)) {
+						if (originalValue = modifiedValue) {
+							value := handler.formatValue(originalValue)
+
+							if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+								value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+
+							value := displayValue("Float", value)
+						}
+						else {
+							value := handler.formatValue(Abs(originalValue - modifiedValue))
+
+							if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+								originalValue := convertUnit("Pressure", convertUnit("Pressure", originalValue, unit, false))
+								modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit, false))
+								value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+							}
+
+							if (modifiedValue > originalValue)
+								value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+										. displayValue("Float", value) . translate(")"))
+							else
+								value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+										. displayValue("Float", value) . translate(")"))
+						}
+					}
+					else {
+						if (originalValue = modifiedValue)
+							value := originalValue
+						else
+							value := modifiedValue
+					}
+
+					category := ""
+
+					for candidate, settings in categories {
+						for ignore, cSetting in string2Values(";", settings)
+							if (InStr(setting, cSetting) == 1) {
+								category := candidate
+
+								break
+							}
+
+						if (category != "")
+							break
+					}
+
+					label := editor.getLabel(setting)
+
+					if inList(kPressureUnits, unit)
+						unit := getUnit("Pressure")
+
+					settingsList.Push(categoriesLabels[category] . translate(": ") . label . translate(" = ") . value . A_Space . translate(unit))
+				}
+			}
+		}
+
+		this.logDiary("Save", setup.Name, setup.FileName, values2String("`n", settingsList*))
+	}
+
 	loadSimulator(simulator, force := false) {
 		local simulators, settings
 
@@ -1653,7 +1777,9 @@ class SetupWorkbench extends ConfigurationItem {
 		if this.SetupEngineer
 			activateWindow(this.SetupEngineer.Window)
 		else {
-			this.iSetupEngineer := SetupEngineer(this, readMultiMap(kUserConfigDirectory . "Setup Workbench.ini"))
+			this.iSetupEngineer := SetupEngineer(this
+											   , readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
+											   , this.Diary)
 
 			this.SetupEngineer.show()
 		}
@@ -1918,6 +2044,7 @@ class SetupWorkbench extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local noIssue, ignore, characteristic, widgets, value1, value2, settings
 		local setting, delta
+		local characteristicLabels, ignore, characteristic, issues
 
 		this.Window.Block()
 
@@ -1925,6 +2052,11 @@ class SetupWorkbench extends ConfigurationItem {
 			noIssue := true
 
 			if knowledgeBase {
+				issues := []
+
+				characteristicLabels := toMap(getMultiMapValues(this.Definition
+															  , "Workbench.Characteristics.Labels"), LabelsMap)
+
 				for ignore, characteristic in this.SelectedCharacteristics {
 					noIssue := false
 
@@ -1935,6 +2067,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 					knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
+
+					issues.Push({Issue: characteristicLabels[characteristic]
+							   , Frequency: value1 . "%", Severity: value2 . "%"})
 				}
 
 				if !noIssue {
@@ -1944,6 +2079,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
+
+					this.logDiary("Characteristics", JSON.print(issues, "  "))
 				}
 			}
 
@@ -2738,7 +2875,8 @@ class SetupEditor extends ConfigurationItem {
 		}
 
 		saveModifiedSetup(*) {
-			editor.saveSetup()
+			if editor.saveSetup()
+				editor.Workbench.logSave(this, this.Setup)
 		}
 
 		editorGui := SetupEditor.EditorWindow(this)
@@ -3068,6 +3206,8 @@ class SetupEditor extends ConfigurationItem {
 
 			lastCategory := category
 		}
+
+		this.Workbench.logLoad(this, this.Setup)
 
 		this.updateState()
 	}
@@ -4217,10 +4357,12 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	__New(setupWorkbench, configuration) {
+	__New(setupWorkbench, configuration, diary := false) {
 		this.iWorkbench := setupWorkbench
 
 		super.__New(configuration)
+
+		this.iDiary := diary
 
 		this.loadInstructions(configuration)
 
@@ -4556,7 +4698,8 @@ class SetupEngineer extends ConfigurationItem {
 		local service := this.Options["Setup Engineer.Service"]
 		local ignore, instruction
 
-		this.iDiary := (normalizeDirectoryPath(this.Options["Setup Workbench.Diary"]) . "\" . translate("Diary ") . A_Now . ".txt")
+		if !this.Diary
+			this.iDiary := (normalizeDirectoryPath(this.Options["Setup Workbench.Diary"]) . "\" . translate("Diary ") . A_Now . ".txt")
 
 		if service {
 			service := string2Values("|", service, 3)
@@ -4917,7 +5060,10 @@ class SetupEngineer extends ConfigurationItem {
 		if answer {
 			if this.Diary
 				try {
-					FileAppend(translate("-- Analysis --------") . "`n`n" . translate("Lap:") . A_Space . telemetry.Name . "`n`n" . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n" . answer . "`n`n", this.Diary, "UTF-16")
+					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Analysis")}) . "`n`n"
+							 . translate("Lap:") . A_Space . telemetry.Name . "`n`n"
+							 . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n"
+							 . answer . "`n`n", this.Diary, "UTF-16")
 				}
 				catch Any as exception {
 					logError(exception)
@@ -4955,8 +5101,9 @@ class SetupEngineer extends ConfigurationItem {
 
 				if this.Diary
 					try {
-						FileAppend(translate("-- Recommendations --------") . "`n`n"
-								 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
+						FileAppend(substituteVariables(translate("-- %header% --------")
+													 , {header: translate("Recommendations")}) . "`n`n"
+							 	 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
 					}
 					catch Any as exception {
 						logError(exception, true)
@@ -5745,7 +5892,7 @@ startupSetupWorkbench() {
 
 		workbench.show()
 
-		if !GetKeyState("Ctrl")
+		if !GetKeyState("Ctrl") {
 			if simulator {
 				workbench.Window.Block()
 
@@ -5767,6 +5914,9 @@ startupSetupWorkbench() {
 			}
 			else
 				workbench.loadSimulator(true, true)
+
+			workbench.logDiary("Selection")
+		}
 		else
 			Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
 

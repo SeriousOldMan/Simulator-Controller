@@ -5377,8 +5377,13 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VdiaryPathEdit")
 		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseDiaryPath)
 
+		editorGui.SetFont("Norm", "Arial")
+		editorGui.SetFont("Bold Italic", "Arial")
+		editorGui.Add("Text", "x8 yp+35 w468 h23 Center", translate("Setup Engineer"))
+		editorGui.SetFont("Norm", "Arial")
+
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w100 h23", translate("Service "))
+		editorGui.Add("Text", "x" . (x + 8) . " yp+19 w100 h23", translate("Service "))
 		editorGui.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 

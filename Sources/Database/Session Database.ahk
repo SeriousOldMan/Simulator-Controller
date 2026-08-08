@@ -7050,7 +7050,7 @@ lapTimeDisplayValue(lapTime) {
 	local seconds, fraction, minutes
 
 	if ((lapTime = "-") || isNull(lapTime))
-		return translate("-")
+		return "-"
 	else {
 		if isNumber(lapTime)
 			return displayValue("Time", lapTime)

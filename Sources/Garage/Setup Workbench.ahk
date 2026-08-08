@@ -1443,6 +1443,11 @@ class SetupWorkbench extends ConfigurationItem {
 					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
 							 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
 							 . arguments[3] . "`n`n", this.Diary, "UTF-16")
+				case "Lap":
+					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Lap")}) . "`n`n"
+							 . translate("Name:") . A_Space . arguments[1] . "`n"
+							 . translate("Lap Time:") . A_Space . arguments[2] . "`n"
+							 . translate("Sector Times:") . A_Space . arguments[3] . "`n`n", this.Diary, "UTF-16")
 			}
 	}
 
@@ -1525,6 +1530,10 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 
 		this.logDiary("Save", setup.Name, setup.FileName, values2String("`n", settingsList*))
+	}
+
+	logLap(name, lapTime, sectorTimes) {
+		this.logDiary("Lap", name, lapTime, sectorTimes ? values2String(", ", sectorTimes*) : translate("-"))
 	}
 
 	loadSimulator(simulator, force := false) {
@@ -1757,6 +1766,8 @@ class SetupWorkbench extends ConfigurationItem {
 				hasTask := true
 
 				PeriodicTask(startupCollector, 2000, kLowPriority).start()
+
+				PeriodicTask(() => this.updateTelemetries(), 5000, kLowPriority).start()
 			}
 		}
 	}
@@ -1771,6 +1782,53 @@ class SetupWorkbench extends ConfigurationItem {
 
 	closedTelemetryViewer() {
 		this.iTelemetryViewer := false
+	}
+
+	updateTelemetries() {
+		local simulator := this.SelectedSimulator[false]
+		local track := this.SelectedTrack[false]
+		local telemetries := []
+		local name, info, lapTime, sectorTimes
+
+		static lastActiveSimulator := false
+		static lastActiveTrack := false
+		static lastTelemetries := []
+
+		if (simulator && (simulator != true) && track && ((simulator != lastSimulator) || (track != lastTrack)))
+			lastTelemetries := []
+
+		lastActiveSimulator := simulator
+		lastActiveTrack := track
+
+		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F"
+			telemetries.Push(A_LoopFileFullPath)
+
+		do(telemetries, (fileName) {
+			if !inList(lastTelemetries, fileName) {
+				lastTelemetries.Push(fileName)
+
+				if FileExist(fileName . ".info") {
+					info := readMultiMap(fileName . ".info")
+
+					lapTime := getMultiMapValue(info, "Lap", "LapTime"
+												, getMultiMapValue(info, "Info", "LapTime", false))
+					sectorTimes := getMultiMapValue(info, "Lap", "SectorTimes"
+														, getMultiMapValue(info, "Info", "SectorTimes", false))
+
+					if sectorTimes
+						sectorTimes := string2Values(",", sectorTimes)
+					else
+						sectorTimes := ["-"]
+
+					if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+						sectorTimes := false
+
+					SplitPath(filName, , , , &name)
+
+					this.logLap(name, lapTimeDisplayValue(lapTime), sectorTimes)
+				}
+			}
+		})
 	}
 
 	openSetupEngineer() {
@@ -3090,7 +3148,7 @@ class SetupEditor extends ConfigurationItem {
 		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Clicks"))
 	}
 
-	loadSetup(&setup := false) {
+	loadSetup(&setup := false, log := true) {
 		local categories, categoriesLabels
 		local ignore, setting, handler, modifiedValue, originalValue, unit, value, category, candidate, settings
 		local cSetting, label, lastCategory
@@ -3207,7 +3265,8 @@ class SetupEditor extends ConfigurationItem {
 			lastCategory := category
 		}
 
-		this.Workbench.logLoad(this, this.Setup)
+		if log
+			this.Workbench.logLoad(this, this.Setup)
 
 		this.updateState()
 	}
@@ -3326,7 +3385,7 @@ class SetupEditor extends ConfigurationItem {
 
 		this.Setup.reset()
 
-		this.loadSetup(&setup)
+		this.loadSetup(&setup, false)
 	}
 
 	updateSetting(setting, newValue) {
@@ -4480,6 +4539,8 @@ class SetupEngineer extends ConfigurationItem {
 		if this.iUpdateTask
 			this.iUpdateTask.stop()
 
+		this.stopInteraction()
+
 		if this.Workbench
 			this.Workbench.closedSetupEngineer()
 
@@ -4755,6 +4816,14 @@ class SetupEngineer extends ConfigurationItem {
 			this.connectorState("Error", "Configuration")
 
 			return false
+		}
+	}
+
+	stopInteraction() {
+		if this.Connector {
+			this.Connector.Disconnect()
+
+			this.iConnector := false
 		}
 	}
 

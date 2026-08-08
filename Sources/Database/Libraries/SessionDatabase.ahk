@@ -1808,8 +1808,8 @@ class SessionDatabase extends ConfigurationItem {
 
 		simulator := this.getSimulatorCode(simulator)
 
-		invertX := inList(["LMU", "RF2"], simulator)
-		invertY := inList(["LMU", "RF2", "R3E", "AMS2"], simulator)
+		invertX := inList(["LMU", "RF2", "AMS2", "PCARS2"], simulator)
+		invertY := inList(["LMU", "RF2", "R3E", "AMS2", "PCARS2"], simulator)
 
 		if (invertX || invertY) {
 			loop Read, fileName {

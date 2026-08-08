@@ -170,6 +170,8 @@ class TelemetryCollector {
 
 				this.LoadedLaps[lap] := lap
 
+				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
+					
 				return importFileName
 			}
 			catch Any as exception {
@@ -206,6 +208,8 @@ class TelemetryCollector {
 				while (ProcessExist(pid) && (count++ < 100))
 					Sleep(100)
 
+				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
+					
 				return importFileName
 			}
 			catch Any as exception {

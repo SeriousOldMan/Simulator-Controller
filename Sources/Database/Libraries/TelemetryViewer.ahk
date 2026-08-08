@@ -1213,7 +1213,7 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		if this.iAnalyze {
+		if this.Analyze {
 			viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton").OnEvent("Click", openSuspensionInspector)
 			setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
 		}
@@ -1341,11 +1341,14 @@ class TelemetryViewer {
 				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
 			}
 
-			this.Control["suspensionButton"].Enabled := true
+			if this.Analyze
+				this.Control["suspensionButton"].Enabled := true
 		}
 		else {
 			this.Control["saveButton"].Enabled := false
-			this.Control["suspensionButton"].Enabled := true
+
+			if this.Analyze
+				this.Control["suspensionButton"].Enabled := true
 		}
 
 		if this.SelectedReferenceLap {

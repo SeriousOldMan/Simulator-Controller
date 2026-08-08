@@ -7,6 +7,8 @@ static class Program
     static StreamWriter outStream = null;
 
     static float lastRunning = -1;
+	
+	static string simulator = "Unknown";
 
     static float running = 0.0f;
     static float speed = 0.0f;
@@ -97,6 +99,10 @@ static class Program
                     case "Sector3TimeSeconds":
                         reader.Read();
                         sector3Time = float.Parse(reader.Value.ToString());
+                        break;
+                    case "Simulator":
+                        reader.Read();
+                        simulator = reader.Value.ToString();
                         break;
                 }
 
@@ -225,8 +231,16 @@ static class Program
             outStream.Write(abs + ";");
             outStream.Write(longG + ";");
             outStream.Write(latG + ";");
-            outStream.Write(posX + ";");
-            outStream.Write(posY + ";");
+			
+			if ((simulator == "LM Ultimate") || (simulator == "rFactor 2")) {
+				outStream.Write(- posX + ";");
+				outStream.Write(- posY + ";");
+			}
+			else {
+				outStream.Write(posX + ";");
+				outStream.Write(posY + ";");
+			}
+			
             outStream.Write(time + ";");
 
             if (flSuspDefl >= 0)

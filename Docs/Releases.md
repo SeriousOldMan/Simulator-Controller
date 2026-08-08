@@ -30,6 +30,7 @@
 #### Fixes
 
   - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
+  - Fixed the coordinate system transformation for the Second Monitor connector. Telemetry files acquired from Second Monitor will now be compatible with all position related functions.
   
 #### Changes
 

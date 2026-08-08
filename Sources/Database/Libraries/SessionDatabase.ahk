@@ -1802,6 +1802,30 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	static normalizeTelemetry(simulator, fileName) {
+		local invertX := inList(["LMU", "RF2"], this.getSimulatorCode(simulator))
+		local invertY := inList(["LMU", "RF2", "R3E", "AMS2"], this.getSimulatorCode(simulator))
+		local newData := ""
+
+		if (invertX || invertY) {
+			loop Read, fileName {
+				data := string2Values(";", A_LoopReadLine)
+
+				if invertX
+					data[12] := - data[12]
+
+				if invertY
+					data[13] := - data[13]
+
+				newData .= (values2String(";", data*) . "`n")
+			}
+
+			deleteFile(fileName)
+
+			FileAppend(newData, fileName)
+		}
+	}
+
 	importTelemetry(simulator, car, track, fileName, &info, verbose := true) {
 		local running := 0
 		local name, infoFileName, motecFile
@@ -1824,6 +1848,8 @@ class SessionDatabase extends ConfigurationItem {
 				*/
 
 				if FileExist(importFileName) {
+					SessionDatabase.normalizeTelemetry(simulator, importFileName)
+
 					info := (importFileName . ".info")
 
 					return importFileName

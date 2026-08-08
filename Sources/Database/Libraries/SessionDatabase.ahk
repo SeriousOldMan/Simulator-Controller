@@ -1803,9 +1803,13 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	static normalizeTelemetry(simulator, fileName) {
-		local invertX := inList(["LMU", "RF2"], this.getSimulatorCode(simulator))
-		local invertY := inList(["LMU", "RF2", "R3E", "AMS2"], this.getSimulatorCode(simulator))
 		local newData := ""
+		local invertX, invertY
+
+		simulator := this.getSimulatorCode(simulator)
+
+		invertX := inList(["LMU", "RF2"], simulator)
+		invertY := inList(["LMU", "RF2", "R3E", "AMS2"], simulator)
 
 		if (invertX || invertY) {
 			loop Read, fileName {
@@ -2098,6 +2102,9 @@ class SessionDatabase extends ConfigurationItem {
 						}
 
 						FileAppend(values2String(";", line*) . "`n", importFileName)
+
+						if !iRacing
+							SessionDatabase.normalizeTelemetry(simulator, importFileName)
 					}
 				}
 

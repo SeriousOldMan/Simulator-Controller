@@ -231,16 +231,8 @@ static class Program
             outStream.Write(abs + ";");
             outStream.Write(longG + ";");
             outStream.Write(latG + ";");
-			
-			if ((simulator == "LM Ultimate") || (simulator == "rFactor 2")) {
-				outStream.Write(- posX + ";");
-				outStream.Write(- posY + ";");
-			}
-			else {
-				outStream.Write(posX + ";");
-				outStream.Write(posY + ";");
-			}
-			
+			outStream.Write(posX + ";");
+			outStream.Write(posY + ";");
             outStream.Write(time + ";");
 
             if (flSuspDefl >= 0)

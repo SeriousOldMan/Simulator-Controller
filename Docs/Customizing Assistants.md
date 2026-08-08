@@ -374,11 +374,11 @@ IMPORTANT: When action handling is enabled, it might be necessary to disable the
 
 The following short conversations demonstrate the potential of the *Conversation* booster with both the Engineer and the Strategist.
 
-[Conversation with Engineer](https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/Docs/Conversation_with_the_Engineer.mp3)
+[Conversation with Engineer](http://simulator-controller.selfhost.co/Attachments/Conversation_with_the_Engineer.mp3)
 
-[Conversation with Strategist 1](https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/Docs/Conversation_with_the_Strategist_1.mp3)
+[Conversation with Strategist 1](http://simulator-controller.selfhost.co/Attachments/Conversation_with_the_Strategist_1.mp3)
 
-[Conversation with Strategist 2](https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/Docs/Conversation_with_the_Strategist_2.mp3)
+[Conversation with Strategist 2](http://simulator-controller.selfhost.co/Attachments/Conversation_with_the_Strategist_2.mp3)
 
 ### Reasoning Booster
 

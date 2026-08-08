@@ -269,7 +269,7 @@ Once you have choosen your settings, click on the button with the engineer icon.
 
 The structure, content and quality of the review strongly depends on the configured LLM, so it will need several runs at the beginning until you get good results. As mentioned above, don't waste your time with small or outdated models.
 
-[Here](https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/Docs/Telemetry%20Analysis.html) is an example of a high quality analysis created with GPT 5.5.
+[Here](http://simulator-controller.selfhost.co/Attachments/Telemetry%20Analysis.html) is an example of a high quality analysis created with GPT 5.5.
 
 #### Applying recommendations
 

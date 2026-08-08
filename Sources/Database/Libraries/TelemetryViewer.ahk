@@ -1330,7 +1330,7 @@ class TelemetryViewer {
 		else
 			this.Control["deleteButton"].Enabled := false
 
-		this.Manager.getSessionInformation(&simulator, &car, &track)
+		this.getSessionInformation(&simulator, &car, &track)
 
 		if (this.SelectedLap && car && track) {
 			if isNumber(this.SelectedLap)
@@ -1360,12 +1360,16 @@ class TelemetryViewer {
 		this.Control["trackButton"].Enabled := sessionDB.hasTrackMap(simulator, track)
 	}
 
+	getSessionInformation(&simulator, &car, &track) {
+		this.Manager.getSessionInformation(&simulator, &car, &track)
+	}
+
 	getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
 		local info
 
-		if !isNumber(lap) {
+		if isObject(lap) {
 			driver := lap[2]
-			lapTime := ((lap[3] != "-") ? lap[3] : false)
+			lapTime := ((lap[3] != translate("-")) ? lap[3] : false)
 			sectorTimes := lap[4]
 		}
 		else if (!this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
@@ -1379,6 +1383,9 @@ class TelemetryViewer {
 											, getMultiMapValue(info, "Info", "LapTime", false))
 			sectorTimes := getMultiMapValue(info, "Lap", "SectorTimes"
 												, getMultiMapValue(info, "Info", "SectorTimes", false))
+
+			if sectorTimes
+				sectorTimes := string2Values(",", sectorTimes)
 		}
 
 		if !driver
@@ -1484,7 +1491,7 @@ class TelemetryViewer {
 		if this.SuspensionInspector
 			activateWindow(this.SuspensionInspector.Window)
 		else {
-			this.Manager.getSessionInformation(&simulator, &car, &track)
+			this.getSessionInformation(&simulator, &car, &track)
 
 			this.iSuspensionInspector := SuspensionInspector(this, simulator, car, track)
 
@@ -1510,7 +1517,7 @@ class TelemetryViewer {
 		if this.TrackMap
 			activateWindow(this.TrackMap.Window)
 		else {
-			this.Manager.getSessionInformation(&simulator, &car, &track)
+			this.getSessionInformation(&simulator, &car, &track)
 
 			this.iTrackMap := TrackMap(simulator, track, this)
 
@@ -1563,7 +1570,7 @@ class TelemetryViewer {
 		}
 
 		if this.TrackMap {
-			this.Manager.getSessionInformation(&simulator, &car, &track)
+			this.getSessionInformation(&simulator, &car, &track)
 
 			if SessionDatabase().hasTrackMap(simulator, track)
 				this.TrackMap.updateTrackMap(simulator, track)
@@ -1743,7 +1750,7 @@ class TelemetryViewer {
 				return false
 		}
 
-		this.Manager.getSessionInformation(&simulator, &car, &track)
+		this.getSessionInformation(&simulator, &car, &track)
 
 		if !fileName {
 			this.Window.Opt("+OwnDialogs")
@@ -1778,7 +1785,7 @@ class TelemetryViewer {
 		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver, lapTime, sectorTimes
 		local dbFileName
 
-		this.Manager.getSessionInformation(&simulator, &car, &track)
+		this.getSessionInformation(&simulator, &car, &track)
 
 		if !lap {
 			lap := this.SelectedLap
@@ -2007,7 +2014,7 @@ class TelemetryViewer {
 		local simulator, car, track, analyzer, telemetry, section, referenceLap, driver, lapTime, sectorTimes
 
 		try {
-			this.Manager.getSessionInformation(&simulator, &car, &track)
+			this.getSessionInformation(&simulator, &car, &track)
 
 			analyzer := TelemetryAnalyzer(simulator, track)
 

@@ -312,7 +312,7 @@ Example: "Jona, can you plan a pitstop?"
 
 This activates Jona, the Race Engineer, and immediately asks Jona to plan a pitstop.
 
-[Listen to a conversation](https://raw.githubusercontent.com/SeriousOldMan/Simulator-Controller/refs/heads/main/Docs/Activation_and_Command.mp3)
+[Listen to a conversation](http://simulator-controller.selfhost.co/Attachments/Activation_and_Command.mp3)
 
 ###### Notes
 

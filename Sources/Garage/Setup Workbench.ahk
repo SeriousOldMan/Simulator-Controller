@@ -4591,21 +4591,30 @@ class SetupEngineer extends ConfigurationItem {
 				if FileExist(fileName . ".info") {
 					info := readMultiMap(fileName . ".info")
 
-					lapTime := getMultiMapValue(info, "Lap", "LapTime", translate("-"))
+					lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
 
-					if getMultiMapValue(info, "Telemetry", "Driver", false)
-						driver := SessionDatabase.getDriverName(this.Simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-					else
-						driver := false
+					driver := getMultiMapValue(info, "Lap", "Driver", false)
 
 					if !driver
-						driver := getMultiMapValue(info, "Telemetry", "Driver")
+						if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+							driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+
+							if driver
+								driver := SessionDatabase.getDriverName(this.Simulator, driver)
+							else
+								driver := getMultiMapValue(info, "Info", "Driver", false)
+						}
 
 					if !driver
 						driver := SessionDatabase.getName("Creator")
 
-					date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-						   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+					try {
+						date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+							   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+					}
+					catch Any {
+						date := translate("-")
+					}
 				}
 				else {
 					info := false

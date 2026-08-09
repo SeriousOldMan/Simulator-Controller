@@ -257,8 +257,8 @@ Below you find all instruction categories and the supported variables:
 |             | %wheelbase%       | Wheelbase of the car.                                                      |
 | Handling    | Scope             | This instruction is used only when you have decided to supply the identified handling issues beside the telemetry data to the LLM. |
 |             | %handling%        | This variable is substituted with a JSON representation of the issues. |
-| Analyse     | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data. |
-| Optimize    | Scope             | Once an analysis has been created, this instruction tells the LLM how to use a supplied function/tool to apply the recommended setup changes to a setup file. |
+| Analysis    | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data. |
+| Recommenations | Scope          | Once an analysis has been created, this instruction tells the LLM how to use a supplied function/tool to apply the recommended setup changes to a setup file. |
 
 #### Acquiring telemetry data
 

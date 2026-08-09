@@ -471,6 +471,10 @@ class SetupWorkbench extends ConfigurationItem {
 			workbench.editSetup()
 		}
 
+		editDiary(*) {
+			Run("Notepad.exe `"" . this.Diary . "`"")
+		}
+
 		loadIssues(*) {
 			local fileName
 
@@ -598,7 +602,11 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Assistant.ico"))
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
-		button := workbenchGui.Add("Button", "x1172 yp+6 w23 h23 X:Move")
+		button := workbenchGui.Add("Button", "x1148 yp+6 w23 h23 X:Move")
+		button.OnEvent("Click", editDiary)
+		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L2 T2 R2 B2")
+
+		button := workbenchGui.Add("Button", "x1172 yp w23 h23 X:Move")
 		button.OnEvent("Click", (*) => this.editSettings())
 		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
 
@@ -1790,15 +1798,15 @@ class SetupWorkbench extends ConfigurationItem {
 		local telemetries := []
 		local name, info, lapTime, sectorTimes
 
-		static lastActiveSimulator := false
-		static lastActiveTrack := false
+		static lastSimulator := false
+		static lastTrack := false
 		static lastTelemetries := []
 
 		if (simulator && (simulator != true) && track && ((simulator != lastSimulator) || (track != lastTrack)))
 			lastTelemetries := []
 
-		lastActiveSimulator := simulator
-		lastActiveTrack := track
+		lastSimulator := simulator
+		lastTrack := track
 
 		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F"
 			telemetries.Push(A_LoopFileFullPath)
@@ -1823,7 +1831,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
 						sectorTimes := false
 
-					SplitPath(filName, , , , &name)
+					SplitPath(fileName, , , , &name)
 
 					this.logLap(name, lapTimeDisplayValue(lapTime), sectorTimes)
 				}
@@ -2126,8 +2134,8 @@ class SetupWorkbench extends ConfigurationItem {
 					knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
 
-					issues.Push({Issue: characteristicLabels[characteristic]
-							   , Frequency: value1 . "%", Severity: value2 . "%"})
+					issues.Push(characteristicLabels[characteristic] . translate(" -> ")
+							  . value1 . translate("%") . translate(" / ") . value2 . translate("%"))
 				}
 
 				if !noIssue {
@@ -2138,7 +2146,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
 
-					this.logDiary("Characteristics", JSON.print(issues, "  "))
+					this.logDiary("Characteristics", values2String("`n", issues*))
 				}
 			}
 

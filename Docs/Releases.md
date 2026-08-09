@@ -37,7 +37,7 @@
   - The "Setup Workbench" offers a new tool. Using a GPT provider and a high end LLM, an integrated *Setup Engineer* can analyze complete telemetry data and create a detailed analysis and recommendations for setup changes based on this. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) for more information and instructions.
   
     The idea of ​​the *Setup Engineer* had been on my mind for a long time, but it was only recently that LLMs became powerful enough to handle the vast amounts of data and mathematical calculations required for a robust analysis of telemetry data. The catch, however, is that you need one of the latest state-of-the-art models from providers like OpenAI, Anthropic, or Google — and those aren't exactly cheap. But the results are worth it, I promise.
-  - A diary (log file) has been implemented for the "Setup Workbench". The diary folder can be configured in the settings of the "Setup Workbench".
+  - A diary (log file) has been implemented for the "Setup Workbench". The diary folder can be [configured in the settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#settings) of the "Setup Workbench".
 
 # Release history
 

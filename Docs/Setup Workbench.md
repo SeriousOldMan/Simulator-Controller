@@ -239,7 +239,7 @@ The fourth tool available to detect and mitigate car setup issues is the so-call
 
 Please note that a high end LLM is required for the Setup Engineer. It must be capable to work with huge amounts of nuerical data, must be able to do thousands of numerical calculations and must be able to follow several related goals at the same time. At the time of this writing, only models in the category of OpenAIs GPT 5.4 (not mini or nano) and beyond show good results. Of course, using models of this category is not cheap - one run of the Setup Engineer with GPT 5.4 costs around 20-30 cent.
 
-And also similar to the Driving Coach, you can modify the special instructions send to the LLM together with the telemetry data:
+And also similar to the Driving Coach, you can modify the special instructions send to the LLM together with the telemetry data. However, the default instructions are well-balanced, so a modification is normally not ncessary.
 
 Below you find all instruction categories and the supported variables:
 

@@ -35,7 +35,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 7.2.0
 
-Nothing to do.
+Everything handled automatically.
 
 ## Release 7.1.5
 

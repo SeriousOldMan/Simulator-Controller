@@ -1,8 +1,8 @@
 [Development]
 Version=7.2.0.0-dev
 Target=7.2.0.0-release
-Date=08/08/26
-Download=
+Date=08/09/26
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/uchfVZcz/Releases/Simulator%20Controller%207.2.0.0-dev.zip
 Changes=Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
@@ -22,7 +22,7 @@ Utilities.7.0.3.Path=.
 Utilities.7.0.3.Content=Utilities
 Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/W5yabNda/Components/Utilities%207.0.3.zip;https://www.dropbox.com/scl/fi/4vhkcdoc8pjwvwx3bo6xw/Utilities-7.0.3.zip?rlkey=rsonyko3vm8574cn8q8th2ktx&st=yivkyizz&dl=1;http://%master%/Components/Utilities 7.0.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+7.0.3.zip
 [Current]
-Type=Release
+Type=Development
 [Version]
 Development=7.2.0.0-dev
 Release=7.1.5.0-release

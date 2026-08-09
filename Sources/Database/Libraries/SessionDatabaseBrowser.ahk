@@ -203,7 +203,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						if info {
 							driverName := getMultiMapValue(info, "Lap", "Driver", false)
 
-							if !dri+verName
+							if !driverName
 								if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
 									driver := getMultiMapValue(info, "Telemetry", "Driver", false)
 

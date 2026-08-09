@@ -201,23 +201,33 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						info := sessionDB.readTelemetryInfo(simulator, car, track, name)
 
 						if info {
-							if getMultiMapValue(info, "Telemetry", "Driver", false)
-								driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-							else
-								driverName := false
+							driverName := getMultiMapValue(info, "Lap", "Driver", false)
+
+							if !dri+verName
+								if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+									driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+
+									if driver
+										driverName := SessionDatabase.getDriverName(simulator, driver)
+									else
+										driverName := getMultiMapValue(info, "Info", "Driver", false)
+								}
 
 							lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
-							date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-								   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+
+							try {
+								date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+									   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+							}
+							catch Any {
+								date := translate("-")
+							}
 						}
 						else {
 							driverName := false
 							lapTime := translate("-")
 							date := translate("-")
 						}
-
-						if !driverName
-							driverName := getMultiMapValue(info, "Telemetry", "Driver")
 
 						if !driverName
 							driverName := SessionDatabase.getName("Creator")

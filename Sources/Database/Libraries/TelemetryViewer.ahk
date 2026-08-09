@@ -1641,7 +1641,7 @@ class TelemetryViewer {
 			local theLapTime := false
 			local theSectorTimes := false
 			local telemetry := false
-			local name, directory, dataFile, file, size, lap
+			local name, directory, dataFile, file, size, lap, tDriver
 
 			DirCreate(this.TelemetryDirectory . "Imported")
 
@@ -1673,6 +1673,13 @@ class TelemetryViewer {
 				}
 
 				writeMultiMap(fileName . ".info", info)
+			}
+			else {
+				SplitPath(fileName, , , , &name)
+
+				FileCopy(fileName, this.TelemetryDirectory . "Imported\" . name . ".telemetry", 1)
+
+				fileName := (this.TelemetryDirectory . "Imported\" . name . ".telemetry")
 			}
 
 			if (fileName && (fileName != "")) {
@@ -1733,12 +1740,14 @@ class TelemetryViewer {
 						theSectorTimes := false
 				}
 
-				if info
-					lap := [name, theDriver ? theDriver
-											: SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+				if info {
+					tDriver := getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false))
+					
+					lap := [name, theDriver ? theDriver : SessionDatabase.getDriverName(simulator, tDriver)
 						  , theLapTime ? theLapTime : "-"
 						  , theSectorTimes ? theSectorTimes : []
 						  , telemetry]
+				}
 				else
 					lap := [name, theDriver ? theDriver : "John Doe (JD)"
 						  , theLapTime ? theLapTime : "-"

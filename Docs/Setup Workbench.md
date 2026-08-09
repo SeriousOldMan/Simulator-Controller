@@ -264,7 +264,7 @@ Below you find all instruction categories and the supported variables:
 
 The Setup Engineer works on numerical telemetry data. Therefore it is necessary to run a few laps and collect telemetry data using the integrated telemetry system (see above). You must have choosen a specific car and also a specific track before using the Setup Engineer and the recorded telemetry data must originate from this combination, of course. Otherwise the results would be more tha questionable.
 
-Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database.
+Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database. Telemetry files from other locations than the session database may not be detected correctly or will lack information like the lap time.
 
 #### Creating a lap analysis
 

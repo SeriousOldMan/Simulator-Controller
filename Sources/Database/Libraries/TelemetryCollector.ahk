@@ -159,7 +159,7 @@ class TelemetryCollector {
 
 				FileAppend(text, inputFileName)
 
-				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . inputFileName . "`" `"" . importFileName . "`"", , "Hide", &pid)
+				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . inputFileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
 
 				Sleep(500)
 
@@ -171,7 +171,7 @@ class TelemetryCollector {
 				this.LoadedLaps[lap] := lap
 
 				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
-					
+
 				return importFileName
 			}
 			catch Any as exception {
@@ -209,7 +209,7 @@ class TelemetryCollector {
 					Sleep(100)
 
 				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
-					
+
 				return importFileName
 			}
 			catch Any as exception {

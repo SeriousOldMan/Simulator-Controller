@@ -244,7 +244,7 @@ static class Program
                 outStream.WriteLine((invertedDefl ? -rrSuspDefl : rrSuspDefl));
             }
             else
-                outStream.Write("null"); // yawRate
+                outStream.WriteLine("null"); // yawRate
 
             lastRunning = running;
         }

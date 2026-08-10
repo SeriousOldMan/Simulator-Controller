@@ -638,7 +638,7 @@ class TelemetryViewer {
 
 	iCollect := false
 	iSynchronize := false
-	iAnalyze := false
+	iSuspension := false
 
 	iSynchronizeTask := false
 
@@ -869,9 +869,9 @@ class TelemetryViewer {
 		}
 	}
 
-	Analyze {
+	Suspension {
 		Get {
-			return this.iAnalyze
+			return this.iSuspension
 		}
 	}
 
@@ -915,13 +915,13 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, synchronize := true, collect := true, analyze := false) {
+	__New(manager, directory, synchronize := true, collect := true, suspension := false) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iSynchronize := synchronize
 		this.iCollect := collect
-		this.iAnalyze := analyze
+		this.iSuspension := suspension
 
 		this.loadLayouts()
 	}
@@ -1213,7 +1213,7 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		if this.Analyze {
+		if this.Suspension {
 			viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton").OnEvent("Click", openSuspensionInspector)
 			setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
 		}
@@ -1341,13 +1341,13 @@ class TelemetryViewer {
 				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
 			}
 
-			if this.Analyze
+			if this.Suspension
 				this.Control["suspensionButton"].Enabled := true
 		}
 		else {
 			this.Control["saveButton"].Enabled := false
 
-			if this.Analyze
+			if this.Suspension
 				this.Control["suspensionButton"].Enabled := true
 		}
 
@@ -1742,7 +1742,7 @@ class TelemetryViewer {
 
 				if info {
 					tDriver := getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false))
-					
+
 					lap := [name, theDriver ? theDriver : SessionDatabase.getDriverName(simulator, tDriver)
 						  , theLapTime ? theLapTime : "-"
 						  , theSectorTimes ? theSectorTimes : []

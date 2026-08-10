@@ -202,7 +202,7 @@ static class Program
                     case "lapTimeSeconds":
                         reader.Read();
                         time = (int)Math.Round(float.Parse(reader.Value.ToString()) * 1000);
-						altLapTime = time;
+						altLapTime = Math.Max(time, altLapTime);
                         break;
                     case "lapDistance":
                         reader.Read();
@@ -656,16 +656,26 @@ static class Program
             outStream.WriteLine("[Info]");
             outStream.WriteLine("Source=Second Monitor");
             outStream.Write("Driver="); outStream.WriteLine(driver);
-            outStream.Write("Lap="); outStream.WriteLine(lapNumber);
-			
-			if (lapTime != 0)
-				outStream.Write("LapTime="); outStream.WriteLine(lapTime);
-			else if (altLapTime != 0)
-				outStream.Write("LapTime="); outStream.WriteLine(altLapTime / 1000.0f);
-			
-			if (sector1Time != 0 || sector2Time != 0 || sector2Time != 0)
-				outStream.Write("SectorTimes="); outStream.Write(sector1Time); outStream.Write(",");
-												 outStream.Write(sector2Time); outStream.Write(","); outStream.WriteLine(sector3Time);
+
+            if (lapNumber != 0)
+            {
+                outStream.Write("Lap="); outStream.WriteLine(lapNumber);
+            }
+
+            if (lapTime != 0)
+            {
+                outStream.Write("LapTime="); outStream.WriteLine(lapTime);
+            }
+            else if (altLapTime != 0)
+            {
+                outStream.Write("LapTime="); outStream.WriteLine(altLapTime / 1000.0f);
+            }
+
+            if (sector1Time != 0 || sector2Time != 0 || sector2Time != 0)
+            {
+                outStream.Write("SectorTimes="); outStream.Write(sector1Time); outStream.Write(",");
+                                                 outStream.Write(sector2Time); outStream.Write(","); outStream.WriteLine(sector3Time);
+            }
 
             outStream.Close();
         }

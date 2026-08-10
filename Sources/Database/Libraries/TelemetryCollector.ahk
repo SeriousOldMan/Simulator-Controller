@@ -140,7 +140,7 @@ class TelemetryCollector {
 		}
 
 		loadLap(lap) {
-			local inputFileName, importFileName, text, pid
+			local inputFileName, importFileName, text, pid, info
 
 			lap := Integer(lap)
 
@@ -171,6 +171,12 @@ class TelemetryCollector {
 				this.LoadedLaps[lap] := lap
 
 				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
+
+				info := readMultiMap(importFileName . ".info")
+
+				setMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Driver"))
+
+				writeMultiMap(importFileName . ".info", info)
 
 				return importFileName
 			}

@@ -641,7 +641,7 @@ class SessionDatabase extends ConfigurationItem {
 			return name
 		else if defaultForname
 			return driverName(defaultForname, defaultSurname, defaultNickname
-									, (defaultSurname != ""), (defaultNickname != ""))
+							, (defaultSurname != ""), (defaultNickname != ""))
 		else
 			return this.getUserName()
 	}

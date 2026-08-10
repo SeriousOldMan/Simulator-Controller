@@ -1775,6 +1775,16 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV720() {
+	local dbConfig := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+
+	removeMultiMapValue(dbConfig, "Database", "Version")
+
+	writeMultiMap(kUserConfigDirectory . "Session Database.ini", dbConfig)
+
+	deleteFile(kDatabaseDirectory . "DOWNLOAD")
+}
+
 updateConfigurationForV711() {
 	local simulator, car, ignore, task, drivers, driver, ignore, candidate
 

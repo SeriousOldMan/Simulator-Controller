@@ -178,7 +178,8 @@ class TelemetryCollector {
 				logError(exception)
 			}
 			finally {
-				deleteFile(inputFileName)
+				if !isDebug()
+					deleteFile(inputFileName)
 			}
 		}
 
@@ -218,7 +219,8 @@ class TelemetryCollector {
 				return false
 			}
 			finally {
-				deleteFile(inputFileName)
+				if !isDebug()
+					deleteFile(inputFileName)
 			}
 		}
 	}

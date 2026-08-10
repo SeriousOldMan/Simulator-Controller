@@ -17,9 +17,6 @@
   4. Include lap time meadian value in the lap time information given by the Strategist and others
   5. Driver Input overlay (brake / throttle) by the Driving Coach
   
-#### Session Database
-  1. Tyre wear viewer and calculator
-  
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer

@@ -32,6 +32,8 @@
   - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
   - Fixed the coordinate system transformation for the Second Monitor connector. Telemetry files acquired from Second Monitor will now be compatible with all position related functions.
   - Once more we have a fix for the community database synchronization.
+  - Fixed a bug in Second Monitor integration, when no suspension information is available.
+  - Fixed missing lap time information, when Second Monitor is used as telemetry provider.
   
 #### Changes
 
@@ -39,6 +41,7 @@
   
     The idea of ​​the *Setup Engineer* had been on my mind for a long time, but it was only recently that LLMs became powerful enough to handle the vast amounts of data and mathematical calculations required for a robust analysis of telemetry data. The catch, however, is that you need one of the latest state-of-the-art models from providers like OpenAI, Anthropic, or Google — and those aren't exactly cheap. But the results are worth it, I promise.
   - A diary (log file) has been implemented for the "Setup Workbench". The diary folder can be [configured in the settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#settings) of the "Setup Workbench".
+  - The "Session Database" provides a new inspector which gives you detailed information about the tyre wear per lap for each wheel in specific weather conditions. Depending on your settings, the number of usable laps per tyre will be calculated automatically. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres) for more information.
 
 # Release history
 

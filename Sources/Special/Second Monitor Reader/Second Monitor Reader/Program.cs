@@ -27,6 +27,7 @@ static class Program
     static string driver = "John Doe (JD)";
     static int lapNumber = 0;
     static float lapTime = 0.0f;
+	static long altLapTime = 0;
     static float sector1Time = 0.0f;
     static float sector2Time = 0.0f;
     static float sector3Time = 0.0f;
@@ -114,7 +115,7 @@ static class Program
 
         while (reader.Read())
             if (reader.TokenType == JsonToken.EndArray)
-                break;
+				break;
             else
                 readPoint(reader);
     }
@@ -163,7 +164,8 @@ static class Program
         abs = 0;
         longG = 0.0f;
         latG = 0.0f;
-        int time = 0;
+		
+		int time = 0;
 		int lastTime = 0;
 
         yawRate = -1;
@@ -200,6 +202,7 @@ static class Program
                     case "lapTimeSeconds":
                         reader.Read();
                         time = (int)Math.Round(float.Parse(reader.Value.ToString()) * 1000);
+						altLapTime = time;
                         break;
                     case "lapDistance":
                         reader.Read();
@@ -330,6 +333,9 @@ static class Program
 					case "WheelsInfo":
 						readWheelsInfo(reader);
                         break;
+                    case "wheelsData":
+						readWheelsInfo(reader);
+                        break;
                     case "CurrentGear":
                         goto case "currentGear";
                     case "currentGear":
@@ -452,7 +458,24 @@ static class Program
             else if (reader.Value != null)
                 switch (reader.Value.ToString())
                 {
-                    case "SuspensionTravel":
+                    case "suspensionTravelInMm":
+                        reader.Read();
+                        switch (wheel) {
+							case "FL":
+								flSuspDefl = float.Parse(reader.Value.ToString()) / 1000;
+                                break;
+							case "FR":
+								frSuspDefl = float.Parse(reader.Value.ToString()) / 1000;
+                                break;
+                            case "RL":
+								rlSuspDefl = float.Parse(reader.Value.ToString()) / 1000;
+                                break;
+                            case "RR":
+								rrSuspDefl = float.Parse(reader.Value.ToString()) / 1000;
+                                break;
+                        }
+						break;
+					case "SuspensionTravel":
                         reader.Read();
                         reader.Read();
                         reader.Read();
@@ -492,13 +515,25 @@ static class Program
 					case "FrontLeft":
 						readWheelInfo(reader, "FL");
                         break;
+                    case "frontLeft":
+						readWheelInfo(reader, "FL");
+                        break;
                     case "FrontRight":
+						readWheelInfo(reader, "FR");
+                        break;
+                    case "frontRight":
 						readWheelInfo(reader, "FR");
                         break;
                     case "RearLeft":
 						readWheelInfo(reader, "RL");
                         break;
+                    case "rearLeft":
+						readWheelInfo(reader, "RL");
+                        break;
                     case "RearRight":
+						readWheelInfo(reader, "RR");
+                        break;
+                    case "rearRight":
 						readWheelInfo(reader, "RR");
                         break;
                 }
@@ -622,9 +657,15 @@ static class Program
             outStream.WriteLine("Source=Second Monitor");
             outStream.Write("Driver="); outStream.WriteLine(driver);
             outStream.Write("Lap="); outStream.WriteLine(lapNumber);
-            outStream.Write("LapTime="); outStream.WriteLine(lapTime);
-            outStream.Write("SectorTimes="); outStream.Write(sector1Time); outStream.Write(",");
-                                             outStream.Write(sector2Time); outStream.Write(","); outStream.WriteLine(sector3Time);
+			
+			if (lapTime != 0)
+				outStream.Write("LapTime="); outStream.WriteLine(lapTime);
+			else if (altLapTime != 0)
+				outStream.Write("LapTime="); outStream.WriteLine(altLapTime / 1000.0f);
+			
+			if (sector1Time != 0 || sector2Time != 0 || sector2Time != 0)
+				outStream.Write("SectorTimes="); outStream.Write(sector1Time); outStream.Write(",");
+												 outStream.Write(sector2Time); outStream.Write(","); outStream.WriteLine(sector3Time);
 
             outStream.Close();
         }

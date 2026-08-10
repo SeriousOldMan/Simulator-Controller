@@ -414,6 +414,8 @@ class SetupWorkbench extends ConfigurationItem {
 		diaryFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
 									  , "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
 
+		DirCreate(diaryFolder)
+
 		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . translate("Diary ") . A_Now . ".txt")
 
 		SetupWorkbench.Instance := this

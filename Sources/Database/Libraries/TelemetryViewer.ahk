@@ -1157,14 +1157,14 @@ class TelemetryViewer {
 
 		viewerGui.SetFont("s10 Bold", "Arial")
 
-		viewerGui.Add("Text", "w666 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
+		viewerGui.Add("Text", "w696 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
 
 		viewerGui.SetFont("s9 Norm", "Arial")
 
-		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
+		viewerGui.Add("Documentation", "x201 YP+20 w351 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
+		button := viewerGui.Add("Button", "x683 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 														  , "Telemetry Viewer", "Provider", "Internal")
@@ -1218,12 +1218,15 @@ class TelemetryViewer {
 			setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
 		}
 
-		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Layout"))
-		viewerGui.Add("DropDownList", "x556 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
+		viewerGui.Add("Text", "x515 yp+4 w63 X:Move", translate("Layout"))
+		viewerGui.Add("DropDownList", "x586 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
 
-		viewerGui.Add("Button", "x653 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
+		viewerGui.Add("Button", "x683 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
 
-		this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
+		if this.Suspension
+			this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x475 yp+9 w30 h30 vcollectingNotifier Hidden")
+		else
+			this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
 
 		this.CollectingNotifier.document.open()
 		this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'> </body></html>")
@@ -1239,11 +1242,11 @@ class TelemetryViewer {
 
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
-		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Zoom"))
-		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
-		viewerGui.Add("Slider", "Center Thick15 x617 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
+		viewerGui.Add("Text", "x515 yp+4 w63 X:Move", translate("Zoom"))
+		viewerGui.Add("Slider", "Center Thick15 x586 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
+		viewerGui.Add("Slider", "Center Thick15 x647 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
 
-		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w660 h480 W:Grow H:Grow Border")
+		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w690 h480 W:Grow H:Grow Border")
 
 		viewerControl.document.open()
 		viewerControl.document.write("")

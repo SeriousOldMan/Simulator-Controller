@@ -414,6 +414,9 @@ class SetupWorkbench extends ConfigurationItem {
 		diaryFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
 									  , "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
 
+		if (!diaryFolder || (diaryFolder))
+			diaryFolder := (kTempDirectory . "Setup Workbench\Diary")
+
 		DirCreate(diaryFolder)
 
 		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . translate("Diary ") . A_Now . ".txt")
@@ -1436,29 +1439,28 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	logDiary(type, arguments*) {
-		if this.Diary
-			switch type, false {
-				case "Selection":
-					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Selection")}) . "`n`n"
-							 . translate("Simulator:") . A_Space . this.SelectedSimulator[true] . "`n"
-							 . translate("Car:") . A_Space . this.SelectedCar[true] . "`n"
-							 . translate("Track:") . A_Space . this.SelectedTrack[true] . "`n`n", this.Diary, "UTF-16")
-				case "Characteristics":
-					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Characteristics")}) . "`n`n"
-							 . arguments[1] . "`n`n", this.Diary, "UTF-16")
-				case "Load":
-					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Load")}) . "`n`n"
-							 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n", this.Diary, "UTF-16")
-				case "Save":
-					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
-							 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
-							 . arguments[3] . "`n`n", this.Diary, "UTF-16")
-				case "Lap":
-					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Lap")}) . "`n`n"
-							 . translate("Name:") . A_Space . arguments[1] . "`n"
-							 . translate("Lap Time:") . A_Space . arguments[2] . "`n"
-							 . translate("Sector Times:") . A_Space . arguments[3] . "`n`n", this.Diary, "UTF-16")
-			}
+		switch type, false {
+			case "Selection":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Selection")}) . "`n`n"
+						 . translate("Simulator:") . A_Space . this.SelectedSimulator[true] . "`n"
+						 . translate("Car:") . A_Space . this.SelectedCar[true] . "`n"
+						 . translate("Track:") . A_Space . this.SelectedTrack[true] . "`n`n", this.Diary, "UTF-16")
+			case "Characteristics":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Characteristics")}) . "`n`n"
+						 . arguments[1] . "`n`n", this.Diary, "UTF-16")
+			case "Load":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Load")}) . "`n`n"
+						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n", this.Diary, "UTF-16")
+			case "Save":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
+						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
+						 . arguments[3] . "`n`n", this.Diary, "UTF-16")
+			case "Lap":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Lap")}) . "`n`n"
+						 . translate("Name:") . A_Space . arguments[1] . "`n"
+						 . translate("Lap Time:") . A_Space . arguments[2] . "`n"
+						 . translate("Sector Times:") . A_Space . arguments[3] . "`n`n", this.Diary, "UTF-16")
+		}
 	}
 
 	logLoad(editor, setup) {
@@ -4402,12 +4404,6 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	Diary {
-		Get {
-			return this.iDiary
-		}
-	}
-
 	Analysis {
 		Get {
 			return this.iAnalysis
@@ -4431,16 +4427,7 @@ class SetupEngineer extends ConfigurationItem {
 
 		super.__New(configuration)
 
-		this.iDiary := diary
-
 		this.loadInstructions(configuration)
-
-		try {
-			DirCreate(this.Options["Setup Workbench.Diary"])
-		}
-		catch Any as exception {
-			logError(exception)
-		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -4449,11 +4436,6 @@ class SetupEngineer extends ConfigurationItem {
 		super.loadFromConfiguration(configuration)
 
 		options := this.Options
-
-		options["Setup Workbench.Diary"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
-
-		if (!options["Setup Workbench.Diary"] || (Trim(options["Setup Workbench.Diary"]) = ""))
-			options["Setup Workbench.Diary"] := (kTempDirectory . "Setup Workench\Diary")
 
 		options["Setup Engineer.Service"] := getMultiMapValue(configuration, "Setup Engineer Service", "Service", getMultiMapValue(configuration, "Setup Engineer", "Service", false))
 		options["Setup Engineer.Model"] := getMultiMapValue(configuration, "Setup Engineer Service", "Model", false)
@@ -4777,9 +4759,6 @@ class SetupEngineer extends ConfigurationItem {
 	startInteraction() {
 		local service := this.Options["Setup Engineer.Service"]
 		local ignore, instruction
-
-		if !this.Diary
-			this.iDiary := (normalizeDirectoryPath(this.Options["Setup Workbench.Diary"]) . "\" . translate("Diary ") . A_Now . ".txt")
 
 		if service {
 			service := string2Values("|", service, 3)
@@ -5145,18 +5124,16 @@ class SetupEngineer extends ConfigurationItem {
 			}
 		}
 
-		if answer {
-			if this.Diary
-				try {
-					FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Analysis")}) . "`n`n"
-							 . translate("Lap:") . A_Space . telemetry.Name . "`n`n"
-							 . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n"
-							 . answer . "`n`n", this.Diary, "UTF-16")
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-		}
+		if answer
+			try {
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Analysis")}) . "`n`n"
+						 . translate("Lap:") . A_Space . telemetry.Name . "`n`n"
+						 . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n"
+						 . answer . "`n`n", this.Workbench.Diary, "UTF-16")
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 
 		return answer
 	}
@@ -5187,15 +5164,15 @@ class SetupEngineer extends ConfigurationItem {
 
 				this.Connector.Ask(analysis, , , &calls := [])
 
-				if this.Diary
-					try {
-						FileAppend(substituteVariables(translate("-- %header% --------")
-													 , {header: translate("Recommendations")}) . "`n`n"
-							 	 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
-					}
-					catch Any as exception {
-						logError(exception, true)
-					}
+				try {
+					FileAppend(substituteVariables(translate("-- %header% --------")
+												 , {header: translate("Recommendations")}) . "`n`n"
+							 . values2String("`n", collect(calls, printCall)*) . "`n`n"
+							 , this.Workbench.Diary, "UTF-16")
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 			}
 		}
 		catch Any as exception {

@@ -1199,7 +1199,7 @@ class TelemetryViewer {
 		})
 		setButtonIcon(button, kIconsDirectory . "Connect.ico", 1)
 
-		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
+		viewerGui.Add("Text", "x8 yp+25 w706 W:Grow 0x10")
 
 		viewerGui.SetFont("s8 Norm", "Arial")
 

@@ -214,9 +214,13 @@ Beside the typical duties of a Spotter, this Assistant is also able to automate 
 
 #### Setup Workbench
 
-Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
+Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based on the same AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench.jpg)
+
+Additionally, an integrated Setup Engineer using GPT technology can also create a detailed analysis of the car handling and your driving style based on the telemetry data of a specific lap. Once an analysis has been created, the recommended setup changes can automatically applied to a setup file.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 
 #### Support for controllers and devices
 

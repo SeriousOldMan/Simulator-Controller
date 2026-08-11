@@ -88,7 +88,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 		types := "*.telemetry; *.json; *.CSV"
 
-		if (simulator = "iRacing")
+		if ((simulator = "iRacing") && SessionDatabase().hasTrackMap(simulator, track))
 			types .= "; *.ibt"
 
 		OnMessage(0x44, translateLoadCancelButtons)

@@ -1798,7 +1798,7 @@ class TelemetryViewer {
 		local fileName := false
 		local simulator, car, track
 		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver, lapTime, sectorTimes
-		local dbFileName
+		local originalFileName
 
 		this.getSessionInformation(&simulator, &car, &track)
 
@@ -1851,9 +1851,11 @@ class TelemetryViewer {
 
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
 						if isNumber(lap)
-							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+							originalFileName := (this.TelemetryDirectory . "Lap " . lap . ".telemetry")
 						else
-							file := FileOpen(lap[5], "r-wd")
+							originalFileName := lap[5]
+
+						file := FileOpen(originalFileName, "r-wd")
 
 						if file {
 							size := file.Length
@@ -1881,9 +1883,7 @@ class TelemetryViewer {
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 
 							if isNumber(lap) {
-								dbFileName := (sessionDB.getTelemetryDirectory(simulator, car, track) . fileName . ".telemetry")
-
-								this.getLapInformation(lap, dbFileName, &driver, &lapTime, &sectorTimes)
+								this.getLapInformation(lap, originalFileName, &driver, &lapTime, &sectorTimes)
 
 								setMultiMapValue(info, "Lap", "Driver", driver)
 

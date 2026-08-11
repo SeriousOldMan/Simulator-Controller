@@ -180,9 +180,9 @@ The telemetry system supports two different sources of telemetry data. One, whic
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.
    - Use the small button with the "Disc" icon to save a telemetry lap to the session database or any other location.
-   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location.
+   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location. When opening telemetry files, all importable formats like CSV are supported beside the internal telemetry file format.
    - Telemetry data, which has been *imported* this way will not become part of the current session.
-   *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
+   *Imported* telemetry data can be removed by using the *Delete* button. This will not remove it from its original location.
 
 Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 

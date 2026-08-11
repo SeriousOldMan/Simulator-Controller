@@ -4836,6 +4836,7 @@ class SetupEngineer extends ConfigurationItem {
 	createTelemetry(telemetry) {
 		local result := ""
 		local columns := []
+		local data := []
 		local lastDistance := 0
 		local lastTime := 0
 		local columnNr, distance, time, count, skip
@@ -4845,7 +4846,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			for ignore, channel in kTelemetryChannels
 				if ((channel.Indices.Length = 1) && (channel.Indices[1] == columnNr)) {
-					columns.Push(channel.Name)
+					columns.Push(channel.Name . " (" . channel.Units[1] . ")")
 
 					break
 				}
@@ -4854,23 +4855,39 @@ class SetupEngineer extends ConfigurationItem {
 				columns.Push("Unknown")
 		}
 
+		loop telemetry.Data.Length {
+			time := telemetry.getValue(A_Index, "Time")
+			distance := telemetry.getValue(A_Index, "Distance")
+
+			if ((lastTime != time) || (lastDistance != distance)) {
+				data.Push(values2String(";", telemetry.Data[A_Index]*))
+
+				lastTime := time
+				lastDistance := distance
+			}
+		}
+
 		result := (values2String(";", columns*) . "`n")
 
-		skip := Round(telemetry.Data.Length / this.Resolution)
+		skip := Round(data.Length / this.Resolution)
 
-		if skip
+		if skip {
 			count := 0
 
-		loop telemetry.Data.Length {
-			if (isSet(count) && (++count != 1)) {
-				if (count > skip)
-					count := 0
+			loop data.Length {
+				if (++count != 1) {
+					if (count > skip)
+						count := 0
 
-				continue
+					continue
+				}
+
+				result .= (data[A_Index] . "`n")
 			}
-
-			result .= (values2String(";", telemetry.Data[A_Index]*) . "`n")
 		}
+		else
+			loop data.Length
+				result .= (data[A_Index] . "`n")
 
 		return result
 	}

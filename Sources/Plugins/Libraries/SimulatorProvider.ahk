@@ -259,7 +259,12 @@ class SimulatorProvider {
 
 	static createSimulatorProvider(simulator, car, track) {
 		try {
-			return %SessionDatabase.getSimulatorCode(simulator)%Provider(car, track)
+			simulator := SessionDatabase.getSimulatorCode(simulator)
+
+			if this.SimulatorProviders.Has(simulator)
+				return this.SimulatorProviders[simulator](car, track)
+			else
+				return %SessionDatabase.getSimulatorCode(simulator)%Provider(car, track)
 		}
 		catch Any {
 			return SimulatorProvider.GenericSimulatorProvider(SessionDatabase.getSimulatorName(simulator), car, track)

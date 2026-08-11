@@ -1,8 +1,8 @@
 [Development]
-Version=7.2.0.0-dev
+Version=7.2.0.0-beta
 Target=7.2.0.0-release
-Date=08/09/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/uchfVZcz/Releases/Simulator%20Controller%207.2.0.0-dev.zip
+Date=08/11/26
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r74nVO_i/Releases/Simulator%20Controller%207.2.0.0-beta.zip
 Changes=Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
@@ -24,5 +24,5 @@ Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=7.2.0.0-dev
+Development=7.2.0.0-beta
 Release=7.1.5.0-release

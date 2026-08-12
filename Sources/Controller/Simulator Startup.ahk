@@ -147,7 +147,7 @@ class NewsResizer extends Window.Resizer {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				return false
 			}
 			finally {
@@ -1230,7 +1230,12 @@ launchPad(command := false, arguments*) {
 
 				curControl.Value := ("*w59 *h59 " . curControl.Value)
 
-				SoundPlay(getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+				try {
+					SoundPlay(getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 			}
 			else if (pressedControl && !GetKeyState("LButton")) {
 				pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)

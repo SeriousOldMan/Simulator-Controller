@@ -8267,6 +8267,53 @@ editSettings(editorOrCommand, arguments*) {
 			editSettings("Rebuild")
 	}
 
+	validateConnection(serverURL, serverToken, &error?) {
+		local dllFile := (kBinariesDirectory . "Connectors\Data Store Connector.dll")
+		local connector
+
+		error := false
+
+		try {
+			if (!FileExist(dllFile)) {
+				logMessage(kLogCritical, translate("Data Store Connector.dll not found in ") . kBinariesDirectory)
+
+				throw "Unable to find Data Store Connector.dll in " . kBinariesDirectory . "..."
+			}
+
+			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
+
+			if !kSilentMode
+				showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			return false
+		}
+
+		try {
+			connector.Initialize(serverURL, serverToken)
+
+			connection := connector.Connect(serverToken, sessionDB.ID, sessionDB.getName("Profile"))
+
+			if (connection && (connection != "")) {
+				connector.ValidateDataToken()
+
+				return true
+			}
+			else
+				return false
+		}
+		catch Any as exception {
+			error := exception
+
+			return false
+		}
+	}
+
 	if (editorOrCommand == kOk) {
 		if currentConnection
 			editSettings("SaveConnection")
@@ -8282,6 +8329,8 @@ editSettings(editorOrCommand, arguments*) {
 		}
 
 		if ((groups.Count != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length))
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+		else if exist(connections, (c) => !validateConnection(serverURLs[c[1]], serverTokens[c[1]]))
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 		else
 			result := kOk
@@ -8904,9 +8953,13 @@ editSettings(editorOrCommand, arguments*) {
 
 						if restart {
 							withBlockedWindows(MsgDlg, translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
-								 , translate("Information"), 262192)
+													 , translate("Information"), 262192)
 
 							broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitProcess")
+
+							Sleep(1000)
+
+							ExitApp(0)
 						}
 					}
 					else

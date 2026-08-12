@@ -34,6 +34,7 @@
   - Once more we have a fix for the community database synchronization.
   - Fixed a bug in Second Monitor integration, when no suspension information is available.
   - Fixed missing lap time information, when Second Monitor is used as telemetry provider.
+  - Fixed a bug in "Simulator Setup" that caused the language selection on the "General settings & voice control" page to reset to the UI language on each run of "Simulator Setup".
   
 #### Changes
 

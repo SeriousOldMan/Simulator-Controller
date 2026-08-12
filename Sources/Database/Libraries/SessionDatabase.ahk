@@ -354,13 +354,17 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerToken[identifier] {
 		Get {
-			return SessionDatabase.ServerTokens[identifier]
+			local token := SessionDatabase.ServerTokens[identifier]
+
+			return (isObject(token) ? false : token)
 		}
 	}
 
 	ServerToken[identifier] {
 		Get {
-			return SessionDatabase.ServerTokens[identifier]
+			local token := SessionDatabase.ServerTokens[identifier]
+
+			return (isObject(token) ? false : token)
 		}
 	}
 

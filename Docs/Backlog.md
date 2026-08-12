@@ -17,6 +17,9 @@
   4. Include lap time meadian value in the lap time information given by the Strategist and others
   5. Driver Input overlay (brake / throttle) by the Driving Coach
   
+#### Session Databse
+  1. Sanity check for Team Server configuration
+  
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer

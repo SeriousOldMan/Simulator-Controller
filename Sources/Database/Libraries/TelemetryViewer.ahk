@@ -1796,6 +1796,9 @@ class TelemetryViewer {
 
 	saveLap(lap := false, prompt := true) {
 		local fileName := false
+		local theDriver := "John Doe (JD)"
+		local theLapTime := "-"
+		local theSectorTimes := ["-"]
 		local simulator, car, track
 		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver, lapTime, sectorTimes
 		local originalFileName
@@ -1818,7 +1821,11 @@ class TelemetryViewer {
 				dirName := ""
 
 			if isNumber(lap) {
-				this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes)
+				if this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
+					theDriver := driver
+					theLapTime := lapTime
+					theSectorTimes := sectorTimes
+				}
 
 				fileName := (dirName . "\Lap " . lap . translate(" (") . driver . ((lapTime != "-") ? (" - " . lapTime) : "") . translate(")"))
 			}
@@ -1883,8 +1890,6 @@ class TelemetryViewer {
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 
 							if isNumber(lap) {
-								this.getLapInformation(lap, originalFileName, &driver, &lapTime, &sectorTimes)
-
 								setMultiMapValue(info, "Lap", "Driver", driver)
 
 								if (lapTime && (lapTime != "-"))
@@ -2111,7 +2116,7 @@ class TelemetryViewer {
 		}
 
 		this.getLapInformation(lap, false, &driver, &lapTime, &sectorTimes)
-
+return "Foo"
 		if isNumber(lap)
 			theLap := lap
 		else

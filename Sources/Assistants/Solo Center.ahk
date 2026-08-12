@@ -326,7 +326,7 @@ class SoloCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 				finally {
@@ -390,7 +390,7 @@ class SoloCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 				finally {
@@ -2031,13 +2031,19 @@ class SoloCenter extends ConfigurationItem {
 
 			lapTime := lap.LapTime
 			sectorTimes := lap.SectorsTime
-			
+
+			if (!lapTime || isNull(lapTime))
+				lapTime := "-"
+
+			if (!sectorTimes || (isObject(sectorTimes) && (sectorTimes.Length = 0)))
+				sectorTiems := ["-"]
+
 			return true
 		}
 		else {
 			lapTime := "-"
 			sectorTimes := ["-"]
-			
+
 			return false
 		}
 	}

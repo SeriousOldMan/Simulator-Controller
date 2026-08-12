@@ -1,15 +1,15 @@
 [Development]
-Version=7.2.0.0-beta
+Version=7.2.0.0-release
 Target=7.2.0.0-release
-Date=08/12/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r74nVO_i/Releases/Simulator%20Controller%207.2.0.0-beta.zip
+Date=08/14/26
+Download=https://cutt.ly/1yaK2KLG;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/4T_XGv2A/Releases/Simulator%20Controller%207.2.0.0-release.zip;https://www.dropbox.com/scl/fi/w8mzj26y6le3mvocb0uxf/Simulator-Controller-7.2.0.0-release.zip?rlkey=8rtkh8v1sgde64pefo7c8o6xu&st=217e512n&dl=1;http://%master%/Releases/Simulator Controller 7.2.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.2.0.0-release.zip
 Changes=Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider, Support opening of IBT files directly from browser, Validation for Team Server connection in "Session Database"
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Release]
-Version=7.1.5.0-release
-Date=08/07/26
-Download=https://cutt.ly/uyo4mIod;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cC-CiRg8/Releases/Simulator%20Controller%207.1.5.0-release.zip;https://www.dropbox.com/scl/fi/pafe1bch2jpbhvd8dn1xa/Simulator-Controller-7.1.5.0-release.zip?rlkey=zg2b3xv1ms2p33zjwrii5otlc&st=dkneba7t&dl=1;http://%master%/Releases/Simulator Controller 7.1.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.1.5.0-release.zip
-Changes=Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list, Optimized loading of large telemetry files, Second Monitor Reader supports suspension deflection
+Version=7.2.0.0-release
+Date=08/14/26
+Download=http://%master%/Releases/Simulator Controller 7.2.0.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.2.0.0-release.zip
+Changes=Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider, Support opening of IBT files directly from browser, Validation for Team Server connection in "Session Database"
 Components=Media->6.9.0,Configuration->7.0.3,Utilities->7.0.3
 [Components]
 Media.6.9.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.7.0.3.Path=.
 Utilities.7.0.3.Content=Utilities
 Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/W5yabNda/Components/Utilities%207.0.3.zip;https://www.dropbox.com/scl/fi/4vhkcdoc8pjwvwx3bo6xw/Utilities-7.0.3.zip?rlkey=rsonyko3vm8574cn8q8th2ktx&st=yivkyizz&dl=1;http://%master%/Components/Utilities 7.0.3.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Components/Utilities+7.0.3.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=7.2.0.0-beta
-Release=7.1.5.0-release
+Development=7.2.0.0-release
+Release=7.2.0.0-release

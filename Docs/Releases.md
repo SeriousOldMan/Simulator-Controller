@@ -1,31 +1,8 @@
 # Latest stable release
 
-## 7.1.5.0
-
-#### Date: 08/07/26
-
-#### Fixes
-
-  - A critical bug has been fixed in the synchronization process of the community database.
-  - The calculated suspension deflection has been fixed for telemtries recorded for *RaceRoom Racing Experience* and *iRacing*.
-  
-#### Changes
-
-  - A new suspension dynamics inspector is available when telemetry data is inspected in the "Setup Workbench". This inspector allows you to optimize the settings for low- and high-speed damping. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-suspension-dynamics) for more information.
-  - The Driving Coach will try to load a track map at the beginning of each lap until success. This helps when the Coach is used on a track, that has neven been driven before.
-  - Many improvements for the telemetry system:
-    - The lap time of a recorded lap will now be displayed in the list of telemetries in the "Session Database", if available.
-	- The high resolution telemetry files implemented in the last release will now load much faster in the telemetry viewer.
-	- The IBT file importer for *iRacing* will now import suspension deflection information, if available.
-	- The Second Monitor importer and also the corresponding telemetry provider for the telemetry system will now import suspension deflection information, if available.
-  - [Internal] Handling of modal windows has been optimized so that always the window, which was on top before the modal window had been opened, will be on top again.
-  - [Internal] A caching has been implemented for loaded telemetry files to prevent to many disc requests.
-
-# Upcoming release
-
 ## 7.2.0.0
 
-#### Date: 08/14/26 (planned)
+#### Date: 08/14/26
 
 #### Fixes
 
@@ -47,7 +24,32 @@
   - IBT files can now be opened directly from the telemetry select dialog.
   - Suspension information and the lap time is now included in telemetry data acquired by the Second Monitor provider.
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 7.1.5.0
+
+#### Date: 08/07/26
+
+#### Fixes
+
+  - A critical bug has been fixed in the synchronization process of the community database.
+  - The calculated suspension deflection has been fixed for telemtries recorded for *RaceRoom Racing Experience* and *iRacing*.
+  
+#### Changes
+
+  - A new suspension dynamics inspector is available when telemetry data is inspected in the "Setup Workbench". This inspector allows you to optimize the settings for low- and high-speed damping. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-suspension-dynamics) for more information.
+  - The Driving Coach will try to load a track map at the beginning of each lap until success. This helps when the Coach is used on a track, that has neven been driven before.
+  - Many improvements for the telemetry system:
+    - The lap time of a recorded lap will now be displayed in the list of telemetries in the "Session Database", if available.
+	- The high resolution telemetry files implemented in the last release will now load much faster in the telemetry viewer.
+	- The IBT file importer for *iRacing* will now import suspension deflection information, if available.
+	- The Second Monitor importer and also the corresponding telemetry provider for the telemetry system will now import suspension deflection information, if available.
+  - [Internal] Handling of modal windows has been optimized so that always the window, which was on top before the modal window had been opened, will be on top again.
+  - [Internal] A caching has been implemented for loaded telemetry files to prevent to many disc requests.
 
 ## 7.1.4.0
 

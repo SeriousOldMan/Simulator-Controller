@@ -290,6 +290,10 @@ The structure, content and quality of the review strongly depends on the configu
 
 If the Setup Engineer identified reasonable changes to the car setup, you can of course apply them manually. But you can also ask the Setup Engineer to do it for you. For this, you have to open a [*Setup Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups) (exactly one) and then you click on the button with the tools in the Setup Engineer window. The LLM, which is required to handle tool calling properly, is then asked to apply its own recommendations to the setup currently loaded in the *Setup Editor*. But always double check the result, only the most capable LLMs will manage to do this without any errors.
 
+Here is a video that demonstrates the complete workflow:
+
+[![](https://img.youtube.com/vi/xW6XF60wYOg/0.jpg)](https://www.youtube.com/watch?v=xW6XF60wYOg)
+
 ## Understanding the Recommendations
 
 Since "Setup Workbench" has no knowledge about the concrete settings in the current car setup, all recommendations are of relative nature. When you get the recommendation for a reduction of "Camber Rear Left" by -1, this does not mean that you have to reduce the rear left camber by exactly 1 click or by 0.1 degree. It rather means, that a reduction of the camber will have a large, when not the largest impact in the set of recommendations. To be precise, a recommendation with a value of 1.0 or -1.0 is four times as important than a recommendation with a value of 0.25. This is a hint for you where to start with your incremental tests when applying the recommended setup changes to your car.

@@ -2116,7 +2116,7 @@ class TelemetryViewer {
 		}
 
 		this.getLapInformation(lap, false, &driver, &lapTime, &sectorTimes)
-return "Foo"
+
 		if isNumber(lap)
 			theLap := lap
 		else

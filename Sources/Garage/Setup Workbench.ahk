@@ -2004,6 +2004,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	chooseCharacteristic() {
+		local simulators := getKeys(getMultiMapValues(getControllerState(), "Simulators"))
 		local dynamicMenus := CaseInsenseMap()
 		local characteristicLabels, menuIndex, groups, translatedGroups, ignore, group, definition, option
 		local groupMenu, groupEmpty, groupOption, optionMenu, optionEmpty, label, characteristic
@@ -2078,7 +2079,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		if !isDebug()
 			if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-										  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+										  || !inList(simulators, this.SelectedSimulator))
 				characteristicsMenu.Disable(label)
 
 		label := translate("Telemetry...")
@@ -2090,7 +2091,7 @@ class SetupWorkbench extends ConfigurationItem {
 				characteristicsMenu.Disable(label)
 
 			if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-										  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+										  || !inList(simulators, this.SelectedSimulator))
 				characteristicsMenu.Disable(label)
 		}
 
@@ -2100,7 +2101,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.openSetupEngineer())
 
-		if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
+		if (!this.SimulatorDefinition || !inList(simulators, this.SelectedSimulator)
+									  || (this.SelectedSimulator[false] == true)
+									  || (this.SelectedCar[false] == true)
+									  || (this.SelectedTrack[false] == true))
 			characteristicsMenu.Disable(label)
 
 		characteristicsMenu.Show()

@@ -216,7 +216,7 @@ Another very useful tool of the Simulator Controller suite is the Setup Workbenc
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench.jpg)
 
-Additionally, an integrated Setup Engineer using GPT technology can also create a detailed analysis of the car handling and your driving style based on the telemetry data of a specific lap. Once an analysis has been created, the recommended setup changes can automatically applied to a setup file.
+Additionally, an integrated Setup Engineer using GPT technology can also create a detailed analysis of the car handling and your driving style based on the telemetry data of a specific lap. Once an analysis has been created, the recommended setup changes can automatically be applied to a setup file.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 

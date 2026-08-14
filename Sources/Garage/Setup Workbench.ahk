@@ -4694,8 +4694,8 @@ class SetupEngineer extends ConfigurationItem {
 						widgets := workbench.SelectedCharacteristicsWidgets[characteristic]
 
 						issues.Push({Issue: characteristicLabels[characteristic]
-								   , Frequency: widgets[1].Value . "%"
-								   , Severity: widgets[2].Value . "%"})
+								   , Frequency: widgets[1].Value . "\%"
+								   , Severity: widgets[2].Value . "\%"})
 					}
 
 					return substituteVariables(this.Instructions["Handling"], {handling: JSON.print(issues, "  ")})

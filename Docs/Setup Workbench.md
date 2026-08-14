@@ -260,6 +260,8 @@ Below you find all instruction categories and the supported variables:
 | Analysis    | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data.<br><br>Important: The telemetry data is not passed in this instruction using a variable. Rather the data is passed without any further instructions or comments in the user prompt. |
 | Recommenations | Scope          | Once an analysis has been created, this instruction tells the LLM how to use a supplied function/tool to apply the recommended setup changes to a loaded car setup.<br><br>Important: The analysis created in the previous step is not passed in this instruction using a variable. Rather the information is passed without any further instructions or comments in the user prompt. |
 
+If you have changed an instruction, you can revert it to the original instruction by clicking on the small button with the recycle icon. If you hold down the Control key when clicking on the button all instructions will be reverted at the same time.
+
 #### Acquiring telemetry data
 
 The Setup Engineer works on numerical telemetry data. Therefore it is necessary to run a few laps and collect telemetry data using the integrated telemetry system (see above). You must have choosen a specific car and also a specific track before using the Setup Engineer and the recorded telemetry data must originate from this combination, of course. Otherwise the results would be more tha questionable.

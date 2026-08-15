@@ -659,6 +659,7 @@ RaceAssistant.Toggle=
 TelemetryCoaching.Toggle=
 TrackCoaching.Toggle=
 BrakeCoaching.Toggle=
+MotivationCoaching.Toggle=
 Call.Activate=
 Interrupt.Activate=
 SetupWorkbenchOpen.Activate=

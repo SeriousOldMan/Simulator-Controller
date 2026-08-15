@@ -218,6 +218,7 @@
   - [Driver coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data)
 	- [On-track coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-on-the-track)
 	- [Brake coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-braking-points)
+	- [Motivation coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#motivation-on-the-track)
 	- [Automatic coaching](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#automatic-activation-of-coaching-mode)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#how-it-works)
   - [Troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#troubleshooting)

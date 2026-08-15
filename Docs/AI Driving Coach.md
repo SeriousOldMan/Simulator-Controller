@@ -511,6 +511,10 @@ The following video gives you a good demonstration of this:
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
 
+### Motivation on the track
+
+This mode also uses the underlying telemtry data system to help you to retain your focus and your motivation to push. Once the Coach detects, that you are loosing pace, he will yell at you and will try to bring your attention back to the tarmac. You can enable this mode by asking the Coach, whether he can help you to keep your focus.
+
 ### Automatic activation of coaching mode
 
 Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the Coach on your side in each practice session. Always having to ask the Coach to come along can become boring with time. As always with Simulator Controller, there are several methods to do this:

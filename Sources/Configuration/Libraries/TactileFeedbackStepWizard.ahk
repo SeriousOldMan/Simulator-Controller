@@ -156,7 +156,7 @@ class TactileFeedbackStepWizard extends ActionsStepWizard {
 		setButtonIcon(widget9, kResourcesDirectory . "Setup\Images\Pencil.ico", 1, "L2 T2 R2 B2 H16 W16")
 		widget10 := window.Add("ListBox", "x" . secondX . " yp w" . secondWidth . " h60 H:Grow(0.33) ReadOnly Disabled Hidden")
 
-		widget11 := window.Add("Button", "x" . x . " yp+70 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Edit Labels && Icons..."))
+		widget11 := window.Add("Button", "x" . x . " yp+70 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Labels && Icons..."))
 		widget11.OnEvent("Click", openLabelsAndIconsEditor)
 
 		window.SetFont("s8 Bold", "Arial")

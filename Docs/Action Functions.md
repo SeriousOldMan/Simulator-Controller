@@ -118,8 +118,9 @@ These functions let you start and top coaching by the Driving Coach and let you 
 | ------ | ------ | ------ | ------ |
 | startTelemetryCoaching | confirm, auto | Driving Coach | Initiates telemetry data collection by the Driving Coach. After a few laps the Coach will be ready to discuss your performance with you. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. If *auto* is supplied and *true* or "Track", the Driving Coach will start to give corner by corner instructions, once telemetry is available. If "Brake" is supplied, the Coach will give braking instructions. |
 | finishTelemetryCoaching | confirm | Driving Coach | Stops the telemetry based coaching mode of the Driving Coach. |
-| startTrackCoaching | confirm | Driving Coach | Instructs the Driving Coach to give corner by corner instructions while you are driving. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. |
-| startBrakeCoaching | confirm | Driving Coach | Instructs the Driving Coach to give hints while you are driving where and how to brake. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. |
+| startTrackCoaching | confirm | Driving Coach | Instructs the Driving Coach to give corner by corner instructions while you are driving. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. |
+| startBrakeCoaching | confirm | Driving Coach | Instructs the Driving Coach to give hints while you are driving where and how to brake. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. |
+| startMotivationCoaching | confirm | Driving Coach | Instructs the Driving Coach to come up from time to time and call you to focus or push again, if your last laps have been not that good. This is most useful during a race, of course. If *confirm* is supplied and *false*, no confirmation is given by the Driving Coach. |
 | finishCoaching | - | Driving Coach | Stops the Driving Coach to any instructions while you are driving. |
 
 ### Feature activation and general control functions

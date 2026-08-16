@@ -247,7 +247,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
 				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
-				this.updateMotivationCoachingTrayLabel(translate("Motivation Coaching"), brake)
+				this.updateMotivationCoachingTrayLabel(translate("Motivation Coaching"), motivation)
 
 				this.updateActions(kSessionUnknown)
 			}
@@ -264,8 +264,8 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 				this.updateActions(kSessionUnknown)
 			}
 
-			if (brake != this.MotivationCoachingActive) {
-				this.iMotivationCoachingActive := brake
+			if (motivation != this.MotivationCoachingActive) {
+				this.iMotivationCoachingActive := motivation
 
 				this.updateActions(kSessionUnknown)
 			}

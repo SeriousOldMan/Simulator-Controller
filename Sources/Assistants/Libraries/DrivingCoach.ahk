@@ -889,12 +889,17 @@ class DrivingCoach extends GridRaceAssistant {
 		if !this.Connector
 			this.startConversation()
 
-		if (confirm && this.Speaker)
+		if (this.MotivationCoaching && !auto) {
+			if (confirm && this.Speaker)
+				this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
+		}
+		else if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching", false, false, false, {Noise: false})
 
 		this.iCoachingActive := true
 
-		this.startupTelemetryCoaching()
+		if (!this.MotivationCoaching || (auto != "Motivation"))
+			this.startupTelemetryCoaching()
 
 		if auto {
 			state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
@@ -2668,7 +2673,7 @@ class DrivingCoach extends GridRaceAssistant {
 			if announcements
 				this.updateConfigurationValues({Announcements: announcements, OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching
 																			, BrakeCoaching: brakeCoaching || this.BrakeCoaching
-																			, BrakeCoaching: motivationCoaching || this.MotivationCoaching})
+																			, MotivationCoaching: motivationCoaching || this.MotivationCoaching})
 			else
 				this.updateConfigurationValues({OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching, BrakeCoaching: brakeCoaching || this.BrakeCoaching, MotivationCoaching: motivationCoaching || this.MotivationCoaching})
 		}
@@ -2828,7 +2833,7 @@ class DrivingCoach extends GridRaceAssistant {
 				analyzedLaps := lapNumber
 				bestLapTime := Min(bestLapTime, lapTime)
 			}
-			else {
+			else if ((lapNumber < analyzedLaps) || (lapNumber <= (this.BaseLap + (2 * this.LearningLaps)))) {
 				analyzedLaps := 0
 				bestLapTime := 2147483647
 			}

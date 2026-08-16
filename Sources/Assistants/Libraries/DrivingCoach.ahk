@@ -847,7 +847,7 @@ class DrivingCoach extends GridRaceAssistant {
 				this.clearContinuation()
 
 				if !this.CoachingActive
-					this.telemetryCoachingStartRecognized(words, true, "Motivation")
+					this.telemetryCoachingStartRecognized(words, true, "Motivation", true)
 				else
 					this.motivationCoachingStartRecognized(words)
 
@@ -883,18 +883,22 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
-	telemetryCoachingStartRecognized(words, confirm := true, auto := false) {
+	telemetryCoachingStartRecognized(words, confirm := true, auto := false, acknowledge := false) {
 		local state
 
 		if !this.Connector
 			this.startConversation()
 
-		if (confirm && this.Speaker && (auto != "Motivation"))
+		if (auto = "Motivation") {
+			if (confirm && this.Speaker)
+				this.getSpeaker().speakPhrase(acknowledge ? "Roger" : "StartCoaching", false, false, false, {Noise: false})
+		}
+		else if (confirm && this.Speaker)
 			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching", false, false, false, {Noise: false})
 
 		this.iCoachingActive := true
 
-		if (!this.MotivationCoaching || (auto != "Motivation"))
+		if (auto != "Motivation")
 			this.startupTelemetryCoaching()
 
 		if auto {
@@ -1244,7 +1248,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iIssueCollector.stopIssueCollector()
 	}
 
-	startTelemetryCoaching(confirm := true, auto := false) {
+	startTelemetryCoaching(confirm := true, auto := false, acknowledge := true) {
 		local state
 
 		if auto {
@@ -1277,7 +1281,7 @@ class DrivingCoach extends GridRaceAssistant {
 			writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 		}
 
-		this.telemetryCoachingStartRecognized([], confirm, auto)
+		this.telemetryCoachingStartRecognized([], confirm, auto, acknowledge)
 	}
 
 	finishTelemetryCoaching(confirm := true) {
@@ -1330,7 +1334,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local state
 
 		if !this.CoachingActive {
-			this.telemetryCoachingStartRecognized([], confirm, "Motivation")
+			this.telemetryCoachingStartRecognized([], confirm, "Motivation", true)
 
 			this.motivationCoachingStartRecognized([], false)
 		}
@@ -1538,10 +1542,9 @@ class DrivingCoach extends GridRaceAssistant {
 		local ignore, lap, candidate, sessionDB, info, lapTime, sectorTimes, size, telemetry, reference
 
 		if (!this.Started && this.TelemetryAnalyzer.TrackMap) {
-			if this.Speaker[false]
-				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching
-																	|| this.MotivationCoaching) ? "CoachingStart"
-																								: "CoachingReady"
+			if (this.Speaker[false] && !this.MotivationCoaching)
+				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching) ? "CoachingStart"
+																						   : "CoachingReady"
 											, false, true, false, {Noise: false, Important: true})
 
 			this.iStarted := true
@@ -2685,11 +2688,11 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.CoachingActive
 			this.startupTelemetryCoaching()
 		else if this.MotivationCoaching
-			this.startTelemetryCoaching(true, "Motivation")
+			this.startTelemetryCoaching(true, "Motivation", false)
 		else if this.OnTrackCoaching
-			this.startTelemetryCoaching(true, "Track")
+			this.startTelemetryCoaching(true, "Track", false)
 		else if this.BrakeCoaching
-			this.startTelemetryCoaching(true, "Brake")
+			this.startTelemetryCoaching(true, "Brake", false)
 
 		return facts
 	}

@@ -30,7 +30,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 	iTelemetryCoachingActive := false
 	iTrackCoachingActive := false
 	iBrakeCoachingActive := false
-	iMotiviationCoachingActive := false
+	iMotivationCoachingActive := false
 
 	class RemoteDrivingCoach extends RaceAssistantPlugin.RemoteRaceAssistant {
 		__New(plugin, remotePID) {
@@ -137,7 +137,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		}
 	}
 
-	class MotiviationCoachingToggleAction extends ControllerAction {
+	class MotivationCoachingToggleAction extends ControllerAction {
 		iPlugin := false
 
 		Plugin {
@@ -155,10 +155,10 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		fireAction(function, trigger) {
 			local plugin := this.Plugin
 
-			if (plugin.MotiviationCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
+			if (plugin.MotivationCoachingActive && ((trigger = "On") || (trigger = "Off") || (trigger == "Push")))
 				plugin.finishCoaching()
-			else if (!plugin.MotiviationCoachingActive && ((trigger = "On") || (trigger == "Push")))
-				plugin.startMotiviationCoaching()
+			else if (!plugin.MotivationCoachingActive && ((trigger = "On") || (trigger == "Push")))
+				plugin.startMotivationCoaching()
 		}
 	}
 
@@ -559,7 +559,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
-			A_TrayMenu.Insert("1&")
 			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
 
 			hasTrayMenu := true

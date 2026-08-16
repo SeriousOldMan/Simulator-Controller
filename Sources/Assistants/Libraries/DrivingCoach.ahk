@@ -849,7 +849,7 @@ class DrivingCoach extends GridRaceAssistant {
 				if !this.CoachingActive
 					this.telemetryCoachingStartRecognized(words, true, "Motivation")
 				else
-					this.notivationCoachingStartRecognized(words)
+					this.motivationCoachingStartRecognized(words)
 
 				/*
 				else
@@ -889,11 +889,7 @@ class DrivingCoach extends GridRaceAssistant {
 		if !this.Connector
 			this.startConversation()
 
-		if (this.MotivationCoaching && !auto) {
-			if (confirm && this.Speaker)
-				this.getSpeaker().speakPhrase("Roger", false, false, false, {Noise: false})
-		}
-		else if (confirm && this.Speaker)
+		if (confirm && this.Speaker && (auto != "Motivation"))
 			this.getSpeaker().speakPhrase(auto ? "StartCoaching" : "ConfirmCoaching", false, false, false, {Noise: false})
 
 		this.iCoachingActive := true
@@ -1422,6 +1418,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.iTelemetryFuture := false
 
+		if started
+			updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, MotivationCoaching: false})
+
 		if isDebug()
 			if started
 				logMessage(kLogDebug, "Track coaching started...")
@@ -1463,6 +1462,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
+		if started
+			updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false, MotivationCoaching: false})
+
 		if isDebug()
 			if started
 				logMessage(kLogDebug, "Brake coaching started...")
@@ -1502,6 +1504,8 @@ class DrivingCoach extends GridRaceAssistant {
 		setMultiMapValue(state, "Coaching", "Motivation", true)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		updateConfigurationValues({MotivationCoaching: true, BrakeCoaching: false, OnTrackCoaching: false})
 
 		if isDebug()
 			if started
@@ -2680,10 +2684,12 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if this.CoachingActive
 			this.startupTelemetryCoaching()
-		else if (this.MotivationCoaching)
+		else if this.MotivationCoaching
 			this.startTelemetryCoaching(true, "Motivation")
-		else if (this.OnTrackCoaching || this.BrakeCoaching)
-			this.startTelemetryCoaching(true, this.BrakeCoaching ? "Brake" : "Track")
+		else if this.OnTrackCoaching
+			this.startTelemetryCoaching(true, "Track")
+		else if this.BrakeCoaching
+			this.startTelemetryCoaching(true, "Brake")
 
 		return facts
 	}

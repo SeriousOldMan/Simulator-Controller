@@ -2776,6 +2776,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 			if this.CoachingActive
 				this.startupTelemetryCoaching()
+
+			if this.MotivationCoaching
+				if (Random(1, 20) > 18)
+					this.callToFocus()
 		}
 
 		return result
@@ -2784,15 +2788,51 @@ class DrivingCoach extends GridRaceAssistant {
 	updateLap(lapNumber, &data, arguments*) {
 		local result := super.updateLap(lapNumber, &data, arguments*)
 
-		if (lapNumber > 0)
+		if (lapNumber > 0) {
 			if this.CoachingActive
 				this.startupTelemetryCoaching()
+
+			if this.MotivationCoaching
+				if (Random(1, 20) > 18)
+					this.callToFocus()
+		}
 
 		return result
 	}
 
 	acousticFeedback(soundFile) {
 		playSound("DCSoundPlayer.exe", soundFile, this.AudioSettings, "echos 1 1 1 1")
+	}
+
+	callToFocus() {
+		local knowledgeBase := this.KnowledgeBase
+		local lapNumber, lapTime
+
+		static analyzedLaps := 0
+		static bestLapTime := 2147483647
+
+		if knowledgeBase {
+			lapNumber := knowledgeBase.getValue("Lap", 0)
+
+			if ((lapNumber > analyzedLaps) && (lapNumber > (this.BaseLap + (2 * this.LearningLaps)))) {
+				lapTime := knowledgeBase.getValue("Lap." . lapNumber . ".Time", 0)
+
+				if ((lapTime - bestLapTime) > 1000) {
+					if this.Speaker[false]
+						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
+				}
+				else if ((lapTime - bestLapTime) < 200)
+					if this.Speaker[false]
+						this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
+
+				analyzedLaps := lapNumber
+				bestLapTime := Min(bestLapTime, lapTime)
+			}
+			else {
+				analyzedLaps := 0
+				bestLapTime := 2147483647
+			}
+		}
 	}
 
 	positionTrigger(sectionNr, positionX, positionY, diagnostics*) {

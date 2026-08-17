@@ -5048,7 +5048,11 @@ class SetupEngineer extends ConfigurationItem {
 			try {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Analyzing lap..."), "...", "")), () {
-						local driver, lapTime, sectorTimes, telemetry
+						local driver := false
+						local lapTime := false
+						local sectorTimes := false
+						local hasLapTime := true
+						local telemetry
 
 						if FileExist(fileName . ".info") {
 							info := readMultiMap(fileName . ".info")
@@ -5068,8 +5072,11 @@ class SetupEngineer extends ConfigurationItem {
 						if !driver
 							driver := SessionDatabase.getName("Creator")
 
-						if !lapTime
+						if !lapTime {
 							lapTime := translate("-")
+
+							hasLapTime := false
+						}
 
 						if !sectorTimes
 							sectorTimes := ["-"]
@@ -5077,6 +5084,15 @@ class SetupEngineer extends ConfigurationItem {
 						telemetry := TelemetryAnalyzer(this.Simulator
 													 , this.Track).createTelemetry(false, fileName
 																				 , driver, lapTime, sectorTimes)
+
+						if (!hasLapTime && telemetry && telemetry.Data) {
+							lapTime := telemetry.getValue(telemetry.Data.Length, "Time", kUndefined)
+
+							if (lapTime != kUndefined)
+								telemetry := TelemetryAnalyzer(this.Simulator
+															 , this.Track).createTelemetry(false, fileName
+																						 , driver, lapTime, sectorTimes)
+						}
 
 						analysis := this.createAnalysis(telemetry)
 					})

@@ -1371,6 +1371,7 @@ class TelemetryViewer {
 	}
 
 	getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
+		local result := true
 		local info
 
 		if isObject(lap) {
@@ -1393,6 +1394,13 @@ class TelemetryViewer {
 			if sectorTimes
 				sectorTimes := string2Values(",", sectorTimes)
 		}
+		else {
+			driver := false
+			lapTime := false
+			sectorTimes := false
+
+			result := false
+		}
 
 		if !driver
 			driver := SessionDatabase.getName("Creator")
@@ -1402,6 +1410,8 @@ class TelemetryViewer {
 
 		if !sectorTimes
 			sectorTimes := ["-"]
+
+		return result
 	}
 
 	createTelemetry(simulator, track, lap) {
@@ -2135,17 +2145,54 @@ class TelemetryViewer {
 
 	loadTelemetry(select := false) {
 		local laps := []
-		local lap, name, index
+		local lap, name, index, driver, lapTime, sectorTimes, info
 
 		newLap(lap) {
-			local file
+			local file, fileName, analyzer, telemetry, lapTime
+			local simulator, car, track
 
 			if !inList(this.Laps, lap) {
 				try {
-					file := FileOpen(this.TelemetryDirectory . "Lap " . lap . ".telemetry", "r-wd")
+					fileName := (this.TelemetryDirectory . "Lap " . lap . ".telemetry")
+					file := FileOpen(fileName, "r-wd")
 
 					if file {
 						file.Close()
+
+						if !FileExist(fileName . ".info") {
+							info := newMultiMap()
+
+							if this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
+								setMultiMapValue(info, "Info", "Driver", driver)
+								setMultiMapValue(info, "Info", "LapTime", lapTime)
+
+								if isObject(sectorTimes)
+									setMultiMapValue(info, "Info", "SectorTimes", values2String(",", sectorTimes*))
+							}
+							else {
+								setMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Creator"))
+
+								this.getSessionInformation(&simulator, &car, &track)
+
+								analyzer := TelemetryAnalyzer(simulator, track)
+								telemetry := analyzer.createTelemetry(false, fileName, driver, lapTime, sectorTimes)
+
+								if (telemetry && telemetry.Data && (telemetry.Data.Length > 0)) {
+									lapTime := telemetry.getValue(1, "Time", kUndefined)
+
+									if (lapTime != kUndefined) {
+										lapTime := 0
+
+										loop telemetry.Data.Length
+											lapTime := Max(lapTime, telemetry.getValue(A_Index, "Time"))
+
+										setMultiMapValue(info, "Info", "LapTime", Round(lapTime / 1000, 1))
+									}
+								}
+							}
+
+							writeMultiMap(fileName . ".info", info)
+						}
 
 						return true
 					}

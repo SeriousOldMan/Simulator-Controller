@@ -1818,8 +1818,6 @@ class SetupWorkbench extends ConfigurationItem {
 
 		do(telemetries, (fileName) {
 			if !inList(lastTelemetries, fileName) {
-				lastTelemetries.Push(fileName)
-
 				if FileExist(fileName . ".info") {
 					info := readMultiMap(fileName . ".info")
 
@@ -1839,6 +1837,8 @@ class SetupWorkbench extends ConfigurationItem {
 					SplitPath(fileName, , , , &name)
 
 					this.logLap(name, lapTimeDisplayValue(lapTime), sectorTimes)
+
+					lastTelemetries.Push(fileName)
 				}
 			}
 		})
@@ -4602,7 +4602,7 @@ class SetupEngineer extends ConfigurationItem {
 							   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
 					}
 					catch Any {
-						date := translate("-")
+						date := (FormatTime(A_Now, "ShortDate") . translate(" - ") . FormatTime(A_Now, "Time"))
 					}
 				}
 				else {
@@ -4610,7 +4610,7 @@ class SetupEngineer extends ConfigurationItem {
 
 					lapTime := translate("-")
 					driver := translate("-")
-					date := translate("-")
+					date := (FormatTime(A_Now, "ShortDate") . translate(" - ") . FormatTime(A_Now, "Time"))
 				}
 
 				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, driver, lapTimeDisplayValue(lapTime), date)

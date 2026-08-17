@@ -1371,16 +1371,18 @@ class TelemetryViewer {
 	}
 
 	getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
-		local result := true
-		local info
+		local result, info
 
 		if isObject(lap) {
 			driver := lap[2]
 			lapTime := ((lap[3] != translate("-")) ? lap[3] : false)
 			sectorTimes := lap[4]
+
+			result := true
 		}
-		else if (!this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-			  && fileName && FileExist(fileName . ".info")) {
+		else if this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+			result := true
+		else if (fileName && FileExist(fileName . ".info")) {
 			info := readMultiMap(fileName . ".info")
 
 			driver := getMultiMapValue(info, "Lap", "Driver"
@@ -1393,6 +1395,8 @@ class TelemetryViewer {
 
 			if sectorTimes
 				sectorTimes := string2Values(",", sectorTimes)
+
+			result := true
 		}
 		else {
 			driver := false

@@ -4598,11 +4598,10 @@ class SetupEngineer extends ConfigurationItem {
 						driver := SessionDatabase.getName("Creator")
 
 					try {
-						date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-							   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+						date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
 					}
 					catch Any {
-						date := (FormatTime(A_Now, "ShortDate") . translate(" - ") . FormatTime(A_Now, "Time"))
+						date := FormatTime(A_Now, "ShortDate")
 					}
 				}
 				else {
@@ -4610,7 +4609,7 @@ class SetupEngineer extends ConfigurationItem {
 
 					lapTime := translate("-")
 					driver := translate("-")
-					date := (FormatTime(A_Now, "ShortDate") . translate(" - ") . FormatTime(A_Now, "Time"))
+					date := FormatTime(A_Now, "ShortDate")
 				}
 
 				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, driver, lapTimeDisplayValue(lapTime), date)

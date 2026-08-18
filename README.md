@@ -140,6 +140,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 41. [Analyzing handling issues after a session](https://youtu.be/J3C3QMxmA3E) - This video demonstrates how to analyze telemetry data for handling problems after a session and how a new setup can automatically be created based on the telemetry data.
 
+42. [Using the Setup Engineer](https://youtu.be/LlJ-YgZJqFg) - You will learn in this video how to configure and use the new Setup Engineer.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community

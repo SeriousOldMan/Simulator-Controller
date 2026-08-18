@@ -1428,7 +1428,7 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iTelemetryFuture := false
 
 		if started
-			updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, MotivationCoaching: false})
+			this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, MotivationCoaching: false})
 
 		if isDebug()
 			if started
@@ -1472,7 +1472,7 @@ class DrivingCoach extends GridRaceAssistant {
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		if started
-			updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false, MotivationCoaching: false})
+			this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false, MotivationCoaching: false})
 
 		if isDebug()
 			if started
@@ -1503,7 +1503,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupMotivationCoaching() {
-		local state, started
+		local state
 
 		this.shutdownTrackTrigger()
 		this.shutdownBrakeTrigger()
@@ -1514,13 +1514,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		updateConfigurationValues({MotivationCoaching: true, BrakeCoaching: false, OnTrackCoaching: false})
+		this.updateConfigurationValues({MotivationCoaching: true, BrakeCoaching: false, OnTrackCoaching: false})
 
 		if isDebug()
-			if started
-				logMessage(kLogDebug, "Motivation coaching started...")
-			else
-				logMessage(kLogDebug, "Motivation coaching NOT started...")
+			logMessage(kLogDebug, "Motivation coaching started...")
 
 		return true
 	}
@@ -2825,7 +2822,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	callToFocus() {
 		local knowledgeBase := this.KnowledgeBase
-		local lapNumber, lapTime
+		local lapNumber, lapTime, oldMode
 
 		static analyzedLaps := 0
 		static bestLapTime := 2147483647
@@ -2840,7 +2837,16 @@ class DrivingCoach extends GridRaceAssistant {
 					if this.Speaker[false] {
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
 
-						this.handleVoiceText("TEXT", this.Instructions["Coaching.Motivation"], false)
+						oldMode := this.Mode
+
+						this.Mode := "Motivation"
+
+						try {
+							this.handleVoiceText("TEXT", this.Instructions["Coaching.Motivation"], false)
+						}
+						finally {
+							this.Mode := oldMode
+						}
 					}
 				}
 				else if ((lapTime - bestLapTime) < 200)

@@ -26,7 +26,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.1.0
+
+#### Date: 08/21/26 (planned)
+
+#### Fixes
+
+  - Added missing translations for all languages.
+  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
+  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
+  - Fixed the location handling of the diary folder location in "Setup Workbench".
+  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  
+#### Changes
+
+  - Several optical enhancements in "Simulator Setup" and "Simulator Configuration".
 
 # Release history
 

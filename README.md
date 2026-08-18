@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.2.1.0-release](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/d3RFKlg3/Releases/Simulator%20Controller%207.2.1.0-dev.zip) (Early build for 7.2.1. Changes: Fixed several translations, Fixed minor bugs in telemetry handling, Optical enhancements in "Simulator Setup" and "Simulator Configuration", Fixed diary folder location, Fixed scrolling of Setup Engineer telemetry list.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7210) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-721) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

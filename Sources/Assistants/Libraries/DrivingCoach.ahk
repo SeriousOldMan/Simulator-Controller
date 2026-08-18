@@ -174,7 +174,7 @@ class DrivingCoach extends GridRaceAssistant {
 		Get {
 			if isSet(type) {
 				if (type == true)
-					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Suspension", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference"]
+					return ["Character", "Simulation", "Session", "Stint", "Knowledge", "Handling", "Suspension", "Coaching", "Coaching.Lap", "Coaching.Corner", "Coaching.Corner.Approaching", "Coaching.Corner.Problems", "Coaching.Corner.Review", "Coaching.Reference", "Coaching.Motivation"]
 				else
 					return (this.iInstructions.Has(type) ? this.iInstructions[type] : false)
 			}
@@ -551,7 +551,8 @@ class DrivingCoach extends GridRaceAssistant {
 												  , track: settingsDB.getTrackName(simulator, track)})
 				}
 			case "Session":
-				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["SessionInformation"]) {
+				if (knowledgeBase && ((this.Mode = "Conversation") || (this.Mode = "Motivation"))
+								  && this.Announcements["SessionInformation"]) {
 					position := this.GridPosition
 
 					if (position != 0)
@@ -561,7 +562,8 @@ class DrivingCoach extends GridRaceAssistant {
 												  , classPosition: this.GridPosition["Class"], overallPosition: position})
 				}
 			case "Stint":
-				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["StintInformation"]) {
+				if (knowledgeBase && ((this.Mode = "Conversation") || (this.Mode = "Motivation"))
+								  && this.Announcements["StintInformation"]) {
 					language := this.VoiceManager.Language["Original"]
 					position := this.getPosition(false, "Class")
 
@@ -636,7 +638,8 @@ class DrivingCoach extends GridRaceAssistant {
 						return substituteVariables(this.Instructions["Knowledge"], {knowledge: StrReplace(JSON.print(data, isDebug() ? "  " : ""), "%", "\%")})
 				}
 			case "Handling":
-				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["HandlingInformation"]) {
+				if (knowledgeBase && ((this.Mode = "Conversation") || (this.Mode = "Motivation"))
+								  && this.Announcements["HandlingInformation"]) {
 					collector := this.iIssueCollector
 
 					if collector {
@@ -665,7 +668,8 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Suspension":
-				if (knowledgeBase && (this.Mode = "Conversation") && this.Announcements["HandlingInformation"]) {
+				if (knowledgeBase && ((this.Mode = "Conversation") || (this.Mode = "Motivation"))
+								  && this.Announcements["HandlingInformation"]) {
 					collector := this.iIssueCollector
 
 					if collector {
@@ -702,8 +706,9 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Coaching":
-				if ((knowledgeBase || isDebug()) && this.CoachingActive && this.TelemetryAnalyzer && (Trim(this.Instructions["Coaching"]) != ""))
-					if (this.Mode = "Conversation") {
+				if ((knowledgeBase || isDebug()) && (this.CoachingActive || (this.Mode = "Motivation"))
+												 && this.TelemetryAnalyzer && (Trim(this.Instructions["Coaching"]) != ""))
+					if ((this.Mode = "Conversation") || (this.Mode = "Motivation")) {
 						telemetry := this.getTelemetry(&reference := true)
 
 						if telemetry {
@@ -2832,8 +2837,11 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := knowledgeBase.getValue("Lap." . lapNumber . ".Time", 0)
 
 				if ((lapTime - bestLapTime) > 1000) {
-					if this.Speaker[false]
+					if this.Speaker[false] {
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
+
+						this.handleVoiceText("TEXT", this.Instructions["Coaching.Motivation"], false)
+					}
 				}
 				else if ((lapTime - bestLapTime) < 200)
 					if this.Speaker[false]

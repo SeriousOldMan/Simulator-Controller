@@ -415,7 +415,7 @@ class SetupWorkbench extends ConfigurationItem {
 		diaryFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
 									  , "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
 
-		if (!diaryFolder || (diaryFolder))
+		if (!diaryFolder || (diaryFolder = ""))
 			diaryFolder := (kTempDirectory . "Setup Workbench\Diary")
 
 		DirCreate(diaryFolder)

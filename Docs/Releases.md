@@ -40,7 +40,7 @@
   
 #### Changes
 
-  - Several optical enhancements in "Simulator Setup" and "Simulator Configuration".
+  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
 
 # Release history
 

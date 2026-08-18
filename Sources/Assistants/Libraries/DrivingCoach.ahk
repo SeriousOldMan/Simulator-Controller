@@ -2822,7 +2822,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateDriver() {
 		local knowledgeBase := this.KnowledgeBase
-		local lapNumber, lapTime, oldMode, valid
+		local lapNumber, lapTime, oldMode, valid, delta
 
 		static analyzedLaps := 0
 		static lastLapTime := 0
@@ -2838,8 +2838,10 @@ class DrivingCoach extends GridRaceAssistant {
 				if (lapTime = lastLapTime)
 					return
 
-				if this.Speaker[false]
-					if ((lapTime - bestLapTime) > 1000) {
+				if this.Speaker[false] {
+					delta := (lapTime - bestLapTime)
+
+					if (delta > 1000) {
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
 
 						oldMode := this.Mode
@@ -2853,14 +2855,14 @@ class DrivingCoach extends GridRaceAssistant {
 							this.Mode := oldMode
 						}
 					}
-					else if ((lapTime - bestLapTime) > 500)
+					else if (delta > 500)
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
-					else if valid
-						if (Abs(lapTime - bestLapTime) < 0)
+					else if (valid && (delta < 0))
+						if (delta < -200)
 							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
-						else if (Abs(lapTime - bestLapTime) < 200)
-							if (Random(1, 10) > 8)
-								this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
+						else if (Random(1, 10) > 8)
+							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
+				}
 
 				analyzedLaps := lapNumber
 				lastLapTime := lapTime

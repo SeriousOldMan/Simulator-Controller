@@ -41,6 +41,7 @@
 #### Changes
 
   - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
+  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
 
 # Release history
 

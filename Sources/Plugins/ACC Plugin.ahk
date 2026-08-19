@@ -217,7 +217,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.iUDPProvider := ACCUDPProvider(this.getArgumentValue("udpConnection", false))
 
-			controller.registerPlugin(this)
+			controller.registerPlugin(name, this)
 		}
 	}
 

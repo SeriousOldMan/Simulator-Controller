@@ -71,7 +71,7 @@ class ACEPlugin extends RaceAssistantSimulatorPlugin {
 		if (this.Active || (isDebug() && isDevelopment())) {
 			this.iUDPProvider := ACEUDPProvider(this.getArgumentValue("udpConnection", false))
 
-			controller.registerPlugin(this)
+			controller.registerPlugin(name, this)
 		}
 	}
 

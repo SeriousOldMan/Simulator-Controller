@@ -342,7 +342,7 @@ class SystemPlugin extends ControllerPlugin {
 				this.registerMode(this.iLaunchMode)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 
 			this.initializeBackgroundTasks()
 		}

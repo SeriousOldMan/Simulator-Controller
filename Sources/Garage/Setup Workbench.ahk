@@ -4556,14 +4556,12 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	updateTelemetries() {
-		local selected := this.TelemetriesListView.GetNext(0)
 		local telemetries := []
+		local loadedTelemetries := []
+		local availableTelemetries := []
+		local removedTelemetries := []
+		local initialize := (this.TelemetriesListView.GetCount() = 0)
 		local info, lapTime, name, driver, date
-
-		if selected
-			selected := this.TelemetriesListView.GetText(selected)
-
-		this.TelemetriesListView.Delete()
 
 		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F"
 			telemetries.Push(A_LoopFileFullPath)
@@ -4571,58 +4569,79 @@ class SetupEngineer extends ConfigurationItem {
 		loop Files, kTempDirectory . "Setup Workbench\Telemetry\Imported\*.telemetry", "F"
 			telemetries.Push(A_LoopFileFullPath)
 
-		do(telemetries, (fileName) {
-			SplitPath(fileName, , , , &name)
+		loop this.TelemetriesListView.GetCount()
+			loadedTelemetries.Push(this.TelemetriesListView.GetText(A_Index))
 
-			this.TelemetriesListView.Opt("-Redraw")
+		availableTelemetries := collect(telemetries, (t) {
+			local name
 
-			try {
-				if FileExist(fileName . ".info") {
-					info := readMultiMap(fileName . ".info")
+			SplitPath(t, , , , &name)
 
-					lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+			return name
+		})
 
-					driver := getMultiMapValue(info, "Lap", "Driver", false)
+		this.TelemetriesListView.Opt("-Redraw")
 
-					if !driver
-						if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
-							driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+		try {
+			do(telemetries, (fileName) {
+				SplitPath(fileName, , , , &name)
 
-							if driver
-								driver := SessionDatabase.getDriverName(this.Simulator, driver)
-							else
-								driver := getMultiMapValue(info, "Info", "Driver", false)
+				if !inList(loadedTelemetries, name) {
+					if FileExist(fileName . ".info") {
+						info := readMultiMap(fileName . ".info")
+
+						lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+
+						driver := getMultiMapValue(info, "Lap", "Driver", false)
+
+						if !driver
+							if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+								driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+
+								if driver
+									driver := SessionDatabase.getDriverName(this.Simulator, driver)
+								else
+									driver := getMultiMapValue(info, "Info", "Driver", false)
+							}
+
+						if !driver
+							driver := SessionDatabase.getName("Creator")
+
+						try {
+							date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
 						}
-
-					if !driver
-						driver := SessionDatabase.getName("Creator")
-
-					try {
-						date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
+						catch Any {
+							date := FormatTime(A_Now, "ShortDate")
+						}
 					}
-					catch Any {
+					else {
+						info := false
+
+						lapTime := translate("-")
+						driver := translate("-")
 						date := FormatTime(A_Now, "ShortDate")
 					}
+
+					this.TelemetriesListView.Add("", name, driver, lapTimeDisplayValue(lapTime), date)
 				}
-				else {
-					info := false
+			})
 
-					lapTime := translate("-")
-					driver := translate("-")
-					date := FormatTime(A_Now, "ShortDate")
-				}
+			loop this.TelemetriesListView.GetCount()
+				if !inList(availableTelemetries, this.TelemetriesListView.GetText(A_Index))
+					removedTelemetries.Push(A_Index)
 
-				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, driver, lapTimeDisplayValue(lapTime), date)
+			do(reverse(removedTelemetries), (t) => this.TelemetriesListView.Delete(t))
 
+			if initialize {
 				this.TelemetriesListView.ModifyCol()
 
 				loop 4
 					this.TelemetriesListView.ModifyCol(A_Index, "AutoHdr")
 			}
-			finally {
-				this.TelemetriesListView.Opt("+Redraw")
-			}
-		})
+		}
+		finally {
+			this.TelemetriesListView.Opt("+Redraw")
+		}
 
 		this.updateState()
 	}

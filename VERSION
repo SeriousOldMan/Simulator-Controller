@@ -2,8 +2,8 @@
 Version=7.2.2.0-dev
 Target=7.2.2.0-release
 Date=08/19/26
-Download=Race motivation support by the Driving Coach
-Changes=Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider, Support opening of IBT files directly from browser, Validation for Team Server connection in "Session Database"
+Download=
+Changes=Race motivation support by the Driving Coach
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.0.3
 [Release]
 Version=7.2.0.0-release

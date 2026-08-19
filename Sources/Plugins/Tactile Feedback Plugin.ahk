@@ -352,7 +352,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				this.createEffectAction(controller, chassisMode, "Chassis", string2Values(A_Space, effect)*)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 
 			for ignore, toggle in ["Pedal", "Front", "Rear"]
 				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Functions", toggle . " Vibration", kUndefined) != kUndefined))
@@ -376,7 +376,7 @@ class TactileFeedbackPlugin extends ControllerPlugin {
 				this.disablePedalVibration(false, true, pedalVibrationEnabled != this.PedalVibrationEnabled)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 		}
 	}
 

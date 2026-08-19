@@ -403,7 +403,7 @@ class TeamServerPlugin extends ControllerPlugin {
 				this.createTeamServerAction(controller, "TeamCenterOpen", openTeamCenter)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 
 			if this.TeamServerEnabled
 				this.enableTeamServer(false, true)

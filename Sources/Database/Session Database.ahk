@@ -6520,16 +6520,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 					switch tyre, false {
 						case "Front.Left":
+							window["flWear"].Opt("Background" . "D0D0D0")
 							window["flWear"].Text := tyreWear
+							window["flLaps"].Opt("Background" . "D0D0D0")
 							window["flLaps"].Text := tyreLaps
 						case "Front.Right":
+							window["frWear"].Opt("Background" . "D0D0D0")
 							window["frWear"].Text := tyreWear
+							window["frLaps"].Opt("Background" . "D0D0D0")
 							window["frLaps"].Text := tyreLaps
 						case "Rear.Left":
+							window["rlWear"].Opt("Background" . "D0D0D0")
 							window["rlWear"].Text := tyreWear
+							window["rlLaps"].Opt("Background" . "D0D0D0")
 							window["rlLaps"].Text := tyreLaps
 						case "Rear.Right":
+							window["rrWear"].Opt("Background" . "D0D0D0")
 							window["rrWear"].Text := tyreWear
+							window["rrLaps"].Opt("Background" . "D0D0D0")
 							window["rrLaps"].Text := tyreLaps
 					}
 				}

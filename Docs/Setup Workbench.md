@@ -12,7 +12,7 @@ Before we dive into the workflow of the "Setup Workbench", let's have a look at 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.jpg)
 
-You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be note in the form of a diary. The following entries will be made:
+You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be noted in the form of a diary. The following entries will be made:
 
 - Each selection of simulator, car and/or track
 - Every change to the issues in the *Characteristics* pane of the main window

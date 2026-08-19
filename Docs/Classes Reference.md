@@ -526,10 +526,13 @@ Registers a visual representation for the hardware controller. This method is au
 #### *unregisterFunctionController(controller :: FunctionController)*
 Removes a visual representation for the hardware controller from this controller. This method might be called from your own plugin to remove all predefined controller representations before registering your own ones.
 
-#### *registerPlugin(plugin :: ControllerPlugin)*
-Registers the given plugin for the controller. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
+#### *registerPlugin(name :: String, plugin :: ControllerPlugin)*
+Registers the given plugin for the controller. *name* is the official name of the plugin, for example "ACC" for *Assetto Corsa Competizione*. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
 
-Note: Normally, this method is called by the constructor of the plugin. Therefore it is in many cases unnecessary to call *registerPlugin* directly. But depending on initialization order, where modes and actions have been defined after the basic instance construction, a second activation of the plugin might be necessary. All side effects of *registerPlugin* are idempotent, so you can call it as many times you like. 
+Note: Normally, this method is called by the constructor of the plugin. Therefore it is in many cases unnecessary to call *registerPlugin* directly. But depending on initialization order, where modes and actions have been defined after the basic instance construction, a second activation of the plugin might be necessary. All side effects of *registerPlugin* are idempotent, so you can call it as many times you like.
+
+#### *unregisterPlugin(name :: String)*
+Unregisters the plugin which has been already registered for the given *name*. This can be used to actually register a different plugin, which has been created from a subclass of the original plugin.
 
 #### *registerMode(plugin :: ControllerPlugin, mode :: ControllerMode)*
 Registers the given mode of the given plugin for the controller.

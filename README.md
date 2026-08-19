@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.2.1.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/TPbsTdQ0/Releases/Simulator%20Controller%207.2.1.0-beta.zip) (Test build for 7.2.1. Changes: Fixed several translations, Fixed minor bugs in telemetry handling, Optical enhancements in "Simulator Setup" and "Simulator Configuration", Fixed diary folder location, Fixed scrolling of Setup Engineer telemetry list, Modified plugin registration method.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7210) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-721) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 
@@ -140,6 +142,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 41. [Analyzing handling issues after a session](https://youtu.be/J3C3QMxmA3E) - This video demonstrates how to analyze telemetry data for handling problems after a session and how a new setup can automatically be created based on the telemetry data.
 
+42. [Using the Setup Engineer](https://youtu.be/LlJ-YgZJqFg) - You will learn in this video how to configure and use the new Setup Engineer.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community
@@ -216,7 +220,7 @@ Another very useful tool of the Simulator Controller suite is the Setup Workbenc
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench.jpg)
 
-Additionally, an integrated Setup Engineer using GPT technology can also create a detailed analysis of the car handling and your driving style based on the telemetry data of a specific lap. Once an analysis has been created, the recommended setup changes can automatically applied to a setup file.
+Additionally, an integrated Setup Engineer using GPT technology can also create a detailed analysis of the car handling and your driving style based on the telemetry data of a specific lap. Once an analysis has been created, the recommended setup changes can automatically be applied to a setup file.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 

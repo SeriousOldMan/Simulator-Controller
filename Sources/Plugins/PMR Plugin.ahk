@@ -52,7 +52,7 @@ class PMRPlugin extends RaceAssistantSimulatorPlugin {
 
 			writeMultiMap(kUserConfigDirectory . "PMR Configuration.ini", udpConfiguration)
 
-			controller.registerPlugin(this)
+			controller.registerPlugin(name, this)
 		}
 	}
 }

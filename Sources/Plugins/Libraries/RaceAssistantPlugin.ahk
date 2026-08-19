@@ -997,7 +997,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			deleteDirectory(kTempDirectory . "Race Assistant")
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 
 			registerMessageHandler(this.Plugin, methodMessageHandler, this)
 

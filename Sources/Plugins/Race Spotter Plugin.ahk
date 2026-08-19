@@ -202,7 +202,7 @@ class RaceSpotterPlugin extends RaceAssistantPlugin {
 			}, 500, kHighPriority)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 		}
 	}
 

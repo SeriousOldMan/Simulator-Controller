@@ -309,7 +309,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 			descriptor := ConfigurationItem.descriptor(action, "Toggle")
 
 			this.registerAction(DrivingCoachPlugin.RaceMotivationToggleAction(this, controller.findFunction(actionFunction)
-																				, this.getLabel(descriptor, action), this.getIcon(descriptor)))
+																				  , this.getLabel(descriptor, action), this.getIcon(descriptor)))
 		}
 		else
 			logMessage(kLogWarn, translate("Action `"") . action . translate("`" not found in plugin ") . translate(this.Plugin) . translate(" - please check the configuration"))

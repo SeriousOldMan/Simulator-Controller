@@ -516,6 +516,8 @@ The following video gives you a good demonstration of this:
 
 This mode also uses the underlying telemtry data system to help you to retain your focus and your motivation to push. Once the Coach detects, that you are loosing pace, he will yell at you and will try to bring your attention back to the tarmac. You can enable this mode by asking the Coach, whether he can help you to keep your focus.
 
+Good to know: You can control the level of verbosity by modifying the *Coaching.TimeLoss* instruction. You can even delete the whole content of this instructions and the Coach will then tell you only that you have lost pace and that you should focus again.
+
 ### Automatic activation of coaching mode
 
 Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the Coach on your side in each practice session. Always having to ask the Coach to come along can become boring with time. As always with Simulator Controller, there are several methods to do this:

@@ -234,6 +234,7 @@ Below you find all instruction categories and the supported variables:
 |             | %corner%          | The corner to be reviewed. |
 | Coaching.Reference | Scope            | This is used as an addition for many of the above synthetic questions/commands for telemetry review. It is used, when a reference lap is available, which can be used for comparison against the most recent lap. |
 |             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the reference lap. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
+| Coaching.TimeLoss | Scope            | This instruction is used when the Coach is active during a race and helps you to keep focus and motivation. |
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 

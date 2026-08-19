@@ -118,6 +118,8 @@ class SetupWorkbench extends ConfigurationItem {
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
 
+	iDiary := false
+
 	iCharacteristics := []
 	iSettings := []
 
@@ -237,6 +239,12 @@ class SetupWorkbench extends ConfigurationItem {
 	SimulatorSettings {
 		Get {
 			return this.iSimulatorSettings
+		}
+	}
+
+	Diary {
+		Get {
+			return this.iDiary
 		}
 	}
 
@@ -379,7 +387,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
-		local definition, ignore, fileName
+		local definition, ignore, fileName, diaryFolder
 
 		if simulator {
 			this.iSelectedSimulator := SessionDatabase.getSimulatorName(simulator)
@@ -404,6 +412,16 @@ class SetupWorkbench extends ConfigurationItem {
 
 		super.__New(kSimulatorConfiguration)
 
+		diaryFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
+									  , "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
+
+		if (!diaryFolder || (diaryFolder = ""))
+			diaryFolder := (kTempDirectory . "Setup Workbench\Diary")
+
+		DirCreate(diaryFolder)
+
+		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . translate("Diary ") . A_Now . ".txt")
+
 		SetupWorkbench.Instance := this
 
 		OnExit((*) {
@@ -422,10 +440,14 @@ class SetupWorkbench extends ConfigurationItem {
 
 		chooseSimulator(*) {
 			workbench.loadSimulator((workbenchGui["simulatorDropDown"].Text = translate("Generic")) ? true : workbenchGui["simulatorDropDown"].Text)
+
+			workbench.logDiary("Selection")
 		}
 
 		chooseCar(*) {
 			workbench.loadCar((workbenchGui["carDropDown"].Text = translate("All")) ? true : workbenchGui["carDropDown"].Text)
+
+			workbench.logDiary("Selection")
 		}
 
 		chooseTrack(*) {
@@ -440,6 +462,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 				workbench.loadTrack(tracks[inList(trackNames, workbenchGui["trackDropDown"].Text)])
 			}
+
+			workbench.logDiary("Selection")
 		}
 
 		chooseWeather(*) {
@@ -451,6 +475,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		editSetup(*) {
 			workbench.editSetup()
+		}
+
+		editDiary(*) {
+			Run("Notepad.exe `"" . this.Diary . "`"")
 		}
 
 		loadIssues(*) {
@@ -580,7 +608,11 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Picture", "x420 ys+12 w30 h30", workbenchGui.Theme.RecolorizeImage(kIconsDirectory . "Assistant.ico"))
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
-		button := workbenchGui.Add("Button", "x1172 yp+6 w23 h23 X:Move")
+		button := workbenchGui.Add("Button", "x1148 yp+6 w23 h23 X:Move")
+		button.OnEvent("Click", editDiary)
+		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L2 T2 R2 B2")
+
+		button := workbenchGui.Add("Button", "x1172 yp w23 h23 X:Move")
 		button.OnEvent("Click", (*) => this.editSettings())
 		setButtonIcon(button, kIconsDirectory . "General Settings.ico", 1)
 
@@ -685,6 +717,8 @@ class SetupWorkbench extends ConfigurationItem {
 				this.loadTrack(track, false)
 				this.loadWeather(weather, false)
 
+				this.logDiary("Selection")
+
 				characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
 
 				characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
@@ -722,6 +756,8 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 		else
 			this.loadSimulator(true, true)
+
+		this.logDiary("Selection")
 
 		return false
 	}
@@ -1403,6 +1439,116 @@ class SetupWorkbench extends ConfigurationItem {
 		this.iDefinition := this.iOriginalDefinition.Clone()
 	}
 
+	logDiary(type, arguments*) {
+		switch type, false {
+			case "Selection":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Selection")}) . "`n`n"
+						 . translate("Simulator:") . A_Space . this.SelectedSimulator[true] . "`n"
+						 . translate("Car:") . A_Space . this.SelectedCar[true] . "`n"
+						 . translate("Track:") . A_Space . this.SelectedTrack[true] . "`n`n", this.Diary, "UTF-16")
+			case "Characteristics":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Characteristics")}) . "`n`n"
+						 . arguments[1] . "`n`n", this.Diary, "UTF-16")
+			case "Load":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Load")}) . "`n`n"
+						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n", this.Diary, "UTF-16")
+			case "Save":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
+						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
+						 . arguments[3] . "`n`n", this.Diary, "UTF-16")
+			case "Lap":
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Lap")}) . "`n`n"
+						 . translate("Name:") . A_Space . arguments[1] . "`n"
+						 . translate("Lap Time:") . A_Space . arguments[2] . "`n"
+						 . translate("Sector Times:") . A_Space . arguments[3] . "`n`n", this.Diary, "UTF-16")
+		}
+	}
+
+	logLoad(editor, setup) {
+		this.logDiary("Load", setup.Name, setup.FileName)
+	}
+
+	logSave(editor, setup) {
+		local categories := getMultiMapValues(this.Definition, "Workbench.Categories")
+		local categoriesLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		local settingsList := []
+		local ignore, setting, handler, unit, originalValue, modifiedValue, value
+		local candidate, settings
+
+		for ignore, setting in editor.getSettings() {
+			handler := editor.createSettingHandler(setting)
+
+			if handler {
+				unit := editor.getUnit(setting)
+
+				originalValue := handler.convertToDisplayValue(setup.getValue(setting, true))
+				modifiedValue := handler.convertToDisplayValue(setup.getValue(setting, false))
+
+				if (originalValue != modifiedValue) {
+					if (isNumber(originalValue) && isNumber(modifiedValue)) {
+						if (originalValue = modifiedValue) {
+							value := handler.formatValue(originalValue)
+
+							if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure")))
+								value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+
+							value := displayValue("Float", value)
+						}
+						else {
+							value := handler.formatValue(Abs(originalValue - modifiedValue))
+
+							if (inList(kPressureUnits, unit) && (unit != getUnit("Pressure"))) {
+								originalValue := convertUnit("Pressure", convertUnit("Pressure", originalValue, unit, false))
+								modifiedValue := convertUnit("Pressure", convertUnit("Pressure", modifiedValue, unit, false))
+								value := convertUnit("Pressure", convertUnit("Pressure", value, unit, false))
+							}
+
+							if (modifiedValue > originalValue)
+								value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "+"
+										. displayValue("Float", value) . translate(")"))
+							else
+								value := (displayValue("Float", modifiedValue) . A_Space . translate("(") . "-"
+										. displayValue("Float", value) . translate(")"))
+						}
+					}
+					else {
+						if (originalValue = modifiedValue)
+							value := originalValue
+						else
+							value := modifiedValue
+					}
+
+					category := ""
+
+					for candidate, settings in categories {
+						for ignore, cSetting in string2Values(";", settings)
+							if (InStr(setting, cSetting) == 1) {
+								category := candidate
+
+								break
+							}
+
+						if (category != "")
+							break
+					}
+
+					label := editor.getLabel(setting)
+
+					if inList(kPressureUnits, unit)
+						unit := getUnit("Pressure")
+
+					settingsList.Push(categoriesLabels[category] . translate(": ") . label . translate(" = ") . value . A_Space . translate(unit))
+				}
+			}
+		}
+
+		this.logDiary("Save", setup.Name, setup.FileName, values2String("`n", settingsList*))
+	}
+
+	logLap(name, lapTime, sectorTimes) {
+		this.logDiary("Lap", name, lapTime, sectorTimes ? values2String(", ", sectorTimes*) : translate("-"))
+	}
+
 	loadSimulator(simulator, force := false) {
 		local simulators, settings
 
@@ -1633,6 +1779,8 @@ class SetupWorkbench extends ConfigurationItem {
 				hasTask := true
 
 				PeriodicTask(startupCollector, 2000, kLowPriority).start()
+
+				PeriodicTask(() => this.updateTelemetries(), 5000, kLowPriority).start()
 			}
 		}
 	}
@@ -1649,11 +1797,60 @@ class SetupWorkbench extends ConfigurationItem {
 		this.iTelemetryViewer := false
 	}
 
+	updateTelemetries() {
+		local simulator := this.SelectedSimulator[false]
+		local track := this.SelectedTrack[false]
+		local telemetries := []
+		local name, info, lapTime, sectorTimes
+
+		static lastSimulator := false
+		static lastTrack := false
+		static lastTelemetries := []
+
+		if (simulator && (simulator != true) && track && ((simulator != lastSimulator) || (track != lastTrack)))
+			lastTelemetries := []
+
+		lastSimulator := simulator
+		lastTrack := track
+
+		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F"
+			telemetries.Push(A_LoopFileFullPath)
+
+		do(telemetries, (fileName) {
+			if !inList(lastTelemetries, fileName) {
+				if FileExist(fileName . ".info") {
+					info := readMultiMap(fileName . ".info")
+
+					lapTime := getMultiMapValue(info, "Lap", "LapTime"
+												, getMultiMapValue(info, "Info", "LapTime", false))
+					sectorTimes := getMultiMapValue(info, "Lap", "SectorTimes"
+														, getMultiMapValue(info, "Info", "SectorTimes", false))
+
+					if sectorTimes
+						sectorTimes := string2Values(",", sectorTimes)
+					else
+						sectorTimes := ["-"]
+
+					if (sectorTimes && !first(sectorTimes, (s) => (isNumber(s) && (s != 0))))
+						sectorTimes := false
+
+					SplitPath(fileName, , , , &name)
+
+					this.logLap(name, lapTimeDisplayValue(lapTime), sectorTimes)
+
+					lastTelemetries.Push(fileName)
+				}
+			}
+		})
+	}
+
 	openSetupEngineer() {
 		if this.SetupEngineer
 			activateWindow(this.SetupEngineer.Window)
 		else {
-			this.iSetupEngineer := SetupEngineer(this, readMultiMap(kUserConfigDirectory . "Setup Workbench.ini"))
+			this.iSetupEngineer := SetupEngineer(this
+											   , readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
+											   , this.Diary)
 
 			this.SetupEngineer.show()
 		}
@@ -1690,7 +1887,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		lapTime := "-"
 		sectorTimes := ["-"]
-		
+
 		return false
 	}
 
@@ -1808,6 +2005,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	chooseCharacteristic() {
+		local simulators := getKeys(getMultiMapValues(getControllerState(), "Simulators"))
 		local dynamicMenus := CaseInsenseMap()
 		local characteristicLabels, menuIndex, groups, translatedGroups, ignore, group, definition, option
 		local groupMenu, groupEmpty, groupOption, optionMenu, optionEmpty, label, characteristic
@@ -1882,7 +2080,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		if !isDebug()
 			if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-										  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+										  || !inList(simulators, this.SelectedSimulator))
 				characteristicsMenu.Disable(label)
 
 		label := translate("Telemetry...")
@@ -1894,7 +2092,7 @@ class SetupWorkbench extends ConfigurationItem {
 				characteristicsMenu.Disable(label)
 
 			if (!this.SimulatorDefinition || !getMultiMapValue(this.SimulatorDefinition, "Simulator", "Analyzer", false)
-										  || !inList(getKeys(getMultiMapValues(getControllerState(), "Simulators")), this.SelectedSimulator))
+										  || !inList(simulators, this.SelectedSimulator))
 				characteristicsMenu.Disable(label)
 		}
 
@@ -1904,7 +2102,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu.Add(label, (*) => this.openSetupEngineer())
 
-		if ((this.SelectedSimulator[false] == true) || (this.SelectedCar[false] == true) || (this.SelectedTrack[false] == true))
+		if (!this.SimulatorDefinition || !inList(simulators, this.SelectedSimulator)
+									  || (this.SelectedSimulator[false] == true)
+									  || (this.SelectedCar[false] == true)
+									  || (this.SelectedTrack[false] == true))
 			characteristicsMenu.Disable(label)
 
 		characteristicsMenu.Show()
@@ -1918,6 +2119,7 @@ class SetupWorkbench extends ConfigurationItem {
 		local knowledgeBase := this.KnowledgeBase
 		local noIssue, ignore, characteristic, widgets, value1, value2, settings
 		local setting, delta
+		local characteristicLabels, ignore, characteristic, issues
 
 		this.Window.Block()
 
@@ -1925,6 +2127,11 @@ class SetupWorkbench extends ConfigurationItem {
 			noIssue := true
 
 			if knowledgeBase {
+				issues := []
+
+				characteristicLabels := toMap(getMultiMapValues(this.Definition
+															  , "Workbench.Characteristics.Labels"), LabelsMap)
+
 				for ignore, characteristic in this.SelectedCharacteristics {
 					noIssue := false
 
@@ -1935,6 +2142,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 					knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
+
+					issues.Push(characteristicLabels[characteristic] . translate(" -> ")
+							  . value1 . translate("%") . translate(" / ") . value2 . translate("%"))
 				}
 
 				if !noIssue {
@@ -1944,6 +2154,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
+
+					this.logDiary("Characteristics", values2String("`n", issues*))
 				}
 			}
 
@@ -2738,7 +2950,8 @@ class SetupEditor extends ConfigurationItem {
 		}
 
 		saveModifiedSetup(*) {
-			editor.saveSetup()
+			if editor.saveSetup()
+				editor.Workbench.logSave(this, this.Setup)
 		}
 
 		editorGui := SetupEditor.EditorWindow(this)
@@ -2952,7 +3165,7 @@ class SetupEditor extends ConfigurationItem {
 		return (settingsUnits.Has(setting) ? settingsUnits[setting] : translate("Clicks"))
 	}
 
-	loadSetup(&setup := false) {
+	loadSetup(&setup := false, log := true) {
 		local categories, categoriesLabels
 		local ignore, setting, handler, modifiedValue, originalValue, unit, value, category, candidate, settings
 		local cSetting, label, lastCategory
@@ -3068,6 +3281,9 @@ class SetupEditor extends ConfigurationItem {
 
 			lastCategory := category
 		}
+
+		if log
+			this.Workbench.logLoad(this, this.Setup)
 
 		this.updateState()
 	}
@@ -3186,7 +3402,7 @@ class SetupEditor extends ConfigurationItem {
 
 		this.Setup.reset()
 
-		this.loadSetup(&setup)
+		this.loadSetup(&setup, false)
 	}
 
 	updateSetting(setting, newValue) {
@@ -4193,12 +4409,6 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	Diary {
-		Get {
-			return this.iDiary
-		}
-	}
-
 	Analysis {
 		Get {
 			return this.iAnalysis
@@ -4217,19 +4427,12 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	__New(setupWorkbench, configuration) {
+	__New(setupWorkbench, configuration, diary := false) {
 		this.iWorkbench := setupWorkbench
 
 		super.__New(configuration)
 
 		this.loadInstructions(configuration)
-
-		try {
-			DirCreate(this.Options["Setup Workbench.Diary"])
-		}
-		catch Any as exception {
-			logError(exception)
-		}
 	}
 
 	loadFromConfiguration(configuration) {
@@ -4238,11 +4441,6 @@ class SetupEngineer extends ConfigurationItem {
 		super.loadFromConfiguration(configuration)
 
 		options := this.Options
-
-		options["Setup Workbench.Diary"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
-
-		if (!options["Setup Workbench.Diary"] || (Trim(options["Setup Workbench.Diary"]) = ""))
-			options["Setup Workbench.Diary"] := (kTempDirectory . "Setup Workench\Diary")
 
 		options["Setup Engineer.Service"] := getMultiMapValue(configuration, "Setup Engineer Service", "Service", getMultiMapValue(configuration, "Setup Engineer", "Service", false))
 		options["Setup Engineer.Model"] := getMultiMapValue(configuration, "Setup Engineer Service", "Model", false)
@@ -4338,6 +4536,8 @@ class SetupEngineer extends ConfigurationItem {
 		if this.iUpdateTask
 			this.iUpdateTask.stop()
 
+		this.stopInteraction()
+
 		if this.Workbench
 			this.Workbench.closedSetupEngineer()
 
@@ -4356,14 +4556,12 @@ class SetupEngineer extends ConfigurationItem {
 	}
 
 	updateTelemetries() {
-		local selected := this.TelemetriesListView.GetNext(0)
 		local telemetries := []
+		local loadedTelemetries := []
+		local availableTelemetries := []
+		local removedTelemetries := []
+		local initialize := (this.TelemetriesListView.GetCount() = 0)
 		local info, lapTime, name, driver, date
-
-		if selected
-			selected := this.TelemetriesListView.GetText(selected)
-
-		this.TelemetriesListView.Delete()
 
 		loop Files, kTempDirectory . "Setup Workbench\Telemetry\*.telemetry", "F"
 			telemetries.Push(A_LoopFileFullPath)
@@ -4371,50 +4569,79 @@ class SetupEngineer extends ConfigurationItem {
 		loop Files, kTempDirectory . "Setup Workbench\Telemetry\Imported\*.telemetry", "F"
 			telemetries.Push(A_LoopFileFullPath)
 
-		do(telemetries, (fileName) {
-			SplitPath(fileName, , , , &name)
+		loop this.TelemetriesListView.GetCount()
+			loadedTelemetries.Push(this.TelemetriesListView.GetText(A_Index))
 
-			this.TelemetriesListView.Opt("-Redraw")
+		availableTelemetries := collect(telemetries, (t) {
+			local name
 
-			try {
-				if FileExist(fileName . ".info") {
-					info := readMultiMap(fileName . ".info")
+			SplitPath(t, , , , &name)
 
-					lapTime := getMultiMapValue(info, "Lap", "LapTime", translate("-"))
+			return name
+		})
 
-					if getMultiMapValue(info, "Telemetry", "Driver", false)
-						driver := SessionDatabase.getDriverName(this.Simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-					else
-						driver := false
+		this.TelemetriesListView.Opt("-Redraw")
 
-					if !driver
-						driver := getMultiMapValue(info, "Telemetry", "Driver")
+		try {
+			do(telemetries, (fileName) {
+				SplitPath(fileName, , , , &name)
 
-					if !driver
-						driver := SessionDatabase.getName("Creator")
+				if !inList(loadedTelemetries, name) {
+					if FileExist(fileName . ".info") {
+						info := readMultiMap(fileName . ".info")
 
-					date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-						   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+						lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+
+						driver := getMultiMapValue(info, "Lap", "Driver", false)
+
+						if !driver
+							if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+								driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+
+								if driver
+									driver := SessionDatabase.getDriverName(this.Simulator, driver)
+								else
+									driver := getMultiMapValue(info, "Info", "Driver", false)
+							}
+
+						if !driver
+							driver := SessionDatabase.getName("Creator")
+
+						try {
+							date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
+						}
+						catch Any {
+							date := FormatTime(A_Now, "ShortDate")
+						}
+					}
+					else {
+						info := false
+
+						lapTime := translate("-")
+						driver := translate("-")
+						date := FormatTime(A_Now, "ShortDate")
+					}
+
+					this.TelemetriesListView.Add("", name, driver, lapTimeDisplayValue(lapTime), date)
 				}
-				else {
-					info := false
+			})
 
-					lapTime := translate("-")
-					driver := translate("-")
-					date := translate("-")
-				}
+			loop this.TelemetriesListView.GetCount()
+				if !inList(availableTelemetries, this.TelemetriesListView.GetText(A_Index))
+					removedTelemetries.Push(A_Index)
 
-				this.TelemetriesListView.Add((name = selected) ? "Select Vis" : "", name, driver, lapTimeDisplayValue(lapTime), date)
+			do(reverse(removedTelemetries), (t) => this.TelemetriesListView.Delete(t))
 
+			if initialize {
 				this.TelemetriesListView.ModifyCol()
 
 				loop 4
 					this.TelemetriesListView.ModifyCol(A_Index, "AutoHdr")
 			}
-			finally {
-				this.TelemetriesListView.Opt("+Redraw")
-			}
-		})
+		}
+		finally {
+			this.TelemetriesListView.Opt("+Redraw")
+		}
 
 		this.updateState()
 	}
@@ -4486,8 +4713,8 @@ class SetupEngineer extends ConfigurationItem {
 						widgets := workbench.SelectedCharacteristicsWidgets[characteristic]
 
 						issues.Push({Issue: characteristicLabels[characteristic]
-								   , Frequency: widgets[1].Value . "%"
-								   , Severity: widgets[2].Value . "%"})
+								   , Frequency: widgets[1].Value . "\%"
+								   , Severity: widgets[2].Value . "\%"})
 					}
 
 					return substituteVariables(this.Instructions["Handling"], {handling: JSON.print(issues, "  ")})
@@ -4556,8 +4783,6 @@ class SetupEngineer extends ConfigurationItem {
 		local service := this.Options["Setup Engineer.Service"]
 		local ignore, instruction
 
-		this.iDiary := (normalizeDirectoryPath(this.Options["Setup Workbench.Diary"]) . "\" . translate("Diary ") . A_Now . ".txt")
-
 		if service {
 			service := string2Values("|", service, 3)
 
@@ -4615,6 +4840,14 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
+	stopInteraction() {
+		if this.Connector {
+			this.Connector.Disconnect()
+
+			this.iConnector := false
+		}
+	}
+
 	restartInteraction() {
 		if this.Connector {
 			this.Connector.Restart()
@@ -4626,6 +4859,7 @@ class SetupEngineer extends ConfigurationItem {
 	createTelemetry(telemetry) {
 		local result := ""
 		local columns := []
+		local data := []
 		local lastDistance := 0
 		local lastTime := 0
 		local columnNr, distance, time, count, skip
@@ -4635,7 +4869,7 @@ class SetupEngineer extends ConfigurationItem {
 
 			for ignore, channel in kTelemetryChannels
 				if ((channel.Indices.Length = 1) && (channel.Indices[1] == columnNr)) {
-					columns.Push(channel.Name)
+					columns.Push(channel.Name . " (" . channel.Units[1] . ")")
 
 					break
 				}
@@ -4644,23 +4878,39 @@ class SetupEngineer extends ConfigurationItem {
 				columns.Push("Unknown")
 		}
 
+		loop telemetry.Data.Length {
+			time := telemetry.getValue(A_Index, "Time")
+			distance := telemetry.getValue(A_Index, "Distance")
+
+			if ((lastTime != time) || (lastDistance != distance)) {
+				data.Push(values2String(";", telemetry.Data[A_Index]*))
+
+				lastTime := time
+				lastDistance := distance
+			}
+		}
+
 		result := (values2String(";", columns*) . "`n")
 
-		skip := Round(telemetry.Data.Length / this.Resolution)
+		skip := Round(data.Length / this.Resolution)
 
-		if skip
+		if skip {
 			count := 0
 
-		loop telemetry.Data.Length {
-			if (isSet(count) && (++count != 1)) {
-				if (count > skip)
-					count := 0
+			loop data.Length {
+				if (++count != 1) {
+					if (count > skip)
+						count := 0
 
-				continue
+					continue
+				}
+
+				result .= (data[A_Index] . "`n")
 			}
-
-			result .= (values2String(";", telemetry.Data[A_Index]*) . "`n")
 		}
+		else
+			loop data.Length
+				result .= (data[A_Index] . "`n")
 
 		return result
 	}
@@ -4668,7 +4918,7 @@ class SetupEngineer extends ConfigurationItem {
 	showAnalysis(content, analysis := false) {
 		local height := (this.AnalysisViewer.getHeight() - 4)
 		local html := ""
-		local document, height
+		local document, height, ignore, tag
 
 		getCSS() {
 			local script
@@ -4782,6 +5032,9 @@ class SetupEngineer extends ConfigurationItem {
 
 		content := StrReplace(content, "%", "\%")
 
+		for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
+			content := StrReplace(content, tag, "")
+
 		this.AnalysisViewer.document.open()
 		this.AnalysisViewer.document.write(substituteVariables(document
 															 , {fontColor: this.Window.Theme.TextColor
@@ -4813,8 +5066,53 @@ class SetupEngineer extends ConfigurationItem {
 			try {
 				withBlockedWindows(() {
 					withTask(ProgressTask(StrReplace(translate("Analyzing lap..."), "...", "")), () {
-						analysis := this.createAnalysis(TelemetryAnalyzer(this.Simulator
-																		, this.Track).createTelemetry(false, fileName))
+						local driver := false
+						local lapTime := false
+						local sectorTimes := false
+						local hasLapTime := true
+						local telemetry
+
+						if FileExist(fileName . ".info") {
+							info := readMultiMap(fileName . ".info")
+
+							driver := getMultiMapValue(info, "Lap", "Driver"
+														   , getMultiMapValue(info, "Info", "Driver", false))
+
+							lapTime := getMultiMapValue(info, "Lap", "LapTime"
+															, getMultiMapValue(info, "Info", "LapTime", false))
+							sectorTimes := getMultiMapValue(info, "Lap", "SectorTimes"
+																, getMultiMapValue(info, "Info", "SectorTimes", false))
+
+							if sectorTimes
+								sectorTimes := string2Values(",", sectorTimes)
+						}
+
+						if !driver
+							driver := SessionDatabase.getName("Creator")
+
+						if !lapTime {
+							lapTime := translate("-")
+
+							hasLapTime := false
+						}
+
+						if !sectorTimes
+							sectorTimes := ["-"]
+
+						telemetry := TelemetryAnalyzer(this.Simulator
+													 , this.Track).createTelemetry(false, fileName
+																				 , driver, lapTime, sectorTimes)
+
+						if (!hasLapTime && telemetry && telemetry.Data) {
+							lapTime := telemetry.getValue(telemetry.Data.Length, "Time", kUndefined)
+
+							if (lapTime != kUndefined)
+								telemetry := TelemetryAnalyzer(this.Simulator
+															 , this.Track).createTelemetry(false, fileName
+																						 , driver, lapTime, sectorTimes)
+						}
+
+						analysis := this.createAnalysis(telemetry)
 					})
 				})
 
@@ -4882,15 +5180,16 @@ class SetupEngineer extends ConfigurationItem {
 			}
 		}
 
-		if answer {
-			if this.Diary
-				try {
-					FileAppend(translate("-- Analysis --------") . "`n`n" . translate("Lap:") . A_Space . telemetry.Name . "`n`n" . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n" . answer . "`n`n", this.Diary, "UTF-16")
-				}
-				catch Any as exception {
-					logError(exception)
-				}
-		}
+		if answer
+			try {
+				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Analysis")}) . "`n`n"
+						 . translate("Lap:") . A_Space . telemetry.Name . "`n`n"
+						 . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n"
+						 . answer . "`n`n", this.Workbench.Diary, "UTF-16")
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 
 		return answer
 	}
@@ -4921,14 +5220,15 @@ class SetupEngineer extends ConfigurationItem {
 
 				this.Connector.Ask(analysis, , , &calls := [])
 
-				if this.Diary
-					try {
-						FileAppend(translate("-- Recommendations --------") . "`n`n"
-								 . values2String("`n", collect(calls, printCall)*) . "`n`n", this.Diary, "UTF-16")
-					}
-					catch Any as exception {
-						logError(exception, true)
-					}
+				try {
+					FileAppend(substituteVariables(translate("-- %header% --------")
+												 , {header: translate("Recommendations")}) . "`n`n"
+							 . values2String("`n", collect(calls, printCall)*) . "`n`n"
+							 , this.Workbench.Diary, "UTF-16")
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 			}
 		}
 		catch Any as exception {
@@ -5198,8 +5498,13 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VdiaryPathEdit")
 		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseDiaryPath)
 
+		editorGui.SetFont("Norm", "Arial")
+		editorGui.SetFont("Bold Italic", "Arial")
+		editorGui.Add("Text", "x8 yp+35 w468 h23 Center", translate("Setup Engineer"))
+		editorGui.SetFont("Norm", "Arial")
+
 		editorGui.SetFont("Italic", "Arial")
-		editorGui.Add("Text", "x" . (x + 8) . " yp+30 w100 h23", translate("Service "))
+		editorGui.Add("Text", "x" . (x + 8) . " yp+19 w100 h23", translate("Service "))
 		editorGui.Add("Text", "x120 yp+7 w" . (width + 8 - 120) . " 0x10 W:Grow")
 		editorGui.SetFont("Norm", "Arial")
 
@@ -5713,7 +6018,7 @@ startupSetupWorkbench() {
 
 		workbench.show()
 
-		if !GetKeyState("Ctrl")
+		if !GetKeyState("Ctrl") {
 			if simulator {
 				workbench.Window.Block()
 
@@ -5735,6 +6040,9 @@ startupSetupWorkbench() {
 			}
 			else
 				workbench.loadSimulator(true, true)
+
+			workbench.logDiary("Selection")
+		}
 		else
 			Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)
 

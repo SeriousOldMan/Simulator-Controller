@@ -27,6 +27,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 	local x, y, names, ignore, infos, index, name, dirName, driverName
 	local carNames, trackNames, newSimulator, newCar, newTrack, newSourceType, force
 	local userTelemetries, communityTelemetries, info, command, fileNames, date
+	local directory
 
 	static sessionDB := false
 
@@ -69,7 +70,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 		local seconds, fraction, minutes
 
 		if ((lapTime = "-") || isNull(lapTime))
-			return translate("-")
+			return "-"
 		else {
 			if isNumber(lapTime)
 				return displayValue("Time", lapTime)
@@ -85,9 +86,39 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 		dirName := (SessionDatabase.DatabasePath . "User\")
 
+		types := "*.telemetry; *.json; *.CSV"
+
+		if ((simulator = "iRacing") && SessionDatabase().hasTrackMap(simulator, track))
+			types .= "; *.ibt"
+
 		OnMessage(0x44, translateLoadCancelButtons)
-		fileName := withBlockedWindows(FileSelect, "M1", dirName, translate("Load Telemetry..."), "Lap Telemetry (*.telemetry; *.json; *.CSV)")
+		fileName := withBlockedWindows(FileSelect, (simulator = "iRacing") ? 1 : "M1"
+												 , dirName, translate("Load Telemetry...")
+												 , "Lap Telemetry (" . types . ")")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
+
+		if (isObject(fileName) && (fileName.Length = 1) && InStr(fileName[1], ".ibt"))
+			fileName := fileName[1]
+
+		if (!isObject(fileName) && InStr(fileName, ".ibt")) {
+			directory := (kTempDirectory . "Telemetry\IBT Import")
+
+			deleteDirectory(directory)
+
+			DirCreate(directory)
+
+			SplitPath(fileName, &name)
+
+			withBlockedWindows(() {
+				withTask(ProgressTask(translate("Extracting ") . name), () {
+					RunWait("`"" . kBinariesDirectory . "Connectors\iRacing IBT Reader\iRacing IBT Reader.exe`" `"" . fileName . "`" `"" . directory . "`"", , "Hide")
+				})
+			})
+
+			OnMessage(0x44, translateLoadCancelButtons)
+			fileName := withBlockedWindows(FileSelect, "M1", directory, translate("Load Telemetry..."), "Lap Telemetry (*.irc)")
+			OnMessage(0x44, translateLoadCancelButtons, 0)
+		}
 
 		if ((fileName != "") || (isObject(fileName) && (fileName.Length > 0))) {
 			fileNames := []
@@ -201,23 +232,33 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 						info := sessionDB.readTelemetryInfo(simulator, car, track, name)
 
 						if info {
-							if getMultiMapValue(info, "Telemetry", "Driver", false)
-								driverName := SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
-							else
-								driverName := false
+							driverName := getMultiMapValue(info, "Lap", "Driver", false)
+
+							if !driverName
+								if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+									driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+
+									if driver
+										driverName := SessionDatabase.getDriverName(simulator, driver)
+									else
+										driverName := getMultiMapValue(info, "Info", "Driver", false)
+								}
 
 							lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))
-							date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
-								   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+
+							try {
+								date := (FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate") . translate(" - ")
+									   . FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "Time"))
+							}
+							catch Any {
+								date := translate("-")
+							}
 						}
 						else {
 							driverName := false
 							lapTime := translate("-")
 							date := translate("-")
 						}
-
-						if !driverName
-							driverName := getMultiMapValue(info, "Telemetry", "Driver")
 
 						if !driverName
 							driverName := SessionDatabase.getName("Creator")

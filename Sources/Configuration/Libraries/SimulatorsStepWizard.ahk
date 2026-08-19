@@ -199,7 +199,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 			}
 		}
 
-		widget := window.Add("Button", "x" . x . " ys+307 w" . col1Width . " h23 Y:Move(0.66) Hidden", translate("Edit Labels && Icons..."))
+		widget := window.Add("Button", "x" . x . " ys+307 w" . col1Width . " h23 Y:Move(0.66) Hidden", translate("Labels && Icons..."))
 		widget.OnEvent("Click", openLabelsAndIconsEditor)
 
 		this.registerWidgets(1, widget)

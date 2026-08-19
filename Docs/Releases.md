@@ -1,5 +1,50 @@
 # Latest stable release
 
+## 7.2.0.0
+
+#### Date: 08/14/26
+
+#### Fixes
+
+  - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
+  - Fixed the coordinate system transformation for the Second Monitor connector. Telemetry files acquired from Second Monitor will now be compatible with all position related functions.
+  - Once more we have a fix for the community database synchronization.
+  - Fixed a bug in Second Monitor integration, when no suspension information is available.
+  - Fixed missing lap time information, when Second Monitor is used as telemetry provider.
+  - Fixed a bug in "Simulator Setup" that caused the language selection on the "General settings & voice control" page to reset to the UI language on each run of "Simulator Setup".
+  
+#### Changes
+
+  - The "Setup Workbench" offers a new tool. Using a GPT provider and a high end LLM, an integrated *Setup Engineer* can analyze complete telemetry data and create a detailed analysis and recommendations for setup changes based on this. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) for more information and instructions.
+  
+    The idea of ​​the *Setup Engineer* had been on my mind for a long time, but it was only recently that LLMs became powerful enough to handle the vast amounts of data and mathematical calculations required for a robust analysis of telemetry data. The catch, however, is that you need one of the latest state-of-the-art models from providers like OpenAI, Anthropic, or Google — and those aren't exactly cheap. But the results are worth it, I promise.
+  - A diary (log file) has been implemented for the "Setup Workbench". The diary folder can be [configured in the settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#settings) of the "Setup Workbench".
+  - It is no longer possible to close the settings dialog of the "Session Database", if there is an invalid configuration for a Team Server connection.
+  - The "Session Database" provides a new inspector which gives you detailed information about the tyre wear per lap for each wheel in specific weather conditions. Depending on your settings, the number of usable laps per tyre will be calculated automatically. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres) for more information.
+  - IBT files can now be opened directly from the telemetry select dialog.
+  - Suspension information and the lap time is now included in telemetry data acquired by the Second Monitor provider.
+
+# Upcoming release
+
+## 7.2.1.0
+
+#### Date: 08/21/26 (planned)
+
+#### Fixes
+
+  - Added missing translations for all languages.
+  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
+  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
+  - Fixed the location handling of the diary folder location in "Setup Workbench".
+  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  
+#### Changes
+
+  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
+  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
+
+# Release history
+
 ## 7.1.5.0
 
 #### Date: 08/07/26
@@ -20,22 +65,6 @@
 	- The Second Monitor importer and also the corresponding telemetry provider for the telemetry system will now import suspension deflection information, if available.
   - [Internal] Handling of modal windows has been optimized so that always the window, which was on top before the modal window had been opened, will be on top again.
   - [Internal] A caching has been implemented for loaded telemetry files to prevent to many disc requests.
-
-# Upcoming release
-
-## 7.2.0.0
-
-#### Date: 08/14/26 (planned)
-
-#### Fixes
-
-  - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
-  
-#### Changes
-
-  - The "Setup Workbench" offers a new tool. Using a GPT provider and a high end LLM, an integrated Setup Engineer can analyze complete telemetry data and create a detailed analysis and recommendations for setup changes based on this. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) for more information and instructions.
-
-# Release history
 
 ## 7.1.4.0
 

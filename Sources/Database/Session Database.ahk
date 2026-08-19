@@ -62,7 +62,7 @@ global kModuleDocumentations := Map("Settings", "https://github.com/SeriousOldMa
 								  , "Laps", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries"
 								  , "Strategies", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies"
 								  , "Setups", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups"
-								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#pressures"
+								  , "Pressures", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres"
 								  , "Track", "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation")
 
 
@@ -165,7 +165,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			driver := "John Doe (JD)"
 			lapTime := "-"
 			sectorTimes := ["-"]
-			
+
 			return false
 		}
 	}
@@ -220,7 +220,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 			}
@@ -2012,7 +2012,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.SetFont("s10 Bold", "Arial")
 
 		editorGui.Add("Picture", "x16 yp+10 w30 h30 vsettingsImg6", this.themeIcon(kIconsDirectory . "Pressure.ico")).OnEvent("Click", chooseTab.Bind("Pressures"))
-		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab6", translate("Pressures")).OnEvent("Click", chooseTab.Bind("Pressures"))
+		editorGui.Add("Text", "x50 yp+5 w220 h26 W:Grow(0.2) vsettingsTab6", translate("Tyres")).OnEvent("Click", chooseTab.Bind("Pressures"))
 
 		editorGui.Add("Text", "x16 yp+32 w267 W:Grow(0.2) 0x10")
 
@@ -2028,7 +2028,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui.Add("Picture", "x280 ys-2 w390 h554 Border X:Move(0.2) W:Grow(0.8) H:Grow")
 
-		tabs := collect(["Settings", "Track", "Session", "Telemetries", "Stratgies", "Setups", "Pressures", "Data"], translate)
+		tabs := collect(["Settings", "Track", "Session", "Telemetries", "Stratgies", "Setups", "Tyres", "Administration"], translate)
 
 		editorGui.Add("Tab2", "x296 ys+16 w0 h0 -Wrap Section vsettingsTab", tabs)
 
@@ -2217,6 +2217,46 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		editorGui.Add("Picture", "x440 yp+40 w158 h8 X:Move(0.2) Center", kResourcesDirectory . "Icons\Pressures.png")
 		editorGui.Add("Text", "x440 yp+10 w80 h23 X:Move(0.2) Left", translate("Exact"))
 		editorGui.Add("Text", "x518 yp w80 h23 X:Move(0.2) Right", translate("Estimated"))
+
+		editorGui.SetFont("Norm", "Arial")
+		editorGui.SetFont("Bold Italic", "Arial")
+
+		editorGui.Add("Text", "x342 yp+30 w267 0x10 X:Move(0.2)")
+		editorGui.Add("Text", "x296 yp+10 w370 h20 X:Move(0.2) Center BackgroundTrans", translate("Wear"))
+
+		editorGui.SetFont("Norm", "Arial")
+
+		editorGui.Add("Text", "x296 yp+30 w85 h23 X:Move(0.2) +0x200", translate("Front Left"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled vflWear", displayValue("Float", 0.0))
+		editorGui.Add("Text", "xp+52 yp w20 h23 +0x200 X:Move(0.2)", translate("%"))
+		editorGui.Add("Text", "xp+20 yp w60 h23 +0x200 X:Move(0.2)", translate("p. Lap"))
+		editorGui.Add("Text", "xp+60 yp w24 h23 +0x200 X:Move(0.2)", translate("->"))
+		editorGui.Add("Edit", "xp+30 yp w50 X:Move(0.2) Disabled Center vflLaps", 0)
+		editorGui.Add("Text", "xp+52 yp w60 h23 +0x200 X:Move(0.2)", translate("Laps"))
+
+		editorGui.Add("Text", "x296 yp+24 w85 h23 +0x200 X:Move(0.2)", translate("Front Right"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled vfrWear", displayValue("Float", 0.0))
+		editorGui.Add("Text", "xp+52 yp w20 h23 +0x200 X:Move(0.2)", translate("%"))
+		editorGui.Add("Text", "xp+20 yp w60 h23 +0x200 X:Move(0.2)", translate("p. Lap"))
+		editorGui.Add("Text", "xp+60 yp w24 h23 +0x200 X:Move(0.2)", translate("->"))
+		editorGui.Add("Edit", "xp+30 yp w50 X:Move(0.2) Disabled Center vfrLaps", 0)
+		editorGui.Add("Text", "xp+52 yp w60 h23 +0x200 X:Move(0.2)", translate("Laps"))
+
+		editorGui.Add("Text", "x296 yp+24 w85 h23 +0x200 X:Move(0.2)", translate("Rear Left"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled vrlWear", displayValue("Float", 0.0))
+		editorGui.Add("Text", "xp+52 yp w20 h23 +0x200 X:Move(0.2)", translate("%"))
+		editorGui.Add("Text", "xp+20 yp w60 h23 +0x200 X:Move(0.2)", translate("p. Lap"))
+		editorGui.Add("Text", "xp+60 yp w24 h23 +0x200 X:Move(0.2)", translate("->"))
+		editorGui.Add("Edit", "xp+30 yp w50 X:Move(0.2) Disabled Center vrlLaps", 0)
+		editorGui.Add("Text", "xp+52 yp w60 h23 +0x200 X:Move(0.2)", translate("Laps"))
+
+		editorGui.Add("Text", "x296 yp+24 w85 h23 +0x200 X:Move(0.2)", translate("Rear Right"))
+		editorGui.Add("Edit", "xp+90 yp w50 X:Move(0.2) Disabled vrrWear", displayValue("Float", 0.0))
+		editorGui.Add("Text", "xp+52 yp w20 h23 +0x200 X:Move(0.2)", translate("%"))
+		editorGui.Add("Text", "xp+20 yp w60 h23 +0x200 X:Move(0.2)", translate("p. Lap"))
+		editorGui.Add("Text", "xp+60 yp w24 h23 +0x200 X:Move(0.2)", translate("->"))
+		editorGui.Add("Edit", "xp+30 yp w50 X:Move(0.2) Disabled Center vrrLaps", 0)
+		editorGui.Add("Text", "xp+52 yp w60 h23 +0x200 X:Move(0.2)", translate("Laps"))
 
 		if this.RequestorPID
 			editorGui.Add("Button", "x440 yp+50 w80 h23 X:Move(0.2) vtransferPressuresButton", translate("Load")).OnEvent("Click", transferPressures)
@@ -6256,14 +6296,42 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	loadPressures() {
 		local sessionDB := this.SessionDatabase
 		local window, compounds, chosenCompound, tyreCompound, tyreCompoundColor, pressureInfos, index
-		local ignore, tyre, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
-		local drivers, driver, selectedDriver
+		local ignore, postfix, tyre, pressureInfo, pressure, trackDelta, airDelta, color
+		local drivers, driver, selectedDriver, tyresDB
+		local filteredWears, wears, wear, lastLap, theTyre, tyreWear, tyreLaps, maxWear
 
 		static lastSimulator := false
 		static lastCar := false
 		static lastTrack := false
 		static lastCommunity := kUndefined
 		static lastColor := "D0D0D0"
+
+		getMaxTyreWear(simulator, car, track
+					 , weather, tyreCompound, tyreCompoundColor, default := 75) {
+			local minTreadDepth := SettingsDatabase().readSettingValue(simulator, car, track, "*", weather
+																	  , "Session Settings", "Tyre.Tread.Minimum"
+																	  , kUndefined)
+			local lap, mixedCompounds
+
+			if (minTreadDepth = kUndefined)
+				return default
+			else if isInteger(minTreadDepth)
+				return (100 - minTreadDepth)
+			else {
+				minTreadDepth := string2Map(";", "->", minTreadDepth)
+
+				if tyreCompound {
+					tyreCompound := compound(tyreCompound, tyreCompoundColor)
+
+					if minTreadDepth.Has(tyreCompound)
+						return (100 - minTreadDepth[tyreCompound])
+					else
+						return default
+				}
+				else
+					return (100 - average(getValues(minTreadDepth)))
+			}
+		}
 
 		if (this.SelectedSimulator && (this.SelectedSimulator != true)
 		 && this.SelectedCar && (this.SelectedCar != true)
@@ -6336,14 +6404,28 @@ class SessionDatabaseEditor extends ConfigurationItem {
 					this.iTyreCompound := tyreCompound
 					this.iTyreCompoundColor := tyreCompoundColor
 
-					pressureInfos := SessionDatabaseEditor.EditorTyresDatabase().getPressures(this.SelectedSimulator, this.SelectedCar
-																							, this.SelectedTrack, this.SelectedWeather
-																							, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
-																							, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
-																							, tyreCompound, tyreCompoundColor, driver)
+					tyresDB := SessionDatabaseEditor.EditorTyresDatabase()
+
+					pressureInfos := tyresDB.getPressures(this.SelectedSimulator, this.SelectedCar
+														, this.SelectedTrack, this.SelectedWeather
+														, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
+														, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
+														, tyreCompound, tyreCompoundColor, driver)
+
+					maxWear := getMaxTyreWear(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+											, this.SelectedWeather, tyreCompound, tyreCompoundColor)
+
+					wears := tyresDB.getTyreWears(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
+												, this.SelectedWeather
+												, convertUnit("Temperature", window["airTemperatureEdit"].Value, false)
+												, convertUnit("Temperature", window["trackTemperatureEdit"].Value, false)
+												, tyreCompound, tyreCompoundColor
+												, (maxWear != kUndefined) ? maxWear : unset, driver)
 				}
-				else
+				else {
 					pressureInfos := []
+					wears := []
+				}
 
 				if (pressureInfos.Count == 0) {
 					for ignore, tyre in ["fl", "fr", "rl", "rr"]
@@ -6391,6 +6473,72 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 						if this.RequestorPID
 							window["transferPressuresButton"].Enabled := true
+					}
+				}
+
+				for ignore, theTyre in ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"] {
+					tyre := theTyre
+
+					filteredWears := choose(wears, (w) => w["Tyre"] = tyre)
+					lastLap := 0
+					tyreWears := []
+
+					for ignore, wear in bubbleSort(&filteredWears, (w1, w2) => (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
+						if (wear["Tyre.Laps"] < 5)
+							continue
+						else if (wear["Tyre.Laps"] > 50)
+							break
+						else if (lastLap == 0) {
+							tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
+
+							lastLap := wear["Tyre.Laps"]
+						}
+						else if (lastLap != wear["Tyre.Laps"]) {
+							if (wear["Tyre.Wear"] < average(tyreWears[tyreWears.Length].Wears))
+								break
+							else {
+								tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
+
+								lastLap := wear["Tyre.Laps"]
+							}
+						}
+						else
+							tyreWears[tyreWears.Length].Wears.Push(wear["Tyre.Wear"])
+
+					if (tyreWears.Length > 0) {
+						do(tyreWears, (w) => w.Wears := Max(w.Wears*) / w.Laps)
+
+						tyreWear := average(collect(tyreWears, (w) => w.Wears))
+
+						tyreLaps := Floor(maxWear / tyreWear)
+						tyreWear := displayValue("Float", tyreWear, 1)
+					}
+					else {
+						tyreWear := translate("-")
+						tyreLaps := translate("-")
+					}
+
+					switch tyre, false {
+						case "Front.Left":
+							window["flWear"].Opt("Background" . "D0D0D0")
+							window["flWear"].Text := tyreWear
+							window["flLaps"].Opt("Background" . "D0D0D0")
+							window["flLaps"].Text := tyreLaps
+						case "Front.Right":
+							window["frWear"].Opt("Background" . "D0D0D0")
+							window["frWear"].Text := tyreWear
+							window["frLaps"].Opt("Background" . "D0D0D0")
+							window["frLaps"].Text := tyreLaps
+						case "Rear.Left":
+							window["rlWear"].Opt("Background" . "D0D0D0")
+							window["rlWear"].Text := tyreWear
+							window["rlLaps"].Opt("Background" . "D0D0D0")
+							window["rlLaps"].Text := tyreLaps
+						case "Rear.Right":
+							window["rrWear"].Opt("Background" . "D0D0D0")
+							window["rrWear"].Text := tyreWear
+							window["rrLaps"].Opt("Background" . "D0D0D0")
+							window["rrLaps"].Text := tyreLaps
 					}
 				}
 			}
@@ -7050,7 +7198,7 @@ lapTimeDisplayValue(lapTime) {
 	local seconds, fraction, minutes
 
 	if ((lapTime = "-") || isNull(lapTime))
-		return translate("-")
+		return "-"
 	else {
 		if isNumber(lapTime)
 			return displayValue("Time", lapTime)
@@ -8127,6 +8275,53 @@ editSettings(editorOrCommand, arguments*) {
 			editSettings("Rebuild")
 	}
 
+	validateConnection(serverURL, serverToken, &error?) {
+		local dllFile := (kBinariesDirectory . "Connectors\Data Store Connector.dll")
+		local connector
+
+		error := false
+
+		try {
+			if (!FileExist(dllFile)) {
+				logMessage(kLogCritical, translate("Data Store Connector.dll not found in ") . kBinariesDirectory)
+
+				throw "Unable to find Data Store Connector.dll in " . kBinariesDirectory . "..."
+			}
+
+			connector := CLR_LoadLibrary(dllFile).CreateInstance("TeamServer.DataConnector")
+		}
+		catch Any as exception {
+			logError(exception, true)
+
+			logMessage(kLogCritical, translate("Error while initializing Data Store Connector - please rebuild the applications"))
+
+			if !kSilentMode
+				showMessage(translate("Error while initializing Data Store Connector - please rebuild the applications") . translate("...")
+						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+
+			return false
+		}
+
+		try {
+			connector.Initialize(serverURL, serverToken)
+
+			connection := connector.Connect(serverToken, sessionDB.ID, sessionDB.getName("Profile"))
+
+			if (connection && (connection != "")) {
+				connector.ValidateDataToken()
+
+				return true
+			}
+			else
+				return false
+		}
+		catch Any as exception {
+			error := exception
+
+			return false
+		}
+	}
+
 	if (editorOrCommand == kOk) {
 		if currentConnection
 			editSettings("SaveConnection")
@@ -8142,6 +8337,8 @@ editSettings(editorOrCommand, arguments*) {
 		}
 
 		if ((groups.Count != connections.Length) || (serverURLs.Count != connections.Length) || (serverTokens.Count != connections.Length))
+			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
+		else if exist(connections, (c) => !validateConnection(serverURLs[c[1]], serverTokens[c[1]]))
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
 		else
 			result := kOk
@@ -8764,9 +8961,13 @@ editSettings(editorOrCommand, arguments*) {
 
 						if restart {
 							withBlockedWindows(MsgDlg, translate("The session database configuration has been updated and the application will exit now. Make sure to restart all other applications as well.")
-								 , translate("Information"), 262192)
+													 , translate("Information"), 262192)
 
 							broadcastMessage(concatenate(kBackgroundApps, kForegroundApps), "exitProcess")
+
+							Sleep(1000)
+
+							ExitApp(0)
 						}
 					}
 					else

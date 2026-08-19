@@ -434,7 +434,7 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 		for ignore, fileName in ftpListFiles(MASTER, "SimulatorController", "Sc-1234567890-Sc", "Database-Downloads") { ; ftpListFiles("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", "htdocs/simulator-controller/database-downloads") {
 			type := StrSplit(Trim(fileName), ".", "", 2)
 
-			databaseDirectory := type[2]
+			databaseDirectory := values2String(".", choose(string2Values(".", type[2]), isNumber)*)
 			type := type[1]
 
 			if ((downloadPressures && (type = "Pressures")) || (downloadWears && (type = "Wears"))
@@ -464,23 +464,25 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 				}
 		}
 
-		deleteDirectory(sessionDBPath . "Community")
+		if (types.Length > 0) {
+			deleteDirectory(sessionDBPath . "Community")
 
-		for ignore, type in types
-			try {
-				if FileExist(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community")
-					DirCopy(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community", sessionDBPath . "Community", 1)
-				else if FileExist(kTempDirectory . "Shared Database\" . type . "\Community")
-					DirCopy(kTempDirectory . "Shared Database\" . type . "\Community", sessionDBPath . "Community", 1)
+			for ignore, type in types
+				try {
+					if FileExist(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community")
+						DirCopy(kTempDirectory . "Shared Database\" . type . "\" . databaseDirectory . "\Community", sessionDBPath . "Community", 1)
+					else if FileExist(kTempDirectory . "Shared Database\" . type . "\Community")
+						DirCopy(kTempDirectory . "Shared Database\" . type . "\Community", sessionDBPath . "Community", 1)
 
-				updateState()
-			}
-			catch Any as exception {
-				logError(exception)
-			}
+					updateState()
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
-		if databaseDirectory
-			SessionDatabase.DatabaseVersion := databaseDirectory
+			if databaseDirectory
+				SessionDatabase.DatabaseVersion := databaseDirectory
+		}
 
 		deleteDirectory(kTempDirectory . "Shared Database")
 		deleteFile(sessionDBPath . "DOWNLOAD")

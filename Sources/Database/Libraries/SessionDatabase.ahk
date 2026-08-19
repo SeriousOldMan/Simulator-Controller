@@ -312,7 +312,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerURLs[identifier?] {
 		Get {
-			if (SessionDatabase.sServerURLs.Count = 0) ; isSet(identifier) && !SessionDatabase.sServerURLs.Has(identifier))
+			if (SessionDatabase.sServerURLs.Count = 0)
 				SessionDatabase.sServerURLs := stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
 			return (isSet(identifier) ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
@@ -354,13 +354,17 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerToken[identifier] {
 		Get {
-			return SessionDatabase.ServerTokens[identifier]
+			local token := SessionDatabase.ServerTokens[identifier]
+
+			return (isObject(token) ? false : token)
 		}
 	}
 
 	ServerToken[identifier] {
 		Get {
-			return SessionDatabase.ServerTokens[identifier]
+			local token := SessionDatabase.ServerTokens[identifier]
+
+			return (isObject(token) ? false : token)
 		}
 	}
 
@@ -641,7 +645,7 @@ class SessionDatabase extends ConfigurationItem {
 			return name
 		else if defaultForname
 			return driverName(defaultForname, defaultSurname, defaultNickname
-									, (defaultSurname != ""), (defaultNickname != ""))
+							, (defaultSurname != ""), (defaultNickname != ""))
 		else
 			return this.getUserName()
 	}
@@ -1802,6 +1806,34 @@ class SessionDatabase extends ConfigurationItem {
 		}
 	}
 
+	static normalizeTelemetry(simulator, fileName) {
+		local newData := ""
+		local invertX, invertY
+
+		simulator := this.getSimulatorCode(simulator)
+
+		invertX := inList(["LMU", "RF2", "R3E", "AMS2", "PCARS2"], simulator)
+		invertY := inList(["LMU", "RF2", "R3E", "AMS2", "PCARS2"], simulator)
+
+		if (invertX || invertY) {
+			loop Read, fileName {
+				data := string2Values(";", A_LoopReadLine)
+
+				if invertX
+					data[12] := - data[12]
+
+				if invertY
+					data[13] := - data[13]
+
+				newData .= (values2String(";", data*) . "`n")
+			}
+
+			deleteFile(fileName)
+
+			FileAppend(newData, fileName)
+		}
+	}
+
 	importTelemetry(simulator, car, track, fileName, &info, verbose := true) {
 		local running := 0
 		local name, infoFileName, motecFile
@@ -1824,6 +1856,8 @@ class SessionDatabase extends ConfigurationItem {
 				*/
 
 				if FileExist(importFileName) {
+					SessionDatabase.normalizeTelemetry(simulator, importFileName)
+
 					info := (importFileName . ".info")
 
 					return importFileName
@@ -2072,6 +2106,9 @@ class SessionDatabase extends ConfigurationItem {
 						}
 
 						FileAppend(values2String(";", line*) . "`n", importFileName)
+
+						if !iRacing
+							SessionDatabase.normalizeTelemetry(simulator, importFileName)
 					}
 				}
 

@@ -204,7 +204,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		window.SetFont("s8 Norm", "Arial")
 
-		widget14 := window.Add("Button", "x" . x . " yp+30 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Edit Labels && Icons..."))
+		widget14 := window.Add("Button", "x" . x . " yp+30 w" . colWidth . " h23 Y:Move(0.33) Hidden", translate("Labels && Icons..."))
 		widget14.OnEvent("Click", openLabelsAndIconsEditor)
 
 		window.SetFont("s8 Bold", "Arial")

@@ -6,6 +6,27 @@ Welcome to "Setup Workbench", a new member in the growing collection of tools of
 
 Important: "Setup Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Workbench" once using administrator privileges.
 
+## Settings
+
+Before we dive into the workflow of the "Setup Workbench", let's have a look at the settings, which are available with the button on the upper right corner of the main window.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.jpg)
+
+You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be noted in the form of a diary. The following entries will be made:
+
+- Each selection of simulator, car and/or track
+- Every change to the issues in the *Characteristics* pane of the main window
+- Loading a setup
+- Saving a setup incl. information about the changed setup settings
+- All actions taken by the AI-based Setup Engineer
+- Information about each driven lap (lap time, sector times, ...), if the telemetry system is running
+
+By the way, this diary can be opened with a click of the button with the small book icon directly beside the settings button. You may make notes in this file as well, but make sure to save them, before you go back to the "Setup Workbench", otherwise new entries may be lost.
+
+Good to know: If you do not configure a diary folder, the diary will be written to the *Simulator Controller\Temp\Setup Workbench\Diary* folder in your user *Documents* folder. But as the path suggests, it may be lost, once the *Temp* folder is cleaned up.
+
+In the lower area, you can configure a GPT service provider if you want to use the AI-based Setup Engineer. This part is optional and is described in detail further down below.
+
 ## Describing Setup Issues
 
 The real world approach, when developing a setup for a race car, is to drive a few laps and make mental notes of all the flaws and drawbacks of the current car handling. You then describe all these issues to your suspension engineer, who then adjusts the settings on the car accordingly. Another test on the track will hopefully confirm the improvements that have been made, but usually also reveal new issues that arise as a result of the changes. After you have gone through this cycle a few times, you usually have found the best possible compromise for the current track.
@@ -214,17 +235,11 @@ Good to know: If you use the "Open..." button in the dialog, which let's you bro
 
 ### Setup Engineer
 
-The fourth tool available to detect and mitigate car setup issues is the so-called *Setup Engineer*, which is using GPT technology to analyze your telemetry data and derive a very detaild performance and handling analysis. Before you can use the Setup Engineer, you must configure a GPT service provider using this dialog, which can be openend by clicking on the settings button in the upper right corner of the main window of "Setup Workbench".
+The fourth tool available to detect and mitigate car setup issues is the so-called *Setup Engineer*, which is using GPT technology to analyze your telemetry data and derive a very detaild performance and handling analysis. Before you can use the Setup Engineer, you must configure a GPT service provider in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#settings), which can be openend by clicking on the settings button in the upper right corner of the main window of "Setup Workbench". Here cou can choose a GPT service provider and a suitable LLM for the Setup Engineer. The choices are similar to the GPT configuration of the Driving Coach. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for more information about the supported GPT service providers.
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.jpg)
+Please note that a high end LLM is required for the Setup Engineer. It must be capable to work with huge amounts of nuerical data, must be able to do thousands of numerical calculations and must be able to follow several related goals at the same time. At the time of this writing, only models in the category of OpenAIs GPT 5.4 (not mini or nano) and beyond show good results. Of course, using models of this category is not cheap - one run of the Setup Engineer with GPT 5.4 costs around 20-30 cent.
 
-Here cou can choose a GPT service and a suitable LLM for the Setup Engineer. The choice are similar to the GPT configuration of the Driving Coach. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) for more information about the available GPT provider.
-
-Please note that a high end LLM is required for the Setup Engineer. It must be capable to work with huge amounts of nuerical data, must be able to thousands of numerical calculations and must be able to follow several related goals at once. At the time of this writing, only models in the category of OpenAIs GPT 5.4 (not mini or nano) and beyond show good results. And of course, using models of this category is not cheap - one run of the Setup Engineer with GPT 5.4 costs around 20-30 cent.
-
-Beside configuring a GPT provider, you can identify a special folder in the first field. The Setup Engineer will store text files containing a description of all its actions in this folder.
-
-And also similar to the Driving Coach, you can modify the special instructions send to the LLM together with the telemetry data:
+And also similar to the Driving Coach, you can modify the special instructions send to the LLM together with the telemetry data. However, the default instructions are well-balanced, so a modification is normally not ncessary.
 
 Below you find all instruction categories and the supported variables:
 
@@ -242,14 +257,16 @@ Below you find all instruction categories and the supported variables:
 |             | %wheelbase%       | Wheelbase of the car.                                                      |
 | Handling    | Scope             | This instruction is used only when you have decided to supply the identified handling issues beside the telemetry data to the LLM. |
 |             | %handling%        | This variable is substituted with a JSON representation of the issues. |
-| Analyse     | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data. |
-| Optimize    | Scope             | Once an analysis has been created, this instruction tells the LLM how to use a supplied function/tool to apply the recommended setup changes to a setup file. |
+| Analysis    | Scope             | The most important instruction. It defines the goal for the LLM and supplies information about the structure of the telemetry data.<br><br>Important: The telemetry data is not passed in this instruction using a variable. Rather the data is passed without any further instructions or comments in the user prompt. |
+| Recommenations | Scope          | Once an analysis has been created, this instruction tells the LLM how to use a supplied function/tool to apply the recommended setup changes to a loaded car setup.<br><br>Important: The analysis created in the previous step is not passed in this instruction using a variable. Rather the information is passed without any further instructions or comments in the user prompt. |
+
+If you have changed an instruction, you can revert it to the original instruction by clicking on the small button with the recycle icon. If you hold down the Control key when clicking on the button all instructions will be reverted at the same time.
 
 #### Acquiring telemetry data
 
 The Setup Engineer works on numerical telemetry data. Therefore it is necessary to run a few laps and collect telemetry data using the integrated telemetry system (see above). You must have choosen a specific car and also a specific track before using the Setup Engineer and the recorded telemetry data must originate from this combination, of course. Otherwise the results would be more tha questionable.
 
-Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database.
+Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database. Telemetry files from other locations than the session database may not be detected correctly or will lack information like the lap time.
 
 #### Creating a lap analysis
 
@@ -265,14 +282,19 @@ Additional to the choices described above data about the car geometry will be ma
 
 Once you have choosen your settings, click on the button with the engineer icon. It will take some time for the LLM to analyze the data. Once completed, a review based on the telemetry data and, if supplied, on the supplied issues will be presented in the lower area of the window.
 
-
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 
 The structure, content and quality of the review strongly depends on the configured LLM, so it will need several runs at the beginning until you get good results. As mentioned above, don't waste your time with small or outdated models.
 
+[Here](http://simulator-controller.selfhost.co/Attachments/Telemetry%20Analysis.html) is an example of a high quality analysis created with GPT 5.5.
+
 #### Applying recommendations
 
 If the Setup Engineer identified reasonable changes to the car setup, you can of course apply them manually. But you can also ask the Setup Engineer to do it for you. For this, you have to open a [*Setup Editor*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups) (exactly one) and then you click on the button with the tools in the Setup Engineer window. The LLM, which is required to handle tool calling properly, is then asked to apply its own recommendations to the setup currently loaded in the *Setup Editor*. But always double check the result, only the most capable LLMs will manage to do this without any errors.
+
+Here is a video that demonstrates the complete workflow:
+
+[![](https://img.youtube.com/vi/xW6XF60wYOg/0.jpg)](https://www.youtube.com/watch?v=xW6XF60wYOg)
 
 ## Understanding the Recommendations
 

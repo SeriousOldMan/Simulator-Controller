@@ -17,14 +17,10 @@
   4. Include lap time meadian value in the lap time information given by the Strategist and others
   5. Driver Input overlay (brake / throttle) by the Driving Coach
   
-#### Session Database
-  1. Tyre wear viewer and calculator
-  
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
   2. Gear ratio optimizer for the Issue Analyzer
-  3. Engineer's Diary with change history, lap times after change, notes and so on
-  4. Support for *Asseto Corsa EVO* setup files
+  3. Support for *Asseto Corsa EVO* setup files
   
 #### Strategy Workbench
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)

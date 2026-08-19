@@ -1508,6 +1508,12 @@ class LLMConnector {
 		model := ((this.Models.Length > 0) ? this.Models[1] : "")
 	}
 
+	Connect(*) {
+	}
+
+	Disconnect(*) {
+	}
+
 	Restart() {
 		this.History := true
 

@@ -1612,7 +1612,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
    You can configure either the 2025 or the 2026 UDP packet format, both are supported. All teams, drivers, tracks and other extensions of the 2026 DLC are supported.
 
-2. The *EA Javelin* AntiCheat software prevents using Simulator Controller on the same machine as *F1 25*. Therefore it is necessary to run Simulator Controller on a separate PC, which is required anyway, when *F1 25* is running on console.
+2. The *EA Javelin* AntiCheat software generally prevents using Simulator Controller on the same machine as *F1 25*, because it is flagged as cheating software due to the underlying programming language, which is in widespread use for game scripting. It has been reported, that it is possible to start Simulator Controller in a small time window between the Javelin checks and the actual start of the game engine. But this is a one out of three in best case and therefore it much better to run Simulator Controller on a separate PC, which is required anyway, when *F1 25* is running on console.
 
 3. When the PC version of *F1 25* is used, it is also possible to run Simulator Controller in a virtual environment like [VirtualBox](https://www.virtualbox.org/) or [VMware Player](https://www.techspot.com/downloads/1969-vmware-player.html). When setting up such an environment, the following must be noted:
 
@@ -1625,7 +1625,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 4. The local Firewall will ask for permission to open the configured port, when the different API services are started for the first time. Since this will happen, while you are in a session, it is recommended to first run everything locally and not in an important online race, right?
 
-5. Because in any case *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*. You must *locate* *F1 25* for remote execution in "Simulator Setup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) for more information. If you are using the low-level tool "Simulator Configuration" for all your configuration work, use the following steps:
+5. Because in most cases *F1 25* is not installed on the same machine as Simulator Controller, automatic configuration of the *F125* plugin will not be supported in "Simulator Setup". Therefore, a few steps are necessary, before Simulator Controller will offer a remote connection to *F1 25*. You must *locate* *F1 25* for remote execution in "Simulator Setup". See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#locating-simulators-and-applications) for more information. If you are using the low-level tool "Simulator Configuration" for all your configuration work, use the following steps:
 
    - Start "Simulator Configuration".
    - Go to the "Plugins" page and activate the *F125* plugin. Enter "F1 25" as the application name (mind the space between *F1* and *25*).
@@ -1638,7 +1638,7 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
    - The data for the the last lap is not reported when the drivers car has crossed the finish line. Therefore, the last lap is missing from all reports, race review, and so on.
    - If you quit a session before finishing it, the end of the session is not detected by the Assistants - they think the simulator is paused. Therefore, you must end the session manually in Simulator Controller.
-   - Sometimes, dpending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
+   - Sometimes, depending on the timing, a session start may be missed by the Assistants. Only solution for the moment is to restart the session.
    - Suspension damage cannot be detected in the data. There is a tyre damage information available (for example when jumping over sausage curbs), but this damage is issued too often to be used as substitute for suspension damage.
    - When running Simulator Controller in *VirtualBox*, it can happen that reports in "Solo Center" or "Team Center" are not displayed correctly, although the data is error free. In this case, save the session to a file and reload it. Everything should display correctly then.
 

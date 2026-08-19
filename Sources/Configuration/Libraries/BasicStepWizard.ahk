@@ -1120,7 +1120,9 @@ class BasicStepWizard extends StepWizard {
 				wizard.setModuleValue(assistant, "Agent Booster", false, false)
 		}
 
-		setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
+		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Language", kUndefined) = kUndefined)
+			setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
+		
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["basicPushToTalkEdit"].Text)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["basicPushToTalkModeDropDown"].Value])
 

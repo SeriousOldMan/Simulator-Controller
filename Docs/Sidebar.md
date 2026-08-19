@@ -143,7 +143,7 @@
   - [Telemetries](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries)
   - [Strategies](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#strategies)
   - [Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#setups)
-  - [Pressures](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#pressures)
+  - [Tyres](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres)
   - [Administration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration)
   - [Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings-1)
   

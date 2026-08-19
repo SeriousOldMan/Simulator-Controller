@@ -121,7 +121,7 @@ The Telemetry Viewer supports two different sources of telemetry data. One, whic
 
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
-Important: Session that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
+Important: Sessions that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
 
 ##### Notes
 
@@ -132,9 +132,9 @@ Important: Session that are saved with telemetry data will NOT be synchronized w
 5. You can save and load telemetry data for a given lap for later usage:
    - Typically used for reference laps, even from other drivers.
    - Use the small button with the "Disc" icon to save a telemetry lap to the session database or any other location.
-   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location.
+   - Use the small button with the "Folder" icon to load a telemetry lap from the session database or any other location. When opening telemetry files, all importable formats like CSV are supported additionally to the internal telemetry file format.
    - Telemetry data, which has been *imported* this way will not become part of the current session.
-   *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
+   *Imported* telemetry data can be removed by using the *Delete* button. This will not remove it from its original location.
 
 Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 

@@ -37,6 +37,7 @@
   - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
   - Fixed the location handling of the diary folder location in "Setup Workbench".
   - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
   
 #### Changes
 

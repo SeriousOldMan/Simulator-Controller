@@ -258,7 +258,7 @@ class SetupWizard extends ConfiguratorPanel {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 			}
@@ -2839,13 +2839,18 @@ class StartStepWizard extends StepWizard {
 
 							resetVolume(volume)
 
-							SoundPlay(audio)
+							try {
+								SoundPlay(audio)
+							}
+							catch Any as exception {
+								logError(exception, false, false)
+							}
 						}
 					}
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 			}
@@ -3006,7 +3011,12 @@ class StartStepWizard extends StepWizard {
 			audio := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
 
 			if audio
-				SoundPlay(audio)
+				try {
+					SoundPlay(audio)
+				}
+				catch Any as exception {
+					logError(exception, false, false)
+				}
 		}
 
 		super.showPage(page)

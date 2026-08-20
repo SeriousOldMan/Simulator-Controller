@@ -660,7 +660,7 @@ class SpeechSynthesizer {
 		callback := this.SpeechStatusCallback
 
 		if kSox { ; && (this.Synthesizer != "OpenAI")) {
-			pid := playSoundwait ? "SoundPlayerSync.exe" : "SoundPlayerAsync", soundFile, this.AudioSettings)
+			pid := playSound(wait ? "SoundPlayerSync" : "SoundPlayerAsync", soundFile, this.AudioSettings)
 
 			if callback
 				callback.Call("Start")

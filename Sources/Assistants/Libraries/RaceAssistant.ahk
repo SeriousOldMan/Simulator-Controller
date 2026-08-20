@@ -188,7 +188,7 @@ class AssistantEvent extends AgentEvent {
 		triggerEvent() {
 			static reasoningStartSound := getFileName("Reasoning Begin.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
-			playSound"RASoundPlayer", reasoningStartSound, getAudioSettings("Reasoning"))
+			playSound("RASoundPlayer", reasoningStartSound, getAudioSettings("Reasoning"))
 
 			return booster.trigger(this, this.createTrigger(this.Event, this.Phrase, arguments)
 								 , this.createGoal(this.Goal, arguments)
@@ -1749,7 +1749,7 @@ class RaceAssistant extends ConfigurationItem {
 			if this.ConversationBooster {
 				data := this.getKnowledge("Conversation")
 
-				playSound"RASoundPlayer", conversationStartSound, getAudioSettings("Conversation"))
+				playSound("RASoundPlayer", conversationStartSound, getAudioSettings("Conversation"))
 
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
@@ -1758,7 +1758,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				if text {
 					if (text != true) {
-						playSound"RASoundPlayer", conversationStopSound, getAudioSettings("Conversation"))
+						playSound("RASoundPlayer", conversationStopSound, getAudioSettings("Conversation"))
 
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
@@ -5593,7 +5593,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 	runAction(enoughData, confirm) {
 		if chime
-			playSound"RASoundPlayer", reasoningStopSound, getAudioSettings("Reasoning"))
+			playSound("RASoundPlayer", reasoningStopSound, getAudioSettings("Reasoning"))
 
 		if !assistant.KnowledgeBase
 			return assistant.hasEnoughData()

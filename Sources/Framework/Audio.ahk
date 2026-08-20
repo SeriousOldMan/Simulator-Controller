@@ -229,6 +229,9 @@ playSound(player, wavFile, settings := false, options := false) {
 			return pid
 	}
 	else {
+		if isDebug()
+			logMessage(kLogDebug, "Playing sound `"" . wavFile . "`"...")
+
 		try
 			if wait
 				SoundPlay(wavFile, "Wait")

@@ -846,7 +846,7 @@ speak(message) {
 
 play(soundFileName) {
 	try {
-		playSound"AUTSoundPlayer", soundFileName, getAudioSettings("Actions"))
+		playSound("AUTSoundPlayer", soundFileName, getAudioSettings("Actions"))
 	}
 	catch Any as exception {
 		logError(exception, true)

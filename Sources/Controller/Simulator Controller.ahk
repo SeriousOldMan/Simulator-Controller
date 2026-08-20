@@ -1004,7 +1004,7 @@ class SimulatorController extends ConfigurationItem {
 		if first
 			first := false
 		else
-			playSound"SCSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+			playSound("SCSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 										 , getAudioSettings("Controller"))
 	}
 

@@ -663,7 +663,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 				else {
 					if this.VoiceServer.hasPushToTalk()
-						playSound"VSSoundPlayer", (this.VoiceServer.PushToTalkMode = "Hold") ? talkSound : startTalkSound
+						playSound("VSSoundPlayer", (this.VoiceServer.PushToTalkMode = "Hold") ? talkSound : startTalkSound
 													 , getAudioSettings("Activation"))
 
 					this.iListening := true
@@ -684,7 +684,7 @@ class VoiceServer extends ConfigurationItem {
 				}
 				else {
 					if ((this.VoiceServer.PushToTalkMode != "Hold") && this.VoiceServer.hasPushToTalk())
-						playSound"VSSoundPlayer", stopTalkSound, getAudioSettings("Activation"))
+						playSound("VSSoundPlayer", stopTalkSound, getAudioSettings("Activation"))
 
 					this.iListening := false
 
@@ -1400,7 +1400,7 @@ class VoiceServer extends ConfigurationItem {
 					this.interrupt(false, (this.Interruptable = "All"))
 
 				if this.hasPushToTalk()
-					playSound"VSSoundPlayer", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
+					playSound("VSSoundPlayer", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
 												 , getAudioSettings("Activation"))
 
 				this.iListening := true
@@ -1421,7 +1421,7 @@ class VoiceServer extends ConfigurationItem {
 			}
 			else {
 				if ((this.PushToTalkMode != "Hold") && this.hasPushToTalk())
-					playSound"VSSoundPlayer", stopTalkSound, getAudioSettings("Activation"))
+					playSound("VSSoundPlayer", stopTalkSound, getAudioSettings("Activation"))
 
 				this.iListening := false
 

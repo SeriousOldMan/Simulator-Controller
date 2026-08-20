@@ -2666,7 +2666,7 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	acousticFeedback(soundFile) {
-		playSound"DCSoundPlayer", soundFile, this.AudioSettings, "echos 1 1 1 1")
+		playSound("DCSoundPlayer", soundFile, this.AudioSettings, "echos 1 1 1 1")
 	}
 
 	positionTrigger(sectionNr, positionX, positionY, diagnostics*) {

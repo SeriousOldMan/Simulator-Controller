@@ -479,7 +479,7 @@ class IssueCollector {
 	}
 
 	static acousticFeedback(soundFile) {
-		playSound"SWSoundPlayer", soundFile, IssueCollector.AudioSettings, "echos 1 1 1 1")
+		playSound("SWSoundPlayer", soundFile, IssueCollector.AudioSettings, "echos 1 1 1 1")
 	}
 
 	static createHandling(issues) {

@@ -127,10 +127,10 @@ requireSoundPlayer(player) {
 	local path
 
 	if (kSox && FileExist(kSox)) {
-		path := (kProgramsDirectory . player)
-		
 		if !InStr(player, ".exe")
 			player .= ".exe"
+
+		path := (kProgramsDirectory . player)
 
 		if FileExist(path)
 			return path
@@ -154,12 +154,39 @@ requireSoundPlayer(player) {
 }
 
 playSound(player, wavFile, settings := false, options := false) {
+	local wait := false
 	local workingDirectory, pid, audioDevice, volume
 
-	if (player = "System")
-		player := false
+	if (player = "SystemPlayer") {
+		player := requireSoundPlayer(player)
+
+		if (settings = "Wait") {
+			options := "Wait"
+			settings := false
+		}
+
+		if (!wavFile || (wavFile = "NonExistent.avi")) {
+			if player {
+				player := ProcessExist(player)
+
+				if player
+					try
+						ProcessClose(player)
+			}
+			else
+				try
+					SoundPlay("NonExistent.avi")
+
+			return
+		}
+	}
 	else
 		player := requireSoundPlayer(player)
+
+	if (options := "Wait") {
+		wait := true
+		options := false
+	}
 
 	if settings {
 		audioDevice := settings.AudioDevice
@@ -191,13 +218,22 @@ playSound(player, wavFile, settings := false, options := false) {
 			pid := false
 		}
 
-		return pid
+		if wait {
+			loop
+				Sleep(100)
+			until !ProcessExist(pid)
+
+			return false
+		}
+		else
+			return pid
 	}
 	else {
-		if (options = "Wait")
-			SoundPlay(wavFile, "Wait")
-		else
-			SoundPlay(wavFile)
+		try
+			if wait
+				SoundPlay(wavFile, "Wait")
+			else
+				SoundPlay(wavFile)
 
 		return false
 	}
@@ -233,10 +269,10 @@ requireAudioConfiguration() {
 		if (!gAudioConfigurationMode && FileExist(fileName)) {
 			gAudioConfigurationModeModTime := FileGetTime(fileName, "M")
 			gAudioConfigurationMode := string2Values("->", FileRead(fileName))
-			
+
 			if (gAudioConfigurationMode.Length != 2) {
 				gAudioConfigurationMode := false
-				
+
 				deleteFile(fileName)
 			}
 		}

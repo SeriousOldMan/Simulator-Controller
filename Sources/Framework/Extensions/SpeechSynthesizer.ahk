@@ -660,7 +660,7 @@ class SpeechSynthesizer {
 		callback := this.SpeechStatusCallback
 
 		if kSox { ; && (this.Synthesizer != "OpenAI")) {
-			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile, this.AudioSettings)
+			pid := playSoundwait ? "SoundPlayerSync.exe" : "SoundPlayerAsync", soundFile, this.AudioSettings)
 
 			if callback
 				callback.Call("Start")
@@ -706,7 +706,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Start")
 
-				playSound("System", soundFile, false, "Wait")
+				playSound("SystemPlayer", soundFile, false, "Wait")
 
 				if callback
 					callback.Call("Stop")
@@ -715,7 +715,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Play")
 
-				playSound("System", soundFile)
+				playSound("SystemPlayer", soundFile)
 			}
 		}
 	}
@@ -1229,8 +1229,7 @@ class SpeechSynthesizer {
 			return true
 		}
 		else if (this.iPlaysCacheFile || inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs"], this.Synthesizer)) {
-			try
-				playSound("System", "NonExistent.avi")
+			playSound("SystemPlayer", false)
 
 			if this.iPlaysCacheFile {
 				this.iPlaysCacheFile := false

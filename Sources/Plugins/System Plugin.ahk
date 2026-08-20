@@ -516,7 +516,7 @@ class SystemPlugin extends ControllerPlugin {
 				songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 				if FileExist(songFile) {
-					SoundPlay(songFile)
+					playSound("SystemPlayer", songFile)
 
 					this.iStartupSongIsPlaying := true
 				}
@@ -533,8 +533,7 @@ class SystemPlugin extends ControllerPlugin {
 		if this.iStartupSongIsPlaying
 			masterVolume := fadeOut()
 
-		try
-			SoundPlay("NonExistent.avi")
+		playSound("SystemPlayer", false)
 
 		if this.iStartupSongIsPlaying {
 			if callback
@@ -847,7 +846,7 @@ speak(message) {
 
 play(soundFileName) {
 	try {
-		playSound("AUTSoundPlayer.exe", soundFileName, getAudioSettings("Actions"))
+		playSound"AUTSoundPlayer", soundFileName, getAudioSettings("Actions"))
 	}
 	catch Any as exception {
 		logError(exception, true)

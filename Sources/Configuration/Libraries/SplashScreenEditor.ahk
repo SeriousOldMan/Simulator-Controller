@@ -604,7 +604,7 @@ class SplashScreensList extends ConfigurationItemList {
 
 		if (stop || this.iSoundIsPlaying) {
 			try {
-				SoundPlay("NonExistent.avi")
+				playSound("SystemPlayer", "NonExistent.avi")
 			}
 			catch Any as exception {
 			}
@@ -618,7 +618,7 @@ class SplashScreensList extends ConfigurationItemList {
 				songFile := getFileName(this.Control["soundFilePathEdit"].Text, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 				if FileExist(songFile) {
-					SoundPlay(songFile)
+					playSound("SystemPlayer", songFile)
 
 					setButtonIcon(this.Control["playSoundFileButton"], kIconsDirectory . "Pause.ico", 1, "L2 T2 R2 B2")
 

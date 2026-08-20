@@ -1,5 +1,30 @@
 # Latest stable release
 
+## 7.2.1.0
+
+#### Date: 08/21/26
+
+#### Fixes
+
+  - Added missing translations for all languages.
+  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
+  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
+  - Fixed the location handling of the diary folder location in "Setup Workbench".
+  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
+  
+#### Changes
+
+  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
+  - [Internal] Sounds that do not require an audio route will now also be played by SoX, if installed.
+  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.2.0.0
 
 #### Date: 08/14/26
@@ -23,28 +48,6 @@
   - The "Session Database" provides a new inspector which gives you detailed information about the tyre wear per lap for each wheel in specific weather conditions. Depending on your settings, the number of usable laps per tyre will be calculated automatically. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres) for more information.
   - IBT files can now be opened directly from the telemetry select dialog.
   - Suspension information and the lap time is now included in telemetry data acquired by the Second Monitor provider.
-
-# Upcoming release
-
-## 7.2.1.0
-
-#### Date: 08/21/26 (planned)
-
-#### Fixes
-
-  - Added missing translations for all languages.
-  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
-  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
-  - Fixed the location handling of the diary folder location in "Setup Workbench".
-  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
-  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
-  
-#### Changes
-
-  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
-  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
-
-# Release history
 
 ## 7.1.5.0
 

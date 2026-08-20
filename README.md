@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.0.0-release](https://cutt.ly/1yaK2KLG) (Changes: Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider, Support opening of IBT files directly from browser, Validation for Team Server connection in "Session Database".)
+[7.2.1.0-release](https://cutt.ly/zyd8ZJvn) (Changes: Fixed several translations, Fixed minor bugs in telemetry handling, Optical enhancements in "Simulator Setup" and "Simulator Configuration", Fixed diary folder location, Fixed scrolling of Setup Engineer telemetry list, Modified plugin registration method, Prevent crash for sound play failure in "Simulator Setup", Workaround for failing SoundPlay.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7200) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-720) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7210) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-721) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.1.5.0-release](https://cutt.ly/uyo4mIod) (Changes: Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list, Optimized loading of large telemetry files, Second Monitor Reader supports suspension deflection.)
+[7.2.0.0-release](https://cutt.ly/1yaK2KLG) (Changes: Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider, Support opening of IBT files directly from browser, Validation for Team Server connection in "Session Database".)
 
-[7.1.4.0-release](https://cutt.ly/byuDM3Nk) (Changes: Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach, Full customizeable suspension sample in "Setup Workbench", Fixed transfer of issues to the workarea of "Setup Workbench", Optimized recommendations for bottom out issues in "Setup Workbench", Added suspension deflection to standard telemetry files, Optimized handling of analyzer settings in "Setup Workbench", Increased resolution of telmetry files, Fixed saving of reverted instructions, Fixed hiding of basic page in "Simulator Setup".)
+[7.1.5.0-release](https://cutt.ly/uyo4mIod) (Changes: Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list, Optimized loading of large telemetry files, Second Monitor Reader supports suspension deflection.)
 
 #### Current development build
 
-[7.2.1.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/TPbsTdQ0/Releases/Simulator%20Controller%207.2.1.0-beta.zip) (Test build for 7.2.1. Changes: Fixed several translations, Fixed minor bugs in telemetry handling, Optical enhancements in "Simulator Setup" and "Simulator Configuration", Fixed diary folder location, Fixed scrolling of Setup Engineer telemetry list, Modified plugin registration method, Prevent crash for sound play failure in "Simulator Setup".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7210) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-721) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

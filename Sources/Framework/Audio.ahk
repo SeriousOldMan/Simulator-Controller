@@ -154,16 +154,10 @@ requireSoundPlayer(player) {
 }
 
 playSound(player, wavFile, settings := false, options := false) {
-	local wait := false
-	local workingDirectory, pid, audioDevice, volume
+	local workingDirectory, pid, audioDevice, volume, wait
 
 	if (player = "SystemPlayer") {
 		player := requireSoundPlayer(player)
-
-		if (settings = "Wait") {
-			options := "Wait"
-			settings := false
-		}
 
 		if (!wavFile || (wavFile = "NonExistent.avi")) {
 			if player {
@@ -183,9 +177,10 @@ playSound(player, wavFile, settings := false, options := false) {
 	else
 		player := requireSoundPlayer(player)
 
-	if (options := "Wait") {
-		wait := true
-		options := false
+	if (settings = "Wait") {
+		options := "Wait"
+
+		settings := false
 	}
 
 	if settings {
@@ -199,6 +194,14 @@ playSound(player, wavFile, settings := false, options := false) {
 
 	if (audioDevice = kNull)
 		return false
+
+	if InStr(options, "Wait") {
+		options := StrReplace(options, "Wait", "")
+
+		wait := true
+	}
+	else
+		wait := false
 
 	if player {
 		SplitPath(kSox, , &workingDirectory)

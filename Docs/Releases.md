@@ -21,7 +21,45 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.2.0
+
+#### Date: 08/28/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The Driving Coach provides a new coaching mode, which is most helpful during a race. He will now praise you for a good lap, but will also blame you and call you back to focus, if you lose your pace. Additionally, he can give you advice where on the track you are losing time and what to change.
+    - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#motivation-on-the-track) has been added for the Driving Coach.
+	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
+	- The motivation mode can also be activated from the tray menu of the "Simulator Controller" process.
+	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
+	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
+  - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
+  - New car models for "Setup Workbench" (by @inthebagbud UK):
+    - Automobilista 2
+	  - Formula V10 Gen2 (has been removed)
+      - Formula V10 Gen2 (B)
+      - Formula V10 Gen2 (M)
+      - Formula V10 Gen3 (B)
+      - Formula V10 Gen3 (M)
+      - Formula V8 Gen1 (B)
+      - Formula V8 Gen1 (M)
+      - Formula V8 Gen2
+      - Gillet Vertigo Streiff
+      - Lister Storm GTM
+      - Maserati GranSport Trofeo
+      - Milano GT55
+      - Panoz Esperante GTLM
+      - Renault R25
+      - Renault R26
+      - Renault R28
+      - Saleen S7-R GT1
+      - Spyker C8 Spyder GT2-R
+      - TVR Tuscan T400R GT2
+
 
 # Release history
 

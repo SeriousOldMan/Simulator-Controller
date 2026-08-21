@@ -1041,6 +1041,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.shutdownTrackCoaching()
 		this.shutdownBrakeCoaching()
+		this.shutdownRaceMotivation()
 	}
 
 	referenceLapRecognized(words) {

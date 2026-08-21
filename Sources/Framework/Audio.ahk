@@ -156,11 +156,13 @@ requireSoundPlayer(player) {
 playSound(player, wavFile, settings := false, options := false) {
 	local workingDirectory, pid, audioDevice, volume, wait
 
-	if (player = "SystemPlayer") {
+	if (player = "SysSoundPlayer") {
 		player := requireSoundPlayer(player)
 
 		if (!wavFile || (wavFile = "NonExistent.avi")) {
 			if player {
+				SplitPath(player, &player)
+
 				player := ProcessExist(player)
 
 				if player

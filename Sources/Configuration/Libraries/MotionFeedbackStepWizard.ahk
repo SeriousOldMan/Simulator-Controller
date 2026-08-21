@@ -625,7 +625,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.Control["motionIntensityField"].Text := function
 
-		playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+		playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadControllerLabels()
 	}
@@ -634,7 +634,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		this.Control["motionIntensityField"].Value := ""
 
 		if sound
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadControllerLabels()
 	}
@@ -659,7 +659,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.Control["effectSelectorField"].Text := function
 
-		playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+		playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadControllerLabels()
 	}
@@ -668,7 +668,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		this.Control["effectSelectorField"].Text := ""
 
 		if sound
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadControllerLabels()
 	}
@@ -693,7 +693,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.Control["effectIntensityField"].Text := function
 
-		playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+		playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadControllerLabels()
 	}
@@ -702,7 +702,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 		this.Control["effectIntensityField"].Text := ""
 
 		if sound
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadControllerLabels()
 	}
@@ -721,7 +721,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 		this.setActionArgument(row, values2String("|", arguments*))
 
-		playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+		playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 		this.loadActions()
 	}
@@ -772,7 +772,7 @@ class MotionFeedbackStepWizard extends ActionsStepWizard {
 
 			this.setActionArgument(row, values2String("|", arguments*))
 
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 			this.loadActions()
 		}

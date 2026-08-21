@@ -34,7 +34,7 @@ playSplashScreenSong(songFile) {
 	songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 	if FileExist(songFile)
-		playSound("SystemPlayer", songFile)
+		playSound("SysSoundPlayer", songFile)
 }
 
 
@@ -218,7 +218,7 @@ showSplashScreen(splashScreen := unset, songHandler := false, alwaysOnTop := tru
 hideSplashScreen() {
 	SetTimer(showSplashScreen, 0)
 
-	playSound("SystemPlayer", false)
+	playSound("SysSoundPlayer", false)
 
 	hideSplash()
 }

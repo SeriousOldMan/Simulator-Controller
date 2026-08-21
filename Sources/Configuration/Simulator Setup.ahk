@@ -2830,11 +2830,11 @@ class StartStepWizard extends StepWizard {
 						if audio {
 							volume := fadeOut(20)
 
-							playSound("SystemPlayer", false)
+							playSound("SysSoundPlayer", false)
 							
 							resetVolume(volume)
 
-							playSound("SystemPlayer", audio)
+							playSound("SysSoundPlayer", audio)
 						}
 					}
 				}
@@ -2977,7 +2977,7 @@ class StartStepWizard extends StepWizard {
 		if substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false)) {
 			volume := fadeOut()
 
-			playSound("SystemPlayer", false)
+			playSound("SysSoundPlayer", false)
 			
 			resetVolume(volume)
 		}
@@ -2996,7 +2996,7 @@ class StartStepWizard extends StepWizard {
 			audio := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
 
 			if audio
-				playSound("SystemPlayer", audio)
+				playSound("SysSoundPlayer", audio)
 		}
 
 		super.showPage(page)
@@ -3008,7 +3008,7 @@ class StartStepWizard extends StepWizard {
 		if ((page == 1) && substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))) {
 			volume := fadeOut()
 
-			playSound("SystemPlayer", false)
+			playSound("SysSoundPlayer", false)
 
 			resetVolume(volume)
 		}

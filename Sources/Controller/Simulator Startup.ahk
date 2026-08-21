@@ -1230,7 +1230,7 @@ launchPad(command := false, arguments*) {
 
 				curControl.Value := ("*w59 *h59 " . curControl.Value)
 
-				playSound("SystemPlayer", getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+				playSound("SysSoundPlayer", getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 			}
 			else if (pressedControl && !GetKeyState("LButton")) {
 				pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)

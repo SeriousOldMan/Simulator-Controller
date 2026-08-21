@@ -516,7 +516,7 @@ class SystemPlugin extends ControllerPlugin {
 				songFile := getFileName(songFile, kUserSplashMediaDirectory, kSplashMediaDirectory)
 
 				if FileExist(songFile) {
-					playSound("SystemPlayer", songFile)
+					playSound("SysSoundPlayer", songFile)
 
 					this.iStartupSongIsPlaying := true
 				}
@@ -533,7 +533,7 @@ class SystemPlugin extends ControllerPlugin {
 		if this.iStartupSongIsPlaying
 			masterVolume := fadeOut()
 
-		playSound("SystemPlayer", false)
+		playSound("SysSoundPlayer", false)
 
 		if this.iStartupSongIsPlaying {
 			if callback

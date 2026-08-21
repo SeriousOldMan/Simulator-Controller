@@ -210,7 +210,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 					else
 						this.iLaunchApplications[application] := Array(label, "")
 
-					playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+					playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 					this.loadApplications()
 				}
@@ -655,7 +655,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		if !inList(this.iModeSelectors, function) {
 			this.iModeSelectors.Push(function)
 
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 			this.iModeSelectorsListView.Delete()
 			this.iModeSelectorsListView.Add(this.iModeSelectors)
@@ -672,7 +672,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		if index {
 			this.iModeSelectors.RemoveAt(index)
 
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 			this.iModeSelectorsListView.Delete()
 			this.iModeSelectorsListView.Add(this.iModeSelectors)
@@ -699,7 +699,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 			for application, candidate in this.iLaunchApplications
 				if (candidate[2] = function) {
-					playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+					playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 					this.iLaunchApplications.Delete(application)
 
@@ -738,7 +738,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 		function := this.iLaunchApplications[application]
 
 		if (function && (function != "")) {
-			playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+			playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 			this.iLaunchApplications.Delete(application)
 
@@ -796,7 +796,7 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 				contextMenu.Show()
 			}
 			else {
-				playSound("SystemPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
+				playSound("SysSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 
 				wizard := this.SetupWizard
 

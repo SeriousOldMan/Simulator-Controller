@@ -93,6 +93,8 @@ Information=informações da sessão, informações do stint, informações de p
    [(CanYou) me dar {recomendações, dicas, instruções, orientação} {enquanto eu estiver dirigindo, durante a pilotagem, para cada curva}, {Por favor, me diga, Diga} {antes de, para} cada {curva, trecho} o que eu {posso, devo} mudar, (CanYou) me treinar {na pista, enquanto eu estiver dirigindo, durante a pilotagem}]
 
    [(CanYou) me dizer onde estão os pontos de frenagem, {Por favor, me diga, Diga} onde frear, (CanWe) praticar {frenagem, pontos de frenagem}]
+   
+   [(CanYou) me ajudar a manter o foco, (CanYou) me motivar se necessário, Por favor ajude-me a manter o foco]
 
    [{Obrigado, Agora} quero focar, {Ok, Deixa} eu {aplicar, testar} {suas recomendações, suas instruções, isso} agora, {Por favor, pare, Pare} de me dar {recomendações, dicas, instruções, recomendações para cada curva, dicas para cada curva, instruções para cada curva}, {Por favor, sem, Sem} mais {instruções, instruções por favor}]
 

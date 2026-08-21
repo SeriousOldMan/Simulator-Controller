@@ -234,6 +234,7 @@ Below you find all instruction categories and the supported variables:
 |             | %corner%          | The corner to be reviewed. |
 | Coaching.Reference | Scope            | This is used as an addition for many of the above synthetic questions/commands for telemetry review. It is used, when a reference lap is available, which can be used for comparison against the most recent lap. |
 |             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the reference lap. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
+| Motivation.TimeLoss | Scope            | This instruction is used when the Coach is active during a race and helps you to keep focus and motivation. |
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
@@ -510,6 +511,12 @@ The following video gives you a good demonstration of this:
 	 
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
+
+### Motivation on the track
+
+This mode also uses the underlying telemtry data system to help you to retain your focus and your motivation to push. Once the Coach detects, that you are loosing pace, he will yell at you and will try to bring your attention back to the tarmac. You can enable this mode by asking the Coach, whether he can help you to keep your focus.
+
+Good to know: You can control the level of verbosity by modifying the *Motivation.TimeLoss* instruction (see above). You can even delete the whole content of this instructions and the Coach will then tell you only that you have lost pace and that you should focus again.
 
 ### Automatic activation of coaching mode
 

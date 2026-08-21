@@ -1705,6 +1705,7 @@ availableFunctions(configuration, &hasTeamServer := false
 		functions.Push(Array("Driving Coach", "Handling Analysis"))
 		functions.Push(Array("Driving Coach", "On-track Coaching"))
 		functions.Push(Array("Driving Coach", "Brake Coaching"))
+		functions.Push(Array("Driving Coach", "Race Motivation"))
 	}
 
 	if hasRaceSpotter {
@@ -2489,7 +2490,20 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 					if ((function = "Brake Coaching") && profile.Has("Function.On-Track Coaching"))
 						profile["Function.On-Track Coaching"] := false
-					else if ((function = "On-Track Coaching") && profile.Has("Function.Brake Coaching"))
+
+					if ((function = "Brake Coaching") && profile.Has("Function.Race Motivation"))
+						profile["Function.Race Motivation"] := false
+
+					if ((function = "On-Track Coaching") && profile.Has("Function.Brake Coaching"))
+						profile["Function.Brake Coaching"] := false
+
+					if ((function = "On-Track Coaching") && profile.Has("Function.Race Motivation"))
+						profile["Function.Race Motivation"] := false
+
+					if ((function = "Race Motivation") && profile.Has("Function.On-Track Coaching"))
+						profile["Function.On-Track Coaching"] := false
+
+					if ((function = "Race Motivation") && profile.Has("Function.Brake Coaching"))
 						profile["Function.Brake Coaching"] := false
 				}
 			}

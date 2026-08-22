@@ -1171,7 +1171,7 @@ tyreChange(All, [?tyre | ?tyres], [?avgWear | ?avgWears], ?remainingLaps) <=
 		
 tyreChange(All, [], ?)
 tyreChange(All, [?tyre | ?tyres], ?remainingLaps) <=
-		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(?type, ?tyre, ?maxLaps), 
+		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(All, ?tyre, ?maxLaps), 
 		?laps = ?curLaps + ?remainingLaps, ?laps =< ?maxLaps, tyreChange(All, ?tyres, ?remainingLaps)
 
 tyreMaxLaps(All, ?tyre, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound, !Tyre.Compound.Color, Laps.Max, ?maxLaps)
@@ -1217,7 +1217,7 @@ tyreChange(Axle, ?tyre, ?remainingLaps) <=
 
 tyreChange(Axle, [], ?)
 tyreChange(Axle, [?tyre | ?tyres], ?remainingLaps) <=
-		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(?type, ?tyre, ?maxLaps), 
+		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(Axle, ?tyre, ?maxLaps), 
 		?laps = ?curLaps + ?remainingLaps, ?laps =< ?maxLaps, tyreChange(Axle, ?tyres, ?remainingLaps)
 
 tyreMaxLaps(Axle, FL, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound.Front, !Tyre.Compound.Color.Front, Laps.Max, ?maxLaps)
@@ -1301,7 +1301,7 @@ tyreChange(Wheel, RearRight, ?, !Tyre.Compound.Target.RearRight, !Tyre.Compound.
 
 tyreChange(Wheel, [], ?)
 tyreChange(Wheel, [?tyre | ?tyres], ?remainingLaps) <=
-		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(?type, ?tyre, ?maxLaps), 
+		Get(Tyre, ?tyre, Laps, ?curLaps), tyreMaxLaps(Wheel, ?tyre, ?maxLaps), 
 		?laps = ?curLaps + ?remainingLaps, ?laps =< ?maxLaps, tyreChange(Wheel, ?tyres, ?remainingLaps)
 
 tyreMaxLaps(Wheel, FL, ?maxLaps) <= Get(Session.Settings.Tyre, !Tyre.Compound.FrontLeft, !Tyre.Compound.Color.FrontLeft, Laps.Max, ?maxLaps)

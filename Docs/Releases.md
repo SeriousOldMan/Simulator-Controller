@@ -60,7 +60,6 @@
       - Spyker C8 Spyder GT2-R
       - TVR Tuscan T400R GT2
 
-
 # Release history
 
 ## 7.2.0.0

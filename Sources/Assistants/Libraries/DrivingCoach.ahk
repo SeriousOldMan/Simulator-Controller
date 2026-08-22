@@ -1423,6 +1423,8 @@ class DrivingCoach extends GridRaceAssistant {
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Track", started)
+		setMultiMapValue(state, "Coaching", "Brake", false)
+		setMultiMapValue(state, "Coaching", "Motivation", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
@@ -1469,6 +1471,8 @@ class DrivingCoach extends GridRaceAssistant {
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Brake", started)
+		setMultiMapValue(state, "Coaching", "Track", false)
+		setMultiMapValue(state, "Coaching", "Motivation", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
@@ -1512,6 +1516,8 @@ class DrivingCoach extends GridRaceAssistant {
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Motivation", true)
+		setMultiMapValue(state, "Coaching", "Track", false)
+		setMultiMapValue(state, "Coaching", "Brake", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 

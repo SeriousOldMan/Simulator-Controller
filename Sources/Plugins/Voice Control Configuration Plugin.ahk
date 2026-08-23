@@ -63,6 +63,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 	iTopElevenLabsCredentialsVisible := false
 	iBottomElevenLabsCredentialsVisible := false
 
+	iTopPiperCredentialsVisible := false
+
 	iBottomWhisperCredentialsVisible := false
 
 	iSoundProcessingSettings := false
@@ -1434,6 +1436,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iTopYandexCredentialsVisible := false
 		this.iBottomYandexCredentialsVisible := false
 
+		this.iTopPiperCredentialsVisible := false
+
 		this.iBottomWhisperCredentialsVisible := false
 	}
 
@@ -2181,6 +2185,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.showControls(this.iTopWidgets)
 		this.showControls(this.iPiperSynthesizerWidgets)
 
+		this.iTopPiperCredentialsVisible := true
+
 		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
 			this.transposeControls(this.iOtherWidgets, 24 * this.iPiperSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else
@@ -2247,6 +2253,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.hideControls(this.iPiperSynthesizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
+		this.iTopPiperCredentialsVisible := false
+
 		if (this.iSynthesizerMode == "Piper")
 			this.transposeControls(this.iOtherWidgets, -24 * this.iPiperSynthesizerWidgets.Length, this.Window.TitleBarHeight)
 		else if (this.iSynthesizerMode != "Init")
@@ -2290,8 +2298,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
 			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
-			else if this.iTopGoogleCredentialsVisible
-				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+			else if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible)
+				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * 8) - 3, titleBarHeight)
 			else
 				this.transposeControls(this.iWhisperRecognizerWidgets, (24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
 
@@ -2314,8 +2322,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
-			else if this.iTopGoogleCredentialsVisible
-				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+			else if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible)
+				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * 8) + 3, titleBarHeight)
 			else
 				this.transposeControls(this.iWhisperRecognizerWidgets, (-24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
 
@@ -2343,8 +2351,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
 			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iYandexRecognizerWidgets, (24 * 9) - 3, titleBarHeight)
-			else if this.iTopGoogleCredentialsVisible
-				this.transposeControls(this.iYandexRecognizerWidgets, (24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
+			else if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible)
+				this.transposeControls(this.iYandexRecognizerWidgets, (24 * 8) - 3, titleBarHeight)
 			else
 				this.transposeControls(this.iYandexRecognizerWidgets, (24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) - 3, titleBarHeight)
 
@@ -2371,8 +2379,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 			if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * 9) + 3, titleBarHeight)
-			else if this.iTopGoogleCredentialsVisible
-				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * (this.iTopGoogleCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
+			else if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible)
+				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * 8) + 3, titleBarHeight)
 			else
 				this.transposeControls(this.iYandexRecognizerWidgets, (-24 * (this.iTopElevenLabsCredentialsVisible ? 8 : 7)) + 3, titleBarHeight)
 
@@ -2395,7 +2403,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopAzureCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
+				if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible
+													  || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
 				else if (this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
@@ -2423,7 +2432,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (this.iRecognizerMode == "Azure") {
 				this.hideControls(this.iAzureRecognizerWidgets)
 
-				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
+				if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible
+													  || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
 				else if (this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
@@ -2447,7 +2457,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopGoogleCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : ((this.iTopElevenLabsCredentialsVisible || this.iTopPiperCredentialsVisible) ? 8 : 7))) - 3, titleBarHeight)
 				this.showControls(this.iGoogleRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -2466,7 +2476,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopGoogleCredentialsVisible {
 			if (this.iRecognizerMode == "Google") {
 				this.hideControls(this.iGoogleRecognizerWidgets)
-				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopElevenLabsCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
+				this.transposeControls(this.iGoogleRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : ((this.iTopElevenLabsCredentialsVisible || this.iTopPiperCredentialsVisible) ? 8 : 7))) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iGoogleRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")
@@ -2484,7 +2494,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		; if !this.iTopOpenAICredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
+				if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible
+													  || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
 				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
@@ -2515,7 +2526,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			if (this.iRecognizerMode == "OpenAI") {
 				this.hideControls(this.iOpenAIRecognizerWidgets)
 
-				if (this.iTopGoogleCredentialsVisible || this.iTopElevenLabsCredentialsVisible)
+				if (this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible
+													  || this.iTopElevenLabsCredentialsVisible)
 					delta := 8
 				else if (this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible)
 					delta := 9
@@ -2542,7 +2554,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		if !this.iTopElevenLabsCredentialsVisible {
 			if ((this.iRecognizerMode == false) || (this.iRecognizerMode != "Init")) {
-				this.transposeControls(this.iElevenLabsRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) - 3, titleBarHeight)
+				this.transposeControls(this.iElevenLabsRecognizerWidgets, (24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : ((this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible) ? 8 : 7))) - 3, titleBarHeight)
 				this.showControls(this.iElevenLabsRecognizerWidgets)
 				this.transposeControls(this.iBottomWidgets, 24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
 			}
@@ -2561,7 +2573,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if !this.iTopElevenLabsCredentialsVisible {
 			if (this.iRecognizerMode == "ElevenLabs") {
 				this.hideControls(this.iElevenLabsRecognizerWidgets)
-				this.transposeControls(this.iElevenLabsRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : (this.iTopGoogleCredentialsVisible ? 8 : 7))) + 3, titleBarHeight)
+				this.transposeControls(this.iElevenLabsRecognizerWidgets, (-24 * ((this.iTopAzureCredentialsVisible || this.iTopOpenAICredentialsVisible || this.iTopYandexCredentialsVisible) ? 9 : ((this.iTopGoogleCredentialsVisible || this.iTopPiperCredentialsVisible) ? 8 : 7))) + 3, titleBarHeight)
 				this.transposeControls(this.iBottomWidgets, -24 * this.iElevenLabsRecognizerWidgets.Length, titleBarHeight)
 			}
 			else if (this.iRecognizerMode != "Init")

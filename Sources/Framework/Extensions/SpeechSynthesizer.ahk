@@ -163,8 +163,14 @@ class SpeechSynthesizer {
 			local voices, voice, lcid, ignore, candidate, name
 
 			if (!language || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "OpenAI")
-						  || (this.Synthesizer = "Yandex") || (this.Synthesizer = "Piper"))
+						  || (this.Synthesizer = "Yandex"))
 				return this.iVoices
+			else if (this.Synthesizer = "Piper") {
+				if language
+					return choose(this.iVoices, (v) => (InStr(v, language . "_") == 1))
+				else
+					return this.iVoices
+			}
 			else {
 				voices := []
 
@@ -601,6 +607,9 @@ class SpeechSynthesizer {
 
 				if ((result.Status >= 200) && (result.Status < 300)) {
 					voices := []
+
+					for ignore, voice in result.JSON
+						voices.Push(voice["name"])
 
 					return voices
 				}
@@ -1342,8 +1351,8 @@ class SpeechSynthesizer {
 	}
 
 	computeVoice(voice, language, randomize := true) {
-		local availableVoices := []
 		local voices := this.Voices
+		local availableVoices := []
 		local count, locale, ignore, candidate, id
 
 		if inList(voices, voice)
@@ -1399,6 +1408,8 @@ class SpeechSynthesizer {
 			}
 		}
 		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "Yandex")) {
+			availableVoices := this.Voices
+
 			if (voice == true) {
 				count := availableVoices.Length
 
@@ -1415,7 +1426,9 @@ class SpeechSynthesizer {
 				return voice
 		}
 		else if (this.Synthesizer = "Piper") {
-			if (voice == true) {
+			if ((voice == true) && language) {
+				availableVoices := this.Voices[language]
+
 				count := availableVoices.Length
 
 				if (count == 0)
@@ -1425,8 +1438,6 @@ class SpeechSynthesizer {
 				else
 					voice := availableVoices[1]
 			}
-			else if voice
-				return voice
 		}
 
 		if (availableVoices.Length > 0)

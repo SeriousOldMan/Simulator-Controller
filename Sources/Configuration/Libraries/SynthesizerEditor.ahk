@@ -50,6 +50,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 	iOpenAISynthesizerWidgets := []
 	iYandexSynthesizerWidgets := []
 	iElevenLabsSynthesizerWidgets := []
+	iPiperSynthesizerWidgets := []
 	iOtherWidgets := []
 
 	iTopAzureCredentialsVisible := false
@@ -98,6 +99,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.updateGoogleVoices()
 		}
 
+		updatePiperVoices(*) {
+			this.updatePiperVoices()
+		}
+
 		updateElevenLabsVoices(*) {
 			this.updateElevenLabsVoices()
 		}
@@ -118,8 +123,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 				this.hideOpenAISynthesizerEditor()
 			else if (oldChoice == 6)
 				this.hideElevenLabsSynthesizerEditor()
-			else
+			else if (oldChoice == 7)
 				this.hideYandexSynthesizerEditor()
+			else
+				this.hidePiperSynthesizerEditor()
 
 			if (voiceSynthesizerDropDown.Value == 1)
 				this.showWindowsSynthesizerEditor()
@@ -133,8 +140,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 				this.showOpenAISynthesizerEditor()
 			else if (voiceSynthesizerDropDown.Value == 6)
 				this.showElevenLabsSynthesizerEditor()
-			else
+			else if (voiceSynthesizerDropDown.Value == 7)
 				this.showYandexSynthesizerEditor()
+			else
+				this.showPiperSynthesizerEditor()
 
 			if ((voiceSynthesizerDropDown.Value <= 2) || (voiceSynthesizerDropDown.Value >= 4))
 				this.updateLanguage()
@@ -187,7 +196,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		w4 := width - (x4 - x)
 		x5 := x3 + 24
 
-		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs", "Yandex"]
+		choices := ["Windows (Win32)", "Windows (.NET)", "Azure Cognitive Services", "Google Speech Services", "OpenAI API", "ElevenLabs", "Yandex", "Piper"]
 		chosen := 0
 
 		widget1 := editorGui.Add("Text", "x" . x0 . " yp+10 w110 h23 +0x200 Section Hidden", translate("Speech Synthesizer"))
@@ -376,6 +385,27 @@ class SynthesizerEditor extends ConfiguratorPanel {
 										 , [editorGui["basicYandexSpeakerAPIKeyLabel"], editorGui["basicYandexSpeakerAPIKeyEdit"]]
 										 , [editorGui["basicYandexSpeakerLabel"], editorGui["basicYandexSpeakerVoiceEdit"], widget45]]
 
+		widget46 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicPiperServerURLLabel Hidden", translate("Server URL"))
+		widget46.Info := "Basic.Synthesizer.Info"
+		widget47 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicPiperServerURLEdit Hidden")
+		widget47.Info := "Basic.Synthesizer.Info"
+		widget47.OnEvent("Change", updatePiperVoices)
+
+		voices := [translate("Deactivated"), translate("Random")]
+
+		widget48 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicPiperSpeakerLabel Hidden", translate("Voice"))
+		widget48.Info := "Basic.Synthesizer.Info"
+		widget49 := editorGui.Add("DropDownList", "x" . (x1 + 24) . " yp w" . (w1 - 24) . " W:Grow VbasicPiperSpeakerDropDown Hidden", voices)
+		widget49.Info := "Basic.Synthesizer.Info"
+
+		widget50 := editorGui.Add("Button", "x" . x1 . " yp w23 h23 Default Hidden")
+		widget50.Info := "Basic.Synthesizer.Play.Info"
+		widget50.OnEvent("Click", (*) => this.testSpeaker())
+		setButtonIcon(widget50, kIconsDirectory . "Start.ico", 1, "L4 T4 R4 B4")
+
+		this.iPiperSynthesizerWidgets := [[editorGui["basicPiperServerURLLabel"], editorGui["basicPiperServerURLEdit"]]
+										 , [editorGui["basicPiperSpeakerLabel"], editorGui["basicPiperSpeakerDropDown"], widget50]]
+
 		this.updateLanguage()
 
 		this.hideControls(this.iTopWidgets)
@@ -385,6 +415,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.hideControls(this.iOpenAISynthesizerWidgets)
 		this.hideControls(this.iYandexSynthesizerWidgets)
 		this.hideControls(this.iElevenLabsSynthesizerWidgets)
+		this.hideControls(this.iPiperSynthesizerWidgets)
 		this.hideControls(this.iOtherWidgets)
 
 		this.iSynthesizerMode := "Init"
@@ -424,7 +455,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			if (InStr(synthesizer, "ElevenLabs") == 1)
 				synthesizer := "ElevenLabs"
 
-			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex"], synthesizer)
+			if (InStr(synthesizer, "Piper") == 1)
+				synthesizer := "Piper"
+
+			this.Value["voiceSynthesizer"] := inList(["Windows", "dotNET", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex", "Piper"], synthesizer)
 
 			this.Value["azureSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Azure", true)
 			this.Value["windowsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Windows", getMultiMapValue(configuration, "Voice Control", "Speaker", true))
@@ -433,6 +467,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.Value["openAISpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			this.Value["yandexSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			this.Value["elevenLabsSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			this.Value["piperSpeaker"] := getMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 
 			this.Value["azureSubscriptionKey"] := getMultiMapValue(configuration, "Voice Control", "Azure.SubscriptionKey"
 																				, getMultiMapValue(configuration, "Voice Control"
@@ -458,6 +493,8 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.Value["yandexSpeakerAPIKey"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", "")
 			this.Value["yandexSpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerVoice", "")
 
+			this.Value["piperServerURL"] := getMultiMapValue(configuration, "Voice Control", "Piper.ServerURL"
+																		  , "http://localhost:5000")
 			this.Value["speakerVolume"] := getMultiMapValue(configuration, "Voice Control", "SpeakerVolume", 100)
 			this.Value["speakerPitch"] := getMultiMapValue(configuration, "Voice Control", "SpeakerPitch", 0)
 			this.Value["speakerSpeed"] := getMultiMapValue(configuration, "Voice Control", "SpeakerSpeed", 0)
@@ -492,10 +529,12 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 					try
 						this.Value["yandexSpeakerVoice"] := getMultiMapValue(configuration, "Voice Control", "Speaker")
+				case "Piper":
+					this.Value["piperServerURL"] := string2Values("|", getMultiMapValue(configuration, "Voice Control", "Synthesizer"))[2]
 			}
 
 			if this.Configuration
-				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker"]
+				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker", "piperSpeaker"]
 					if (this.Value[speaker] == true)
 						this.Value[speaker] := translate("Random")
 					else if (this.Value[speaker] == false)
@@ -508,6 +547,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		local azureSpeaker := this.Control["basicAzureSpeakerDropDown"].Text
 		local googleSpeaker := this.Control["basicGoogleSpeakerDropDown"].Text
 		local elevenLabsSpeaker := this.Control["basicElevenLabsSpeakerDropDown"].Text
+		local piperSpeaker := this.Control["basicPiperSpeakerDropDown"].Text
 
 		super.saveToConfiguration(configuration)
 
@@ -537,6 +577,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 2) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "dotNET")
@@ -547,6 +588,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 3) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text))
@@ -557,6 +599,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 4) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text))
@@ -567,6 +610,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 5) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
@@ -579,6 +623,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 		}
 		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 6) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text))
@@ -589,8 +634,9 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
 		}
-		else {
+		else if (this.Control["basicVoiceSynthesizerDropDown"].Value = 7) {
 			setMultiMapValue(configuration, "Voice Control", "Synthesizer"
 										  , "Yandex|" . Trim(this.Control["basicYandexSpeakerServerURLEdit"].Text) . "|"
 													  . Trim(this.Control["basicYandexSpeakerAPIKeyEdit"].Text))
@@ -600,6 +646,18 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
 			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
 			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
+		}
+		else {
+			setMultiMapValue(configuration, "Voice Control", "Synthesizer", "Piper|" . Trim(this.Control["basicPiperServerURLEdit"].Text))
+			setMultiMapValue(configuration, "Voice Control", "Speaker", piperSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Windows", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.dotNET", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", piperSpeaker)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.OpenAI", "/")
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Yandex", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.ElevenLabs", true)
+			setMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
 		}
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.Azure", azureSpeaker)
@@ -624,6 +682,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerServerURL", Trim(this.Control["basicYandexSpeakerServerURLEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerAPIKey", Trim(this.Control["basicYandexSpeakerAPIKeyEdit"].Text))
 		setMultiMapValue(configuration, "Voice Control", "Yandex.SpeakerVoice", Trim(this.Control["basicYandexSpeakerVoiceEdit"].Text))
+
+		setMultiMapValue(configuration, "Voice Control", "Speaker.Piper", piperSpeaker)
+		setMultiMapValue(configuration, "Voice Control", "Piper.Speaker", piperSpeaker)
+		setMultiMapValue(configuration, "Voice Control", "Piper.ServerURL", Trim(this.Control["basicPiperServerURLEdit"].Text))
 
 		setMultiMapValue(configuration, "Voice Control", "SpeakerVolume", this.Control["basicSpeakerVolumeSlider"].Value)
 		setMultiMapValue(configuration, "Voice Control", "SpeakerPitch", this.Control["basicSpeakerPitchSlider"].Value)
@@ -654,6 +716,8 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.Control["basicYandexSpeakerAPIKeyEdit"].Text := this.Value["yandexSpeakerAPIKey"]
 		this.Control["basicYandexSpeakerVoiceEdit"].Text := this.Value["yandexSpeakerVoice"]
 
+		this.Control["basicPiperServerURLEdit"].Text := this.Value["piperServerURL"]
+
 		if (this.Value["voiceSynthesizer"] = 1)
 			this.updateWindowsVoices(configuration)
 		else if (this.Value["voiceSynthesizer"] = 2)
@@ -664,6 +728,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.updateOpenAIVoices(configuration)
 		this.updateYandexVoices(configuration)
 		this.updateElevenLabsVoices(configuration)
+		this.updatePiperVoices(configuration)
 
 		this.Control["basicSpeakerVolumeSlider"].Value := this.Value["speakerVolume"]
 		this.Control["basicSpeakerPitchSlider"].Value := this.Value["speakerPitch"]
@@ -768,8 +833,10 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.showOpenAISynthesizerEditor()
 		else if (voiceSynthesizer == 6)
 			this.showElevenLabsSynthesizerEditor()
-		else
+		else if (voiceSynthesizer == 7)
 			this.showYandexSynthesizerEditor()
+		else
+			this.showPiperSynthesizerEditor()
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -992,6 +1059,37 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.iSynthesizerMode := false
 	}
 
+	showPiperSynthesizerEditor() {
+		this.showControls(this.iTopWidgets)
+		this.showControls(this.iPiperSynthesizerWidgets)
+
+		if ((this.iSynthesizerMode == false) || (this.iSynthesizerMode = "Init"))
+			this.transposeControls(this.iOtherWidgets, 24 * this.iPiperSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else
+			throw "Internal error detected in SynthesizerEditor.showPiperSynthesizerEditor..."
+
+		this.showControls(this.iOtherWidgets)
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
+		this.iSynthesizerMode := "Piper"
+	}
+
+	hidePiperSynthesizerEditor() {
+		this.hideControls(this.iTopWidgets)
+		this.hideControls(this.iPiperSynthesizerWidgets)
+		this.hideControls(this.iOtherWidgets)
+
+		if (this.iSynthesizerMode == "Piper")
+			this.transposeControls(this.iOtherWidgets, -24 * this.iPiperSynthesizerWidgets.Length, this.Window.TitleBarHeight)
+		else if (this.iSynthesizerMode != "Init")
+			throw "Internal error detected in SynthesizerEditor.hidePiperSynthesizerEditor..."
+
+		this.Control["basicWindowsSettingsButton"].Enabled := false
+
+		this.iSynthesizerMode := false
+	}
+
 	getCurrentLanguage() {
 		local voiceLanguage := this.iLanguage
 		local languages := availableLanguages("Grammars")
@@ -1027,6 +1125,7 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.updateOpenAIVoices()
 		this.updateYandexVoices()
 		this.updateElevenLabsVoices()
+		this.updatePiperVoices()
 	}
 
 	loadVoices(synthesizer, configuration) {
@@ -1219,6 +1318,49 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.Control["basicElevenLabsSpeakerDropDown"].Delete()
 		this.Control["basicElevenLabsSpeakerDropDown"].Add(voices)
 		this.Control["basicElevenLabsSpeakerDropDown"].Choose(chosen)
+	}
+
+	updatePiperVoices(configuration := false) {
+		local voices := []
+		local piperSpeaker, chosen, language
+
+		if configuration
+			piperSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Piper", true)
+		else {
+			piperSpeaker := this.Control["basicPiperSpeakerDropDown"].Text
+
+			configuration := this.Configuration
+		}
+
+		if (configuration && !piperSpeaker)
+			piperSpeaker := getMultiMapValue(configuration, "Voice Control", "Speaker.Google", true)
+
+		language := this.getCurrentLanguage()
+
+		try {
+			voices := SpeechSynthesizer("Piper|" . Trim(this.Control["basicPiperServerURLEdit"].Text), true, language).Voices[language].Clone()
+		}
+		catch Any as exception {
+			logError(exception)
+
+			voices := []
+		}
+
+		voices.InsertAt(1, translate("Random"))
+		voices.InsertAt(1, translate("Deactivated"))
+
+		if (piperSpeaker == false)
+			chosen := 1
+		else {
+			chosen := inList(voices, piperSpeaker)
+
+			if (chosen == 0)
+				chosen := 2
+		}
+
+		this.Control["basicPiperSpeakerDropDown"].Delete()
+		this.Control["basicPiperSpeakerDropDown"].Add(voices)
+		this.Control["basicPiperSpeakerDropDown"].Choose(chosen)
 	}
 
 	showControls(widgets) {

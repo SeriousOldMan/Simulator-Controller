@@ -439,6 +439,12 @@ Important: *SoX* needs to be installed for the Yandex voice recognition to work 
 
 3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
 
+###### Piper
+
+[Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main) is a speech generation engine, which is in widespread use for home automation can be used to generate speech using a web server in your local network (incl. localhost of course). All voices installed in the Piper service can be used, of course, but you have to use a voice which is capable to handle the currently selected language.
+
+Important: Piper must be run as a web server and obviously it must be running during configuration and while Simulator Controller is running.
+
 ###### Whisper Runtime
 
 Whisper is a very capable neural speech recognition system developed by OpenAI. Whisper is open source and executes locally on your PC. Therefore it requires a powerful machine and a GPU with at least 6GB of free memory. The integration for Simulator Controller supports the execution of Whisper either on the same PC as Simulator Controller and of course also the simulator, which means that this machine must really high end, or you can Whisper on a different machine and connect to this machine using HTTP.

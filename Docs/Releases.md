@@ -37,7 +37,7 @@
 	- The motivation mode can also be activated from the tray menu of the "Simulator Controller" process.
 	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
 	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
-  - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Piper) for more information.
+  - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Piper) for more information.
   - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
   - New car models for "Setup Workbench" (by @inthebagbud UK):
     - Automobilista 2

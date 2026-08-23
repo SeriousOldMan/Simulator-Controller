@@ -441,7 +441,9 @@ Important: *SoX* needs to be installed for the Yandex voice recognition to work 
 
 ###### Piper
 
-[Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main) is a speech generation engine, which is in widespread use for home automation can be used to generate speech using a web server in your local network (incl. localhost of course).
+[Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main) is a speech synthesis engine, which is in widespread use for home automation can be used to generate speech using a web server in your local network (incl. localhost of course).
+
+You can find extensive documentation for Piper [here](https://thedocs.io/piper1-gpl/) and all voices for the different language are hosted on the [Hugging Face website](https://huggingface.co/rhasspy/piper-voices/tree/main).
 
 Important: Piper must be run as a web server and obviously it must be running during configuration and while Simulator Controller is running.
 

@@ -540,7 +540,7 @@ class SpeechSynthesizer {
 	}
 
 	getVoices() {
-		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
+		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element, ignore, voice
 
 		try {
 			if (this.Synthesizer = "Windows") {
@@ -603,13 +603,20 @@ class SpeechSynthesizer {
 				return voices
 			}
 			else if (this.Synthesizer = "Piper") {
-				result := WinHttpRequest().GET(this.iServerURL . "/voices", Map(), {Encoding: "UTF-8"})
+				result := WinHttpRequest().GET(this.iServerURL . "/voices", "", Map(), {Encoding: "UTF-8"})
 
 				if ((result.Status >= 200) && (result.Status < 300)) {
 					voices := []
 
-					for ignore, voice in result.JSON
-						voices.Push(voice["name"])
+					result := result.JSON
+
+					if result.Has("voices") {
+						for ignore, voice in result["voices"]
+							voices.Push(voice)
+					}
+					else
+						for voice, ignore in result
+							voices.Push(voice)
 
 					return voices
 				}

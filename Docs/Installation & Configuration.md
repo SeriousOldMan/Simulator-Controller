@@ -431,7 +431,7 @@ For recognition, do not change any of the default values for the *Service URL* a
 
 Important: *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
 
-###### Notes
+####### Notes
 
 1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
 

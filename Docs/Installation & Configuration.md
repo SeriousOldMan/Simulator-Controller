@@ -419,6 +419,14 @@ ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs
 
 You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with ElevenLabs in the browser. Using the API, however, will require a paid subscription.
 
+Notes:
+
+1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
+
+2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings).
+
+3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
+
 ###### Yandex
 
 Yandex, a Russian search engine and cloud service provider, can be used for speech synthesis and also for speech recognition. Although Yandex's speech recognition can theoretically be used for any language, it works best for the Russian language.
@@ -430,14 +438,6 @@ For speech synthesis, you must supply an API key and choose a voice (do not chan
 For recognition, do not change any of the default values for the *Service URL* as well and also not the *Model*, only supply the API key. A *service* account is also required here.
 
 Important: *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
-
-####### Notes
-
-1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
-
-2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings).
-
-3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
 
 ###### Piper
 

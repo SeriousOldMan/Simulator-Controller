@@ -19,6 +19,8 @@
 	  - [Google](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#google-speech-services)
 	  - [OpenAI API](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#openai-api)
 	  - [ElevenLabs](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#elevenlabs)
+	  - [Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#yandex)
+	  - [Piper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#piper)
 	  - [Whisper](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#whisper-runtime)
 	  - [Boosting with a LLM](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#boosting-conversation-with-a-llm)
     - [Plugins](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins)

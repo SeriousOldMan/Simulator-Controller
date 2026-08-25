@@ -149,6 +149,8 @@ class SynthesizerEditor extends ConfiguratorPanel {
 				this.updateLanguage()
 
 			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
+
+			this.updateState()
 		}
 
 		chooseAPIKeyFilePath(*) {
@@ -733,6 +735,33 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		this.Control["basicSpeakerVolumeSlider"].Value := this.Value["speakerVolume"]
 		this.Control["basicSpeakerPitchSlider"].Value := this.Value["speakerPitch"]
 		this.Control["basicSpeakerSpeedSlider"].Value := this.Value["speakerSpeed"]
+
+		this.updateState()
+	}
+
+	updateState() {
+		if (this.iSynthesizerMode && (this.iSynthesizerMode != "Init"))
+			switch this.iSynthesizerMode, false {
+				case "OpenAI", "Piper", "Yandex":
+					this.Control["basicSpeakerVolumeSlider"].Enabled := false
+					this.Control["basicSpeakerPitchSlider"].Enabled := false
+					this.Control["basicSpeakerSpeedSlider"].Enabled := true
+
+					this.Control["basicSpeakerVolumeSlider"].Value := 100
+					this.Control["basicSpeakerPitchSlider"].Value := 0
+				case "ElevenLabs":
+					this.Control["basicSpeakerVolumeSlider"].Enabled := false
+					this.Control["basicSpeakerPitchSlider"].Enabled := false
+					this.Control["basicSpeakerSpeedSlider"].Enabled := false
+
+					this.Control["basicSpeakerVolumeSlider"].Value := 100
+					this.Control["basicSpeakerPitchSlider"].Value := 0
+					this.Control["basicSpeakerSpeedSlider"].Value := 0
+				default:
+					this.Control["basicSpeakerVolumeSlider"].Enabled := true
+					this.Control["basicSpeakerPitchSlider"].Enabled := true
+					this.Control["basicSpeakerSpeedSlider"].Enabled := true
+			}
 	}
 
 	findWidget(x, y, test := (*) => true) {
@@ -837,6 +866,8 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			this.showYandexSynthesizerEditor()
 		else
 			this.showPiperSynthesizerEditor()
+
+		this.updateState()
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -1130,7 +1161,16 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 	loadVoices(synthesizer, configuration) {
 		local language := this.getCurrentLanguage()
-		local voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+		local voices
+
+		this.Window.Block()
+
+		try {
+			voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
+		}
+		finally {
+			this.Window.Unblock()
+		}
 
 		voices.InsertAt(1, translate("Random"))
 		voices.InsertAt(1, translate("Deactivated"))
@@ -1218,7 +1258,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		if (Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text) != "") {
 			language := this.getCurrentLanguage()
 
-			voices := SpeechSynthesizer("Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
+			this.Window.Block()
+
+			try {
+				voices := SpeechSynthesizer("Google|" . Trim(this.Control["basicGoogleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
+			}
+			finally {
+				this.Window.Unblock()
+			}
 		}
 
 		voices.InsertAt(1, translate("Random"))
@@ -1256,7 +1303,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		if ((Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text) != "") && (Trim(this.Control["basicAzureTokenIssuerEdit"].Text) != "")) {
 			language := this.getCurrentLanguage()
 
-			voices := SpeechSynthesizer("Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
+			this.Window.Block()
+
+			try {
+				voices := SpeechSynthesizer("Azure|" . Trim(this.Control["basicAzureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["basicAzureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
+			}
+			finally {
+				this.Window.Unblock()
+			}
 		}
 
 		voices.InsertAt(1, translate("Random"))
@@ -1300,7 +1354,14 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		if (Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text) != "") {
 			language := this.getCurrentLanguage()
 
-			voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
+			this.Window.Block()
+
+			try {
+				voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["basicElevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
+			}
+			finally {
+				this.Window.Unblock()
+			}
 		}
 
 		voices.InsertAt(1, translate("Random"))
@@ -1337,6 +1398,8 @@ class SynthesizerEditor extends ConfiguratorPanel {
 
 		language := this.getCurrentLanguage()
 
+		this.Window.Block()
+
 		try {
 			voices := SpeechSynthesizer("Piper|" . Trim(this.Control["basicPiperServerURLEdit"].Text), true, language).Voices[language].Clone()
 		}
@@ -1344,6 +1407,9 @@ class SynthesizerEditor extends ConfiguratorPanel {
 			logError(exception)
 
 			voices := []
+		}
+		finally {
+			this.Window.Unblock()
 		}
 
 		voices.InsertAt(1, translate("Random"))

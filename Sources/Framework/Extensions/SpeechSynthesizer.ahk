@@ -1198,7 +1198,7 @@ class SpeechSynthesizer {
 			try {
 				result := WinHttpRequest().POST(this.iServerURL . "/synthesize"
 											  , JSON.print(Map("voice", this.Voice, "text", text
-															 , "length_scale", Min(4, Max(0.25, 1 + (0.05 * this.iRate)))))
+															 , "length_scale", Min(4, Max(0.25, 1 - (0.05 * this.iRate)))))
 											  , Map("Content-Type", "application/json")
 											  , {Raw: true})
 

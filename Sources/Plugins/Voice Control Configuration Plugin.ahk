@@ -196,6 +196,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				this.updateLanguage(false)
 
 			voiceSynthesizerDropDown.LastValue := voiceSynthesizerDropDown.Value
+
+			this.updateState()
 		}
 
 		chooseVoiceRecognizer(update, *) {
@@ -341,6 +343,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			}
 
 			voiceRecognizerDropDown.LastValue := voiceRecognizerDropDown.Value
+
+			this.updateState()
 		}
 
 		getPTTHotkey(*) {
@@ -415,7 +419,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		}
 
 		updateP2T(*) {
-			this.updateWidgets()
+			this.updateState()
 		}
 
 		window.SetFont("Norm", "Arial")
@@ -1242,6 +1246,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["pushToTalkEdit"].Text := this.Value["pushToTalk"]
 		this.Control["pushToTalkModeDropDown"].Choose(inList(["Hold", "Press", "Custom"], this.Value["pushToTalkMode"]))
 		this.Control["activationCommandEdit"].Text := this.Value["activationCommand"]
+
+		this.updateState()
 	}
 
 	loadLanguages() {
@@ -1296,17 +1302,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.Control["voiceLanguageDropDown"].LastValue := chosen
 	}
 
-	show() {
-		super.show()
-
-		this.loadConfigurator(this.Configuration)
-
-		this.showWidgets()
-
-		this.updateWidgets()
-	}
-
-	updateWidgets() {
+	updateState() {
 		if (this.Control["pushToTalkModeDropDown"].Value = 3) {
 			this.Control["pushToTalkEdit"].Enabled := false
 			this.Control["pushToTalkEdit"].Value := ""
@@ -1316,6 +1312,37 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Control["pushToTalkEdit"].Enabled := true
 			this.Control["pushToTalkButton"].Enabled := true
 		}
+
+		if (this.iSynthesizerMode && (this.iSynthesizerMode != "Init"))
+			switch this.iSynthesizerMode, false {
+				case "OpenAI", "Piper", "Yandex":
+					this.Control["speakerVolumeSlider"].Enabled := false
+					this.Control["speakerPitchSlider"].Enabled := false
+					this.Control["speakerSpeedSlider"].Enabled := true
+
+					this.Control["speakerVolumeSlider"].Value := 100
+					this.Control["speakerPitchSlider"].Value := 0
+				case "ElevenLabs":
+					this.Control["speakerVolumeSlider"].Enabled := false
+					this.Control["speakerPitchSlider"].Enabled := false
+					this.Control["speakerSpeedSlider"].Enabled := false
+
+					this.Control["speakerVolumeSlider"].Value := 100
+					this.Control["speakerPitchSlider"].Value := 0
+					this.Control["speakerSpeedSlider"].Value := 0
+				default:
+					this.Control["speakerVolumeSlider"].Enabled := true
+					this.Control["speakerPitchSlider"].Enabled := true
+					this.Control["speakerSpeedSlider"].Enabled := true
+			}
+	}
+
+	show() {
+		super.show()
+
+		this.loadConfigurator(this.Configuration)
+
+		this.showWidgets()
 	}
 
 	showWidgets() {
@@ -1363,6 +1390,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.showWhisperServerRecognizerEditor()
 		else
 			this.showWhisperLocalRecognizerEditor()
+
+		this.updateState()
 	}
 
 	hideWidgets() {
@@ -1439,6 +1468,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		this.iTopPiperCredentialsVisible := false
 
 		this.iBottomWhisperCredentialsVisible := false
+
+		this.updateState()
 	}
 
 	showWindowsSynthesizerEditor() {
@@ -2718,6 +2749,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		local language := this.getCurrentLanguage()
 		local voices
 
+		this.Window.Block()
+
 		try {
 			voices := SpeechSynthesizer(synthesizer, true, language).Voices[language].Clone()
 		}
@@ -2725,6 +2758,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			logError(exception)
 
 			voices := []
+		}
+		finally {
+			this.Window.Unblock()
 		}
 
 		voices.InsertAt(1, translate("Random"))
@@ -2813,6 +2849,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if ((Trim(this.Control["azureSubscriptionKeyEdit"].Text) != "") && (Trim(this.Control["azureTokenIssuerEdit"].Text) != "")) {
 			language := this.getCurrentLanguage()
 
+			this.Window.Block()
+
 			try {
 				voices := SpeechSynthesizer("Azure|" . Trim(this.Control["azureTokenIssuerEdit"].Text) . "|" . Trim(this.Control["azureSubscriptionKeyEdit"].Text), true, language).Voices[language].Clone()
 			}
@@ -2820,6 +2858,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				logError(exception)
 
 				voices := []
+			}
+			finally {
+				this.Window.Unblock()
 			}
 		}
 
@@ -2858,6 +2899,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (Trim(this.Control["googleAPIKeyFileEdit"].Text) != "") {
 			language := this.getCurrentLanguage()
 
+			this.Window.Block()
+
 			try {
 				voices := SpeechSynthesizer("Google|" . Trim(this.Control["googleAPIKeyFileEdit"].Text), true, language).Voices[language].Clone()
 			}
@@ -2865,6 +2908,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				logError(exception)
 
 				voices := []
+			}
+			finally {
+				this.Window.Unblock()
 			}
 		}
 
@@ -2909,6 +2955,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (Trim(this.Control["elevenLabsAPIKeyEdit"].Text) != "") {
 			language := this.getCurrentLanguage()
 
+			this.Window.Block()
+
 			try {
 				voices := SpeechSynthesizer("ElevenLabs|" . Trim(this.Control["elevenLabsAPIKeyEdit"].Text), true, language).Voices[language].Clone()
 			}
@@ -2916,6 +2964,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 				logError(exception)
 
 				voices := []
+			}
+			finally {
+				this.Window.Unblock()
 			}
 		}
 
@@ -2953,6 +3004,8 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		language := this.getCurrentLanguage()
 
+		this.Window.Block()
+
 		try {
 			voices := SpeechSynthesizer("Piper|" . Trim(this.Control["piperServerURLEdit"].Text), true, language).Voices[language].Clone()
 		}
@@ -2960,6 +3013,9 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			logError(exception)
 
 			voices := []
+		}
+		finally {
+			this.Window.Unblock()
 		}
 
 		voices.InsertAt(1, translate("Random"))

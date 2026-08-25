@@ -1622,9 +1622,6 @@ class SoloCenter extends ConfigurationItem {
 				centerGui["practiceCenterTabView"].Redraw()
 
 				if (centerGui["practiceCenterTabView"].Value = 4) {
-					center.FuelDataListView.Redraw()
-					center.TyreDataListView.Redraw()
-
 					center.FuelDataListView.ModifyCol()
 
 					loop center.FuelDataListView.GetCount("Col")
@@ -1635,10 +1632,13 @@ class SoloCenter extends ConfigurationItem {
 					loop center.TyreDataListView.GetCount("Col")
 						center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 
-					WinRedraw(centerGui)
+					; WinRedraw(centerGui)
 
 					center.ChartViewer.Resized()
 					center.DetailsViewer.Resized()
+
+					center.FuelDataListView.Redraw()
+					center.TyreDataListView.Redraw()
 				}
 
 				this.analyzeTelemetry()

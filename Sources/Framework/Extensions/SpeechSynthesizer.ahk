@@ -1345,9 +1345,9 @@ class SpeechSynthesizer {
 		this.iVolume := volume
 
 		if (this.Synthesizer = "Windows")
-			this.iSpeechSynthesizer.Volume := (kSoX ? 100 : this.iVolume)
+			this.iSpeechSynthesizer.Volume := (kSoX ? 100 : volume)
 		else if (this.Synthesizer = "dotNET")
-			this.iSpeechSynthesizer.SetProsody(this.iRate, kSoX ? 100 : this.iVolume)
+			this.iSpeechSynthesizer.SetProsody(this.iRate, kSoX ? 100 : volume)
 	}
 
 	setPitch(pitch) {

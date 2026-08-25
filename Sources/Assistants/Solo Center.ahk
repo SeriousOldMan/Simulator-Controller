@@ -1632,13 +1632,13 @@ class SoloCenter extends ConfigurationItem {
 					loop center.TyreDataListView.GetCount("Col")
 						center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 
-					; WinRedraw(centerGui)
+					Task.startTask(() {
+						center.ChartViewer.Resized()
+						center.DetailsViewer.Resized()
 
-					center.ChartViewer.Resized()
-					center.DetailsViewer.Resized()
-
-					center.FuelDataListView.Redraw()
-					center.TyreDataListView.Redraw()
+						center.FuelDataListView.Redraw()
+						center.TyreDataListView.Redraw()
+					})
 				}
 
 				this.analyzeTelemetry()

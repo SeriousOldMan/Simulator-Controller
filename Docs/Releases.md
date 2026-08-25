@@ -41,7 +41,7 @@
   - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Piper) for more information.
   - Sliders for Volume, Pitch and Speed will now be disabled in voice configuration, if the corresponding option is not supported by the chosen speech synthesis method.
   - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
-  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722).
+  - A new article has been written for the *News* system.
   - New car models for "Setup Workbench" (by @inthebagbud UK):
     - Automobilista 2
 	  - Formula V10 Gen2 (has been removed)
@@ -63,8 +63,6 @@
       - Saleen S7-R GT1
       - Spyker C8 Spyder GT2-R
       - TVR Tuscan T400R GT2
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722), if you are using the local LLM Runtime.
 
 # Release history
 

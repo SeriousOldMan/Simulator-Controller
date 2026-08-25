@@ -297,7 +297,7 @@ With the introduction of a new Race Assistant in Release 3.1 there are now sever
 
 #### *Activation* commands vs. *normal* commands
 
-Before version 5.5.8 of Simulator Controller, it was necessary to press the *Push-To-Talk* button twice (like a double click with the mouse) to initiate an activation command. This is no longer necessary in most cases, but there is an exception. If you have configured the AI Driving Coach and you are using the voice recognition which comes with the Windows operating system (not "Azure" or "Google"), you will have to use the following method to activate another dialog partenr, once you are talking with the Driving Coach:
+Before version 5.5.8 of Simulator Controller, it was necessary to press the *Push-To-Talk* button twice (like a double click with the mouse) to initiate an activation command. This is no longer necessary in most cases, but there is an exception. If you have configured the AI Driving Coach and you are using the voice recognition which comes with the Windows operating system (not "Azure" or "Google"), you will have to use the following method to activate another dialog partner, once you are talking with the Driving Coach:
 
 You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button to activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" method as described below.
 

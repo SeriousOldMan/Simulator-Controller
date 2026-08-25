@@ -743,18 +743,22 @@ class SynthesizerEditor extends ConfiguratorPanel {
 		if (this.iSynthesizerMode && (this.iSynthesizerMode != "Init"))
 			switch this.iSynthesizerMode, false {
 				case "OpenAI", "Piper", "Yandex":
-					this.Control["basicSpeakerVolumeSlider"].Enabled := false
+					this.Control["basicSpeakerVolumeSlider"].Enabled := (kSoX != false)
 					this.Control["basicSpeakerPitchSlider"].Enabled := false
 					this.Control["basicSpeakerSpeedSlider"].Enabled := true
 
-					this.Control["basicSpeakerVolumeSlider"].Value := 100
+					if kSoX
+						this.Control["basicSpeakerVolumeSlider"].Value := 100
+
 					this.Control["basicSpeakerPitchSlider"].Value := 0
 				case "ElevenLabs":
-					this.Control["basicSpeakerVolumeSlider"].Enabled := false
+					this.Control["basicSpeakerVolumeSlider"].Enabled := (kSoX != false)
 					this.Control["basicSpeakerPitchSlider"].Enabled := false
 					this.Control["basicSpeakerSpeedSlider"].Enabled := false
 
-					this.Control["basicSpeakerVolumeSlider"].Value := 100
+					if kSoX
+						this.Control["basicSpeakerVolumeSlider"].Value := 100
+
 					this.Control["basicSpeakerPitchSlider"].Value := 0
 					this.Control["basicSpeakerSpeedSlider"].Value := 0
 				default:

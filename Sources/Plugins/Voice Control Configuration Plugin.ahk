@@ -1316,18 +1316,22 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		if (this.iSynthesizerMode && (this.iSynthesizerMode != "Init"))
 			switch this.iSynthesizerMode, false {
 				case "OpenAI", "Piper", "Yandex":
-					this.Control["speakerVolumeSlider"].Enabled := false
+					this.Control["speakerVolumeSlider"].Enabled := (kSoX != false)
 					this.Control["speakerPitchSlider"].Enabled := false
 					this.Control["speakerSpeedSlider"].Enabled := true
 
-					this.Control["speakerVolumeSlider"].Value := 100
+					if kSoX
+						this.Control["speakerVolumeSlider"].Value := 100
+
 					this.Control["speakerPitchSlider"].Value := 0
 				case "ElevenLabs":
-					this.Control["speakerVolumeSlider"].Enabled := false
+					this.Control["speakerVolumeSlider"].Enabled := (kSoX != false)
 					this.Control["speakerPitchSlider"].Enabled := false
 					this.Control["speakerSpeedSlider"].Enabled := false
 
-					this.Control["speakerVolumeSlider"].Value := 100
+					if kSoX
+						this.Control["speakerVolumeSlider"].Value := 100
+
 					this.Control["speakerPitchSlider"].Value := 0
 					this.Control["speakerSpeedSlider"].Value := 0
 				default:

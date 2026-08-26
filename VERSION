@@ -1,8 +1,8 @@
 [Development]
-Version=7.2.2.0-dev
+Version=7.2.2.0-beta
 Target=7.2.2.0-release
-Date=08/25/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/j4ENrFpC/Releases/Simulator%20Controller%207.2.2.0-dev.zip
+Date=08/26/26
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/wri_ufvg/Releases/Simulator%20Controller%207.2.2.0-beta.zip
 Changes=Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.0.3
 [Release]
@@ -27,5 +27,5 @@ Utilities.7.0.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=7.2.2.0-dev
+Development=7.2.2.0-beta
 Release=7.2.1.0-release

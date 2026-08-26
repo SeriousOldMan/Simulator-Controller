@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.2.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/wri_ufvg/Releases/Simulator%20Controller%207.2.2.0-beta.zip) (Test build for 7.2.2. Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration.)
+[7.2.2.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/wri_ufvg/Releases/Simulator%20Controller%207.2.2.0-beta.zip) (Test build for 7.2.2. Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMU.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7220) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -29,6 +29,7 @@
 
   - Fixed a very complex bug, which prevented lap or wear based tyre change decision, if tyres could be changed individually for each wheel, but a single tyre compound must be used for all wheels. This is especially the case for *iRacing*.
   - Fixed a redraw problem on the *Data* tab in "Solo Center".
+  - Fixed selection of pitstop repair requests using controller actions for *Le Mans Ultimate*.
   
 #### Changes
 

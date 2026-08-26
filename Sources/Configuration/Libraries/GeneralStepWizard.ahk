@@ -457,7 +457,6 @@ class GeneralStepWizard extends ControllerPreviewStepWizard {
 
 			this.iVoiceControlConfigurator.loadConfigurator(configuration)
 			this.iVoiceControlConfigurator.showWidgets()
-			this.iVoiceControlConfigurator.updateWidgets()
 		}
 		else
 			for ignore, widget in this.iVoiceControlWidgets

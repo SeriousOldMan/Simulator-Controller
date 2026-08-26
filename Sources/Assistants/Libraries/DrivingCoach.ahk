@@ -2829,16 +2829,17 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateDriver() {
 		local knowledgeBase := this.KnowledgeBase
-		local lapNumber, lapTime, oldMode, valid, delta
+		local retry := false
+		local lapNumber, lapTime, oldMode, valid, delta, lastDelta, bestDelta
 
 		static analyzedLaps := 0
-		static lastLapTime := 0
+		static lastLapTime := 2147483647
 		static bestLapTime := 2147483647
 
 		if knowledgeBase {
 			lapNumber := knowledgeBase.getValue("Lap", 0)
 
-			if ((lapNumber > analyzedLaps) && (lapNumber > (this.BaseLap + (2 * this.LearningLaps)))) {
+			if ((lapNumber > analyzedLaps) && (lapNumber >= (this.BaseLap + (2 * this.LearningLaps)))) {
 				lapTime := knowledgeBase.getValue("Lap." . lapNumber . ".Time", 0)
 				valid := knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
 
@@ -2846,40 +2847,52 @@ class DrivingCoach extends GridRaceAssistant {
 					return
 
 				if this.Speaker[false] {
-					delta := (lapTime - bestLapTime)
+					lastDelta := (lapTime - lastLapTime)
+					bestDelta := (lapTime - bestLapTime)
 
-					if (delta > 1000) {
+					if ((lastDelta > 500) || (bestDelta > 500)) {
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
 
-						oldMode := this.Mode
+						if ((lastDelta > 800) || (bestDelta > 800)) {
+							oldMode := this.Mode
 
-						this.Mode := "Motivation"
+							this.Mode := "Motivation"
 
-						try {
-							this.handleVoiceText("TEXT", this.Instructions["Motivation.TimeLoss"], false)
-						}
-						finally {
-							this.Mode := oldMode
+							try {
+								this.handleVoiceText("TEXT", this.Instructions["Motivation.TimeLoss"], false)
+							}
+							finally {
+								this.Mode := oldMode
+							}
 						}
 					}
-					else if (delta > 500)
-						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
-					else if (valid && (delta < 0))
-						if (delta < -200)
+					else if (lastDelta > 200) {
+						if (Random(1, 10) > 9)
+							this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
+						else
+							retry := true
+					}
+					else if valid
+						if ((bestDelta < 300) || (lastDelta < -1000))
 							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
-						else if (Random(1, 10) > 8)
-							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
+						else if ((lastDelta < -500) || (bestDelta < 500))
+							if (Random(1, 10) > 9)
+								this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
+							else
+								retry := true
 				}
 
-				analyzedLaps := lapNumber
-				lastLapTime := lapTime
+				if !retry {
+					analyzedLaps := lapNumber
+					lastLapTime := lapTime
 
-				if valid
-					bestLapTime := Min(bestLapTime, lapTime)
+					if valid
+						bestLapTime := Min(bestLapTime, lapTime)
+				}
 			}
 			else if ((lapNumber < analyzedLaps) || (lapNumber <= (this.BaseLap + (2 * this.LearningLaps)))) {
 				analyzedLaps := 0
-				lastLapTime := 0
+				lastLapTime := 2147483647
 				bestLapTime := 2147483647
 			}
 		}

@@ -2344,7 +2344,7 @@ class FileSetup extends Setup {
 		}
 	}
 
-	__New(editor, originalFileName := false, modifiedFileName := false) {
+	__New(editor, originalFileName := false, modifiedFileName := false, read := true) {
 		local setup
 
 		super.__New(editor)
@@ -2352,16 +2352,18 @@ class FileSetup extends Setup {
 		this.iOriginalFileName := originalFileName
 		this.iModifiedFileName := modifiedFileName
 
-		if (originalFileName && FileExist(originalFileName)) {
-			setup := FileRead(originalFileName)
+		if read {
+			if (originalFileName && FileExist(originalFileName)) {
+				setup := FileRead(originalFileName)
 
-			this.iOriginalSetup := setup
-		}
+				this.iOriginalSetup := setup
+			}
 
-		if (modifiedFileName && FileExist(modifiedFileName)) {
-			setup := FileRead(modifiedFileName)
+			if (modifiedFileName && FileExist(modifiedFileName)) {
+				setup := FileRead(modifiedFileName)
 
-			this.iModifiedSetup := setup
+				this.iModifiedSetup := setup
+			}
 		}
 	}
 
@@ -6027,6 +6029,7 @@ if kLogStartup
 #Include "Libraries\F125IssueAnalyzer.ahk"
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
+#Include "Libraries\ACESetupEditor.ahk"
 #Include "Libraries\LMUSetupEditor.ahk"
 #Include "Libraries\RF2SetupEditor.ahk"
 

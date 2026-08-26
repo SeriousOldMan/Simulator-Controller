@@ -709,32 +709,32 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Coaching":
-				if (knowledgeBase || isDebug())
-					if (this.Mode = "Motivation") {
+				if ((knowledgeBase || isDebug()) && this.CoachingActive && this.TelemetryAnalyzer
+												 && (Trim(this.Instructions["Coaching"]) != ""))
+					if (this.Mode = "Conversation") {
 						telemetry := this.getTelemetry(&reference := true)
 
-						if reference
-							return substituteVariables(this.Instructions["Coaching.Reference"]
-													 , {telemetry: reference.JSON})
-					}
-					else if (this.CoachingActive && this.TelemetryAnalyzer
-												 && (Trim(this.Instructions["Coaching"]) != ""))
-						if (this.Mode = "Conversation") {
-							telemetry := this.getTelemetry(&reference := true)
+						if telemetry {
+							command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
+														 , {telemetry: telemetry.JSON})
 
-							if telemetry {
-								command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-															 , {telemetry: telemetry.JSON})
+							if reference
+								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																	   , {telemetry: reference.JSON}))
 
-								if reference
-									command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-																		   , {telemetry: reference.JSON}))
-
-								return command
-							}
+							return command
 						}
-						else
-							return this.Instructions["Coaching"]
+					}
+					else if (this.Mode != "Motivation")
+						return this.Instructions["Coaching"]
+			case "Coaching.Reference":
+				if ((knowledgeBase || isDebug()) && (this.Mode = "Motivation")) {
+					telemetry := this.getTelemetry(&reference := true)
+
+					if (telemetry && reference)
+						return substituteVariables(this.Instructions["Coaching.Reference"]
+												 , {telemetry: reference.JSON})
+				}
 		}
 
 		return false
@@ -2840,7 +2840,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateDriver() {
 		local knowledgeBase := this.KnowledgeBase
-		local processed := false
+		local telemetry, command, reference
 		local lapNumber, lapTime, oldMode, valid, delta, lastDelta, bestDelta
 
 		static analyzedLaps := 0
@@ -2854,62 +2854,50 @@ class DrivingCoach extends GridRaceAssistant {
 				lapTime := knowledgeBase.getValue("Lap." . lapNumber . ".Time", 0)
 				valid := knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true)
 
-				if (lapTime = lastLapTime)
+				if ((lapTime = lastLapTime) || (Random(1, 10) > 3))
 					return
 
 				if this.Speaker[false] {
 					lastDelta := (lapTime - lastLapTime)
 					bestDelta := (lapTime - bestLapTime)
 
-					if ((lastDelta > 500) || (bestDelta > 500)) {
+					if ((lastDelta > 800) || (bestDelta > 800)) {
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
 
-						if ((lastDelta > 800) || (bestDelta > 800)) {
+						if ((lastDelta > 1000) || (bestDelta > 1000)) {
 							oldMode := this.Mode
 
 							this.Mode := "Motivation"
 
 							try {
-								this.handleVoiceText("TEXT", this.Instructions["Motivation.TimeLoss"], false)
+								telemetry := this.getTelemetry(&reference := true)
+
+								if (telemetry && (telemetry.Sections.Length > 0) && reference) {
+									command := substituteVariables(this.Instructions["Motivation.TimeLoss"]
+																 , {telemetry: telemetry.JSON})
+
+									this.handleVoiceText("TEXT", command, false)
+								}
 							}
 							finally {
 								this.Mode := oldMode
 							}
 						}
-
-						processed := true
 					}
-					else if (lastDelta > 200) {
-						if (Random(1, 10) > 9) {
-							this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
-
-							processed := true
-						}
-					}
-					else if valid {
-						if ((bestDelta < 300) || (lastDelta < -1000)) {
+					else if ((lastDelta > 500) && (Random(1, 10) > 7))
+						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
+					else if valid
+						if ((bestDelta < 300) || (lastDelta < -1000))
 							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
-
-							processed := true
-						}
-						else if (((lastDelta < -500) || (bestDelta < 500)) && (Random(1, 10) > 9)) {
+						else if (((bestDelta < 500) || (lastDelta < -500)) && (Random(1, 10) > 5))
 							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
-
-							processed := true
-						}
-					}
-					else
-						processed := true
 				}
 
-				if processed {
-					analyzedLaps := lapNumber
+				analyzedLaps := lapNumber
 
-					if valid {
-						lastLapTime := lapTime
-
-						bestLapTime := Min(bestLapTime, lapTime)
-					}
+				if valid {
+					lastLapTime := lapTime
+					bestLapTime := Min(bestLapTime, lapTime)
 				}
 			}
 			else if ((lapNumber < analyzedLaps) || (lapNumber <= (this.BaseLap + (2 * this.LearningLaps)))) {

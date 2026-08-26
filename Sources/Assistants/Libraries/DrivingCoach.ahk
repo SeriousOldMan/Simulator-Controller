@@ -298,7 +298,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 	ReferenceMode {
 		Get {
-			return this.iReferenceMode
+			if (this.Mode = "Motivation")
+				return "Fastest"
+			else
+				return this.iReferenceMode
 		}
 	}
 
@@ -706,24 +709,32 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 				}
 			case "Coaching":
-				if ((knowledgeBase || isDebug()) && (this.CoachingActive || (this.Mode = "Motivation"))
-												 && this.TelemetryAnalyzer && (Trim(this.Instructions["Coaching"]) != ""))
-					if ((this.Mode = "Conversation") || (this.Mode = "Motivation")) {
+				if (knowledgeBase || isDebug())
+					if (this.Mode = "Motivation") {
 						telemetry := this.getTelemetry(&reference := true)
 
-						if telemetry {
-							command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
-														 , {telemetry: telemetry.JSON})
-
-							if reference
-								command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
-																	   , {telemetry: reference.JSON}))
-
-							return command
-						}
+						if reference
+							return substituteVariables(this.Instructions["Coaching.Reference"]
+													 , {telemetry: reference.JSON})
 					}
-					else
-						return this.Instructions["Coaching"]
+					else if (this.CoachingActive && this.TelemetryAnalyzer
+												 && (Trim(this.Instructions["Coaching"]) != ""))
+						if (this.Mode = "Conversation") {
+							telemetry := this.getTelemetry(&reference := true)
+
+							if telemetry {
+								command := substituteVariables(this.Instructions["Coaching"] . "`n`n%telemetry%"
+															 , {telemetry: telemetry.JSON})
+
+								if reference
+									command .= ("`n`n" . substituteVariables(this.Instructions["Coaching.Reference"]
+																		   , {telemetry: reference.JSON}))
+
+								return command
+							}
+						}
+						else
+							return this.Instructions["Coaching"]
 		}
 
 		return false
@@ -2829,7 +2840,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateDriver() {
 		local knowledgeBase := this.KnowledgeBase
-		local retry := false
+		local processed := false
 		local lapNumber, lapTime, oldMode, valid, delta, lastDelta, bestDelta
 
 		static analyzedLaps := 0
@@ -2865,29 +2876,40 @@ class DrivingCoach extends GridRaceAssistant {
 								this.Mode := oldMode
 							}
 						}
+
+						processed := true
 					}
 					else if (lastDelta > 200) {
-						if (Random(1, 10) > 9)
+						if (Random(1, 10) > 9) {
 							this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
-						else
-							retry := true
+
+							processed := true
+						}
 					}
-					else if valid
-						if ((bestDelta < 300) || (lastDelta < -1000))
+					else if valid {
+						if ((bestDelta < 300) || (lastDelta < -1000)) {
 							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
-						else if ((lastDelta < -500) || (bestDelta < 500))
-							if (Random(1, 10) > 9)
-								this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
-							else
-								retry := true
+
+							processed := true
+						}
+						else if (((lastDelta < -500) || (bestDelta < 500)) && (Random(1, 10) > 9)) {
+							this.getSpeaker().speakPhrase("PraiseFocus", false, false, false, {Noise: false})
+
+							processed := true
+						}
+					}
+					else
+						processed := true
 				}
 
-				if !retry {
+				if processed {
 					analyzedLaps := lapNumber
-					lastLapTime := lapTime
 
-					if valid
+					if valid {
+						lastLapTime := lapTime
+
 						bestLapTime := Min(bestLapTime, lapTime)
+					}
 				}
 			}
 			else if ((lapNumber < analyzedLaps) || (lapNumber <= (this.BaseLap + (2 * this.LearningLaps)))) {

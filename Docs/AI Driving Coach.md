@@ -517,10 +517,23 @@ The following video gives you a good demonstration of this:
 
 This mode also uses the underlying telemtry data system to help you to retain your focus and your motivation to push. Once the Coach detects, that you are loosing pace, he will yell at you and will try to bring your attention back to the tarmac. You can enable this mode by asking the Coach, whether he can help you to keep your focus.
 
-Good to know:
+You can control the level of verbosity by modifying the *Motivation.TimeLoss* instruction (see above). You can even delete the whole content of this instructions and the Coach will then only tell you that you have lost pace and that you should focus again. But that is only half of the fun, so if the default instruction produces too much output for your taste and distracts you, let's take a look at two alternatives:
 
-- You can control the level of verbosity by modifying the *Motivation.TimeLoss* instruction (see above). You can even delete the whole content of this instructions and the Coach will then only tell you that you have lost pace and that you should focus again.
-- Always the telemetry data of the fastest lap of the session will be used as referencewhen using this mode, indepependent of what has been configured elsewhere.
+	Tell me in which sector I am losing time compared to the other cars.
+	Also tell me the corner where I have lost the most time compared to the
+	reference lap. Please reply in max. 2 very short sentences.
+	Don't call me by name.
+	
+	Here is the data for the last lap:
+	
+	%telemetry%
+
+or even shorter:
+
+	Tell me in which sector I am losing time compared to the other cars.
+	Please reply in one very short sentence. Don't call me by name.
+	
+Good to know: Always the telemetry data of the fastest lap of the session will be used as referencewhen using this mode, indepependent of what has been configured elsewhere.
 
 ### Automatic activation of coaching mode
 

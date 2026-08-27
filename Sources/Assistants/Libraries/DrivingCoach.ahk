@@ -2857,10 +2857,10 @@ class DrivingCoach extends GridRaceAssistant {
 				if ((lapTime = lastLapTime) || (Random(1, 10) > 3))
 					return
 
-				if this.Speaker[false] {
-					lastDelta := (lapTime - lastLapTime)
-					bestDelta := (lapTime - bestLapTime)
+				lastDelta := (lapTime - lastLapTime)
+				bestDelta := (lapTime - bestLapTime)
 
+				if this.Speaker[false] {
 					if ((lastDelta > 800) || (bestDelta > 800)) {
 						this.getSpeaker().speakPhrase("CallToFocus", false, false, false, {Noise: false})
 

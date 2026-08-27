@@ -528,7 +528,11 @@ You can control the level of verbosity by modifying the *Motivation.TimeLoss* in
 	
 	%telemetry%
 
-or even shorter:
+This short video has been created with this instruction.
+
+[![](https://img.youtube.com/vi/Gls2y3A3-Oc/0.jpg)](https://youtu.be/Gls2y3A3-Oc)
+
+But of course, you can go even shorter:
 
 	Tell me in which sector I am losing time compared to the other cars.
 	Please reply in one very short sentence. Don't call me by name.

@@ -1,29 +1,8 @@
 # Latest stable release
 
-## 7.2.1.0
-
-#### Date: 08/21/26
-
-#### Fixes
-
-  - Added missing translations for all languages.
-  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
-  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
-  - Fixed the location handling of the diary folder location in "Setup Workbench".
-  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
-  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
-  
-#### Changes
-
-  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
-  - [Internal] Sounds that do not require an audio route will now also be played by SoX, if installed.
-  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
-
-# Upcoming release
-
 ## 7.2.2.0
 
-#### Date: 08/28/26 (planned)
+#### Date: 08/28/26
 
 #### Fixes
 
@@ -65,7 +44,30 @@
       - Spyker C8 Spyder GT2-R
       - TVR Tuscan T400R GT2
 
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 7.2.1.0
+
+#### Date: 08/21/26
+
+#### Fixes
+
+  - Added missing translations for all languages.
+  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
+  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
+  - Fixed the location handling of the diary folder location in "Setup Workbench".
+  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
+  
+#### Changes
+
+  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
+  - [Internal] Sounds that do not require an audio route will now also be played by SoX, if installed.
+  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
 
 ## 7.2.0.0
 

@@ -26,6 +26,8 @@
   - New car models for "Setup Workbench" :
     - Le Mans Ultimate
 	  - Ferrari 296 LMGT3 EVO
+	  - Chevrolet Corvette Z06 LMGT3.R (actually a fix for bug by Sector 397 - the car's name is reported without the trailing "R")
+	  - Aston Martin Vantage AMR LMGT3 (actually a fix for bug by Sector 397 - the car's name is reported without the trailing "3")
     - Automobilista 2 (by @inthebagbud UK)
 	  - Formula V10 Gen2 (has been removed)
       - Formula V10 Gen2 (B)
@@ -46,6 +48,8 @@
       - Saleen S7-R GT1
       - Spyker C8 Spyder GT2-R
       - TVR Tuscan T400R GT2
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722). A few fixes have been applied for cars in *Le Mans Ultimate* and your data may have been moved to an archive.
 
 # Upcoming release
 

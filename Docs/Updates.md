@@ -35,7 +35,8 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 7.2.2
 
-Everything handled automatically, but you may want to bind a button on your controller for the new motivation mode of the Driving Coach.
+1. The data of "Aston Martin Vantage AMR LMGT" and "Chevrolet Corvette Z06 LMGT3" from *Le Mans Ultimate* may have been moved from the session database to an archive. This archive is located in the *Simulator Controller\Database\Archive\LMU* folder which is located in your user *Documents* folder. If you want to merge the data with data collected for cars with the normal naming scheme, open the files with a unicode capable text editor and copy the data to the corresponding files in *Simulator Controller\Database\User\LMU*.
+2. You may want to bind a button on your controller for the new motivation mode of the Driving Coach.
 
 ## Release 7.2.1
 

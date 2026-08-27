@@ -229,7 +229,7 @@ class LMUProvider extends Sector397Provider {
 	acquireStandingsData(telemetryData, finished := false) {
 		local teamSession := this.TeamData.TeamSession
 		local rf2APIType := (LMUProvider.kAPIType = "RF2")
-		local standingsData, forname, surname, nickname, id, teamID
+		local standingsData, forname, surname, nickname, id, teamID, car
 
 		if ((rf2APIType || teamSession) && LMUProvider.kRESTAPI)
 			this.iStandingsData := LMURESTProvider.StandingsData()
@@ -239,6 +239,13 @@ class LMUProvider extends Sector397Provider {
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
 			forname := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname")
 			surname := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname")
+
+			car := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car")
+
+			if (InStr(car, "Chevrolet Corvette Z06") == 1)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Chevrolet Corvette Z06 LMGT3.R")
+			else if (InStr(car, "Aston Martin Vantage AMR LMGT") == 1)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Aston Martin Vantage AMR LMGT3")
 
 			id := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
 
@@ -457,6 +464,11 @@ class LMUProvider extends Sector397Provider {
 				car := (this.Car || this.TeamData.Car)
 				track := (this.Track || this.TrackData.Track)
 			}
+
+			if (InStr(car, "Chevrolet Corvette Z06") == 1)
+				car := "Chevrolet Corvette Z06 LMGT3.R"
+			else if (InStr(car, "Aston Martin Vantage AMR LMGT") == 1)
+				car := "Aston Martin Vantage AMR LMGT3"
 
 			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car,Track):" . (A_TickCount - splitTime) . " ms...")

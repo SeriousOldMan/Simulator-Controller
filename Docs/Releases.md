@@ -9,6 +9,7 @@
   - Fixed a very complex bug, which prevented lap or wear based tyre change decision, if tyres could be changed individually for each wheel, but a single tyre compound must be used for all wheels. This is especially the case for *iRacing*.
   - Fixed a redraw problem on the *Data* tab in "Solo Center".
   - Fixed selection of pitstop repair requests using controller actions for *Le Mans Ultimate*.
+  - Fixed car meta data for the Ferrari 206 LMGT3 EVO, which was *forgotten* to be included and therefore had no tyre information.
   
 #### Changes
 
@@ -22,8 +23,10 @@
   - Sliders for Volume, Pitch and Speed will now be disabled in voice configuration, if the corresponding option is not supported by the chosen speech synthesis method.
   - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
   - A new article has been written for the *News* system.
-  - New car models for "Setup Workbench" (by @inthebagbud UK):
-    - Automobilista 2
+  - New car models for "Setup Workbench" :
+    - Le Mans Ultimate
+	  - Ferrari 296 LMGT3 EVO
+    - Automobilista 2 (by @inthebagbud UK)
 	  - Formula V10 Gen2 (has been removed)
       - Formula V10 Gen2 (B)
       - Formula V10 Gen2 (M)

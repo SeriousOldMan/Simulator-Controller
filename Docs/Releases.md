@@ -9,7 +9,10 @@
   - Fixed a very complex bug, which prevented lap or wear based tyre change decision, if tyres could be changed individually for each wheel, but a single tyre compound must be used for all wheels. This is especially the case for *iRacing*.
   - Fixed a redraw problem on the *Data* tab in "Solo Center".
   - Fixed selection of pitstop repair requests using controller actions for *Le Mans Ultimate*.
-  - Fixed car meta data for the Ferrari 206 LMGT3 EVO, which was *forgotten* to be included and therefore had no tyre information.
+  - Fixed several car names for *Le Mans Ultimate*, which are reported with incomplete names by the game and therefore had missing information like tyre data:
+    - Chevrolet Corvette Z06 LMGT3.R (the car's name is reported without the trailing "R")
+    - Aston Martin Vantage AMR LMGT3 (the car's name is reported without the trailing "3")
+    - Lamborghini Huracan LMGT3 Evo2 (the car's name is reported without the trailing "2")
   
 #### Changes
 
@@ -23,11 +26,10 @@
   - Sliders for Volume, Pitch and Speed will now be disabled in voice configuration, if the corresponding option is not supported by the chosen speech synthesis method.
   - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
   - A new article has been written for the *News* system.
+  - Added car meta data for the Ferrari 206 LMGT3 EVO, which was *forgotten* to be included and therefore had no tyre information.
   - New car models for "Setup Workbench" :
     - Le Mans Ultimate
-	  - Ferrari 296 LMGT3 EVO
-	  - Chevrolet Corvette Z06 LMGT3.R (actually a fix for bug by Sector 397 - the car's name is reported without the trailing "R")
-	  - Aston Martin Vantage AMR LMGT3 (actually a fix for bug by Sector 397 - the car's name is reported without the trailing "3")
+	  - Ferrari 296 LMGT3 Evo (has been forgotten on release, sorry)
     - Automobilista 2 (by @inthebagbud UK)
 	  - Formula V10 Gen2 (has been removed)
       - Formula V10 Gen2 (B)

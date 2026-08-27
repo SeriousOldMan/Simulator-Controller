@@ -246,6 +246,8 @@ class LMUProvider extends Sector397Provider {
 				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Chevrolet Corvette Z06 LMGT3.R")
 			else if (InStr(car, "Aston Martin Vantage AMR LMGT") == 1)
 				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Aston Martin Vantage AMR LMGT3")
+			else if (InStr(car, "Lamborghini Huracan LMGT3") == 1)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Lamborghini Huracan LMGT3 Evo2")
 
 			id := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
 
@@ -469,6 +471,8 @@ class LMUProvider extends Sector397Provider {
 				car := "Chevrolet Corvette Z06 LMGT3.R"
 			else if (InStr(car, "Aston Martin Vantage AMR LMGT") == 1)
 				car := "Aston Martin Vantage AMR LMGT3"
+			else if (InStr(car, "Lamborghini Huracan LMGT3") == 1)
+				car := "Lamborghini Huracan LMGT3 Evo2"
 
 			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car,Track):" . (A_TickCount - splitTime) . " ms...")

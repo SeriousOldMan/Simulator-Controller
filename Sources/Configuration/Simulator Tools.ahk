@@ -1784,6 +1784,9 @@ updateConfigurationForV722() {
 	try
 		DirMove(kDatabaseDirectory . "User\LMU\Chevrolet Corvette Z06 LMGT3", kDatabaseDirectory . "User\LMU\Chevrolet Corvette Z06 LMGT3.R", "R")
 
+	try
+		DirMove(kDatabaseDirectory . "User\LMU\Lamborghini Huracan LMGT3 Evo", kDatabaseDirectory . "User\LMU\Lamborghini Huracan LMGT3 Evo2", "R")
+
 	updateConfigurationForV681()
 }
 

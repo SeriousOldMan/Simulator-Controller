@@ -55,7 +55,18 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.3.0
+
+#### Date: 09/04/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*.
+  - [Internal] Migrated to AHK 2.1-alpha.31.
 
 # Release history
 

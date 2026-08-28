@@ -1,0 +1,262 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "Math.proto";
+import "CarDataCache.proto";
+import "Scene.proto";
+
+message ShowroomCarStateData {
+  CarInstrumentationValues instrumentation_values = 1;
+  CarInstrumentationValues instrumentation_values_min_limit = 2;
+  CarInstrumentationValues instrumentation_values_max_limit = 3;
+  CarElectronicsValues electronics_values = 11;
+  CarElectronicsValues electronics_values_min_limit = 12;
+  CarElectronicsValues electronics_values_max_limit = 13;
+  CarElectronicsValues electronics_is_modifiable = 14;
+  repeated ShowroomAnimation animations = 22;
+  repeated ShowroomOptionalAnimation optional_animations = 23;
+  bool has_pit_limiter = 24;
+  FakeCarPhysicsState physics_state = 50;
+}
+
+message ShowroomAnimation {
+  CarAnimationType animation_type = 1;
+  GenericRendererAnimation.AnimationPlayType play_type = 4;
+  int32 target = 2;
+  int32 lut_size = 3;
+}
+
+message ShowroomOptionalAnimation {
+  string animation_name = 1;
+  GenericRendererAnimation.AnimationPlayType play_type = 4;
+  int32 target = 2;
+  int32 lut_size = 3;
+}
+
+message ShowroomListResponse {
+  string display_name = 100;
+  SkyRules sky_rules = 10;
+  int32 index = 1;
+}
+
+message ShowroomRequestCarStateData {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseCarStateData {
+  ShowroomCarStateData state = 1;
+}
+
+message ShowroomRequestUpdateCarState {
+  FakeCarPhysicsState state = 1;
+}
+
+message ShowroomResponseUpdateCarState {
+  ShowroomCarStateData state = 1;
+}
+
+message ShowroomRequestResetCarState {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseResetCarState {
+  ShowroomCarStateData state = 1;
+}
+
+message ShowroomRequestSaveCurrent {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseSaveCurrent {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestList {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseList {
+  repeated ShowroomListResponse showrooms = 10;
+}
+
+message ShowroomRequestSelect {
+  int32 index = 1;
+}
+
+message ShowroomResponseSelect {
+  string selected_showroom_name = 2;
+  int32 selected_weather_index = 60;
+  repeated string weather_name_list = 61;
+  int32 selected_hdri_index = 30;
+  repeated string hdri_name_list = 31;
+  Vector2Data date_time_limits = 40;
+  bool hide_weather_selector = 50;
+  bool hide_hdri_selector = 51;
+  bool hide_time_of_day_selector = 52;
+  uint32 date_time = 43;
+  bool is_sky_static = 41;
+  ShowroomData.SceneCameraOptions scene_camera_option = 62;
+  ShowroomCameraMode camera_mode = 63;
+  uint32 spawn_index = 70;
+  uint32 spawn_size = 71;
+  reserved 1 to 1;
+  reserved 20 to 20;
+  reserved 21 to 21;
+}
+
+message ShowroomRequestSelectWeather {
+  int32 index = 1;
+}
+
+message ShowroomResponseSelectWeather {
+  int32 index = 1;
+}
+
+message ShowroomRequestSelectHdri {
+  int32 index = 1;
+}
+
+message ShowroomResponseSelectHdri {
+  int32 index = 1;
+}
+
+message ShowroomRequestSelectDateTime {
+  uint32 date_time = 1;
+}
+
+message ShowroomResponseSelectDateTime {
+  uint32 date_time = 2;
+}
+
+message ShowroomRequestUpdateCarInstrumentation {
+  CarInstrumentationValues values = 1;
+}
+
+message ShowroomResponseUpdateCarInstrumentation {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestUpdateCarElectronics {
+  CarElectronicsValues values = 1;
+}
+
+message ShowroomResponseUpdateCarElectronics {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestUpdateCarAnimation {
+  CarAnimationType animation_type = 1;
+  int32 target = 2;
+}
+
+message ShowroomResponseUpdateCarAnimation {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestUpdateCarOptionalAnimation {
+  string optional_animation_name = 1;
+  int32 target = 2;
+}
+
+message ShowroomResponseUpdateCarOptionalAnimation {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestResetShowroom {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseResetShowroom {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestSelectSpawnPoint {
+  int32 index = 1;
+}
+
+message ShowroomResponseSelectSpawnPoint {
+  int32 index = 1;
+}
+
+message ShowroomRequestSelectInterior {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseSelectInterior {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestSelectExterior {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseSelectExterior {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestSelectWheels {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseSelectWheels {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestToggleInteriorExterior {
+  bool im_empty = 1;
+}
+
+message ShowroomResponseToggleInteriorExterior {
+  bool im_empty = 1;
+}
+
+message ShowroomRequestSelectShowroomCameraMode {
+  ShowroomCameraMode camera_mode = 1;
+}
+
+message ShowroomResponseSelectShowroomCameraMode {
+  bool im_empty = 1;
+}
+
+message ShowroomCommands {
+  ShowroomRequestCarStateData request_car_state_data = 1;
+  ShowroomResponseCarStateData response_car_state_data = 1000;
+  ShowroomRequestUpdateCarState request_update_car_state = 2;
+  ShowroomResponseUpdateCarState response_update_car_state = 1001;
+  ShowroomRequestResetCarState request_reset_car_state = 3;
+  ShowroomResponseResetCarState response_reset_car_state = 1002;
+  ShowroomRequestSaveCurrent request_save_current = 4;
+  ShowroomResponseSaveCurrent response_save_current = 1003;
+  ShowroomRequestList request_list = 5;
+  ShowroomResponseList response_list = 1004;
+  ShowroomRequestSelect request_select = 6;
+  ShowroomResponseSelect response_select = 1005;
+  ShowroomRequestSelectWeather request_select_weather = 7;
+  ShowroomResponseSelectWeather response_select_weather = 1006;
+  ShowroomRequestSelectHdri request_select_hdri = 8;
+  ShowroomResponseSelectHdri response_select_hdri = 1007;
+  ShowroomRequestSelectDateTime request_select_date_time = 9;
+  ShowroomResponseSelectDateTime response_select_date_time = 1008;
+  ShowroomRequestUpdateCarInstrumentation request_update_car_instrumentation = 10;
+  ShowroomResponseUpdateCarInstrumentation response_update_car_instrumentation = 1009;
+  ShowroomRequestUpdateCarElectronics request_update_car_electronics = 11;
+  ShowroomResponseUpdateCarElectronics response_update_car_electronics = 1010;
+  ShowroomRequestUpdateCarAnimation request_update_car_animation = 12;
+  ShowroomResponseUpdateCarAnimation response_update_car_animation = 1011;
+  ShowroomRequestUpdateCarOptionalAnimation request_update_car_optional_animation = 13;
+  ShowroomResponseUpdateCarOptionalAnimation response_update_car_optional_animation = 1012;
+  ShowroomRequestResetShowroom request_reset_showroom = 16;
+  ShowroomResponseResetShowroom response_reset_showroom = 1015;
+  ShowroomRequestSelectSpawnPoint request_select_spawn_point = 17;
+  ShowroomResponseSelectSpawnPoint response_select_spawn_point = 1016;
+  ShowroomRequestSelectInterior request_select_interior = 18;
+  ShowroomResponseSelectInterior response_select_interior = 1017;
+  ShowroomRequestSelectExterior request_select_exterior = 19;
+  ShowroomResponseSelectExterior response_select_exterior = 1018;
+  ShowroomRequestSelectWheels request_select_wheels = 20;
+  ShowroomResponseSelectWheels response_select_wheels = 1019;
+  ShowroomRequestToggleInteriorExterior request_toggle_interior_exterior = 21;
+  ShowroomResponseToggleInteriorExterior response_toggle_interior_exterior = 1020;
+  ShowroomRequestSelectShowroomCameraMode request_select_showroom_camera_mode = 22;
+  ShowroomResponseSelectShowroomCameraMode response_select_showroom_camera_mode = 1021;
+}

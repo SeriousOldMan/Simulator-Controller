@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+import "Options.proto";
+
+enum TimeZone {
+  TimeZone_UTC = 0;
+  TimeZone_LocalSystemTime = 1;
+  TimeZone_Italy = 2;
+  TimeZone_Germany = 3;
+  TimeZone_Belgium = 4;
+  TimeZone_Spain_Madrid = 5;
+  TimeZone_Spain_Barcelona = 6;
+  TimeZone_France = 7;
+  TimeZone_Netherlands = 8;
+  TimeZone_UnitedKingdom = 9;
+  TimeZone_Hungary = 10;
+  TimeZone_Austria = 11;
+  TimeZone_Australia_Bathurst = 12;
+  TimeZone_US_Texas = 13;
+  TimeZone_South_Africa = 14;
+  TimeZone_Pacific_North_America = 15;
+  TimeZone_Japan = 16;
+  TimeZone_EasternStandardTime = 17;
+}
+
+message TimePointData {
+  uint64 nanosecondsUtc = 1;
+  TimeZone timeZone = 2;
+}
+
+message DaylightSavingTimeTransition {
+  int32 year = 1;
+  TimePointData start = 2;
+  TimePointData end = 3;
+  int32 dstOffset = 4;
+}
+
+message TimezoneRegion {
+  TimeZone region = 1;
+  int32 utcOffset = 2;
+  repeated DaylightSavingTimeTransition dstTransitions = 3;
+}
+
+message TimezoneRegionCollection {
+  repeated TimezoneRegion regions = 1;
+}
+
+message HumanReadableDateTimeData {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+  int32 hour = 4;
+  int32 minute = 5;
+  int32 second = 6;
+}

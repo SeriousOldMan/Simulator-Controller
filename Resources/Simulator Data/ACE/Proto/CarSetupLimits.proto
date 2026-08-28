@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+
+message SetupSettingLimits {
+  float step = 1;
+  float min = 2;
+  float max = 3;
+  string lut = 6;
+  CurveDataEx curve = 9;
+  bool is_modifiable = 4;
+  bool hide_value = 5;
+  bool is_negative = 11;
+  string unit = 7;
+  int32 fractional_digits = 8;
+  bool treat_as_boolean = 10;
+}
+
+message DamperSettingsLimits {
+  SetupSettingLimits slow_bump = 1;
+  SetupSettingLimits fast_bump = 2;
+  SetupSettingLimits slow_rebound = 3;
+  SetupSettingLimits fast_rebound = 4;
+}
+
+message BumpStopSettingsLimits {
+  SetupSettingLimits range = 1;
+  SetupSettingLimits rate = 2;
+}
+
+message SuspensionSettingLimits {
+  SetupSettingLimits wheel_rate = 1;
+  BumpStopSettingsLimits bump_stop_up = 2;
+  BumpStopSettingsLimits bump_stop_down = 3;
+  SetupSettingLimits helper_rate = 4;
+  SetupSettingLimits helper_range = 5;
+}
+
+message BrakeSettingLimits {
+  SetupSettingLimits front_bias = 1;
+  SetupSettingLimits torque_multiplier = 2;
+  repeated SetupSettingLimits brake_ducts = 3;
+}
+
+message DifferentialSettingsLimits {
+  SetupSettingLimits power = 1;
+  SetupSettingLimits coast = 2;
+  SetupSettingLimits preload = 3;
+}
+
+message ElectronicsSettingsLimits {
+  SetupSettingLimits tc1 = 1;
+  SetupSettingLimits tc2 = 2;
+  SetupSettingLimits abs = 3;
+  SetupSettingLimits esc = 6;
+  SetupSettingLimits ebb = 11;
+  SetupSettingLimits engine_map = 4;
+  SetupSettingLimits telemetry_laps_to_record = 5;
+  SetupSettingLimits turbo_boost_lv = 7;
+  SetupSettingLimits ers_deployment_map = 8;
+  SetupSettingLimits ers_recharge_lv = 9;
+  SetupSettingLimits ers_heat_charging = 10;
+}
+
+message AeroSettingsLimits {
+  repeated SetupSettingLimits collar_positions = 1;
+  SetupSettingLimits front_target_height = 2;
+  SetupSettingLimits rear_target_height = 3;
+  SetupSettingLimits front_wing_angle = 4;
+  SetupSettingLimits rear_wing_angle = 5;
+}
+
+message MechanicalBalanceLimits {
+  repeated SetupSettingLimits arbs = 1;
+  SetupSettingLimits steer_ratio = 2;
+  BrakeSettingLimits brakes = 3;
+  DifferentialSettingsLimits differential = 4;
+}
+
+message TyreAlignmentLimits {
+  SetupSettingLimits pressure = 1;
+  SetupSettingLimits camber = 2;
+  SetupSettingLimits toe = 3;
+  SetupSettingLimits caster = 4;
+  SetupSettingLimits static_camber = 5;
+  SetupSettingLimits toe_out_linear = 6;
+  SetupSettingLimits compound = 7;
+}
+
+message FuelStrategySettingLimits {
+  SetupSettingLimits fuel = 1;
+}
+
+message CarSetupDataLimits {
+  MechanicalBalanceLimits mechanical_balance = 1;
+  repeated SuspensionSettingLimits suspensions = 2;
+  repeated DamperSettingsLimits dampers = 3;
+  repeated TyreAlignmentLimits alignments = 4;
+  ElectronicsSettingsLimits electronics = 5;
+  AeroSettingsLimits aero = 6;
+  FuelStrategySettingLimits fuel_strategy = 7;
+  bool use_single_compound = 100;
+}
+
+message DamperSettingsUnits {
+  string slow_bump = 1;
+  string fast_bump = 2;
+  string slow_rebound = 3;
+  string fast_rebound = 4;
+}
+
+message BumpStopSettingsUnits {
+  string range = 1;
+  string rate = 2;
+}
+
+message SuspensionSettingUnits {
+  string wheel_rate = 1;
+  BumpStopSettingsUnits bump_stop_up = 2;
+  BumpStopSettingsUnits bump_stop_down = 3;
+  string helper_rate = 4;
+  string helper_range = 5;
+}
+
+message BrakeSettingUnits {
+  string front_bias = 1;
+  string torque_multiplier = 2;
+  repeated string brake_ducts = 3;
+}
+
+message DifferentialSettingsUnits {
+  string power = 1;
+  string coast = 2;
+  string preload = 3;
+}
+
+message ElectronicsSettingsUnits {
+  string tc1 = 1;
+  string tc2 = 2;
+  string abs = 3;
+  string esc = 6;
+  string ebb = 11;
+  string engine_map = 4;
+  string telemetry_laps_to_record = 5;
+  string turbo_boost_lv = 7;
+  string ers_deployment_map = 8;
+  string ers_recharge_lv = 9;
+  string ers_heat_charging = 10;
+}
+
+message AeroSettingsUnits {
+  repeated string collar_positions = 1;
+  string front_target_height = 2;
+  string rear_target_height = 3;
+  string front_wing_angle = 4;
+  string rear_wing_angle = 5;
+}
+
+message MechanicalBalanceUnits {
+  repeated string arbs = 1;
+  string steer_ratio = 2;
+  BrakeSettingUnits brakes = 3;
+  DifferentialSettingsUnits differential = 4;
+}
+
+message TyreAlignmentUnits {
+  string pressure = 1;
+  string camber = 2;
+  string toe = 3;
+  string caster = 4;
+  string static_camber = 5;
+  string toe_out_linear = 6;
+  string compound = 7;
+}
+
+message FuelStrategySettingUnits {
+  string fuel = 1;
+}
+
+message CarSetupDataUnits {
+  MechanicalBalanceUnits mechanical_balance = 1;
+  repeated SuspensionSettingUnits suspensions = 2;
+  repeated DamperSettingsUnits dampers = 3;
+  repeated TyreAlignmentUnits alignments = 4;
+  ElectronicsSettingsUnits electronics = 5;
+  AeroSettingsUnits aero = 6;
+  FuelStrategySettingUnits fuel_strategy = 7;
+  string use_single_compound = 100;
+}

@@ -1,0 +1,155 @@
+syntax = "proto3";
+
+import "ClientCommandsUtil.proto";
+import "Gameplay.proto";
+
+enum WeatherPresetListType {
+  WeatherPresetListType_ALL = 0;
+  WeatherPresetListType_ORIGINAL = 1;
+  WeatherPresetListType_CUSTOM = 2;
+}
+
+enum RealismPresetListType {
+  RealismPresetListType_PRO = 0;
+  RealismPresetListType_OPTION1 = 1;
+  RealismPresetListType_OPTION2 = 2;
+  RealismPresetListType_OPTION3 = 3;
+}
+
+message RacingSettingsWeatherPreset {
+  float clouds_coverage = 1;
+  float rain_quantity = 2;
+  float track_wetness = 3;
+  float puddles = 4;
+  float wind_direction = 5;
+  float wind_speed = 6;
+  bool randomness = 7;
+}
+
+message RacingSettingsRequestWeatherPresetList {
+  WeatherPresetListType list_type = 1;
+  int32 version = 2;
+}
+
+message RacingSettingsResponseWeatherPresetList {
+  repeated string filename = 1;
+}
+
+message RacingSettingsRequestWeatherLoadPreset {
+  string filename = 1;
+}
+
+message RacingSettingsResponseWeatherLoadPreset {
+  ClientCommandsResponse response = 1;
+  RacingSettingsWeatherPreset preset = 2;
+}
+
+message RacingSettingsRequestWeatherSavePreset {
+  string filename = 1;
+  int32 version = 2;
+}
+
+message RacingSettingsResponseWeatherSavePreset {
+  ClientCommandsResponse response = 1;
+}
+
+message RacingSettingsRequestWeatherDeletePreset {
+  string filename = 1;
+}
+
+message RacingSettingsResponseWeatherDeletePreset {
+  ClientCommandsResponse response = 1;
+}
+
+message RacingSettingsRealismPreset {
+  bool brakes_temperature = 1;
+  bool tyre_wear = 2;
+  bool typre_temperature = 3;
+  bool penalities = 4;
+  bool dynamic_track = 5;
+}
+
+message RacingSettingsRequestRealismPresetList {
+  RealismPresetListType list_type = 1;
+  int32 version = 2;
+}
+
+message RacingSettingsResponseRealismPresetList {
+  repeated string filename = 1;
+}
+
+message RacingSettingsRequestRealismLoadPreset {
+  string filename = 1;
+}
+
+message RacingSettingsResponseRealismLoadPreset {
+  ClientCommandsResponse response = 1;
+  RacingSettingsRealismPreset preset = 2;
+}
+
+message RacingSettingsRequestRealismSavePreset {
+  string filename = 1;
+  int32 version = 2;
+}
+
+message RacingSettingsResponseRealismSavePreset {
+  ClientCommandsResponse response = 1;
+}
+
+message RacingSettingsRequestRealismDeletePreset {
+  string filename = 1;
+}
+
+message RacingSettingsResponseRealismDeletePreset {
+  ClientCommandsResponse response = 1;
+}
+
+message RacingSettingsRequestAssistPresetList {
+}
+
+message RacingSettingsResponseAssistPresetList {
+  repeated RacingSettingsAssistPreset presets = 1;
+  AssistPresetListType current_preset = 2;
+  ClientCommandsResponse response = 3;
+}
+
+message RacingSettingsRequestAssistSavePreset {
+  RacingSettingsAssistPreset preset = 2;
+}
+
+message RacingSettingsResponseAssistSavePreset {
+  ClientCommandsResponse response = 1;
+}
+
+message RacingSettingsRequestAssistUseCurrentPreset {
+  RacingSettingsAssistPreset season_definition_preset = 2;
+}
+
+message RacingSettingsResponseAssistUseCurrentPreset {
+  ClientCommandsResponse response = 1;
+}
+
+message RacingSettingsCommands {
+  RacingSettingsRequestWeatherPresetList request_weather_preset_list = 1;
+  RacingSettingsResponseWeatherPresetList response_weather_preset_list = 1000;
+  RacingSettingsRequestWeatherLoadPreset request_weather_load_preset = 2;
+  RacingSettingsResponseWeatherLoadPreset response_weather_load_preset = 1001;
+  RacingSettingsRequestWeatherSavePreset request_weather_save_preset = 3;
+  RacingSettingsResponseWeatherSavePreset response_weather_save_preset = 1002;
+  RacingSettingsRequestWeatherDeletePreset request_weather_delete_preset = 4;
+  RacingSettingsResponseWeatherDeletePreset response_weather_delete_preset = 1003;
+  RacingSettingsRequestRealismPresetList request_realism_preset_list = 5;
+  RacingSettingsResponseRealismPresetList response_realism_preset_list = 1004;
+  RacingSettingsRequestRealismLoadPreset request_realism_load_preset = 6;
+  RacingSettingsResponseRealismLoadPreset response_realism_load_preset = 1005;
+  RacingSettingsRequestRealismSavePreset request_realism_save_preset = 7;
+  RacingSettingsResponseRealismSavePreset response_realism_save_preset = 1006;
+  RacingSettingsRequestRealismDeletePreset request_realism_delete_preset = 8;
+  RacingSettingsResponseRealismDeletePreset response_realism_delete_preset = 1007;
+  RacingSettingsRequestAssistPresetList request_assist_preset_list = 9;
+  RacingSettingsResponseAssistPresetList response_assist_preset_list = 1008;
+  RacingSettingsRequestAssistSavePreset request_assist_save_preset = 10;
+  RacingSettingsResponseAssistSavePreset response_assist_save_preset = 1009;
+  RacingSettingsRequestAssistUseCurrentPreset request_use_current_preset = 11;
+  RacingSettingsResponseAssistUseCurrentPreset response_use_current_preset = 1010;
+}

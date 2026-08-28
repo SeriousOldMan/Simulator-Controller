@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+import "PlatformCommands.proto";
+import "InputConfiguration.proto";
+import "CarDataCache.proto";
+import "LogicScene.proto";
+
+message MfdRequestControls {
+  bool im_empty = 1;
+}
+
+message MfdResponseControls {
+  CommandResponse response = 1;
+  InputSettings input_settings = 2;
+}
+
+message MfdRequestUpdateStarter {
+  bool im_empty = 1;
+}
+
+message MfdResponseUpdateStarter {
+  CommandResponse response = 1;
+}
+
+message MfdRequestSaveControls {
+  InputSettings input_settings = 1;
+}
+
+message MfdResponseSaveControls {
+  CommandResponse response = 1;
+}
+
+message MfdRequestDefaultControls {
+  bool im_empty = 1;
+}
+
+message MfdResponseDefaultControls {
+  CommandResponse response = 1;
+  InputSettings input_settings = 2;
+}
+
+message MfdRequestControlIsolation {
+  bool is_mfd_on_active = 1;
+}
+
+message MfdResponseControlIsolation {
+  bool is_mfd_on_active = 1;
+}
+
+message MfdRequestUpdateElectronics {
+  CarElectronicsValues electronics_values = 1;
+}
+
+message MfdResponseUpdateElectronics {
+  CommandResponse response = 1;
+}
+
+message MfdRequestUpdateInstrumentation {
+  CarInstrumentationValues instrumentation_values = 1;
+}
+
+message MfdResponseUpdateInstrumentation {
+  CommandResponse response = 1;
+}
+
+message MfdRequestPitControls {
+  bool im_empty = 1;
+}
+
+message MfdResponsePitControls {
+  CommandResponse response = 1;
+  CarPitStopValues pit_stop_values_min_limit = 2;
+  CarPitStopValues pit_stop_values_max_limit = 3;
+  CarPitStopValues pit_stop_values_is_modifiable = 4;
+  CarPitStopValues pit_stop_values = 5;
+  bool use_single_compound = 6;
+  float repair_body_time = 7;
+  float repair_suspension_time = 8;
+  float repair_engine_time = 9;
+  float refuel_time = 10;
+  float tyre_change_time = 11;
+  float stop_and_go_time = 12;
+}
+
+message MfdRequestSetPitControls {
+  CarPitStopValues pit_stop_values = 1;
+}
+
+message MfdResponseSetPitControls {
+  CommandResponse response = 1;
+}
+
+message MfdRequestPit {
+  PGUID car_id = 1;
+  bool lock_controls = 2;
+  float time_to_be_added_ms = 3;
+  bool ignore_penalty = 4;
+}
+
+message MfdResponsePit {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+  float pit_time_s = 3;
+  bool serve_stop_and_go_penalty = 4;
+  bool lock_controls = 5;
+  bool has_refuelled = 6;
+  bool has_changed_tyres = 7;
+}
+
+message MfdCommands {
+  MfdRequestControls request_controls = 1;
+  MfdResponseControls response_controls = 1000;
+  MfdRequestSaveControls request_save_controls = 2;
+  MfdResponseSaveControls response_save_controls = 1001;
+  MfdRequestDefaultControls request_default_controls = 3;
+  MfdResponseDefaultControls response_default_controls = 1002;
+  MfdRequestControlIsolation request_control_isolation = 4;
+  MfdResponseControlIsolation response_control_isolation = 1003;
+  MfdRequestUpdateElectronics request_update_electronics = 5;
+  MfdResponseUpdateElectronics response_update_electronics = 1004;
+  MfdRequestUpdateInstrumentation request_update_instrumentation = 6;
+  MfdResponseUpdateInstrumentation response_update_instrumentation = 1005;
+  MfdRequestPitControls request_pit_controls = 7;
+  MfdResponsePitControls response_pit_controls = 1006;
+  MfdRequestSetPitControls request_set_pit_controls = 8;
+  MfdResponseSetPitControls response_set_pit_controls = 1007;
+  MfdRequestPit request_pit = 9;
+  MfdResponsePit response_pit = 1008;
+  MfdRequestUpdateStarter request_update_starter = 10;
+  MfdResponseUpdateStarter response_update_starter = 1009;
+}

@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+enum ClientCommandsMode {
+  ClientCommandsMode_SINGLEPLAYER = 0;
+  ClientCommandsMode_MULTIPLAYER = 1;
+  ClientCommandsMode_SPECIAL_EVENT = 2;
+  ClientCommandsMode_TEST_DRIVE = 3;
+  ClientCommandsMode_DRIVING_ACADEMY = 4;
+}
+
+enum ClientCommandsResponse {
+  ClientCommandsResponse_OK = 0;
+  ClientCommandsResponse_NO_TRACKS = 1;
+  ClientCommandsResponse_NO_SEASONDEFINITION = 2;
+  ClientCommandsResponse_NO_SETTINGS = 3;
+  ClientCommandsResponse_EVENT_WRONG = 4;
+  ClientCommandsResponse_SESSION_WRONG = 5;
+  ClientCommandsResponse_NO_CAR_DESIGN = 25;
+  ClientCommandsResponse_NO_CAR_CONFIG = 26;
+  ClientCommandsResponse_NO_AVAILABLE_CARS = 27;
+  ClientCommandsResponse_BACKENDDISCONNECTED = 50;
+  ClientCommandsResponse_NOUSER = 51;
+  ClientCommandsResponse_MESSAGE_IN_PROGRESS = 98;
+  ClientCommandsResponse_PARAMETER_ERROR = 99;
+  ClientCommandsResponse_CRITICAL_ERROR = 100;
+}
+
+enum GameModeType {
+  GameModeType_NONE = 0;
+  GameModeType_RACE_WEEKEND = 1;
+  GameModeType_SRO_RACE = 2;
+  GameModeType_INSTANT_RACE = 3;
+  GameModeType_SUPERPOLE = 4;
+  GameModeType_FREEROAM = 5;
+  GameModeType_DRIFT = 6;
+  GameModeType_RALLY = 7;
+  GameModeType_HOTSTINT = 8;
+  GameModeType_HOTLAP = 9;
+  GameModeType_PRACTICE = 10;
+  GameModeType_TEST_DRIVE = 11;
+  GameModeType_A_TO_B = 12;
+}
+
+enum InitialGrip {
+  InitialGrip_GREEN = 0;
+  InitialGrip_FAST = 1;
+  InitialGrip_OPTIMUM = 2;
+}
+
+enum SeasonDefinitionType {
+  SeasonDefinitionType_SinglePlayer = 0;
+  SeasonDefinitionType_MultiPlayer = 1;
+  SeasonDefinitionType_Event = 2;
+  SeasonDefinitionType_LicenseEvent = 3;
+  SeasonDefinitionType_OpenWorld = 4;
+}
+
+message SettingsPreset {
+  int32 version = 1;
+  google.protobuf.Any settings = 2;
+}

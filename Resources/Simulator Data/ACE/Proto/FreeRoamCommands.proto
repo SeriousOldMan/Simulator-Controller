@@ -1,0 +1,290 @@
+syntax = "proto3";
+
+import "PlatformCommands.proto";
+import "InputConfiguration.proto";
+import "CarDataCache.proto";
+import "LogicScene.proto";
+import "Scene.proto";
+import "Gameplay.proto";
+
+enum FreeRoamCommandsTimeattack {
+  FreeRoamCommandsTimeAttack_NONE = 0;
+  FreeRoamCommandsTimeAttack_JOIN = 1;
+  FreeRoamCommandsTimeAttack_RESTART = 2;
+  FreeRoamCommandsTimeAttack_EXIT = 3;
+}
+
+enum FreeRoamNotifyType {
+  FreeRoamNotifyType_NONE = 0;
+  FreeRoamNotifyType_NOTIFICATION = 1;
+  FreeRoamNotifyType_DISCOVERY = 2;
+  FreeRoamNotifyType_DETECTION = 3;
+}
+
+enum FreeRoamRespawnType {
+  FreeRoamRespawnType_NONE = 0;
+  FreeRoamRespawnType_LAST_KNOWN_POS = 1;
+  FreeRoamRespawnType_STARTING_PLACE = 2;
+}
+
+enum FreeRoamNavigationDest {
+  FreeRoamNavigationDest_NONE = 0;
+  FreeRoamNavigationDest_TO_POI = 1;
+  FreeRoamNavigationDest_TO_DRIVER = 2;
+}
+
+enum FreeRoamNavigationType {
+  FreeRoamNavigationType_NONE = 0;
+  FreeRoamNavigationType_FAST = 1;
+  FreeRoamNavigationType_SHORT = 2;
+}
+
+message FreeRoamDriver {
+  PGUID car_id = 1;
+  string car_mech = 2;
+  string driver_name = 3;
+}
+
+message onNotifyPoi {
+  FreeRoamNotifyType type = 1;
+  PGUID car_id = 2;
+  GameplayPoi poi = 3;
+  bool is_entering = 4;
+}
+
+message onNotifySpeedtrapDetection {
+  PGUID car_id = 1;
+  GameplayPoi poi = 2;
+  bool is_entering = 3;
+  FreeRoamBestPerformance.Performance value = 4;
+  FreeRoamBestPerformance.Performance best_value = 5;
+}
+
+message onNotifyTimeAttackDetection {
+  PGUID car_id = 1;
+  GameplayPoi poi = 2;
+  FreeRoamTimeAttack timeattack = 3;
+  bool is_entering = 4;
+  FreeRoamBestPerformance.Performance value = 5;
+  FreeRoamBestPerformance.Performance best_value = 6;
+}
+
+message onNotifyCarWashDetection {
+  FreeRoamNotifyType type = 1;
+  PGUID car_id = 2;
+  GameplayPoi poi = 3;
+  bool is_entering = 4;
+}
+
+message onNotifyRepairShopDetection {
+  FreeRoamNotifyType type = 1;
+  PGUID car_id = 2;
+  GameplayPoi poi = 3;
+  bool is_entering = 4;
+  float body_damage = 5;
+  float engine_damage = 6;
+  float suspensions_damage = 7;
+}
+
+message onNotifyTyreShopDetection {
+  FreeRoamNotifyType type = 1;
+  PGUID car_id = 2;
+  GameplayPoi poi = 3;
+  bool is_entering = 4;
+  repeated string front_compounds = 5;
+  repeated string rear_compounds = 6;
+  repeated int32 compounds = 7;
+  repeated PhysicsCarDataCacheFloatSetting tyre_pressure = 8;
+}
+
+message onNotifyGasStationShopDetection {
+  FreeRoamNotifyType type = 1;
+  PGUID car_id = 2;
+  GameplayPoi poi = 3;
+  bool is_entering = 4;
+  float actual_fuel = 5;
+  float max_fuel = 6;
+}
+
+message FreeRoamRequestPoiInfo {
+  fixed64 poi_id = 2;
+}
+
+message FreeRoamResponsePoiInfo {
+  CommandResponse response = 1;
+  GameplayPoi poi = 2;
+}
+
+message FreeRoamRequestTimeattackCommand {
+  PGUID car_id = 1;
+  PGUID event_id = 2;
+  fixed64 poi_id = 3;
+  FreeRoamCommandsTimeattack command = 4;
+}
+
+message FreeRoamResponseTimeattackCommand {
+  CommandResponse response = 1;
+  FreeRoamCommandsTimeattack command = 2;
+  PGUID car_id = 3;
+  PGUID event_id = 4;
+  fixed64 poi_id = 5;
+}
+
+message FreeRoamRequestCarWash {
+  PGUID car_id = 1;
+  bool clean = 2;
+}
+
+message FreeRoamResponseCarWash {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamRequestRepairCar {
+  PGUID car_id = 1;
+  bool repair_body = 3;
+  bool repair_engine = 4;
+  bool repair_suspensions = 5;
+}
+
+message FreeRoamResponseRepairCar {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamRequestEditTyres {
+  PGUID car_id = 1;
+  repeated int32 compounds = 3;
+  repeated bool change_tyres = 4;
+  repeated float tyre_pressure = 5;
+  repeated bool change_tyre_pressure = 6;
+}
+
+message FreeRoamResponseEditTyres {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamRequestFillUpTank {
+  PGUID car_id = 1;
+  bool refuel = 2;
+  float fuel_liters = 3;
+  bool full_tank = 4;
+}
+
+message FreeRoamResponseFillUpTank {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamRequestRespawn {
+  PGUID car_id = 1;
+  FreeRoamRespawnType type = 2;
+  int32 pos = 3;
+}
+
+message FreeRoamResponseRespawn {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamRequestResetCar {
+  PGUID car_id = 1;
+  bool refuel_car = 2;
+  bool repair_car = 3;
+  bool refresh_tyres = 4;
+}
+
+message FreeRoamResponseResetCar {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamRequestRoadNetwork {
+  bool request = 1;
+}
+
+message FreeRoamResponseRoadNetwork {
+  CommandResponse response = 1;
+  repeated FreeRoamRoad roads = 2;
+}
+
+message FreeRoamRequestTeleport {
+  PGUID car_id = 1;
+  fixed64 poi_id = 2;
+}
+
+message FreeRoamResponseTeleport {
+  CommandResponse response = 1;
+}
+
+message FreeRoamRequestDriversList {
+  bool request = 1;
+}
+
+message FreeRoamResponseDriversList {
+  CommandResponse response = 1;
+  repeated FreeRoamDriver drivers = 2;
+}
+
+message FreeRoamRequestNavigateTo {
+  PGUID car_id = 1;
+  FreeRoamNavigationDest dest_type = 2;
+  FreeRoamNavigationType type = 3;
+  fixed64 poi_id = 4;
+  PGUID chase_car_id = 5;
+}
+
+message FreeRoamResponseNavigateTo {
+  CommandResponse response = 1;
+}
+
+message FreeRoamRequestTimeattackInfo {
+  fixed64 poi_id = 1;
+}
+
+message FreeRoamResponseTimeattackInfo {
+  CommandResponse response = 1;
+  FreeRoamTimeAttack timeattack = 2;
+}
+
+message FreeRoamRequestNotifyNewArea {
+  PGUID car_id = 1;
+  ZoneData.FreeRoamZone zone = 2;
+}
+
+message FreeRoamResponseNotifyNewArea {
+  CommandResponse response = 1;
+  PGUID car_id = 2;
+}
+
+message FreeRoamCommands {
+  FreeRoamRequestPoiInfo request_poi_info = 1;
+  FreeRoamResponsePoiInfo response_poi_info = 1000;
+  FreeRoamRequestTimeattackCommand request_timeattack_command = 2;
+  FreeRoamResponseTimeattackCommand response_timeattack_command = 1001;
+  FreeRoamRequestCarWash request_car_wash = 3;
+  FreeRoamResponseCarWash response_car_wash = 1002;
+  FreeRoamRequestRepairCar request_repair_car = 4;
+  FreeRoamResponseRepairCar response_repair_car = 1003;
+  FreeRoamRequestEditTyres request_edit_tyres = 5;
+  FreeRoamResponseEditTyres response_edit_tyres = 1004;
+  FreeRoamRequestFillUpTank request_fill_up_tank = 6;
+  FreeRoamResponseFillUpTank response_fill_up_tank = 1005;
+  FreeRoamRequestRespawn request_respawn = 7;
+  FreeRoamResponseRespawn response_respawn = 1006;
+  FreeRoamRequestResetCar request_reset_car = 8;
+  FreeRoamResponseResetCar response_reset_car = 1007;
+  FreeRoamRequestRoadNetwork request_road_network = 9;
+  FreeRoamResponseRoadNetwork response_road_network = 1008;
+  FreeRoamRequestTeleport request_teleport = 10;
+  FreeRoamResponseTeleport response_teleport = 1009;
+  FreeRoamRequestDriversList request_drivers_list = 11;
+  FreeRoamResponseDriversList response_drivers_list = 1010;
+  FreeRoamRequestNavigateTo request_navigate_to = 12;
+  FreeRoamResponseNavigateTo response_navigate_to = 1011;
+  FreeRoamRequestTimeattackInfo request_timeattack_info = 13;
+  FreeRoamResponseTimeattackInfo response_timeattack_info = 1012;
+  FreeRoamRequestNotifyNewArea request_notify_new_area = 14;
+  FreeRoamResponseNotifyNewArea response_notify_new_area = 1013;
+}

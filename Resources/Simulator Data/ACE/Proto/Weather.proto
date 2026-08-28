@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "DateTime.proto";
+import "Options.proto";
+
+enum WeatherDayDataSliceConditionsEnum {
+  WeatherDayDataSliceConditionsEnum_None = 0;
+  WeatherDayDataSliceConditionsEnum_ThunderstormLightRain = 200;
+  WeatherDayDataSliceConditionsEnum_ThunderstormMediumRain = 201;
+  WeatherDayDataSliceConditionsEnum_ThunderstormHeavyRain = 202;
+  WeatherDayDataSliceConditionsEnum_ThunderstormLight = 210;
+  WeatherDayDataSliceConditionsEnum_ThunderstormMedium = 211;
+  WeatherDayDataSliceConditionsEnum_ThunderstormHeavy = 212;
+  WeatherDayDataSliceConditionsEnum_ThunderstormRagged = 221;
+  WeatherDayDataSliceConditionsEnum_ThunderstormLightDrizzle = 230;
+  WeatherDayDataSliceConditionsEnum_ThunderstormMediumDrizzle = 231;
+  WeatherDayDataSliceConditionsEnum_ThunderstormHeavyDrizzle = 232;
+  WeatherDayDataSliceConditionsEnum_LightDrizzle = 300;
+  WeatherDayDataSliceConditionsEnum_MediumDrizzle = 301;
+  WeatherDayDataSliceConditionsEnum_HeavyDrizzle = 302;
+  WeatherDayDataSliceConditionsEnum_LightDrizzleRain = 310;
+  WeatherDayDataSliceConditionsEnum_MediumDrizzleRain = 311;
+  WeatherDayDataSliceConditionsEnum_HeavyDrizzleRain = 312;
+  WeatherDayDataSliceConditionsEnum_LightDrizzleRainShower = 313;
+  WeatherDayDataSliceConditionsEnum_MediumDrizzleRainShower = 314;
+  WeatherDayDataSliceConditionsEnum_DrizzleShower = 321;
+  WeatherDayDataSliceConditionsEnum_LightRain = 500;
+  WeatherDayDataSliceConditionsEnum_MediumRain = 501;
+  WeatherDayDataSliceConditionsEnum_HeavyRain = 502;
+  WeatherDayDataSliceConditionsEnum_VeryHeavyRain = 503;
+  WeatherDayDataSliceConditionsEnum_ExtremeRain = 504;
+  WeatherDayDataSliceConditionsEnum_FreezingRain = 511;
+  WeatherDayDataSliceConditionsEnum_LightShowerRain = 520;
+  WeatherDayDataSliceConditionsEnum_MediumShowerRain = 521;
+  WeatherDayDataSliceConditionsEnum_HeavyShowerRain = 522;
+  WeatherDayDataSliceConditionsEnum_RaggedShowerRain = 531;
+  WeatherDayDataSliceConditionsEnum_LightSnow = 600;
+  WeatherDayDataSliceConditionsEnum_MediumSnow = 601;
+  WeatherDayDataSliceConditionsEnum_HeavySnow = 602;
+  WeatherDayDataSliceConditionsEnum_Sleet = 611;
+  WeatherDayDataSliceConditionsEnum_LightSleetShower = 612;
+  WeatherDayDataSliceConditionsEnum_MediumSleetShower = 613;
+  WeatherDayDataSliceConditionsEnum_LightRainAndSnow = 615;
+  WeatherDayDataSliceConditionsEnum_MediumRainAndSnow = 616;
+  WeatherDayDataSliceConditionsEnum_LightSnowShower = 620;
+  WeatherDayDataSliceConditionsEnum_MediumSnowShower = 621;
+  WeatherDayDataSliceConditionsEnum_HeavySnowShower = 622;
+  WeatherDayDataSliceConditionsEnum_Mist = 701;
+  WeatherDayDataSliceConditionsEnum_Smoke = 711;
+  WeatherDayDataSliceConditionsEnum_Haze = 721;
+  WeatherDayDataSliceConditionsEnum_SandDust = 731;
+  WeatherDayDataSliceConditionsEnum_Fog = 741;
+  WeatherDayDataSliceConditionsEnum_Sand = 751;
+  WeatherDayDataSliceConditionsEnum_Dust = 761;
+  WeatherDayDataSliceConditionsEnum_VolcanicAsh = 762;
+  WeatherDayDataSliceConditionsEnum_Squall = 771;
+  WeatherDayDataSliceConditionsEnum_Tornado = 781;
+  WeatherDayDataSliceConditionsEnum_ClearSky = 800;
+  WeatherDayDataSliceConditionsEnum_FewClouds = 801;
+  WeatherDayDataSliceConditionsEnum_ScatteredClouds = 802;
+  WeatherDayDataSliceConditionsEnum_BrokenClouds = 803;
+  WeatherDayDataSliceConditionsEnum_OvercastClouds = 804;
+}
+
+enum CloudCoverageEnum {
+  CloudCoverageEnum_LoadedMap = 0;
+  CloudCoverageEnum_RandomMap = 1;
+  CloudCoverageEnum_Constant = 2;
+}
+
+message WeatherData {
+  TimePointData now = 1;
+  Vector3Data sun_position = 2;
+  Vector3Data moon_position = 3;
+  float mean_ambient_temperature_c = 4;
+  float ambient_temperature_c = 21;
+  float cloud_coverage = 8;
+  float gloominess = 12;
+  float precipitation = 18;
+  float fog = 11;
+  float humidity = 14;
+  float cloud_pos_x = 15;
+  float cloud_pos_y = 16;
+  int32 pressure_psi = 13;
+  float wind_speed_m_s = 5;
+  float wind_gust = 6;
+  float wind_direction_deg = 7;
+  float initial_global_wetness = 17;
+  bool is_dynamic_weather = 20;
+  reserved 9 to 9;
+}
+
+message WeatherPreset {
+  string name = 1;
+  int32 bad_weather_index = 2;
+  WeatherData weather_data = 3;
+}
+
+message WeatherDayDataSlice {
+  int32 minute_of_the_day = 1;
+  float ambient_temperature_c = 2;
+  float wind_speed_m_s = 3;
+  int32 wind_direction_deg = 4;
+  int32 pressure = 5;
+  int32 humidity = 6;
+  float cloud_level = 7;
+  float cloud_wetness = 8;
+  int32 cloud_type = 9;
+  float rain_level = 10;
+  repeated WeatherDayDataSliceConditionsEnum conditions = 11;
+}
+
+message WeatherDayData {
+  TimePointData day = 1;
+  repeated WeatherDayDataSlice weather_data = 2;
+}
+
+message WeatherDayDataCollection {
+  string weatherStation = 1;
+  double lat = 2;
+  double lon = 3;
+  repeated WeatherDayData days = 4;
+}
+
+message DynamicWeatherData {
+  int32 seed = 1;
+  float ambient_temperature_mean = 2;
+  int32 n_harmonics = 3;
+  float weather_base_mean = 4;
+  float weather_base_deviation = 5;
+  float variability_deviation = 6;
+  repeated float sine_coefficients = 7;
+  repeated float cosine_coefficients = 8;
+  float wind_speed_mean = 11;
+  float wind_speed_deviation = 12;
+  float wind_direction_change = 13;
+  int32 wind_harmonics = 14;
+}
+
+message WeatherNoiseData {
+  float scale = 1;
+  float frequency = 2;
+  float amplitude = 3;
+  int32 order = 4;
+  Vector2Data seed = 5;
+}
+
+message WeatherConfigurationData {
+  message StaticData {
+    WeatherData static_weather = 1;
+  }
+  message DynamicData {
+    WeatherData initial_weather = 1;
+    DynamicWeatherData dynamic_weather = 2;
+  }
+  HumanReadableDateTimeData initial_date_time = 1;
+  float time_multiplier = 2;
+  float recalc_interval_seconds = 3;
+  WeatherNoiseData spatial_noise_data = 4;
+  oneof type {
+    WeatherConfigurationData.StaticData static_data = 50;
+    WeatherConfigurationData.DynamicData dynamic_data = 52;
+  }
+}
+
+message CloudSettings {
+  CloudCoverageEnum coverageType = 1;
+  string weatherMapPath = 8;
+  float constantCoverage = 2;
+  float constantWetness = 3;
+  float mapScrollSpeed = 4;
+  float mapScale = 5;
+  float mapOffset = 6;
+  float mapAngle = 7;
+  float windSpeed = 11;
+  float windAngle = 12;
+  float verticalSpeed = 13;
+  float cloudBase = 21;
+  float cloudThickness = 22;
+  float cloudScale = 23;
+  float erodeDetailScale = 31;
+  Vector3Data erodeScale = 32;
+  float erodeWidth = 33;
+  float erodeHardness = 34;
+  float globalDensity = 35;
+  int32 shadowSteps = 41;
+  float shadowStepSize = 42;
+  float shadowStepScale = 43;
+  float shadowMipDelta = 44;
+  float shadowMipScale = 45;
+  float shadowMipBias = 46;
+}
+
+message FogSettings {
+  Vector3Data sunColor = 1;
+  Vector3Data refractionColor = 2;
+  Vector3Data hazeColor = 3;
+  float hazeTurbidity = 4;
+  float hazeAltitude = 5;
+  Vector3Data fogColor = 6;
+  float fogTurbidity = 7;
+  float fogBase = 8;
+  float fogAltitude = 9;
+  Vector3Data rainColor = 10;
+  float rainFade = 11;
+  Vector3Data ozoneExtinction = 12;
+  float ozoneDensity = 13;
+}

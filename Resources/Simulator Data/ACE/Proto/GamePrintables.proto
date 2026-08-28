@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "DateTime.proto";
+
+message PrintableDriverAccount {
+  string account_id = 1;
+  repeated PGUID available_driver_guids = 2;
+  PGUID current_driver_guid = 3;
+  bool is_sandbox = 4;
+}
+
+message PrintableDriverProfile {
+  PGUID guid = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string lumirank_name = 4;
+  string nickname = 5;
+  string nationality_alpha_3 = 6;
+  int32 age = 7;
+  int32 year_of_birth = 8;
+}
+
+message PrintableDriverStatistics {
+  PGUID guid = 1;
+  float travelled_distance = 2;
+  float consumed_fuel = 3;
+  int32 first_places = 4;
+  int32 second_places = 5;
+  int32 third_places = 6;
+  int32 pole_positions = 7;
+  int32 started_races = 8;
+  int32 finished_races = 9;
+  int32 login_consecutive_days = 10;
+  int32 total_login_days = 11;
+  HumanReadableDateTimeData last_login_date = 12;
+  int32 total_hours = 13;
+  string last_session_statistics = 14;
+}

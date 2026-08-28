@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+import "Options.proto";
+
+message DamperSettings {
+  float slow_bump = 1;
+  float fast_bump = 2;
+  float slow_rebound = 3;
+  float fast_rebound = 4;
+}
+
+message BumpStopSettings {
+  float range = 1;
+  float rate = 2;
+}
+
+message SuspensionSettings {
+  float wheel_rate = 1;
+  BumpStopSettings bump_stop_up = 2;
+  BumpStopSettings bump_stop_down = 3;
+  float helper_rate = 4;
+  float helper_range = 5;
+}
+
+message BrakeSettings {
+  float front_bias = 1;
+  float torque_multiplier = 2;
+  repeated float brake_ducts = 3;
+}
+
+message DifferentialSettings {
+  float power = 1;
+  float coast = 2;
+  float preload = 3;
+}
+
+message ElectronicsSettings {
+  float tc1 = 1;
+  float tc2 = 2;
+  float abs = 3;
+  float esc = 6;
+  float ebb = 11;
+  float engine_map = 4;
+  float telemetry_laps_to_record = 5;
+  float turbo_boost_lv = 7;
+  float ers_deployment_map = 8;
+  float ers_recharge_lv = 9;
+  float ers_heat_charging = 10;
+}
+
+message AeroSettings {
+  repeated float collar_positions_mm = 1;
+  float front_target_height = 2;
+  float rear_target_height = 3;
+  float front_wing_angle = 4;
+  float rear_wing_angle = 5;
+}
+
+message MechanicalBalance {
+  repeated float arbs = 1;
+  float steer_ratio = 2;
+  BrakeSettings brakes = 3;
+  DifferentialSettings differential = 4;
+}
+
+message TyreAlignment {
+  float pressure = 1;
+  float camber = 2;
+  float toe = 3;
+  float caster = 4;
+  float static_camber = 5;
+  float toe_out_linear = 6;
+  float compound = 7;
+}
+
+message FuelStrategy {
+  float fuel = 1;
+}
+
+message CarSetupData {
+  MechanicalBalance mechanical_balance = 1;
+  repeated SuspensionSettings suspensions = 2;
+  repeated DamperSettings dampers = 3;
+  repeated TyreAlignment alignments = 4;
+  ElectronicsSettings electronics = 5;
+  AeroSettings aero = 6;
+  FuelStrategy fuel_strategy = 7;
+  string final_state_name = 9;
+  int32 version = 10;
+  bool is_setup_shared = 11;
+}

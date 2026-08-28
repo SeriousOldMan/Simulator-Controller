@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+import "Customization.proto";
+import "LogicScene.proto";
+import "GameplayUI.proto";
+import "Scene.proto";
+
+enum LicenseType {
+  LICENSE_ENTRY = 0;
+  LICENSE_SPORTSCAR = 1;
+  LICENSE_SUPERCAR = 2;
+  LICENSE_HYPERCAR = 3;
+  LICENSE_RACING_1 = 4;
+  LICENSE_RACING_2 = 5;
+  LICENSE_RACING_3 = 6;
+}
+
+enum CarSelectionOwnerShipState {
+  CarSelectionOwnerShipState_ALL = 0;
+  CarSelectionOwnerShipState_OWNED = 1;
+  CarSelectionOwnerShipState_RENTAL = 2;
+  CarSelectionOwnerShipState_FIRST_PURCHASE = 3;
+  CarSelectionOwnerShipState_DEALERSHIP = 4;
+  CarSelectionOwnerShipState_USED = 5;
+}
+
+enum PlayerMode {
+  PlayerMode_GameEconomy = 0;
+  PlayerMode_Sandbox = 1;
+}
+
+enum DriverNamePlates {
+  DriverNamePlates_MPOnly = 0;
+  DriverNamePlates_AlwaysOff = 1;
+  DriverNamePlates_AlwaysOn = 2;
+}
+
+message CarConfiguration {
+  string name = 1;
+  string display_name = 2;
+  string note = 4;
+  bool is_oem = 3;
+}
+
+message CarColorPreset {
+  string name = 1;
+  string display_name = 2;
+}
+
+message CarManufacturer {
+  int32 id = 1;
+  string name = 2;
+  string logo_path = 4;
+}
+
+message CarRandomCustomization {
+  int32 id = 1;
+  string desc = 2;
+  string path = 3;
+}
+
+message CarModel {
+  string car_guid = 1;
+  PGUID car_pguid = 100;
+  string name = 3;
+  string display_name = 4;
+  bool is_enabled = 20;
+  int32 year = 6;
+  CarContentData.Property1 property_1 = 30;
+  CarContentData.Property2 property_2 = 31;
+  CarContentData.Property3 property_3 = 32;
+  CarManufacturer manufacturer = 9;
+  CarConfiguration configuration = 10;
+  CarColorPreset preset = 11;
+  repeated CarRandomCustomization oem_path = 14;
+  float average_skill = 13;
+  float performance_indicator = 42;
+  CarSelectionOwnerShipState ownership_state = 17;
+  float total_km = 18;
+  repeated CarSubCategorizations sub_categories = 19;
+  int32 ballast = 24;
+  float restrictor = 25;
+  int32 car_number = 27;
+  DriverModelType driver_model_type = 26;
+  CarSpecsData car_specs = 28;
+  bool is_ai_drivable = 33;
+  bool is_mod = 34;
+  reserved 2 to 2;
+  reserved 7 to 7;
+  reserved 8 to 8;
+  reserved 12 to 12;
+}
+
+message DriverProfileData {
+  repeated DriverSimpleData available_drivers = 1;
+  PGUID current_driver_pguid = 3;
+  reserved 2 to 2;
+}
+
+message DriverProgressionData {
+  double xp_points = 1;
+  int64 money = 2;
+  int32 current_level = 3;
+  float xp_threshold_current_level = 4;
+  float xp_threshold_next_level = 5;
+  float current_xp_per_hour = 6;
+}
+
+message DriverLicenseData {
+  repeated DriverLicense license = 1;
+}
+
+message DriverLicense {
+  LicenseType type = 100;
+  string license_category_guid = 5;
+  bool is_completed = 6;
+  int64 total_time = 7;
+  repeated DriverLicenseEvent license_events = 8;
+}
+
+message DriverLicenseEvent {
+  string special_event_guid = 1;
+  int64 event_time = 2;
+  int64 medal = 3;
+  int64 event_index = 4;
+  int32 attempts = 5;
+}
+
+message DriverPersonalData {
+  string first_name = 1;
+  string last_name = 2;
+  string shortcut_name = 3;
+  string nickname = 4;
+  string nationality_alpha_3 = 5;
+  int32 age = 6;
+  string calculated_discipline_tag = 7;
+  int32 year_of_birth = 9;
+  reserved 8 to 8;
+}
+
+message CarFinalStateWithConsumable {
+  CarConsumableStatus car_consumable_status = 1;
+  CarFinalStateData final_state = 2;
+}
+
+message DriverGarageData {
+  repeated CarFinalStateWithConsumable sandbox_cars = 5;
+  repeated CarFinalStateWithConsumable purchased_cars = 6;
+  repeated string purchased_cars_filenames = 7;
+  repeated CarFinalStates owned_parts = 2;
+  PGUID selected_car_pguid = 4;
+  int32 version = 10;
+  reserved 1 to 1;
+  reserved 3 to 3;
+}
+
+message DriverSimpleData {
+  PGUID driver_pguid = 100;
+  string first_name = 2;
+  string last_name = 3;
+  reserved 1 to 1;
+}
+
+message PersonalSettings {
+  int32 version = 100;
+  PlayerMode player_mode = 1;
+  bool skip_intro = 2;
+  bool show_other_cars_notifications = 24;
+  fixed32 replay_length = 4;
+  bool disabled_idle_camera_sequence = 6;
+  string language = 5;
+  UINotificationPriorityType ui_notification_priority = 23;
+  DriverNamePlates driver_nameplates = 7;
+  ShowroomCameraMode showroom_camera_mode = 9;
+  float vr_panel_distance = 21;
+  float vr_panel_scale = 22;
+  bool ignore_h_shifter = 25;
+  reserved 3 to 3;
+  reserved 8 to 8;
+}
+
+message BackendCars {
+  repeated CarManufacturer manufacturers = 1;
+  repeated CarModel cars = 2;
+  CarModel current_car = 3;
+}
+
+message DriverManager {
+  CarFinalStateWithConsumable current_viewed_car = 6;
+  CarSelectionOwnerShipState current_viewed_car_ownership_state = 12;
+  DriverFinalStateData current_viewed_driver = 8;
+  bool update_viewed_car = 11;
+  reserved 7 to 7;
+  reserved 10 to 10;
+  reserved 13 to 13;
+}
+
+message DriverToBackend {
+  string account_id = 1;
+  DriverPersonalData driver_personal_data = 2;
+  DriverProgressionData driver_progression_data = 3;
+  DriverGarageData driver_garage_data = 4;
+  DriverLicenseData driver_license_data = 5;
+}

@@ -13,7 +13,7 @@ namespace ACECarSetupConverter
         static void readSetup(string protoFile, string jsonFile)
         {
             var bytes = File.ReadAllBytes(protoFile);
-            var request = new ConvertToJsonRequest(protoDefinition, "ACEvo.CarSetup", bytes);
+            var request = new ConvertToJsonRequest(protoDefinition, "CarSetupData", bytes);
 
             File.WriteAllText(jsonFile, new Converter().ConvertAsync(request).Result);
         }
@@ -21,7 +21,7 @@ namespace ACECarSetupConverter
         static void writeSetup(string jsonFile, string protoFile)
         {
             var json = File.ReadAllText(jsonFile);
-            var request = new ConvertToProtoBufRequest(protoDefinition, "ACEvo.CarSetup", json);
+            var request = new ConvertToProtoBufRequest(protoDefinition, "CarSetupData", json);
 
             File.WriteAllBytes(protoFile, new Converter().ConvertAsync(request).Result);
         }

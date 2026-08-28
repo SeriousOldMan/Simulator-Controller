@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "Math.proto";
+
+enum CarStance {
+  CarStance_ErrorNoStance = 0;
+  CarStance_StopWait_Engine_Off = 1;
+  CarStance_StopWait = 2;
+  CarStance_SlowdownForObstacle = 3;
+  CarStance_Street_Legal = 10;
+  CarStance_Street_Sporty = 11;
+  CarStance_Street_Granny = 12;
+  CarStance_RaceFormation = 30;
+  CarStance_RaceFormationDoubleFile = 31;
+  CarStance_RaceRevPreStart = 32;
+  CarStance_RaceFullSend = 33;
+  CarStance_RaceWarmup = 34;
+  CarStance_RaceCooldown = 35;
+}
+
+message CarLocation {
+  enum Type {
+    Unassigned = 0;
+    Pitlane = 1;
+    Pitentry = 2;
+    Pitexit = 3;
+    Track = 4;
+  }
+  CarLocation.Type type = 1;
+}
+
+message CarLocationMessage {
+  CarLocation location = 1;
+  PGUID car_id = 2;
+  CarLocation last_location = 3;
+}
+
+message CarLocationTarget {
+  enum Type {
+    IdealLine = 0;
+    Pitlane = 1;
+    Pitbox = 2;
+  }
+  CarLocationTarget.Type type = 1;
+  int32 duration_seconds = 2;
+  TransformData parking_box = 3;
+  CarStance parking_stance = 4;
+}
+
+message CarLocationTargetMessage {
+  CarLocationTarget location = 1;
+  PGUID car_id = 2;
+}
+
+message CarActionRequest {
+  enum Type {
+    Undefined = 0;
+    Retirement = 1;
+    TeleportToPit_AndStay = 5;
+    TeleportToPit_AndRelaunch = 6;
+    TeleportToPit_AndRepair = 7;
+  }
+  message Message {
+    PGUID car_id = 1;
+    CarActionRequest.Type requested_action = 2;
+  }
+}

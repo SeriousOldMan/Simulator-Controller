@@ -1,0 +1,163 @@
+syntax = "proto3";
+
+import "CarDataCache.proto";
+import "PlatformCommands.proto";
+
+message CarSetupUISlider {
+  string name = 1;
+  float value = 2;
+  float step = 3;
+  float min = 4;
+  float max = 5;
+  float precision = 6;
+  bool is_active = 7;
+  bool hide_value = 8;
+  bool treat_as_boolean = 9;
+  string unit = 10;
+}
+
+message CarSetupUIData {
+  repeated CarSetupUISlider sliders = 1;
+}
+
+message CarSetupStateData {
+  CarSetupUIData car_setup = 1;
+  bool is_on_flat_plane = 2;
+  bool has_controller_converged = 4;
+  reserved 3 to 3;
+}
+
+message CarLastReadings {
+  repeated float tyre_temp_l = 1;
+  repeated float tyre_temp_c = 2;
+  repeated float tyre_temp_r = 3;
+  repeated float tyre_pressure = 4;
+  repeated float tyre_wear = 5;
+  repeated float pad_wear = 6;
+  repeated float disc_wear = 7;
+}
+
+message CarSetupRequestInit {
+  bool im_empty = 1;
+}
+
+message CarSetupResponseInit {
+  bool is_initialized = 1;
+  CarSetupStateData state = 2;
+  CarLastReadings readings = 5;
+  CarTyresRuntimeSettings tyres_runtime_settings = 3;
+  float ffb_gain = 4;
+  bool use_single_compound = 100;
+}
+
+message CarSetupRequestClose {
+  bool im_empty = 1;
+}
+
+message CarSetupResponseClose {
+  bool is_initialized = 1;
+  bool can_exit = 2;
+}
+
+message CarSetupRequestStateData {
+  bool im_empty = 1;
+}
+
+message CarSetupResponseStateData {
+  CarSetupStateData state = 1;
+}
+
+message CarSetupRequestApply {
+  CarSetupUIData car_setup = 1;
+}
+
+message CarSetupResponseApply {
+  CarSetupUIData car_setup = 1;
+}
+
+message CarSetupRequestSelect {
+  int32 index = 1;
+}
+
+message CarSetupResponseSelect {
+  CarSetupStateData state = 1;
+  CarSetupUIData car_setup = 2;
+}
+
+message CarSetupRequestPresetList {
+  int32 version = 2;
+  string car = 3;
+  string track = 4;
+  reserved 1 to 1;
+}
+
+message CarSetupResponsePresetList {
+  CommandResponse response = 1;
+  repeated string filenames = 2;
+}
+
+message CarSetupRequestLoadPreset {
+  string filename = 1;
+}
+
+message CarSetupResponseLoadPreset {
+  CommandResponse response = 1;
+}
+
+message CarSetupRequestLoadDefault {
+  bool im_empty = 2;
+  reserved 1 to 1;
+}
+
+message CarSetupResponseLoadDefault {
+  CommandResponse response = 1;
+}
+
+message CarSetupRequestSavePreset {
+  string filename = 1;
+}
+
+message CarSetupResponseSavePreset {
+  CommandResponse response = 1;
+}
+
+message CarSetupRequestDeletePreset {
+  string filename = 1;
+}
+
+message CarSetupResponseDeletePreset {
+  CommandResponse response = 1;
+}
+
+message CarSetupRequestChangeCarFFB {
+  float ffb_multiplier = 1;
+}
+
+message CarSetupResponseChangeCarFFB {
+  float ffb_multiplier = 1;
+}
+
+message CarSetupCommands {
+  CarSetupRequestInit request_init = 1;
+  CarSetupResponseInit response_init = 1000;
+  CarSetupRequestClose request_close = 2;
+  CarSetupResponseClose response_close = 1001;
+  CarSetupRequestStateData request_state_data = 3;
+  CarSetupResponseStateData response_state_data = 1002;
+  CarSetupRequestApply request_apply = 4;
+  CarSetupResponseApply response_apply = 1003;
+  CarSetupRequestSelect request_select = 5;
+  CarSetupResponseSelect response_select = 1004;
+  CarSetupRequestPresetList request_preset_list = 6;
+  CarSetupResponsePresetList response_preset_list = 1005;
+  CarSetupRequestLoadPreset request_load_preset = 7;
+  CarSetupResponseLoadPreset response_load_preset = 1006;
+  CarSetupRequestLoadDefault request_load_default = 8;
+  CarSetupResponseLoadDefault response_load_default = 1007;
+  CarSetupRequestSavePreset request_save_preset = 9;
+  CarSetupResponseSavePreset response_save_preset = 1008;
+  CarSetupRequestDeletePreset request_delete_preset = 10;
+  CarSetupResponseDeletePreset response_delete_preset = 1009;
+  CarSetupRequestChangeCarFFB request_change_car_f_f_b = 11;
+  CarSetupResponseChangeCarFFB response_change_car_f_f_b = 1010;
+}

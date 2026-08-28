@@ -1,0 +1,150 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+
+message PostProcessingSettings {
+  enum Quality {
+    Quality_Low = 0;
+    Quality_Medium = 1;
+    Quality_High = 2;
+    Quality_Ultra = 3;
+  }
+  enum Resolution {
+    Resolution_Quarter = 0;
+    Resolution_Half = 1;
+  }
+  message Tonemapper {
+    float black_level = 2;
+    float white_level = 3;
+    float mid_section_start = 4;
+    float mid_section_length = 5;
+    float contrast = 6;
+    reserved 1 to 1;
+  }
+  message WhiteBalance {
+    float temperature = 1;
+    float tint = 2;
+  }
+  message ColorCorrection {
+    Vector4Data saturation = 1;
+    Vector4Data contrast = 2;
+    Vector4Data gamma = 3;
+    Vector4Data gain = 4;
+    Vector4Data offset = 5;
+  }
+  message ColorCorrectionRange {
+    float maxShadowsRange = 1;
+    float minHighlightsRange = 2;
+  }
+  message PathToWhite {
+    float pathToWhite = 1;
+    float overExposeSaturation = 2;
+  }
+  message ColorGrading {
+    PostProcessingSettings.WhiteBalance whiteBalance = 1;
+    PostProcessingSettings.ColorCorrection master = 2;
+    PostProcessingSettings.ColorCorrection shadows = 3;
+    PostProcessingSettings.ColorCorrection midtones = 4;
+    PostProcessingSettings.ColorCorrection highlights = 5;
+    PostProcessingSettings.ColorCorrectionRange colorCorrectionRange = 6;
+    PostProcessingSettings.PathToWhite pathToWhite = 7;
+  }
+  message Exposure {
+    message CameraModeSelector {
+      bool cameraModeFree = 1;
+      bool cameraModeDrivableInternal = 2;
+      bool cameraModeDrivableExternal = 3;
+      bool cameraModeOnboard = 4;
+      bool cameraModeTV = 5;
+      bool cameraModeShowroom = 6;
+      bool cameraModeHelicopter = 7;
+    }
+    bool enableAutoExposure = 1;
+    bool ev100FromCameraSettings = 2;
+    float exposureCompensation = 3;
+    float minBrightness = 4;
+    float maxBrightness = 5;
+    float lowPercentage = 6;
+    float highPercentage = 7;
+    float speedUp = 8;
+    float speedDown = 9;
+    Vector2Data histogramLogLuminanceRange = 10;
+    PostProcessingSettings.Quality quality = 11;
+    PostProcessingSettings.Exposure.CameraModeSelector autoExposureSkipTheFocusedCar = 12;
+  }
+  message DepthOfField {
+    bool enable = 1;
+    float aperture = 4;
+    float foregroundBlur = 5;
+    float backgroundBlur = 6;
+    float cocDepthRadius = 2;
+    int32 cocSampleCount = 3;
+    float backgroundDistance = 7;
+    float foregroundDistance = 8;
+    bool explicitFocusDistance = 9;
+    float focusDistanceOverride = 10;
+    bool explicitFocusCenter = 11;
+    Vector2Data focusCenter = 12;
+  }
+  message EyeParametrization {
+    bool eyeFocusVignette = 1;
+    float eyeFocusPow = 2;
+    float eyeFocusIntensity = 3;
+  }
+  message LensEffect {
+    float vignette_intensity = 1;
+    float vignette_radius = 2;
+    float chromatic_aberration = 3;
+    float fisheye_strength = 4;
+  }
+  message DynamicSettings {
+    message OptionalCurve {
+      string curvePath = 1;
+    }
+    message OptionalCurve4 {
+      string curvePath = 1;
+    }
+    message Exposure {
+      PostProcessingSettings.DynamicSettings.OptionalCurve exposureCompensationBySunAngle = 3;
+      PostProcessingSettings.DynamicSettings.OptionalCurve multiplicativeExposureCompensationByGloominess = 6;
+      PostProcessingSettings.DynamicSettings.OptionalCurve minBrightnessBySunAngle = 4;
+      PostProcessingSettings.DynamicSettings.OptionalCurve maxBrightnessBySunAngle = 5;
+    }
+    message WhiteBalance {
+      PostProcessingSettings.DynamicSettings.OptionalCurve temperatureBySunAngle = 1;
+      PostProcessingSettings.DynamicSettings.OptionalCurve additiveTemperatureBySunAngle = 3;
+      PostProcessingSettings.DynamicSettings.OptionalCurve tintBySunAngle = 2;
+    }
+    message ColorCorrection {
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 gammaBySunAngle = 13;
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 additiveGammaByGlominess = 16;
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 gainBySunAngle = 14;
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 saturationBySunAngle = 15;
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 additiveContrastByGlominess = 17;
+      reserved 3 to 3;
+      reserved 4 to 4;
+    }
+    message ColorCorrection2 {
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 gainBySunAngle = 14;
+      PostProcessingSettings.DynamicSettings.OptionalCurve4 additiveGainByGlominess = 15;
+    }
+    message ColorGrading {
+      PostProcessingSettings.DynamicSettings.WhiteBalance whiteBalance = 1;
+      PostProcessingSettings.DynamicSettings.ColorCorrection master = 2;
+      PostProcessingSettings.DynamicSettings.ColorCorrection2 shadows = 3;
+      PostProcessingSettings.DynamicSettings.ColorCorrection2 midtones = 4;
+      PostProcessingSettings.DynamicSettings.ColorCorrection2 highlights = 5;
+    }
+    PostProcessingSettings.DynamicSettings.Exposure exposure = 1;
+    PostProcessingSettings.DynamicSettings.ColorGrading colorGrading = 3;
+  }
+  PostProcessingSettings.Exposure exposure = 1;
+  PostProcessingSettings.Tonemapper tonemapper = 2;
+  PostProcessingSettings.ColorGrading colorGrading = 3;
+  PostProcessingSettings.EyeParametrization eyeParameters = 27;
+  PostProcessingSettings.DepthOfField depthOfField = 28;
+  PostProcessingSettings.LensEffect lensEffect = 29;
+  PostProcessingSettings.DynamicSettings dynamicSettings = 23;
+  reserved 7 to 22;
+}

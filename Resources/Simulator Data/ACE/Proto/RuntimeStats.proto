@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+message PhysicsRuntimeStats {
+  float cpuOccupancy = 1;
+  int32 lateCount = 2;
+  double debugGameTimeMultiplier = 3;
+  bool physicsThreadPerformanceWarning = 4;
+  repeated float stepTimeLegend = 5;
+  repeated int32 stepTimes = 6;
+  float ai_thread_occupancy = 7;
+  int32 ai_thread_budget = 8;
+  repeated int32 ai_thread_step_times = 9;
+}
+
+message GameRuntimeStats {
+  float fps = 1;
+  float fps_avg = 2;
+}
+
+message AudioRuntimeStats {
+  int32 virtual_channels = 1;
+  int32 real_channels = 2;
+  float cpu = 3;
+  float dsp = 4;
+}

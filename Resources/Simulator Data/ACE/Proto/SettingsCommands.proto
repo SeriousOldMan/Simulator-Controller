@@ -1,0 +1,249 @@
+syntax = "proto3";
+
+import "AudioData.proto";
+import "Renderer.proto";
+import "LogicScene.proto";
+import "PlatformCommands.proto";
+import "google/protobuf/any.proto";
+import "Weather.proto";
+import "Math.proto";
+
+enum VideoSettingsSection {
+  VideoSettingsSection_Display = 0;
+  VideoSettingsSection_Graphics = 1;
+  VideoSettingsSection_VR = 2;
+}
+
+message ChangeSceneGraphics {
+  message ShowroomHdri {
+    string hdri = 1;
+  }
+  oneof type {
+    WeatherData weather_data = 1;
+    ChangeSceneGraphics.ShowroomHdri hdri = 2;
+    ShowroomData.SceneCameraOptions scene_camera_options = 3;
+    TransformData optional_matrix = 4;
+  }
+}
+
+message SettingsRequestAudioChangeVolume {
+  AudioVolumeType volume_type = 1;
+  float volume_value = 2;
+}
+
+message SettingsResponseAudioChangeVolume {
+  bool im_empty = 1;
+}
+
+message SettingsRequestAudioDeviceList {
+  bool im_empty = 1;
+}
+
+message SettingsResponseAudioDeviceList {
+  CommandResponse response = 1;
+  repeated string devices = 2;
+}
+
+message SettingsRequestAudioChangeDevice {
+  int32 device_index = 1;
+}
+
+message SettingsResponseAudioChangeDevice {
+  CommandResponse response = 1;
+  AudioDeviceData device_data = 2;
+}
+
+message SettingsRequestAudio {
+  bool im_empty = 1;
+}
+
+message SettingsResponseAudio {
+  AudioSettingsData settings = 1;
+}
+
+message SettingsRequestResetAudio {
+  bool im_empty = 1;
+}
+
+message SettingsResponseResetAudio {
+  bool im_empty = 1;
+}
+
+message SettingsRequestSaveAudio {
+  bool im_empty = 1;
+}
+
+message SettingsResponseSaveAudio {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestAudioPresetList {
+  int32 version = 1;
+}
+
+message SettingsResponseAudioPresetList {
+  CommandResponse response = 1;
+  repeated string filenames = 2;
+}
+
+message SettingsRequestAudioLoadPreset {
+  string filename = 1;
+}
+
+message SettingsResponseAudioLoadPreset {
+  CommandResponse response = 1;
+  AudioSettingsData settings = 2;
+}
+
+message SettingsRequestAudioSavePreset {
+  string filename = 1;
+  int32 version = 2;
+}
+
+message SettingsResponseAudioSavePreset {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestAudioDeletePreset {
+  string filename = 1;
+}
+
+message SettingsResponseAudioDeletePreset {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestAudioPlayPreset {
+  AudioGuiEventType type = 1;
+}
+
+message SettingsResponseAudioPlayPreset {
+  bool im_empty = 1;
+}
+
+message SettingsRequestVideo {
+  bool im_empty = 1;
+}
+
+message SettingsResponseVideo {
+  VideoSettings video = 1;
+  VideoSettingsRules video_settings_rules = 2;
+  AdditionalSettings additional_settings = 3;
+  bool is_vr_enabled = 4;
+}
+
+message SettingsRequestResetVideo {
+  bool is_display = 1;
+  VideoSettingsSection target = 4;
+}
+
+message SettingsResponseResetVideo {
+  bool im_empty = 1;
+}
+
+message SettingsRequestSaveVideo {
+  VideoSettings.Display display = 1;
+  VideoSettings.Graphics graphics = 2;
+  bool is_display = 3;
+  VideoSettingsSection target = 4;
+  VideoSettings.VirtualReality vr = 5;
+}
+
+message SettingsResponseSaveVideo {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestVideoPresetList {
+  int32 version = 1;
+}
+
+message SettingsResponseVideoPresetList {
+  CommandResponse response = 1;
+  repeated string filenames = 2;
+}
+
+message SettingsRequestVideoLoadPreset {
+  string filename = 1;
+}
+
+message SettingsResponseVideoLoadPreset {
+  CommandResponse response = 1;
+  VideoSettings video = 2;
+}
+
+message SettingsRequestVideoSavePreset {
+  string filename = 1;
+  VideoSettings.Display display = 2;
+  VideoSettings.Graphics graphics = 3;
+}
+
+message SettingsResponseVideoSavePreset {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestVideoDeletePreset {
+  string filename = 1;
+}
+
+message SettingsResponseVideoDeletePreset {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestReplaySettings {
+}
+
+message SettingsResponseReplaySettings {
+  ReplaySettings settings = 1;
+  CommandResponse response = 10;
+}
+
+message SettingsRequestReplaySaveSettings {
+  ReplaySettings settings = 1;
+}
+
+message SettingsResponseReplaySaveSettings {
+  ReplaySettings settings = 1;
+  CommandResponse response = 10;
+}
+
+message SettingsCommands {
+  SettingsRequestAudioChangeVolume request_audio_change_volume = 1;
+  SettingsResponseAudioChangeVolume response_audio_change_volume = 1000;
+  SettingsRequestAudioDeviceList request_audio_device_list = 2;
+  SettingsResponseAudioDeviceList response_audio_device_list = 1001;
+  SettingsRequestAudioChangeDevice request_audio_change_device = 3;
+  SettingsResponseAudioChangeDevice response_audio_change_device = 1002;
+  SettingsRequestAudio request_audio = 4;
+  SettingsResponseAudio response_audio = 1003;
+  SettingsRequestResetAudio request_reset_audio = 5;
+  SettingsResponseResetAudio response_reset_audio = 1004;
+  SettingsRequestSaveAudio request_save_audio = 6;
+  SettingsResponseSaveAudio response_save_audio = 1005;
+  SettingsRequestAudioPresetList request_audio_preset_list = 7;
+  SettingsResponseAudioPresetList response_audio_preset_list = 1006;
+  SettingsRequestAudioLoadPreset request_audio_load_preset = 8;
+  SettingsResponseAudioLoadPreset response_audio_load_preset = 1007;
+  SettingsRequestAudioSavePreset request_audio_save_preset = 9;
+  SettingsResponseAudioSavePreset response_audio_save_preset = 1008;
+  SettingsRequestAudioDeletePreset request_audio_delete_preset = 10;
+  SettingsResponseAudioDeletePreset response_audio_delete_preset = 1009;
+  SettingsRequestAudioPlayPreset request_audio_play_preset = 11;
+  SettingsResponseAudioPlayPreset response_audio_play_preset = 1010;
+  SettingsRequestVideo request_video = 12;
+  SettingsResponseVideo response_video = 1011;
+  SettingsRequestResetVideo request_reset_video = 13;
+  SettingsResponseResetVideo response_reset_video = 1012;
+  SettingsRequestSaveVideo request_save_video = 14;
+  SettingsResponseSaveVideo response_save_video = 1013;
+  SettingsRequestVideoPresetList request_video_preset_list = 15;
+  SettingsResponseVideoPresetList response_video_preset_list = 1014;
+  SettingsRequestVideoLoadPreset request_video_load_preset = 16;
+  SettingsResponseVideoLoadPreset response_video_load_preset = 1015;
+  SettingsRequestVideoSavePreset request_video_save_preset = 17;
+  SettingsResponseVideoSavePreset response_video_save_preset = 1016;
+  SettingsRequestVideoDeletePreset request_video_delete_preset = 18;
+  SettingsResponseVideoDeletePreset response_video_delete_preset = 1017;
+  SettingsRequestReplaySettings request_replay_settings = 19;
+  SettingsResponseReplaySettings response_replay_settings = 1018;
+  SettingsRequestReplaySaveSettings request_replay_save_settings = 20;
+  SettingsResponseReplaySaveSettings response_replay_save_settings = 1019;
+}

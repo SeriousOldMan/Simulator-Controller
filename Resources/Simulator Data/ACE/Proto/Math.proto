@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+message Vector2Data {
+  float x = 1;
+  float y = 2;
+}
+
+message Vector3Data {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Vector4Data {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float w = 4;
+}
+
+message QuaternionData {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float w = 4;
+}
+
+message MatrixData {
+  float m00 = 1;
+  float m01 = 2;
+  float m02 = 3;
+  float m03 = 4;
+  float m10 = 5;
+  float m11 = 6;
+  float m12 = 7;
+  float m13 = 8;
+  float m20 = 9;
+  float m21 = 10;
+  float m22 = 11;
+  float m23 = 12;
+  float m30 = 13;
+  float m31 = 14;
+  float m32 = 15;
+  float m33 = 16;
+}
+
+message TransformData {
+  Vector3Data position = 1;
+  Vector3Data rotation = 2;
+  Vector3Data scale = 3;
+}
+
+message CurveData {
+  repeated Vector2Data values = 1;
+}
+
+message CurveDataEx {
+  message Point {
+    float t = 1;
+    float value = 10;
+    Vector2Data anchor_left = 3;
+    Vector2Data anchor_right = 4;
+    reserved 2 to 2;
+    reserved 5 to 5;
+    reserved 6 to 6;
+  }
+  repeated CurveDataEx.Point points = 1;
+}
+
+message CurvesDataEx {
+  repeated CurveDataEx curves = 1;
+}
+
+message Surface3dData {
+  int32 sizeX = 1;
+  int32 sizeY = 2;
+  float minX = 3;
+  float maxX = 4;
+  float minY = 5;
+  float maxY = 6;
+  repeated float values = 7;
+  repeated float interp_coefs = 8;
+  bool coefs_updated = 9;
+}
+
+message SplinePointData {
+  Vector3Data point = 1;
+  float point_length = 2;
+  int32 tag = 3;
+}
+
+message InterpolatingSplineData {
+  enum InterpolationMode {
+    Linear = 0;
+    Bezier = 1;
+    CatmulRom = 2;
+    BSpline = 3;
+    NThBezier = 4;
+  }
+  message Grid {
+    message Cell {
+      repeated int32 closest_indices = 1;
+    }
+    message Row {
+      repeated InterpolatingSplineData.Grid.Cell cells = 1;
+    }
+    Vector3Data max_extreme = 1;
+    Vector3Data min_extreme = 2;
+    int32 neighbors_considered_number = 3;
+    double sampling_density = 4;
+    repeated InterpolatingSplineData.Grid.Row rows = 5;
+  }
+  repeated SplinePointData points = 1;
+  double length = 2;
+  bool is_closed = 3;
+  InterpolatingSplineData.InterpolationMode mode = 5;
+  InterpolatingSplineData.Grid grid = 6;
+}

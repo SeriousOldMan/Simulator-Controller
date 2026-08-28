@@ -1,0 +1,2147 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+import "LogicScene.proto";
+import "CameraProperties.proto";
+import "google/protobuf/any.proto";
+
+enum BaseMeshType {
+  BaseMeshType_Tyre_fl = 0;
+  BaseMeshType_Tyre_fr = 1;
+  BaseMeshType_Tyre_rl = 2;
+  BaseMeshType_Tyre_rr = 3;
+  BaseMeshType_Rim_fl = 4;
+  BaseMeshType_Rim_fr = 5;
+  BaseMeshType_Rim_rl = 6;
+  BaseMeshType_Rim_rr = 7;
+  BaseMeshType_Rim_fl_blur = 8;
+  BaseMeshType_Rim_fr_blur = 9;
+  BaseMeshType_Rim_rl_blur = 10;
+  BaseMeshType_Rim_rr_blur = 11;
+  BaseMeshType_Interior = 12;
+  BaseMeshType_SteeringWheel = 13;
+  BaseMeshType_SeatbeltOn = 14;
+  BaseMeshType_SeatbeltOff = 15;
+  BaseMeshType_HarnessOn = 16;
+  BaseMeshType_HarnessOff = 17;
+  BaseMeshType_SafetyNetOn = 18;
+  BaseMeshType_SafetyNetOff = 19;
+  BaseMeshType_PlateFront = 20;
+  BaseMeshType_PlateRear = 21;
+  BaseMeshType_Driver = 22;
+  BaseMeshType_SteeringCable = 23;
+  BaseMeshType_Caliper_fl = 24;
+  BaseMeshType_Caliper_fr = 25;
+  BaseMeshType_Caliper_rl = 26;
+  BaseMeshType_Caliper_rr = 27;
+  BaseMeshType_RaceDevice1 = 28;
+  BaseMeshType_RaceDevice2 = 29;
+  BaseMeshType_RaceDevice3 = 30;
+  BaseMeshType_RaceDevice4 = 31;
+  BaseMeshType_Count = 32;
+}
+
+enum ComponentType {
+  ComponentType_CarBody = 0;
+  ComponentType_SteeringWheel = 1;
+  ComponentType_WheelFL = 2;
+  ComponentType_WheelFR = 3;
+  ComponentType_WheelRL = 4;
+  ComponentType_WheelRR = 5;
+  ComponentType_SuspFL = 6;
+  ComponentType_SuspFR = 7;
+  ComponentType_SuspRL = 8;
+  ComponentType_SuspRR = 9;
+  ComponentType_HubFL = 10;
+  ComponentType_HubFR = 11;
+  ComponentType_HubRL = 12;
+  ComponentType_HubRR = 13;
+  ComponentType_SuspSteerFL = 14;
+  ComponentType_SuspSteerFR = 15;
+  ComponentType_Paddle = 16;
+  ComponentType_Count = 17;
+}
+
+enum CarAnimationType {
+  CarAnimationType_Wiper = 0;
+  CarAnimationType_Hood = 1;
+  CarAnimationType_Tailgate = 2;
+  CarAnimationType_Door_FL = 3;
+  CarAnimationType_Door_FR = 4;
+  CarAnimationType_Door_RL = 5;
+  CarAnimationType_Door_RR = 6;
+  CarAnimationType_Lights = 7;
+  CarAnimationType_Suspension_FL = 8;
+  CarAnimationType_Suspension_FR = 9;
+  CarAnimationType_Suspension_RL = 10;
+  CarAnimationType_Suspension_RR = 11;
+  CarAnimationType_Pedal_Accelerator = 12;
+  CarAnimationType_Pedal_Brake = 13;
+  CarAnimationType_Pedal_Clutch = 14;
+  CarAnimationType_Gear_Shift_Up = 15;
+  CarAnimationType_Gear_Shift_Down = 16;
+  CarAnimationType_Hand_Brake = 17;
+  CarAnimationType_Count = 18;
+}
+
+enum PoiStatus {
+  PoiStatus_New = 0;
+  PoiStatus_Visited = 1;
+  PoiStatus_Hidden = 2;
+  PoiStatus_Custom = 3;
+}
+
+enum DriverAnimationType {
+  DriverAnimationType_BasePose = 0;
+  DriverAnimationType_Steering = 1;
+  DriverAnimationType_Pedal_Accelerator = 2;
+  DriverAnimationType_Pedal_Brake = 3;
+  DriverAnimationType_Pedal_Clutch = 4;
+  DriverAnimationType_Gear_Shift_Up = 5;
+  DriverAnimationType_Gear_Shift_Down = 6;
+  DriverAnimationType_Gear_Shift_Manual = 7;
+  DriverAnimationType_Hand_Brake = 8;
+  DriverAnimationType_Idle = 9;
+  DriverAnimationType_Count = 10;
+}
+
+enum Wheel {
+  Wheel_FL = 0;
+  Wheel_FR = 1;
+  Wheel_RL = 2;
+  Wheel_RR = 3;
+  Wheel_ALL = 4;
+}
+
+enum IndicatorSide {
+  IndicatorSide_LF = 0;
+  IndicatorSide_RF = 1;
+  IndicatorSide_LR = 2;
+  IndicatorSide_RR = 3;
+  IndicatorSide_All = 4;
+}
+
+enum IndicatorPosition {
+  IndicatorPosition_Front = 0;
+  IndicatorPosition_Rear = 1;
+  IndicatorPosition_All = 2;
+}
+
+enum DamageSide {
+  DamageSide_Damage_LF = 0;
+  DamageSide_Damage_RF = 1;
+  DamageSide_Damage_LR = 2;
+  DamageSide_Damage_RR = 3;
+  DamageSide_Damage_ALL = 4;
+}
+
+enum SpecialSide {
+  SpecialSide_LF = 0;
+  SpecialSide_RF = 1;
+  SpecialSide_LR = 2;
+  SpecialSide_RR = 3;
+  SpecialSide_ALL = 4;
+}
+
+enum DrivingSide {
+  DrivingSide_LHS = 0;
+  DrivingSide_RHS = 1;
+  DrivingSide_Centre = 2;
+}
+
+enum LedLight {
+  Led_01 = 0;
+  Led_02 = 1;
+  Led_03 = 2;
+  Led_04 = 3;
+  Led_05 = 4;
+  Led_06 = 5;
+  Led_07 = 6;
+  Led_08 = 7;
+  Led_09 = 8;
+  Led_10 = 9;
+  Led_11 = 10;
+  Led_12 = 11;
+  Led_13 = 12;
+  Led_14 = 13;
+  Led_15 = 14;
+  Led_16 = 15;
+  Led_17 = 16;
+  Led_18 = 17;
+  Led_19 = 18;
+  Led_20 = 19;
+  Led_21 = 20;
+  Led_22 = 21;
+  Led_23 = 22;
+  Led_24 = 23;
+  Led_25 = 24;
+  Led_26 = 25;
+}
+
+enum TransformMode {
+  TransformMode_Absolute = 0;
+  TransformMode_Relative = 1;
+  TransformMode_None = 2;
+}
+
+enum LayerType {
+  LayerType_Primary = 0;
+  LayerType_Secondary = 1;
+  LayerType_Tertiary = 2;
+}
+
+enum IndirectLightingRendering {
+  IndirectLightRendering_Enabled = 0;
+  IndirectLightRendering_Disabled = 1;
+}
+
+enum IndirectLocalLightingRendering {
+  IndirectLocalLightingRendering_Enabled = 0;
+  IndirectLocalLightingRendering_Disabled = 1;
+}
+
+enum DirectLightingRendering {
+  DirectLightingRendering_Enabled = 0;
+  DirectLightingRendering_Disabled = 1;
+  DirectLightingRendering_Uniform = 2;
+  DirectLightingRendering_EnabledNoDirectional = 3;
+}
+
+enum VolumetricsRendering {
+  VolumetricsRendering_Enabled = 0;
+  VolumetricsRendering_Disabled = 1;
+}
+
+enum ShadowRendering {
+  Shadow_Enabled = 0;
+  Shadow_Disabled = 1;
+  Shadow_DisabledDirectional = 2;
+  Shadow_DisabledSpotlight = 3;
+}
+
+enum SkyRendering {
+  SkyRendering_Default = 0;
+  SkyRendering_Black = 1;
+  SkyRendering_White = 2;
+}
+
+enum StartingPositionType {
+  StartingPositionType_DevelopmentDefault = 0;
+  StartingPositionType_Grid = 3;
+  StartingPositionType_Pit = 4;
+  StartingPositionType_Box = 5;
+  StartingPositionType_Poi = 6;
+}
+
+enum CarSpecs_KeyEnum {
+  CarSpecs_KeyEnum_NONE = 0;
+  CarSpecs_KeyEnum_POWER = 1;
+  CarSpecs_KeyEnum_TORQUE = 2;
+  CarSpecs_KeyEnum_TURBO_PRESSURE = 3;
+  CarSpecs_KeyEnum_DISPLACEMENT = 4;
+  CarSpecs_KeyEnum_BATTERY_CAPACITY = 5;
+  CarSpecs_KeyEnum_KERS_BATTERY_CAPACITY = 6;
+  CarSpecs_KeyEnum_CYLINDERS = 7;
+  CarSpecs_KeyEnum_ACCELERATION = 8;
+  CarSpecs_KeyEnum_MAX_SPEED = 9;
+  CarSpecs_KeyEnum_GEARS = 10;
+  CarSpecs_KeyEnum_WEIGHT = 11;
+  CarSpecs_KeyEnum_WEIGHT_TO_POWER_RATIO = 12;
+  CarSpecs_KeyEnum_MAX_RANGE = 13;
+  CarSpecs_KeyEnum_WIDTH = 14;
+  CarSpecs_KeyEnum_HEIGHT = 15;
+  CarSpecs_KeyEnum_LENGTH = 16;
+  CarSpecs_KeyEnum_WHEELBASE = 17;
+  CarSpecs_KeyEnum_MAX_RPM = 18;
+  CarSpecs_KeyEnum_FUEL_TANK_CAPACITY = 19;
+  CarSpecs_KeyEnum_MAX_E_POWER = 20;
+}
+
+enum CarSpecs_UnitsEnum {
+  CarSpecs_UnitsEnum_NUMBER = 0;
+  CarSpecs_UnitsEnum_VOLUME_MILLILITRES = 1;
+  CarSpecs_UnitsEnum_VOLUME_CUBIC_CENTIMETRES = 2;
+  CarSpecs_UnitsEnum_VOLUME_LITRES = 3;
+  CarSpecs_UnitsEnum_VOLUME_CUBIC_METRES = 4;
+  CarSpecs_UnitsEnum_VOLUME_FLUID_OUNCES_US = 8;
+  CarSpecs_UnitsEnum_VOLUME_QUARTS_US = 9;
+  CarSpecs_UnitsEnum_VOLUME_GALLONS_US = 10;
+  CarSpecs_UnitsEnum_VOLUME_CUBIC_INCHES = 11;
+  CarSpecs_UnitsEnum_VOLUME_CUBIC_FEET = 12;
+  CarSpecs_UnitsEnum_VOLUME_CUBIC_YARDS = 13;
+  CarSpecs_UnitsEnum_VOLUME_FLUID_OUNCES_UK = 16;
+  CarSpecs_UnitsEnum_VOLUME_QUARTS_UK = 19;
+  CarSpecs_UnitsEnum_VOLUME_GALLONS_UK = 20;
+  CarSpecs_UnitsEnum_TIME_MILLISECONDS = 25;
+  CarSpecs_UnitsEnum_TIME_SECONDS = 26;
+  CarSpecs_UnitsEnum_LENGTH_MILLIMETRES = 30;
+  CarSpecs_UnitsEnum_LENGTH_CENTIMETRES = 31;
+  CarSpecs_UnitsEnum_LENGTH_METERS = 32;
+  CarSpecs_UnitsEnum_LENGTH_INCHES = 33;
+  CarSpecs_UnitsEnum_LENGTH_FEET = 34;
+  CarSpecs_UnitsEnum_LENGTH_YARDS = 35;
+  CarSpecs_UnitsEnum_WEIGHT_KILOGRAMS = 40;
+  CarSpecs_UnitsEnum_WEIGHT_OUNCES = 41;
+  CarSpecs_UnitsEnum_WEIGHT_METRIC_POUNDS = 42;
+  CarSpecs_UnitsEnum_ENERGY_JOULES = 44;
+  CarSpecs_UnitsEnum_ENERGY_KILOJOULES = 45;
+  CarSpecs_UnitsEnum_ENERGY_KILOWATT_HOURS = 46;
+  CarSpecs_UnitsEnum_AREA_SQUARE_MILLIMETRES = 50;
+  CarSpecs_UnitsEnum_AREA_SQUARE_CENTIMETRES = 51;
+  CarSpecs_UnitsEnum_AREA_SQUARE_METRES = 52;
+  CarSpecs_UnitsEnum_AREA_SQUARE_INCHES = 53;
+  CarSpecs_UnitsEnum_AREA_SQUARE_FEET = 54;
+  CarSpecs_UnitsEnum_AREA_SQUARE_YARDS = 55;
+  CarSpecs_UnitsEnum_SPEED_KILOMETRES_PER_HOUR = 60;
+  CarSpecs_UnitsEnum_SPEED_MILES_PER_HOUR = 61;
+  CarSpecs_UnitsEnum_TORQUE_NEWTON_METER = 62;
+  CarSpecs_UnitsEnum_TORQUE_POUND_FORCE_FOOT = 63;
+  CarSpecs_UnitsEnum_TORQUE_POUND_FORCE_INCH = 64;
+  CarSpecs_UnitsEnum_TORQUE_KILOGRAM_FORCE_METER = 65;
+  CarSpecs_UnitsEnum_TORQUE_OUNCE_FORCE_INCH = 66;
+  CarSpecs_UnitsEnum_POWER_WATTS = 70;
+  CarSpecs_UnitsEnum_POWER_KILOWATTS = 71;
+  CarSpecs_UnitsEnum_POWER_HORSEPOWER_US = 72;
+  CarSpecs_UnitsEnum_PRESSURE_ATMOSPHERES = 81;
+  CarSpecs_UnitsEnum_PRESSURE_BARS = 82;
+  CarSpecs_UnitsEnum_PRESSURE_PASCALS = 83;
+  CarSpecs_UnitsEnum_PRESSURE_POUND_PER_SQUARE_INCH = 84;
+  CarSpecs_UnitsEnum_CAPACITY_KILOWATT_HOUR = 90;
+  CarSpecs_UnitsEnum_ACCELERATION_METERS_PER_SECOND_SQUARED = 100;
+}
+
+enum RoadPhysicsSurface {
+  RoadPhysicsSurface_Default = 0;
+  RoadPhysicsSurface_AutoAssign = 1;
+  RoadPhysicsSurface_Tarmac = 2;
+  RoadPhysicsSurface_Dirt = 3;
+}
+
+enum ZoneSoundType {
+  ZoneSoundType_Ambient = 0;
+  ZoneSoundType_Reverb = 1;
+}
+
+enum ZoneSoundAreaType {
+  ZoneSoundAreaType_Sphere = 0;
+  ZoneSoundAreaType_Polygon = 1;
+}
+
+message UpdateCarAnimationCommand {
+  PGUID car_id = 1;
+  CarAnimationType car_animation_type = 2;
+  int32 value = 3;
+  bool instant = 4;
+}
+
+message UpdateCarOptionalAnimationCommand {
+  PGUID car_id = 1;
+  string car_animation_name = 2;
+  int32 value = 3;
+  bool instant = 4;
+}
+
+message StaticMeshData {
+  string mesh_path = 1;
+  string surface_id = 2;
+  bool physics_only = 3;
+  bool physics_movable = 5;
+  ColliderData collider = 4;
+}
+
+message InstanceSetData {
+  repeated float positions = 2;
+  repeated float rotations = 3;
+  repeated float scales = 4;
+  reserved 1 to 1;
+}
+
+message InstancedStaticMeshData {
+  string mesh_path = 1;
+  InstanceSetData instance_set = 7;
+  string animation_take = 8;
+  string surface_id = 3;
+  bool physics_only = 4;
+  ColliderData collider = 10;
+  string cooked_instance_set_path = 9;
+  reserved 2 to 2;
+  reserved 5 to 5;
+  reserved 6 to 6;
+}
+
+message InstancedLightData {
+  float max_distance = 1;
+  float fade_distance = 2;
+  LightData light = 3;
+  InstanceSetData instance_set = 4;
+}
+
+message ColorDecalData {
+  Vector4Data color = 1;
+  string texture = 2;
+  float edgeFactor = 3;
+  int32 renderOrder = 4;
+  float lodOut = 5;
+}
+
+message NormalDecalData {
+  float normalIntensity = 1;
+  string texture = 2;
+  float edgeFactor = 3;
+  int32 renderOrder = 4;
+  float lodOut = 5;
+}
+
+message ColorAndNormalDecalData {
+  string colorTexture = 1;
+  string normalTexture = 2;
+  float intensity = 3;
+  float edgeFactor = 4;
+  int32 renderOrder = 5;
+  float lodOut = 6;
+}
+
+message AmbientOcclusionDecalData {
+  float intensity = 1;
+  string texture = 2;
+  float edgeFactor = 3;
+  int32 renderOrder = 4;
+  float lodOut = 5;
+}
+
+message ShadowDecalData {
+  float shadow_intensity = 1;
+  float ao_intensity = 5;
+  string texture = 2;
+  float edgeFactor = 3;
+  int32 renderOrder = 4;
+  float lodOut = 6;
+}
+
+message StartingPositionData {
+  message Tags {
+    repeated string tags = 1;
+  }
+  repeated StartingPositionType types = 6;
+  int32 slot_number = 2;
+  int32 group_number = 7;
+  string hint = 3;
+  StartingPositionData.Tags tags = 4;
+  string gamemode_filter = 5;
+  reserved 1 to 1;
+}
+
+message FogVolumeData {
+  string texture_path = 1;
+  float density = 2;
+  float importance = 3;
+  Vector3Data irradiance = 4;
+}
+
+message CarExhaustGlowingData {
+  float min_temperature = 1;
+  float max_temperature = 2;
+  float min_emissive = 3;
+  float max_emissive = 4;
+  float t_gas_min = 5;
+}
+
+message CarExhaustBackFireData {
+  float high_rpms = 1;
+  float low_rpms = 2;
+  float min_rpms = 3;
+  float high_rate = 4;
+  float blip_time = 5;
+  float delay = 6;
+  float variation = 7;
+  float time = 8;
+  uint32 audio_backfire_type_1_probability = 10;
+  uint32 audio_backfire_type_2_probability = 11;
+  uint32 audio_backfire_type_3_probability = 12;
+  uint32 audio_backfire_type_4_probability = 13;
+  uint32 audio_backfire_type_5_probability = 14;
+  uint32 visual_backfire_type_1_probability = 20;
+  uint32 visual_backfire_type_2_probability = 21;
+  uint32 visual_backfire_type_3_probability = 22;
+  uint32 visual_backfire_type_4_probability = 23;
+  uint32 visual_backfire_type_5_probability = 24;
+  reserved 9 to 9;
+}
+
+message GenericRendererAnimation {
+  enum AnimationPlayType {
+    PulseFull = 0;
+    PulseAndReverse = 1;
+    Looping = 2;
+    SequentialSimple = 3;
+    SequentialLut = 4;
+  }
+  message Animation {
+    string path = 1;
+  }
+  repeated GenericRendererAnimation.Animation animations = 1;
+  float speed_multiplier = 2;
+  bool hide_in_showroom = 10;
+  bool disable_while_driving = 11;
+  repeated float lut_normalized_positions = 14;
+  GenericRendererAnimation.AnimationPlayType play_type = 13;
+  reserved 3 to 3;
+  reserved 4 to 4;
+  reserved 12 to 12;
+}
+
+message MovableOscillationData {
+  enum OscillationType {
+    EngineRpm = 0;
+    Speed = 1;
+    EngineLimiter = 2;
+  }
+  MovableOscillationData.OscillationType oscillation_type = 300;
+  float oscillation_min_value = 301;
+  float oscillation_max_value = 302;
+  Vector3Data oscillation_frequency = 303;
+  Vector3Data oscillation_rotations = 304;
+  Vector3Data oscillation_translations = 305;
+}
+
+message MovablePartData {
+  string bone_name = 1;
+  float base_min_speed = 200;
+  float base_max_speed = 201;
+  Vector3Data base_rotations = 202;
+  Vector3Data base_translations = 203;
+  Vector3Data base_filters = 204;
+  repeated MovableOscillationData oscillations = 310;
+  float g_min_value = 400;
+  float g_max_value = 401;
+  Vector3Data g_rotations = 402;
+  Vector3Data g_translations = 404;
+  Vector3Data g_filters = 403;
+  reserved 300 to 300;
+  reserved 301 to 301;
+  reserved 302 to 302;
+  reserved 303 to 303;
+  reserved 304 to 304;
+}
+
+message OldDamagePartData {
+  enum DamageZone {
+    Front = 0;
+    Rear = 1;
+    Left = 2;
+    Right = 3;
+    Center = 4;
+  }
+  OldDamagePartData.DamageZone damage_zone = 1;
+  string bone_name = 13;
+  float min_speed = 9;
+  float max_speed = 10;
+  Vector3Data rotation_scaling_axis = 3;
+  float rotation_max_angle = 4;
+  Vector3Data oscillation_axis = 5;
+  float oscillation_min_angle = 6;
+  float oscillation_max_angle = 7;
+  float oscillation_g_multiplier = 8;
+  Vector3Data oscillation_allowed_g = 11;
+  float sparks_multiplier = 12;
+  reserved 2 to 2;
+}
+
+message DamagePartData {
+  enum DamageZone {
+    Front = 0;
+    Rear = 1;
+    Left = 2;
+    Right = 3;
+    Center = 4;
+  }
+  DamagePartData.DamageZone damage_zone = 1;
+  float min_damage = 2;
+  float max_damage = 3;
+  Vector3Data damage_rotations = 5;
+  Vector3Data damage_translations = 6;
+  MovablePartData data = 4;
+}
+
+message GenericRendererOptionalAnimation {
+  message NoSpecialization {
+  }
+  message Wing {
+    message SetupWing {
+      bool is_front_wing = 1;
+      reserved 2 to 2;
+    }
+    message CarSpeedKmh {
+      repeated Vector2Data lut_mapping = 1;
+    }
+    message CarGForce {
+      repeated Vector2Data x_lut_mapping = 1;
+      repeated Vector2Data y_lut_mapping = 2;
+      repeated Vector2Data z_lut_mapping = 3;
+      bool use_greatest_value = 100;
+    }
+    message CarControlInputs {
+      repeated Vector2Data gas_lut_mapping = 1;
+      repeated Vector2Data brake_lut_mapping = 2;
+      repeated Vector2Data steering_lut_mapping = 3;
+      bool use_greatest_value = 100;
+    }
+    message CarEngineRpm {
+      repeated Vector2Data lut_mapping = 1;
+    }
+    message CarFanSpeedRpm {
+      int32 input_index = 1;
+      repeated Vector2Data lut_mapping = 2;
+    }
+    message StaticWing {
+    }
+    bool has_drs = 10;
+    float value_when_drs_is_active = 11;
+    oneof type {
+      GenericRendererOptionalAnimation.Wing.SetupWing setup_wing = 1;
+      GenericRendererOptionalAnimation.Wing.CarSpeedKmh car_speed_kmh = 2;
+      GenericRendererOptionalAnimation.Wing.CarGForce car_g_force = 3;
+      GenericRendererOptionalAnimation.Wing.CarControlInputs car_control_inputs = 4;
+      GenericRendererOptionalAnimation.Wing.CarEngineRpm car_engine_rpm = 5;
+      GenericRendererOptionalAnimation.Wing.CarFanSpeedRpm car_fan_speed_rpm = 6;
+      GenericRendererOptionalAnimation.Wing.StaticWing static_wing = 7;
+    }
+  }
+  string animation_name = 1;
+  GenericRendererAnimation animation = 2;
+  oneof type {
+    GenericRendererOptionalAnimation.NoSpecialization no_specialization = 30;
+    GenericRendererOptionalAnimation.Wing wing = 31;
+  }
+}
+
+message DriverGenericAnimationBlendings {
+  float blend_in_time = 1;
+  float blend_out_time = 2;
+  float steer_to_object_time = 3;
+  float object_play_time = 4;
+  float object_to_steer_time = 5;
+}
+
+message CarSpecsData {
+  message Item {
+    CarSpecs_KeyEnum key = 1;
+    float value = 4;
+    CarSpecs_UnitsEnum units = 3;
+    reserved 2 to 2;
+  }
+  repeated CarSpecsData.Item items = 1;
+}
+
+message CarActorData {
+  enum PhysicalLightLocation {
+    PhysicalLightType_FrontLeft = 0;
+    PhysicalLightType_FrontRight = 1;
+    PhysicalLightType_RearLeft = 2;
+    PhysicalLightType_RearRight = 3;
+    PhysicalLightType_Rain = 4;
+    PhysicalLightType_Cockpit = 5;
+  }
+  enum CarDecalCategory {
+    CarDecalCategory_Numberplate = 0;
+    CarDecalCategory_Number = 1;
+    CarDecalCategory_Class = 2;
+  }
+  message BaseMeshes {
+    message BaseMesh {
+      string mesh_path = 1;
+      string attachment_bone_override = 2;
+      TransformData attachment_transform = 3;
+      bool showroom_invisible = 4;
+    }
+    string body_mesh = 1;
+    CarActorData.BaseMeshes.BaseMesh tyre_fl = 2;
+    CarActorData.BaseMeshes.BaseMesh tyre_fr = 3;
+    CarActorData.BaseMeshes.BaseMesh tyre_rl = 4;
+    CarActorData.BaseMeshes.BaseMesh tyre_rr = 5;
+    CarActorData.BaseMeshes.BaseMesh rim_fl = 6;
+    CarActorData.BaseMeshes.BaseMesh rim_fr = 7;
+    CarActorData.BaseMeshes.BaseMesh rim_rl = 8;
+    CarActorData.BaseMeshes.BaseMesh rim_rr = 9;
+    CarActorData.BaseMeshes.BaseMesh rim_fl_blur = 18;
+    CarActorData.BaseMeshes.BaseMesh rim_fr_blur = 19;
+    CarActorData.BaseMeshes.BaseMesh rim_rl_blur = 20;
+    CarActorData.BaseMeshes.BaseMesh rim_rr_blur = 21;
+    CarActorData.BaseMeshes.BaseMesh interior = 10;
+    CarActorData.BaseMeshes.BaseMesh steering_wheel = 11;
+    CarActorData.BaseMeshes.BaseMesh seatbelt_on = 12;
+    CarActorData.BaseMeshes.BaseMesh seatbelt_off = 22;
+    CarActorData.BaseMeshes.BaseMesh harness_on = 23;
+    CarActorData.BaseMeshes.BaseMesh harness_off = 24;
+    CarActorData.BaseMeshes.BaseMesh safety_net_on = 13;
+    CarActorData.BaseMeshes.BaseMesh safety_net_off = 25;
+    CarActorData.BaseMeshes.BaseMesh plate_front = 26;
+    CarActorData.BaseMeshes.BaseMesh plate_rear = 27;
+    CarActorData.BaseMeshes.BaseMesh driver = 28;
+    CarActorData.BaseMeshes.BaseMesh disc_fl = 30;
+    CarActorData.BaseMeshes.BaseMesh disc_fr = 31;
+    CarActorData.BaseMeshes.BaseMesh disc_rl = 32;
+    CarActorData.BaseMeshes.BaseMesh disc_rr = 33;
+    CarActorData.BaseMeshes.BaseMesh steering_cable = 34;
+    CarActorData.BaseMeshes.BaseMesh caliper_fl = 35;
+    CarActorData.BaseMeshes.BaseMesh caliper_fr = 36;
+    CarActorData.BaseMeshes.BaseMesh caliper_rl = 37;
+    CarActorData.BaseMeshes.BaseMesh caliper_rr = 38;
+    CarActorData.BaseMeshes.BaseMesh race_device_1 = 39;
+    CarActorData.BaseMeshes.BaseMesh race_device_2 = 40;
+    CarActorData.BaseMeshes.BaseMesh race_device_3 = 41;
+    CarActorData.BaseMeshes.BaseMesh race_device_4 = 42;
+    reserved 14 to 14;
+    reserved 15 to 15;
+    reserved 16 to 16;
+    reserved 17 to 17;
+  }
+  message Customization {
+    repeated string compatible_rims = 7;
+    repeated string compatible_parts = 8;
+    repeated string car_designs = 9;
+    repeated string mechanical_car_presets = 10;
+    repeated string visual_car_presets = 11;
+    repeated string aftermarket_rims = 20;
+    repeated string aftermarket_parts = 21;
+    repeated string oem_kits = 22;
+    repeated string aftermarket_kits = 23;
+    reserved 1 to 1;
+    reserved 2 to 2;
+    reserved 3 to 3;
+    reserved 4 to 4;
+    reserved 5 to 5;
+    reserved 6 to 6;
+  }
+  message ExternalLivery {
+    repeated string batch_names = 1;
+  }
+  message MaterialChannel {
+    bool override_color = 1;
+    Vector3Data color = 2;
+    bool override_roughness = 5;
+    float roughness = 6;
+    bool override_metalness = 3;
+    float metalness = 4;
+    bool override_clearcoat = 7;
+    float clearcoat = 8;
+    bool override_clearcoat_roughness = 9;
+    float clearcoat_roughness = 10;
+    bool override_normal_intensity = 11;
+    float normal_intensity = 12;
+    bool override_emissive_color = 13;
+    Vector3Data emissive_color = 14;
+  }
+  message MaterialCustomization {
+    string batch = 10;
+    bool replace_material = 1;
+    string material_path = 2;
+    bool override_primary_channel = 3;
+    CarActorData.MaterialChannel primary_channel = 4;
+    bool override_secondary_channel = 5;
+    CarActorData.MaterialChannel secondary_channel = 6;
+    bool override_tertiary_channel = 7;
+    CarActorData.MaterialChannel tertiary_channel = 8;
+  }
+  message GlassMaterialCustomization {
+    string batch = 10;
+    bool replace_material = 1;
+    string material_path = 2;
+    bool override_color = 3;
+    Vector3Data color = 4;
+    bool override_opacity_override = 5;
+    float opacity_override = 6;
+    bool override_emissive_color = 7;
+    Vector3Data emissive_color = 8;
+  }
+  message RuntimeMaterialPreview {
+    float wetness = 1;
+    float damage_cracks = 20;
+    float damage_edges = 21;
+    float damage_scratches = 22;
+    float damage_front = 23;
+    float damage_rear = 24;
+    float damage_left = 25;
+    float damage_right = 26;
+    float dirt_dust = 30;
+    float dirt_grime = 31;
+    float dirt_rubber = 32;
+    float scuff = 2;
+    float tyre_scuff = 3;
+    float tyre_dirt_dust = 40;
+    float tyre_dirt_grime = 41;
+    float tyre_dirt_rubber = 42;
+    float tyre_damage_cracks = 50;
+    float tyre_damage_edges = 51;
+    float tyre_damage_scratches = 52;
+    float tyre_damage_normal = 53;
+    float tyre_damage_intensity = 54;
+    float tyre_wet = 4;
+    float tyre_lateral_deformation = 5;
+    float tyre_vertical_deformation = 6;
+    float tyre_angle = 7;
+    float tyre_velocity = 8;
+    float rim_velocity = 9;
+    float disc_velocity = 10;
+    Vector3Data disc_color_front = 11;
+    Vector3Data disc_emissive_front = 12;
+    Vector3Data disc_color_rear = 13;
+    Vector3Data disc_emissive_rear = 14;
+  }
+  message ShowroomWheelData {
+    Vector3Data offset = 1;
+    Vector3Data rotation = 2;
+  }
+  message OptionalAnimationFrame {
+    int32 frame = 1;
+    string animation_name = 2;
+  }
+  message ShowRoomAnimationFrames {
+    int32 wiper = 2;
+    int32 hood = 3;
+    int32 tailgate = 4;
+    int32 door_FL = 5;
+    int32 door_FR = 6;
+    int32 door_RL = 7;
+    int32 door_RR = 8;
+    int32 lights = 19;
+    int32 suspension_fl = 9;
+    int32 suspension_fr = 10;
+    int32 suspension_rl = 11;
+    int32 suspension_rr = 12;
+    int32 pedal_accelerator = 13;
+    int32 pedal_brake = 14;
+    int32 pedal_clutch = 15;
+    int32 gear_shift_up = 16;
+    int32 gear_shift_down = 17;
+    int32 paddle_shift_up = 21;
+    int32 paddle_shift_down = 22;
+    int32 hand_brake = 20;
+    repeated CarActorData.OptionalAnimationFrame optional_animations = 18;
+  }
+  message ShowroomPreviewData {
+    Vector3Data offset = 1;
+    Vector3Data rotation = 2;
+    CarActorData.ShowroomWheelData wheel_lf = 3;
+    CarActorData.ShowroomWheelData wheel_rf = 4;
+    CarActorData.ShowroomWheelData wheel_lr = 5;
+    CarActorData.ShowroomWheelData wheel_rr = 6;
+    CarActorData.ShowRoomAnimationFrames animations = 7;
+    float steer = 8;
+  }
+  message PreviewTools {
+    CarActorData.MaterialCustomization materialCustomization = 2;
+    CarActorData.GlassMaterialCustomization glassMaterialCustomization = 6;
+    CarActorData.RuntimeMaterialPreview runtime = 3;
+    CarActorData.ShowroomPreviewData showroom = 5;
+    reserved 1 to 1;
+  }
+  message ShaderSettings {
+    float tyre_global_ao = 1;
+    Vector4Data tyre_base_color_multiplier = 10;
+    float tyre_roughness_override = 11;
+    float tyre_reflectance_override = 12;
+    float tyre_clear_coat_override = 13;
+    float tyre_clear_coat_roughness_override = 14;
+    float tyre_maximum_sheen = 15;
+    float rim_velocity_gamma = 2;
+    float rim_velocity_gamma_blur = 6;
+    float rim_inverse_velocity_gamma = 3;
+    repeated string mechanics_glow_batches = 4;
+    float mechanics_glow_intensity = 5;
+  }
+  message Mirror {
+    enum Type {
+      Center = 0;
+      Left = 1;
+      Right = 2;
+    }
+    CarActorData.Mirror.Type type = 1;
+    string batchName = 2;
+    string boneName = 3;
+    Vector3Data offset = 5;
+    float yaw = 6;
+    float pitch = 7;
+    float fov = 8;
+    Vector3Data vr_offset = 9;
+    float vr_yaw = 10;
+    float vr_pitch = 11;
+    float vr_fov = 12;
+    reserved 4 to 4;
+  }
+  message RearCamera {
+    Vector3Data offset = 1;
+    float yaw = 2;
+    float pitch = 3;
+    float fov = 4;
+    string batchName = 5;
+  }
+  message ShowroomCameraInternal {
+    TransformData transform = 7;
+    float x_limit_min = 1;
+    float x_limit_max = 2;
+    float y_limit_min = 3;
+    float y_limit_max = 4;
+    float z_limit_min = 5;
+    float z_limit_max = 6;
+  }
+  message ShowroomCamera {
+    float distance = 1;
+    float min_distance = 3;
+    float max_distance = 4;
+    CarActorData.ShowroomCameraInternal internal = 2;
+  }
+  message CarAnimations {
+    bool skip_physics_camber = 130;
+    GenericRendererAnimation wiper = 102;
+    GenericRendererAnimation hood = 103;
+    GenericRendererAnimation tailgate = 104;
+    GenericRendererAnimation door_fl = 105;
+    GenericRendererAnimation door_fr = 106;
+    GenericRendererAnimation door_rl = 107;
+    GenericRendererAnimation door_rr = 108;
+    GenericRendererAnimation lights = 119;
+    GenericRendererAnimation suspension_fl = 109;
+    GenericRendererAnimation suspension_fr = 110;
+    GenericRendererAnimation suspension_rl = 111;
+    GenericRendererAnimation suspension_rr = 112;
+    GenericRendererAnimation pedal_accelerator = 113;
+    GenericRendererAnimation pedal_brake = 114;
+    GenericRendererAnimation pedal_clutch = 115;
+    GenericRendererAnimation gear_shift_up = 116;
+    GenericRendererAnimation gear_shift_down = 117;
+    GenericRendererAnimation paddle_shift_up = 121;
+    GenericRendererAnimation paddle_shift_down = 122;
+    GenericRendererAnimation hand_brake = 120;
+    repeated GenericRendererOptionalAnimation optional_animations = 118;
+    reserved 1 to 19;
+  }
+  message DriverAnimations {
+    GenericRendererAnimation base_pose = 109;
+    GenericRendererAnimation steering_animation = 101;
+    GenericRendererAnimation steering_paddles_gear_animation = 114;
+    GenericRendererAnimation pedal_accelerator = 102;
+    GenericRendererAnimation pedal_brake = 103;
+    GenericRendererAnimation pedal_clutch = 104;
+    GenericRendererAnimation gear_shift_up = 105;
+    GenericRendererAnimation gear_shift_down = 106;
+    GenericRendererAnimation manual_shift_approach = 107;
+    GenericRendererAnimation paddle_shift_up = 112;
+    GenericRendererAnimation paddle_shift_down = 113;
+    GenericRendererAnimation hand_brake = 110;
+    GenericRendererAnimation idle = 115;
+    repeated GenericRendererOptionalAnimation optional_animations = 111;
+    reserved 1 to 9;
+  }
+  message DriverAnimationBlendings {
+    float hshifter_blend_in_time = 1;
+    float hshifter_blend_out_time = 8;
+    float hshifter_steer_to_shift_time = 2;
+    float hshifter_shift_play_time = 3;
+    float hshifter_shift_to_steer_time = 4;
+    float paddle_blend_in_time = 25;
+    float paddle_blend_out_time = 26;
+    float paddle_steer_to_shift_time = 28;
+    float paddle_shift_play_time = 27;
+    float paddle_shift_to_steer_time = 29;
+    float handbrake_blend_in_time = 30;
+    float handbrake_blend_out_time = 31;
+    float handbrake_steer_to_shift_time = 32;
+    float handbrake_shift_play_time = 33;
+    float handbrake_shift_to_steer_time = 34;
+    float max_g = 9;
+    float pitch_max_deg = 10;
+    float roll_max_deg = 11;
+    float yaw_max_deg = 12;
+    float filter = 13;
+    float head_look_left_deg = 22;
+    float head_look_right_deg = 23;
+    float neck_movement_percent = 24;
+    reserved 5 to 5;
+    reserved 6 to 6;
+    reserved 7 to 7;
+    reserved 14 to 14;
+    reserved 15 to 15;
+    reserved 16 to 16;
+    reserved 17 to 17;
+    reserved 18 to 18;
+    reserved 19 to 19;
+    reserved 20 to 20;
+    reserved 21 to 21;
+  }
+  message PhysicalLight {
+    string debug_name = 1;
+    CarActorData.PhysicalLightLocation location = 6;
+    TransformData transform = 3;
+    bool override_color = 8;
+    Vector4Data color = 7;
+    repeated CarLightingFunction light_functions = 2;
+  }
+  message LightsBatches {
+    repeated string batch_names = 1;
+  }
+  message Display {
+    enum DisplayEnum {
+      DisplayEnum_Custom = 0;
+      DisplayEnum_1 = 1;
+      DisplayEnum_2 = 2;
+      DisplayEnum_3 = 3;
+      DisplayEnum_4 = 4;
+      DisplayEnum_5 = 5;
+      DisplayEnum_6 = 6;
+    }
+    string html = 1;
+    string material = 2;
+    uint32 width = 4;
+    uint32 height = 5;
+    CarActorData.Display.DisplayEnum display_enum = 9;
+    string custom_script = 10;
+    uint32 crop_horizontal = 7;
+    uint32 crop_vertical = 8;
+    reserved 3 to 3;
+    reserved 6 to 6;
+  }
+  message Leds {
+    repeated string led_batch_name = 20;
+    string led_script = 21;
+  }
+  message LedsBatches {
+    repeated string batch_names = 1;
+    CarActorData.Leds leds = 2;
+  }
+  message ShadowDecal {
+    float shadow_decal_scale_x_m = 1;
+    float shadow_decal_scale_y_m = 6;
+    float shadow_decal_scale_z_m = 2;
+    float shadow_decal_position_x_m = 8;
+    float shadow_decal_position_y_m = 3;
+    float shadow_decal_position_z_m = 5;
+    float shadow_decal_edge_factor = 7;
+    float shadow_decal_intensity_multiplier = 9;
+    float shadow_decal_ao_intensity_multiplier = 10;
+    string shadow_decal_texture = 4;
+  }
+  message NumberDecalType {
+    CarActorData.CarDecalCategory category = 2;
+    float size = 3;
+    string digits_texture = 4;
+    string background_texture = 5;
+    string emissive_background = 6;
+    Vector4Data font_color = 7;
+    int32 font_width = 8;
+    int32 font_height = 9;
+    int32 font_position = 10;
+    int32 font_spacing_2_digits = 11;
+    int32 font_spacing_3_digits = 16;
+    int32 max_digits_allowed = 17;
+    float font_emissive = 13;
+    Vector4Data emissive_color = 14;
+    float decal_edge_factor = 15;
+    reserved 12 to 12;
+  }
+  message NumberDecal {
+    bool enabled = 1;
+    int32 type_id = 2;
+    string parent_bone = 3;
+    Vector3Data offset = 4;
+    Vector3Data rotation = 5;
+    Vector3Data scale = 6;
+    bool emissive = 7;
+  }
+  message NumberDecalPositions {
+    repeated CarActorData.NumberDecal front_a = 1;
+    repeated CarActorData.NumberDecal front_b = 2;
+    repeated CarActorData.NumberDecal door_l = 3;
+    repeated CarActorData.NumberDecal door_r = 4;
+    repeated CarActorData.NumberDecal roof = 5;
+    repeated CarActorData.NumberDecal rear_a = 6;
+    repeated CarActorData.NumberDecal rear_b = 7;
+  }
+  CarActorData.BaseMeshes base_meshes = 12;
+  string tyre_textures = 18;
+  CarActorData.Customization customization = 13;
+  CarActorData.ExternalLivery external_livery = 510;
+  repeated CameraModuleData cameras = 1;
+  repeated CarActorData.PhysicalLight lights = 2;
+  string custom_daylight_texture = 502;
+  string custom_low_beam_texture = 500;
+  string custom_high_beam_texture = 501;
+  string light_script = 101;
+  string led_script = 102;
+  string analogic_script = 103;
+  string wiper_script = 104;
+  string exhaust_glowing_script = 105;
+  string exhaust_backfire_script = 106;
+  TransformData vehicle_probe_transform = 16;
+  TransformData cockpit_probe_transform = 17;
+  float lod_out_distance = 5;
+  repeated float lod_in_distances = 6;
+  repeated AudioEventData audio_events = 9;
+  repeated CameraModuleData drivable_cameras = 10;
+  repeated CarActorData.Display displays = 11;
+  repeated OldDamagePartData old_damage_parts = 35;
+  repeated MovablePartData movable_parts = 36;
+  repeated DamagePartData damage_parts = 41;
+  CarSpecsData car_specs = 50;
+  int32 dash_in_hud = 34;
+  CarActorData.PreviewTools preview_tools = 15;
+  CarActorData.ShaderSettings shader_settings = 21;
+  DrivingSide driving_side = 37;
+  repeated CarActorData.Mirror mirrors = 23;
+  CarActorData.RearCamera rear_camera = 24;
+  CarActorData.ShowroomCamera showroom_camera = 32;
+  CarActorData.LightsBatches lights_batches = 25;
+  CarActorData.LedsBatches leds_batches = 26;
+  CarActorData.CarAnimations car_animations = 27;
+  DriverModelType driver_model_type = 200;
+  CarActorData.DriverAnimations driver_animations = 31;
+  CarActorData.DriverAnimationBlendings driver_animation_blendings = 210;
+  CarActorData.ShadowDecal body_shadow_decal = 28;
+  CarActorData.ShadowDecal front_tyres_shadow_decal = 29;
+  CarActorData.ShadowDecal rear_tyres_shadow_decal = 30;
+  repeated CarParticleEmitterData particle_emitters = 40;
+  repeated CarActorData.NumberDecalType number_decal_types = 51;
+  CarActorData.NumberDecalPositions number_decal_positions = 52;
+  reserved 3 to 3;
+  reserved 4 to 4;
+  reserved 7 to 7;
+  reserved 8 to 8;
+  reserved 14 to 14;
+  reserved 19 to 19;
+  reserved 22 to 22;
+  reserved 33 to 33;
+  reserved 100 to 100;
+}
+
+message DriverActorData {
+  message BaseMeshes {
+    message BaseMesh {
+      string mesh_path = 1;
+      string attachment_bone_override = 2;
+      TransformData attachment_transform = 3;
+      bool showroom_invisible = 4;
+    }
+    string skeleton_path = 1;
+    DriverActorData.BaseMeshes.BaseMesh street_head = 2;
+    DriverActorData.BaseMeshes.BaseMesh street_torso = 3;
+    DriverActorData.BaseMeshes.BaseMesh street_legs = 4;
+    DriverActorData.BaseMeshes.BaseMesh street_feet = 6;
+    DriverActorData.BaseMeshes.BaseMesh racing_head = 7;
+    DriverActorData.BaseMeshes.BaseMesh racing_suit = 8;
+    DriverActorData.BaseMeshes.BaseMesh racing_gloves = 9;
+    DriverActorData.BaseMeshes.BaseMesh racing_shoes = 10;
+    DriverActorData.BaseMeshes.BaseMesh racing_helmet = 11;
+    reserved 5 to 5;
+  }
+  message MaterialChannel {
+    bool override_color = 1;
+    Vector3Data color = 2;
+    bool override_roughness = 5;
+    float roughness = 6;
+    bool override_metalness = 3;
+    float metalness = 4;
+    bool override_clearcoat = 7;
+    float clearcoat = 8;
+    bool override_clearcoat_roughness = 9;
+    float clearcoat_roughness = 10;
+    bool override_normal_intensity = 11;
+    float normal_intensity = 12;
+    bool override_emissive_color = 13;
+    Vector3Data emissive_color = 14;
+  }
+  message MaterialCustomization {
+    string batch = 10;
+    bool replace_material = 1;
+    string material_path = 2;
+    bool override_primary_channel = 3;
+    DriverActorData.MaterialChannel primary_channel = 4;
+    bool override_secondary_channel = 5;
+    DriverActorData.MaterialChannel secondary_channel = 6;
+    bool override_tertiary_channel = 7;
+    DriverActorData.MaterialChannel tertiary_channel = 8;
+  }
+  message GlassMaterialCustomization {
+    string batch = 10;
+    bool replace_material = 1;
+    string material_path = 2;
+    bool override_color = 3;
+    Vector3Data color = 4;
+    bool override_opacity_override = 5;
+    float opacity_override = 6;
+    bool override_emissive_color = 7;
+    Vector3Data emissive_color = 8;
+  }
+  message ShowRoomAnimationFrames {
+    bool im_empty = 1;
+  }
+  message PreviewTools {
+    DriverActorData.MaterialCustomization materialCustomization = 2;
+    DriverActorData.GlassMaterialCustomization glassMaterialCustomization = 6;
+    reserved 1 to 1;
+  }
+  message DriverAnimations {
+    GenericRendererAnimation steering_animation = 101;
+    GenericRendererAnimation pedal_accelerator = 102;
+    GenericRendererAnimation pedal_brake = 103;
+    GenericRendererAnimation pedal_clutch = 104;
+    GenericRendererAnimation gear_shift_up = 105;
+    GenericRendererAnimation gear_shift_down = 106;
+    GenericRendererAnimation gear_manual_shift = 107;
+    repeated GenericRendererAnimation optional_animations = 108;
+    reserved 1 to 8;
+  }
+  message Driver {
+    DriverActorData.BaseMeshes base_meshes = 1;
+  }
+  DriverActorData.Driver male = 50;
+  DriverActorData.Driver female = 51;
+  float lod_out_distance = 5;
+  repeated float lod_in_distances = 6;
+  DriverActorData.PreviewTools preview_tools = 15;
+  DriverActorData.DriverAnimations driver_animations = 31;
+  reserved 7 to 7;
+  reserved 12 to 12;
+  reserved 13 to 13;
+}
+
+message CarSpawnData {
+  enum CarSpawnDataType {
+    Default = 0;
+    Replay = 1;
+  }
+  CarSpawnData.CarSpawnDataType car_spawn_type = 1;
+  bool generate_thumbnail = 12;
+  ClientCarControllerType car_controller_type = 3;
+  google.protobuf.Any team_final_state = 666;
+  google.protobuf.Any car_final_state = 5;
+  google.protobuf.Any driver_final_state = 10;
+  google.protobuf.Any car_setup_data = 101;
+  int32 chosen_spawn_group = 13;
+  int32 assigned_car_number = 6;
+  int32 odo_meters = 7;
+  float fuel = 8;
+  int32 ballast = 20;
+  float restrictor = 21;
+  int32 mechanical_preset_id = 22;
+  reserved 4 to 4;
+  reserved 9 to 9;
+  reserved 11 to 11;
+}
+
+message CarShadingGlobalSetting {
+  message PhysicalLightProperties {
+    Vector4Data color = 5;
+    float intensity = 1;
+    float radius = 2;
+    float falloff_exponent = 6;
+    float inner_angle = 3;
+    float outer_angle = 4;
+  }
+  Vector3Data damage_cracks_basecolor = 1;
+  float damage_cracks_roughness = 2;
+  float damage_cracks_normal = 3;
+  float damage_cracks_clear_coat_level = 500;
+  float damage_cracks_clear_coat_normal = 4;
+  Vector3Data damage_edges_basecolor = 5;
+  float damage_edges_roughness = 6;
+  float damage_edges_normal = 7;
+  float damage_edges_clear_coat_level = 501;
+  float damage_edges_clear_coat_normal = 8;
+  Vector3Data damage_scratches_basecolor = 9;
+  float damage_scratches_roughness = 10;
+  float damage_scratches_normal = 11;
+  float damage_scratches_clear_coat_level = 502;
+  float damage_scratches_clear_coat_normal = 12;
+  float damage_clear_coat_roughness = 16;
+  float damage_min_damage_speed = 13;
+  float damage_full_damage_speed = 14;
+  string damage_per_channel_curve = 15;
+  Vector3Data dirt_dust_basecolor = 101;
+  Vector3Data dirt_dust_darker_basecolor = 102;
+  float dirt_dust_reflectance = 103;
+  float dirt_dust_roughness = 104;
+  float dirt_dust_normal = 105;
+  float dirt_dust_ambient_occlusion = 106;
+  float dirt_dust_clear_coat = 107;
+  float dirt_dust_clear_coat_roughness = 108;
+  float dirt_dust_clear_coat_normal = 109;
+  Vector3Data dirt_grime_basecolor = 110;
+  float dirt_grime_reflectance = 111;
+  float dirt_grime_roughness = 112;
+  float dirt_grime_normal = 113;
+  float dirt_grime_ambient_occlusion = 114;
+  float dirt_grime_clear_coat = 115;
+  float dirt_grime_clear_coat_roughness = 116;
+  float dirt_grime_clear_coat_normal = 117;
+  Vector3Data dirt_rubber_basecolor = 118;
+  float dirt_rubber_reflectance = 119;
+  float dirt_rubber_roughness = 120;
+  float dirt_rubber_normal = 121;
+  float dirt_rubber_ambient_occlusion = 122;
+  float dirt_rubber_clear_coat = 123;
+  float dirt_rubber_clear_coat_roughness = 124;
+  float dirt_rubber_clear_coat_normal = 125;
+  float glass_min_damage_speed = 150;
+  float glass_full_damage_speed = 151;
+  float glass_damage_strength = 152;
+  float glass_damage_opacity = 153;
+  float glass_damage_refraction = 154;
+  float glass_damage_dg_value = 155;
+  Vector3Data glass_damage_color = 156;
+  float glass_dirt_strength = 157;
+  float glass_reflection_strength = 158;
+  float glass_scratches_strength = 159;
+  float glass_sun_behind_value = 160;
+  string glass_damage_curve = 161;
+  string glass_damage_sun_elevation = 162;
+  float glass_drs_sun_mult = 200;
+  float glass_drs_sun_pow = 201;
+  Vector3Data glass_drs_dirt_color = 202;
+  Vector4Data glass_drs_values_1 = 203;
+  Vector4Data glass_drs_values_2 = 204;
+  string glass_drs_curve_sun_elevation = 205;
+  string glass_drs_curve_cloud_density = 206;
+  string digital_display_sun_elevation = 250;
+  string digital_display_gloominess = 251;
+  string digital_display_gloominess_influence = 252;
+  float int_glass_min_damage_speed = 750;
+  float int_glass_full_damage_speed = 751;
+  float int_glass_damage_strength = 752;
+  float int_glass_damage_opacity = 753;
+  float int_glass_damage_refraction = 754;
+  float int_glass_damage_dg_value = 755;
+  Vector3Data int_glass_damage_color = 756;
+  float int_glass_dirt_strength = 757;
+  float int_glass_scratches_strength = 759;
+  float int_glass_sun_behind_value = 760;
+  string int_glass_damage_curve = 761;
+  string int_glass_damage_sun_elevation = 762;
+  float int_glass_drs_sun_mult = 800;
+  float int_glass_drs_sun_pow = 801;
+  Vector3Data int_glass_drs_dirt_color = 802;
+  Vector4Data int_glass_drs_values_1 = 803;
+  Vector4Data int_glass_drs_values_2 = 804;
+  string int_glass_drs_curve_sun_elevation = 805;
+  string int_glass_drs_curve_cloud_density = 806;
+  float win_rain_max_emit_rate = 850;
+  float win_rain_drops_scale = 851;
+  float win_rain_life_span = 852;
+  float win_rain_vel_mult = 853;
+  float win_rain_side_vel_mult = 854;
+  float win_rain_gravity_mult = 855;
+  float win_rain_fade_mult = 856;
+  float win_rain_bg_blur = 857;
+  float win_rain_drops_refraction = 858;
+  float win_rain_streaks_refraction = 859;
+  string win_rain_curves = 860;
+  string win_rain_sticky_curve = 861;
+  float win_rain_splash_mult = 870;
+  float win_rain_min_sticky = 871;
+  float win_rain_max_sticky = 872;
+  float win_rain_vel_noise_x = 873;
+  float win_rain_vel_noise_y = 874;
+  float win_rain_wiper_area_mult = 875;
+  float win_rain_wiper_drag = 876;
+  float win_rain_wiper_push = 877;
+  float win_rain_wiper_end_kill_perc = 878;
+  float win_rain_wiper_end_size_mult = 879;
+  float win_rain_wiper_end_life_perc = 880;
+  float ext_glass_min_damage_speed = 650;
+  float ext_glass_full_damage_speed = 651;
+  float ext_glass_damage_strength = 652;
+  float ext_glass_damage_opacity = 653;
+  float ext_glass_damage_refraction = 654;
+  float ext_glass_damage_dg_value = 655;
+  Vector3Data ext_glass_damage_color = 656;
+  float ext_glass_dirt_strength = 657;
+  float ext_glass_scratches_strength = 659;
+  float ext_glass_sun_behind_value = 660;
+  string ext_glass_damage_curve = 661;
+  string ext_glass_damage_sun_elevation = 662;
+  float ext_glass_drs_sun_mult = 700;
+  float ext_glass_drs_sun_pow = 701;
+  Vector3Data ext_glass_drs_dirt_color = 702;
+  Vector4Data ext_glass_drs_values_1 = 703;
+  Vector4Data ext_glass_drs_values_2 = 704;
+  string ext_glass_drs_curve_sun_elevation = 705;
+  string ext_glass_drs_curve_cloud_density = 706;
+  float tyre_min_blur_speed = 300;
+  float tyre_max_blur_speed = 301;
+  float tyre_flex_bubble_effect = 305;
+  float tyre_flex_vertical_scale = 306;
+  float tyre_flex_lateral_scale = 307;
+  float brake_disc_emissive_mult = 302;
+  string brake_disc_color_curve = 303;
+  float brake_disc_blur_bias = 304;
+  Vector3Data tyre_damage_cracks_basecolor = 350;
+  float tyre_damage_cracks_roughness = 351;
+  Vector3Data tyre_damage_edges_basecolor = 352;
+  float tyre_damage_edges_roughness = 353;
+  float tyre_damage_scratches_roughness = 354;
+  float tyre_damage_scratches_ambient_occlusion_mult = 355;
+  float tyre_damage_scratches_microshadow_add = 356;
+  string tyre_damage_curve = 357;
+  Vector3Data tyre_dirt_dust_basecolor = 401;
+  Vector3Data tyre_dirt_dust_darker_basecolor = 402;
+  float tyre_dirt_dust_reflectance = 403;
+  float tyre_dirt_dust_roughness = 404;
+  float tyre_dirt_dust_clear_coat = 407;
+  float tyre_dirt_dust_clear_coat_roughness = 408;
+  Vector3Data tyre_dirt_grime_basecolor = 410;
+  float tyre_dirt_grime_reflectance = 411;
+  float tyre_dirt_grime_roughness = 412;
+  float tyre_dirt_grime_clear_coat = 415;
+  float tyre_dirt_grime_clear_coat_roughness = 416;
+  Vector3Data tyre_dirt_rubber_basecolor = 418;
+  float tyre_dirt_rubber_reflectance = 419;
+  float tyre_dirt_rubber_roughness = 420;
+  float tyre_dirt_rubber_clear_coat = 423;
+  float tyre_dirt_rubber_clear_coat_roughness = 424;
+  string tyre_dirt_curve = 425;
+  float tyre_scuff_roughness_intensity = 451;
+  float tyre_scuff_cc_roughness_intensity = 452;
+  float tyre_scuff_reflectance_intensity = 453;
+  float tyre_scuff_red_roughness_intensity = 454;
+  float tyre_scuff_red_cc_roughness_intensity = 455;
+  float tyre_scuff_ao_roughness_intensity = 456;
+  float tyre_scuff_ao_cc_roughness_intensity = 457;
+  float tyre_scuff_wetness_roughness_intensity = 458;
+  float tyre_scuff_wetness_cc_roughness_intensity = 459;
+  float tyre_scuff_normal_intensity = 460;
+  float shadow_decal_body_intensity = 480;
+  float shadow_decal_body_ao_intensity = 482;
+  float shadow_decal_body_scale_y_m = 486;
+  float shadow_decal_body_edge_factor = 487;
+  float shadow_decal_tyres_intensity = 481;
+  float shadow_decal_tyres_ao_intensity = 483;
+  float shadow_decal_tyres_scale_y_m = 484;
+  float shadow_decal_tyres_edge_factor = 485;
+  string rain_streaks_atspeed_curve = 551;
+  string rain_intensity_static_drops_curve = 552;
+  string rain_wet_track_drops_curve = 553;
+  string rain_speed_static_drops_curve = 554;
+  float raindrops_scale_u = 561;
+  float raindrops_scale_v = 562;
+  float raindrops_speed = 563;
+  float raindrops_max_range = 564;
+  string raindrops_mask = 571;
+  string raindrops_alpha = 572;
+  string raindrops_normal = 573;
+  string tyre_smoke_build_curve = 603;
+  string tyre_smoke_rate_curve = 604;
+  string tyre_smoke_cool_curve = 605;
+  string tyre_dust_rate_curve = 606;
+  string tyre_dust_speed_curve = 607;
+  string tyre_grass_rate_curve = 608;
+  string tyre_grass_speed_curve = 609;
+  string debris_strength_curve = 610;
+  float lod_low_lod2_distance = 1001;
+  float lod_low_lod3_distance = 1002;
+  float lod_low_lod4_distance = 1003;
+  bool lod_low_use_lod1_interior = 1004;
+  float lod_med_lod2_distance = 1011;
+  float lod_med_lod3_distance = 1012;
+  float lod_med_lod4_distance = 1013;
+  bool lod_med_use_lod1_interior = 1014;
+  float lod_high_lod2_distance = 1021;
+  float lod_high_lod3_distance = 1022;
+  float lod_high_lod4_distance = 1023;
+  bool lod_high_use_lod1_interior = 1024;
+  float lod_ultra_lod2_distance = 1031;
+  float lod_ultra_lod3_distance = 1032;
+  float lod_ultra_lod4_distance = 1033;
+  bool lod_ultra_use_lod1_interior = 1034;
+  CarShadingGlobalSetting.PhysicalLightProperties light_front = 1100;
+  CarShadingGlobalSetting.PhysicalLightProperties light_rear = 1101;
+  CarShadingGlobalSetting.PhysicalLightProperties light_rain = 1102;
+  CarShadingGlobalSetting.PhysicalLightProperties light_cockpit = 1103;
+  string daylight_texture = 3001;
+  string low_beam_texture = 1104;
+  string high_beam_texture = 1105;
+  string particle_emitter_default_car_smoke = 1106;
+  string particle_emitter_default_car_vapor = 1107;
+  string particle_emitter_default_tyre_smoke = 1108;
+  string particle_emitter_default_tyre_vapor = 1109;
+  string particle_emitter_default_backfire_type_1 = 1113;
+  string particle_emitter_default_backfire_type_2 = 1117;
+  string particle_emitter_default_backfire_type_3 = 1118;
+  string particle_emitter_default_backfire_type_4 = 1119;
+  string particle_emitter_default_backfire_type_5 = 1120;
+  string particle_emitter_default_debris = 1114;
+  string particle_emitter_default_grass = 1115;
+  string particle_emitter_default_dirt = 1116;
+  bool vehicleled_distance_fade_enabled = 1110;
+  float vehicleled_distance_fade_in = 1111;
+  float vehicleled_distance_fade_out = 1112;
+  string vehicleledlight_emissive_intensity_sun_elevation = 1200;
+  string vehicleledlight_emissive_intensity_gloominess = 1201;
+  string vehiclenight_gsaa_intensity_sun_elevation = 2400;
+  float refraction_disable_range_by_sun_elevation_degrees_x = 1300;
+  float refraction_disable_range_by_sun_elevation_degrees_y = 1301;
+  float refraction_disable_range_by_glominess_x = 1302;
+  float refraction_disable_range_by_glominess_y = 1303;
+  float animation_brake_speed = 2300;
+  float animation_brake_threshold = 2301;
+  float animation_accelerator_speed = 2302;
+  float animation_accelerator_threshold = 2303;
+  reserved 406 to 406;
+  reserved 414 to 414;
+  reserved 422 to 422;
+  reserved 601 to 601;
+  reserved 602 to 602;
+}
+
+message CarShadingDynamicSetting {
+  float dust_rate = 1;
+  float grime_rate = 2;
+  float rubber_rate = 3;
+  float dirt_track_base_rate = 4;
+  float dirt_dust_wetness_factor = 5;
+  float windshield_scratches_dust_rate = 6;
+  float windshield_scratches_dirt_rate = 7;
+  float windshield_scratches_pickup_rate = 8;
+  float windshield_dirt_dust_rate = 9;
+  float windshield_dirt_dirt_rate = 10;
+  float windshield_dirt_pickup_rate = 11;
+}
+
+message TrackLayoutData {
+  string path = 1;
+  Vector3Data start_position = 2;
+  Vector3Data end_position = 3;
+  bool is_closed = 4;
+  bool show_middle_segments = 5;
+  bool use_for_tv_cameras = 6;
+}
+
+message SplineData {
+  enum NodeType {
+    Linear = 0;
+    Constant = 1;
+    Free = 2;
+  }
+  message Road {
+    enum MarkerInterpolation {
+      MarkerInterpolation_Smooth = 0;
+      MarkerInterpolation_Linear = 1;
+      MarkerInterpolation_None = 2;
+    }
+    enum CuspRemoval {
+      CuspRemoval_Default = 0;
+      CuspRemoval_None = 1;
+      CuspRemoval_TillerHanson = 2;
+    }
+    message Widths {
+      float inner_shoulder_width = 1;
+      float inner_turn_width = 2;
+      float lane1_width = 3;
+      float lane2_width = 4;
+      float lane3_width = 5;
+      float outer_turn_width = 6;
+      float outer_shoulder_width = 7;
+      float gutter_width = 8;
+      float sidewall_width = 9;
+      float side_width = 10;
+      float clearing_width = 11;
+    }
+    message Elevations {
+      float inner_shoulder_elevation = 1;
+      float inner_turn_elevation = 2;
+      float lane1_elevation = 3;
+      float lane2_elevation = 4;
+      float lane3_elevation = 5;
+      float outer_turn_elevation = 6;
+      float outer_shoulder_elevation = 7;
+      float gutter_elevation = 8;
+      float sidewall_elevation = 9;
+      float side_elevation = 10;
+      float clearing_elevation = 11;
+    }
+    message Materials {
+      string inner_shoulder_material = 1;
+      string inner_turn_material = 2;
+      string lane1_material = 3;
+      string lane2_material = 4;
+      string lane3_material = 5;
+      string outer_turn_material = 6;
+      string outer_shoulder_material = 7;
+      string gutter_material = 8;
+      string sidewall_material = 9;
+      string side_material = 10;
+      string clearing_material = 11;
+    }
+    message RoadWidths {
+      SplineData.Road.Widths right_widths = 1;
+      SplineData.Road.Widths left_widths = 2;
+    }
+    message RoadElevations {
+      SplineData.Road.Elevations right_elevations = 1;
+      SplineData.Road.Elevations left_elevations = 2;
+    }
+    message RoadMaterials {
+      SplineData.Road.Materials right_materials = 1;
+      SplineData.Road.Materials left_materials = 2;
+    }
+    float camber = 1;
+    SplineData.Road.MarkerInterpolation interpolation = 73;
+    SplineData.Road.CuspRemoval cusp_removal = 74;
+    RoadPhysicsSurface physics_surface = 75;
+    SplineData.Road.RoadWidths widths = 70;
+    SplineData.Road.RoadElevations elevations = 71;
+    SplineData.Road.RoadMaterials materials = 72;
+    reserved 2 to 59;
+  }
+  message RoadDecal {
+    string color_texture = 1;
+    string normal_texture = 2;
+    float size = 3;
+    Vector2Data offset = 4;
+  }
+  message Marker {
+    float position = 1;
+    oneof type {
+      SplineData.Road road = 100;
+      SplineData.RoadDecal road_decal = 101;
+    }
+  }
+  message Node {
+    TransformData transform = 1;
+    Vector3Data previous_anchor = 10;
+    Vector3Data next_anchor = 11;
+    SplineData.NodeType type = 4;
+    repeated SplineData.Marker markers = 12;
+    reserved 2 to 2;
+    reserved 3 to 3;
+  }
+  repeated SplineData.Node nodes = 3;
+  bool is_closed = 10;
+  float recorded_half_car_width = 11;
+  reserved 2 to 2;
+}
+
+message SplineActorData {
+  message DebugOptions {
+    float node_drawing_size = 1;
+    uint32 segment_points_count = 2;
+    uint32 segment_thickness = 3;
+  }
+  SplineData data = 1;
+  Vector4Data color = 21;
+  SplineActorData.DebugOptions debug_options = 30;
+}
+
+message SurfaceDefinitionActorData {
+  repeated SurfaceDefinitionData SurfaceDefinitionData = 1;
+}
+
+message SceneTrackInfoActorData {
+  SceneTrackInfo sceneInfo = 1;
+}
+
+message ZoneGeometricData {
+  repeated TransformData points = 1;
+  repeated string tags = 5;
+  Vector4Data color = 21;
+  float renderHeight = 22;
+  int32 compare_index = 1000;
+}
+
+message ZoneData {
+  message Timelines {
+    reserved 1 to 1;
+  }
+  message SafetyCarLine {
+    enum Type {
+      None = 0;
+      Line1 = 1;
+      Line2 = 2;
+    }
+    ZoneData.SafetyCarLine.Type type = 1;
+  }
+  message LastCorner {
+  }
+  message Pitlane {
+    enum Type {
+      Entry = 0;
+      Exit = 1;
+      Average = 2;
+      Main = 3;
+    }
+    message SegmentIndexes {
+      uint32 segment_a_index = 1;
+      uint32 segment_b_index = 2;
+    }
+    ZoneData.Pitlane.Type pitlane_type = 1;
+    repeated ZoneData.Pitlane.SegmentIndexes entering_of_zone_segments = 2;
+    repeated ZoneData.Pitlane.SegmentIndexes exiting_of_zone_segments = 3;
+  }
+  message Pitbox {
+    int32 slot = 1;
+  }
+  message GridZone {
+  }
+  message EventStart {
+    string event_path = 1;
+  }
+  message Poi {
+    enum Type {
+      GenericPoi = 0;
+      MeetingPoint = 1;
+      CarGarage = 2;
+      RepairShop = 3;
+      TyreShop = 4;
+      GasStation = 5;
+      CarWash = 6;
+      Landmark = 7;
+      TimeAttack = 8;
+      TimeAttack_Start = 80;
+      TimeAttack_Int = 81;
+      TimeAttack_Finish = 82;
+      Speedtrap = 9;
+      DriftStage = 10;
+      Delivery = 11;
+      SprintRace = 12;
+      CircuitRace = 13;
+      TougeBattle = 14;
+      Duel = 15;
+      Custom = 100;
+    }
+    string main_page = 1;
+    string detail_page = 2;
+    string name = 3;
+    bool is_hidden_in_map = 4;
+    float detection_zone = 10;
+    float discovery_zone = 11;
+    float notification_zone = 12;
+    repeated TransformData park_zones = 13;
+    repeated TransformData spawn_points = 24;
+    ZoneData.Poi.Type poi_type = 14;
+    int32 poi_id = 15;
+    string description = 16;
+    string texture = 17;
+    bool auto_discovered = 18;
+    bool is_client = 19;
+    bool is_in_detection_zone = 20;
+    bool is_in_discovery_zone = 21;
+    bool is_in_notification_zone = 22;
+    bool is_discovered = 23;
+    bool is_stopped = 25;
+  }
+  message AtoB {
+    enum Type {
+      Start_A = 0;
+      Finish_B = 1;
+    }
+    ZoneData.AtoB.Type a_to_b_zone_type = 1;
+  }
+  message DangerZone {
+  }
+  message GasStation {
+  }
+  message TyreShop {
+  }
+  message CarRepairShop {
+  }
+  message CarWash {
+  }
+  message FreeRoamZone {
+    string name = 1;
+    string description = 2;
+    float xp = 3;
+  }
+  message PlayerHome {
+  }
+  message PlayerShop {
+  }
+  message Drift {
+  }
+  message TimeAttack {
+  }
+  message RollingStartZone {
+    enum Type {
+      ChangeLine = 0;
+      StartGreenFlag = 1;
+      EndGreenFlag = 2;
+    }
+    ZoneData.RollingStartZone.Type rolling_start_zone_type = 1;
+  }
+  message SpeedLimit {
+    string command_name = 1;
+  }
+  message TVCamera {
+  }
+  message DRSZone {
+  }
+  message PlayAnimation {
+    string animation = 1;
+    fixed64 mesh_actor_guid = 2;
+  }
+  message ParkingSpace {
+    bool wrong_way_enabled = 1;
+  }
+  message Instance {
+    oneof type {
+      ZoneData.Timelines timelines = 100;
+      ZoneData.Pitlane pitlane = 101;
+      ZoneData.Pitbox pitbox = 102;
+      ZoneData.GridZone grid_zone = 103;
+      ZoneData.GasStation gas_station = 104;
+      ZoneData.TyreShop tyre_shop = 99;
+      ZoneData.CarWash car_wash = 98;
+      ZoneData.CarRepairShop car_repair_shop = 97;
+      ZoneData.FreeRoamZone free_roam_zone = 96;
+      ZoneData.PlayerHome player_home = 105;
+      ZoneData.PlayerShop player_shop = 106;
+      ZoneData.Drift drift = 107;
+      ZoneData.TimeAttack time_attack = 108;
+      ZoneData.EventStart event_start = 109;
+      ZoneData.LastCorner last_corner = 110;
+      ZoneData.SpeedLimit speed_limit = 111;
+      ZoneData.TVCamera tvcamera = 112;
+      ZoneData.RollingStartZone rolling_start_zone = 113;
+      ZoneData.SafetyCarLine safety_car_line = 114;
+      ZoneData.AtoB a_to_b = 115;
+      ZoneData.DangerZone danger_zone = 116;
+      ZoneData.PlayAnimation play_animation = 117;
+      ZoneData.DRSZone drs_zone = 118;
+      ZoneData.Poi poi = 127;
+      ZoneData.ParkingSpace parking_space = 128;
+    }
+  }
+  repeated ZoneGeometricData geometrics = 1;
+  repeated ZoneData.Instance instances = 2;
+}
+
+message IntersectionActorData {
+  enum IntersectionAlgorithm {
+    IntersectionAlgorithm_Default = 0;
+    IntersectionAlgorithm_Placeholder = 1;
+    IntersectionAlgorithm_Legacy = 2;
+    IntersectionAlgorithm_ksCsg = 3;
+  }
+  enum ConnectionDisplayMode {
+    ConnectionDisplayMode_Render = 0;
+    ConnectionDisplayMode_Ai = 1;
+  }
+  message RoadConnection {
+    fixed64 road0_localguid = 1;
+    bool road0_beginning = 2;
+    bool road0_left = 3;
+    int32 road0_strip = 4;
+    fixed64 road1_localguid = 5;
+    bool road1_beginning = 6;
+    bool road1_left = 7;
+    int32 road1_strip = 8;
+    bool invisible = 11;
+    string override_material = 10;
+    reserved 9 to 9;
+  }
+  message GapsSettings {
+    bool disable = 3;
+    string material = 1;
+    float world_scale = 2;
+  }
+  IntersectionActorData.IntersectionAlgorithm algorithm = 3;
+  string placeholder_material = 1;
+  IntersectionActorData.ConnectionDisplayMode connection_display_mode = 5;
+  IntersectionActorData.GapsSettings gaps_settings = 6;
+  RoadPhysicsSurface physics_surface = 7;
+  repeated IntersectionActorData.RoadConnection render_connections = 2;
+  repeated IntersectionActorData.RoadConnection ai_connections = 4;
+}
+
+message ZoneActorData {
+  message DebugOptions {
+    float node_drawing_size = 1;
+    uint32 segment_thickness = 3;
+  }
+  ZoneData data = 1000;
+  ZoneActorData.DebugOptions debug_options = 30;
+  reserved 1 to 6;
+  reserved 100 to 110;
+}
+
+message ReflectionProbeShadingSetting {
+  float importance = 1;
+  float intensity = 2;
+  float edgeBlend = 3;
+  bool is_not_box = 5;
+  reserved 4 to 4;
+}
+
+message ReflectionProbeRenderingSetting {
+  enum RenderingSettings {
+    RenderingSettings_Default = 0;
+    RenderingSettings_Custom = 1;
+  }
+  int32 resolution = 1;
+  Vector3Data offset = 2;
+  int32 facesPerFrame = 3;
+  ReflectionProbeRenderingSetting.RenderingSettings rendererSettings = 4;
+  IndirectLightingRendering indirectLightingSetting = 5;
+  DirectLightingRendering directLightingSetting = 6;
+  VolumetricsRendering volumetricsSetting = 7;
+  ShadowRendering shadowSetting = 8;
+  SkyRendering skySetting = 9;
+}
+
+message ReflectionProbeSetting {
+  ReflectionProbeShadingSetting shadingSettings = 1;
+  ReflectionProbeRenderingSetting renderingSettings = 2;
+}
+
+message ReflectionProbeActorData {
+  string texturePath = 1;
+  ReflectionProbeSetting settings = 2;
+}
+
+message IrradianceVolumeActorData {
+  string bounced_sky_visibility_texture = 1;
+  string night_irradiance_texture = 12;
+  float groundInterval = 2;
+  float elevation0 = 3;
+  float elevation1 = 4;
+  float elevation2 = 5;
+  repeated float groundElevation = 6;
+  float collisionTolerance = 8;
+  repeated Vector3Data offsets = 7;
+  uint32 grid_x = 9;
+  uint32 grid_z = 10;
+  fixed64 macro_guid = 11;
+}
+
+message MacroIrradianceVolumeActorData {
+}
+
+message ZoneSoundData {
+  message DebugOptions {
+    float node_drawing_size = 1;
+    uint32 segment_thickness = 3;
+  }
+  ZoneSoundType zoneType = 1;
+  string bank = 6;
+  string event = 7;
+  ZoneSoundAreaType areaType = 10;
+  float radius = 11;
+  Vector2Data scale = 12;
+  Vector2Data offset = 13;
+  float maxVolume = 14;
+  ZoneGeometricData zone = 15;
+  bool onlyFocusedCar = 22;
+  bool speedUpdate = 23;
+  bool useFading = 24;
+  bool isTrigger = 27;
+  ZoneSoundData.DebugOptions debug_options = 30;
+  reserved 21 to 21;
+  reserved 25 to 25;
+  reserved 26 to 26;
+}
+
+message ContainerActorData {
+  string scene_path = 1;
+  bool loaded_on_demand = 3;
+  reserved 2 to 2;
+}
+
+message TerrainActorDataNew {
+  string terrain_path = 1;
+}
+
+message MarshalData {
+  message MarshalSegment {
+    Vector3Data pos = 1;
+  }
+  message Human {
+    GenericRendererAnimation flag_loop = 2;
+    GenericRendererAnimation idle = 3;
+    GenericRendererAnimation flag_start = 4;
+    GenericRendererAnimation flag_end = 5;
+  }
+  message Digital {
+    repeated fixed64 volumetric_light_guids = 2;
+    reserved 1 to 1;
+  }
+  message Pitlane {
+    repeated fixed64 volumetric_light_guids = 2;
+    reserved 1 to 1;
+  }
+  MarshalData.MarshalSegment start = 1;
+  MarshalData.MarshalSegment middle = 2;
+  MarshalData.MarshalSegment end = 3;
+  bool checkered_flag = 4;
+  string mesh_path = 5;
+  int32 special_material_index = 6;
+  oneof actorType {
+    MarshalData.Human human = 10;
+    MarshalData.Digital digital = 11;
+    MarshalData.Pitlane pitlane = 12;
+  }
+  reserved 101 to 101;
+  reserved 102 to 102;
+  reserved 103 to 103;
+  reserved 104 to 104;
+}
+
+message ParticleEmitterActorData {
+  string particle_emitter_path = 1;
+  float strength = 2;
+}
+
+message TrafficVehicleData {
+  string mesh_path = 1;
+  ColliderData collider = 2;
+  float light_up_offset = 4;
+  float light_forward_offset = 5;
+  float light_pitch_rotation = 6;
+  Vector3Data body_color = 7;
+  CarActorData.ShadowDecal body_shadow_decal = 8;
+  float mass_kg = 9;
+  reserved 3 to 3;
+}
+
+message ActorData {
+  oneof actorType {
+    StaticMeshData static_mesh = 100;
+    InstancedStaticMeshData instanced_static_mesh = 105;
+    LightData light = 101;
+    InstancedLightData instanced_light = 139;
+    CameraData camera = 102;
+    CarActorData car = 103;
+    DriverActorData driver = 133;
+    StartingPositionData starting_position = 104;
+    FogVolumeData fog_volume = 106;
+    SplineActorData spline = 108;
+    SurfaceDefinitionActorData surfaces = 109;
+    SceneTrackInfoActorData track_info = 111;
+    ZoneActorData zones = 112;
+    MacroIrradianceVolumeActorData macro_irradiance_volume = 135;
+    ReflectionProbeActorData reflection_probe = 118;
+    IrradianceVolumeActorData irradiance_volume = 120;
+    ColorDecalData color_decal = 128;
+    NormalDecalData normal_decal = 129;
+    ColorAndNormalDecalData color_and_normal_decal = 130;
+    AmbientOcclusionDecalData ambientocclusion_decal = 131;
+    ShadowDecalData shadow_decal = 132;
+    ContainerActorData container = 121;
+    ZoneSoundData zone_sound = 125;
+    TrackLayoutData track_layout = 127;
+    TerrainActorDataNew terrainnew = 134;
+    IntersectionActorData Intersection = 136;
+    MarshalData marshal = 137;
+    ParticleEmitterActorData particle_emitter = 138;
+    TrafficVehicleData traffic_vehicle = 141;
+  }
+  reserved 107 to 107;
+  reserved 110 to 110;
+  reserved 117 to 117;
+}
+
+message ActorBounds {
+  Vector2Data bounds_min = 1;
+  Vector2Data bounds_max = 2;
+  float active_distance = 3;
+}
+
+message SceneActorData {
+  message Temporary {
+    TransformData local_transform_cache = 1;
+  }
+  fixed64 guid = 12;
+  fixed64 local_guid = 17;
+  fixed64 parent_container_guid = 15;
+  fixed64 enabling_container_guid = 16;
+  ActorBounds bounds = 13;
+  float active_distance_override = 14;
+  string name = 1;
+  bool enabled = 2;
+  TransformData transform = 4;
+  repeated string tags = 3;
+  string ref_actor = 49;
+  ActorData actor = 50;
+  SceneActorData.Temporary temporary = 99;
+  reserved 5 to 5;
+  reserved 6 to 6;
+  reserved 100 to 110;
+  reserved 10 to 10;
+  reserved 11 to 11;
+}
+
+message SceneGraphicsSettings {
+  message Pigment {
+    TransformData transform = 1;
+    string texture = 2;
+    bool world_align = 3;
+    Vector2Data world_align_scale_xz = 4;
+  }
+  float haze_minimum_altitude = 1;
+  bool haze_dynamic_min_altitude = 6;
+  float haze_dynamic_min_altitude_offset = 11;
+  float fog_minimum_altitude = 31;
+  bool fog_dynamic_min_altitude = 32;
+  float fog_dynamic_min_altitude_offset = 33;
+  float clouds_raymarch_sphere_offset = 5;
+  bool custom_haze_distance = 7;
+  float haze_start_distance = 8;
+  bool custom_haze_density = 40;
+  float haze_density = 41;
+  bool custom_omni_haze_density = 9;
+  float omni_haze_density = 10;
+  bool enable_omni_haze_density_curve_by_sun_elevation = 60;
+  string omni_haze_density_curve_by_sun_elevation = 61;
+  SceneGraphicsSettings.Pigment pigment = 4;
+  string graphicsSettingsOverride = 3;
+  bool custom_far_plane = 12;
+  float far_plane = 13;
+  bool is_open_world = 20;
+  float night_irradiance_gamma = 50;
+  float night_irradiance_clamp = 51;
+}
+
+message SceneData {
+  repeated string tags = 1;
+  repeated SceneActorData scene_actors = 2;
+  SceneGraphicsSettings graphics_settings = 3;
+}
+
+message CameraModuleData {
+  TransformData transform = 1;
+  CameraData data = 2;
+}
+
+message CameraCollectionData {
+  string name = 1;
+  repeated CameraModuleData cameras = 2;
+}
+
+message CameraUiData {
+  bool show_cinematic_tool = 7;
+  bool show_drivable_cams = 1;
+  bool show_onboard_cams = 2;
+  bool show_tv_cams = 3;
+  bool show_sequence_cams = 4;
+  bool show_showroom_cam = 5;
+  bool show_orbit_cam = 8;
+  bool show_debug_cams = 6;
+}
+
+message EnvironmentShadingGlobalSetting {
+  string box_reflection_probe_intensity_sun_elevation = 1;
+  string reflection_probe_intensity_sun_elevation = 12;
+  string stars_intensity_sun_elevation = 2;
+  string sky_inscatter_scale_main_pass_sun_elevation = 3;
+  string sky_inscatter_offset_skybox_sun_elevation = 4;
+  string night_irradiance_multiplier_sun_elevation = 5;
+  string soft_veil_params_sun_elevation = 30;
+  string natural_veil_params_sun_elevation = 31;
+  string cinematic_veil_params_sun_elevation = 32;
+  string cheap_fog_red_booster_sun_elevation = 11;
+  string shadow_decal_intensity_sun_elevation = 13;
+  float sun_in_sky_main_pass_luminance_multiplier = 8;
+  string surface_material_params_sun_elevation = 10;
+  string grass_material_params_sun_elevation = 9;
+  string water_spray_color_sun_elevation = 33;
+  string smoke_color_sun_elevation = 34;
+  reserved 6 to 6;
+  reserved 7 to 7;
+}

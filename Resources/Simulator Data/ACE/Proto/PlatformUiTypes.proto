@@ -1,0 +1,488 @@
+syntax = "proto3";
+
+import "CarData.proto";
+import "CarDataCache.proto";
+import "Math.proto";
+import "Options.proto";
+import "CarBehaviour.proto";
+import "PenaltySystem.proto";
+import "Gameplay.proto";
+import "GameplayUI.proto";
+
+enum UIFlagType {
+  Flag_None = 0;
+  Flag_White = 1;
+  Flag_Green = 2;
+  Flag_Red = 3;
+  Flag_Blue = 4;
+  Flag_Yellow = 5;
+  Flag_Black = 6;
+  Flag_BlackWhite = 7;
+  Flag_Checkered = 8;
+  Flag_OrangeCircle = 9;
+  Flag_RedYellowStipes = 10;
+}
+
+enum UIEndSessionFlag {
+  UIFlag_None = 0;
+  UIFlag_LastLap = 1;
+  UIFlag_CanSkip = 2;
+  UIFlag_ExpandLeaderboard = 4;
+  UIFlag_PlayerWinner = 8;
+  UIFlag_SessionEnd = 16;
+  UIFlag_NextSessionAvailable = 32;
+  UIFlag_RestartAvailable = 64;
+  UIFlag_MultiPlayerSession = 128;
+  UIFlag_WaitForFinish = 256;
+  UIFlag_WaitForPitBox = 512;
+  UIFlag_WaitForAiControl = 1024;
+  UIFlag_LeaderOnLastLap = 2048;
+}
+
+enum UIInitialGrip {
+  UIInitialGrip_GREEN = 0;
+  UIInitialGrip_FAST = 1;
+  UIInitialGrip_OPTIMUM = 2;
+}
+
+enum UIOnlineStatus {
+  UISinglePlayer = 0;
+  UIOnlineConnected = 1;
+  UIOnlineDisconnected = 2;
+}
+
+enum UICarLapState {
+  UINone = 0;
+  UIOutLap = 1;
+  UICheckered = 2;
+}
+
+message UITyreState {
+  float slip = 1;
+  bool lock = 2;
+  float tyre_pression = 3;
+  float tyre_temperature_c = 4;
+  float brake_temperature_c = 5;
+  float brake_pressure = 6;
+  float tyre_temperature_left = 7;
+  float tyre_temperature_center = 8;
+  float tyre_temperature_right = 9;
+  string tyre_compound_front = 10;
+  string tyre_compound_rear = 11;
+  float tyre_normalized_pressure = 12;
+  float tyre_normalized_temperature_left = 13;
+  float tyre_normalized_temperature_center = 14;
+  float tyre_normalized_temperature_right = 15;
+  float brake_normalized_temperature = 16;
+  float tyre_normalized_temperature_core = 17;
+}
+
+message UIFlagState {
+  UIFlagType flag = 1;
+  UIFlagType global_flag = 2;
+}
+
+message UICurrentCarStateLowFrequency {
+  CarElectronicsValues electronics = 3;
+  CarInstrumentationValues instrumentation = 4;
+  repeated string display_htmls = 10;
+  CarElectronicsValues electronics_min_limit = 11;
+  CarElectronicsValues electronics_max_limit = 12;
+  CarElectronicsValues electronics_is_modifiable = 17;
+  CarInstrumentationValues instrumentation_min_limit = 23;
+  CarInstrumentationValues instrumentation_max_limit = 24;
+  int32 total_lap_count = 6;
+  uint32 current_pos = 18;
+  uint32 total_drivers = 19;
+  int32 last_laptime_ms = 8;
+  int32 best_laptime_ms = 9;
+  UIFlagState flags = 60;
+  fixed32 max_gears = 13;
+  EngineData.EngineType engine_type = 14;
+  bool has_kers = 15;
+  bool is_last_lap = 16;
+  string performance_mode_name = 20;
+  float diff_coast_raw_value = 21;
+  float diff_power_raw_value = 22;
+  int32 race_cut_gained_time_ms = 25;
+  int32 distance_to_deadline = 26;
+  float race_cut_current_delta = 27;
+  repeated bool mandatory_pitstops_done = 28;
+}
+
+message UICurrentCarState {
+  string focused_car_id = 1000;
+  string player_car_id = 1001;
+  bool has_focused_car = 1;
+  bool is_player_car = 29;
+  int32 rpm = 2;
+  float rpm_percent = 3;
+  int32 speed = 4;
+  bool is_rpm_limiter_on = 81;
+  bool is_change_up_rpm = 82;
+  bool is_change_down_rpm = 83;
+  int32 display_speed_kmh = 5;
+  int32 display_speed_mph = 6;
+  float display_speed_ms = 7;
+  float pitspeeding_delta = 84;
+  string gear = 8;
+  bool tc_active = 9;
+  bool abs_active = 10;
+  bool esc_active = 17;
+  int32 gear_int = 11;
+  bool launch_active = 12;
+  bool is_ignition_on = 13;
+  bool is_engine_running = 14;
+  float gas_percent = 15;
+  float brake_percent = 16;
+  float handbrake_percent = 78;
+  float clutch_percent = 79;
+  float steering_percent = 80;
+  float ffb_strength = 123;
+  float car_ffb_mupliplier = 129;
+  int32 water_temperature_c = 20;
+  float water_temperature_percent = 21;
+  int32 air_temperature_c = 22;
+  float water_pressure = 125;
+  float oil_temperature = 126;
+  float oil_pressure = 127;
+  float fuel_pressure_bar = 128;
+  Vector3Data g_forces = 23;
+  float exhaust_temperature_c = 32;
+  float turbo_boost = 33;
+  float turbo_boost_level = 39;
+  float turbo_boost_perc = 43;
+  int32 steer_degrees = 34;
+  float current_km = 40;
+  uint32 total_km = 35;
+  uint32 total_driving_time_s = 41;
+  int32 time_of_day_hours = 36;
+  int32 time_of_day_minutes = 37;
+  int32 time_of_day_seconds = 38;
+  int32 delta_time_ms = 51;
+  int32 current_lap_time_ms = 52;
+  int32 predicted_lap_time_ms = 53;
+  string delta_time_drivername = 56;
+  int32 delta_time_ms_ui = 57;
+  float fuel_liter_current_quantity = 70;
+  float fuel_liter_current_quantity_percent = 71;
+  float fuel_liter_per_km = 76;
+  float km_per_fuel_liter = 77;
+  float current_torque = 87;
+  fixed32 current_bhp = 88;
+  UITyreState tyre_lf = 100;
+  UITyreState tyre_rf = 101;
+  UITyreState tyre_lr = 102;
+  UITyreState tyre_rr = 103;
+  float kers_charge_perc = 42;
+  float kers_current_perc = 44;
+  bool kers_is_charging = 46;
+  float npos = 113;
+  int32 npos_perc = 112;
+  double control_lock_time = 50;
+  bool is_wrong_way = 54;
+  bool is_drs_available = 55;
+  UIDamageState car_damage = 111;
+  CarLocation.Type car_location = 201;
+  UICurrentCarStateLowFrequency low_frequency = 200;
+  UIPitInfo pit_info = 300;
+  float fuel_liter_used = 90;
+  float fuel_liter_per_lap = 91;
+  float laps_possible_with_fuel = 92;
+  float battery_temperature = 93;
+  bool battery_is_charging = 94;
+  float battery_voltage = 124;
+  bool is_max_kj_per_lap_reached = 130;
+  bool is_max_charge_kj_per_lap_reached = 131;
+  float instantaneous_fuel_liter_per_km = 132;
+  float instantaneous_km_per_fuel_liter = 133;
+  float gear_rpm_window = 134;
+  float car_compass = 135;
+  float car_steer_lock = 136;
+  float input_steer_lock = 137;
+}
+
+message UIDamageState {
+  float damage_front = 1;
+  float damage_rear = 2;
+  float damage_left = 3;
+  float damage_right = 4;
+  float damage_center = 5;
+  float damage_suspension_lf = 6;
+  float damage_suspension_rf = 7;
+  float damage_suspension_lr = 8;
+  float damage_suspension_rr = 9;
+}
+
+message OpponentUIData {
+  float relative_dist_x = 1;
+  float relative_dist_y = 2;
+  float opacity = 3;
+  string car_id = 5;
+  reserved 4 to 4;
+}
+
+message WarningUISign {
+  bool is_visible = 1;
+  Vector4Data color = 2;
+  float opacity = 3;
+}
+
+message UIRadarState {
+  repeated OpponentUIData opponents_data = 1;
+  float max_opponent_opacity = 2;
+  WarningUISign left_sign = 3;
+  WarningUISign right_sign = 4;
+  bool is_visible = 5;
+  int32 opponents_num = 6;
+  float opacity = 7;
+}
+
+message UIPitInfo {
+  double time_in_pits = 1;
+  int32 damage = 2;
+  int32 fuel = 3;
+  int32 tyres_lf = 4;
+  int32 tyres_rf = 5;
+  int32 tyres_lr = 6;
+  int32 tyres_rr = 7;
+}
+
+message UISpecialEventState {
+  string event_id = 1;
+  string golden_time = 5;
+  string silver_time = 6;
+  string bronze_time = 7;
+  string my_time = 8;
+  uint32 my_medal = 9;
+  uint32 my_attempts = 10;
+}
+
+message UIInitialWeather {
+  float ambient_temperature_c = 1;
+  float ground_temperature_c = 2;
+  bool is_static_weather = 3;
+  GameModeSelectionWeatherType weather_preset = 4;
+}
+
+message UISessionStateLowFrequency {
+  repeated UIChatMessage chat_messages = 1;
+}
+
+message UIPitstopWindowRange {
+  int32 start_ms = 1;
+  int32 end_ms = 2;
+  string start_time = 3;
+  string end_time = 4;
+}
+
+message UISessionState {
+  bool has_next_session = 8;
+  string session_name = 1;
+  int32 event_id = 23;
+  int32 session_id = 24;
+  string phase_name = 2;
+  UIInitialGrip initial_grip = 9;
+  string time_left = 3;
+  int32 time_left_ms = 35;
+  string wait_time = 14;
+  int32 total_lap = 4;
+  int32 current_lap = 5;
+  int32 lights_on = 6;
+  int32 lights_mode = 7;
+  float lap_length_km = 10;
+  int32 time_of_day_hours = 11;
+  int32 time_of_day_minutes = 12;
+  int32 time_of_day_seconds = 13;
+  int32 end_session_flag = 15;
+  UISpecialEventState special_event_state = 16;
+  UIInitialWeather initial_weather = 19;
+  string time_to_next_session = 17;
+  bool disconnected_from_server = 18;
+  bool restart_season_enabled = 20;
+  bool ui_enable_drive = 21;
+  bool ui_enable_setup = 22;
+  int32 player_ping = 25;
+  int32 player_latency = 26;
+  int32 player_cpu_usage = 27;
+  int32 player_cpu_usage_avg = 28;
+  int32 player_qos = 29;
+  int32 player_qos_avg = 30;
+  int32 player_fps = 31;
+  int32 player_fps_avg = 32;
+  bool is_ready_to_next_blinking = 33;
+  bool show_waiting_for_players = 34;
+  UISessionStateLowFrequency low_frequency_state = 36;
+  bool is_loading_vehicles = 37;
+  repeated UIPitstopWindowRange pitstop_window_ranges = 50;
+  int32 current_pitstop_window_index = 51;
+  bool is_current_pitstop_window_open = 52;
+  int32 pitstop_window_time_ms = 53;
+  string pitstop_window_time = 56;
+  bool pitstop_window_requires_tyre_change = 54;
+  bool pitstop_window_requires_refuelling = 55;
+}
+
+message UITimingState {
+  string current = 1;
+  string delta_current = 2;
+  int32 delta_current_p = 3;
+  string last = 4;
+  string delta_last = 5;
+  int32 delta_last_p = 6;
+  string best = 7;
+  string ideal = 8;
+  repeated string splits = 9;
+  repeated int32 splits_p = 10;
+  string total = 12;
+  bool invalid = 11;
+}
+
+message UIState {
+  string gamemode = 1;
+  string menumode = 2;
+  string uimode = 3;
+  string units = 4;
+  bool is_backend_connected = 5;
+  bool lock_ui = 6;
+  int32 player_mode = 7;
+  int32 ui_bitset = 8;
+  string game_version = 9;
+  bool is_sandbox = 10;
+  int32 garage_cars_count = 12;
+  bool is_admin = 13;
+  UIOnlineStatus online_status = 14;
+  bool is_spectator = 15;
+  int32 current_camera_mode = 18;
+  int32 current_camera_submode = 19;
+  bool is_free_cam = 20;
+  reserved 11 to 11;
+}
+
+message UILeaderboardLineState {
+  int32 pos = 1;
+  string car_location = 2;
+  bool focused = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string nation = 12;
+  int32 car_number = 6;
+  string car_name = 13;
+  string car_brand = 14;
+  string last_lap_time = 7;
+  string best_lap_time = 8;
+  string total_time = 9;
+  int32 total_laps = 10;
+  bool is_ready = 11;
+  string team_name = 15;
+  string penalties = 16;
+  int32 num_pits = 17;
+  string time_diff = 18;
+  int32 ping = 19;
+  UICarLapState state = 20;
+  int32 ballast = 21;
+  float restrictor = 22;
+  string tyre_compound = 23;
+  int32 mandatory_pitstops_countdown = 25;
+  int32 color_override = 26;
+}
+
+message UILeaderboardState {
+  repeated UILeaderboardLineState lines = 1;
+}
+
+message UIRealtimeLeaderboardLineState {
+  int32 pos = 1;
+  string car_location = 2;
+  bool focused = 3;
+  int32 lapped = 4;
+  string first_name = 5;
+  string last_name = 6;
+  int32 car_number = 7;
+  string car_name = 8;
+  string car_brand = 9;
+  string time_gap = 10;
+  string team_name = 11;
+  int32 lap_count = 12;
+  int32 ping = 13;
+  string penalties = 14;
+  UICarLapState state = 15;
+  int32 color_override = 16;
+}
+
+message UIRealtimeLeaderboardState {
+  repeated UIRealtimeLeaderboardLineState lines = 1;
+}
+
+message ReplayLapInfo {
+  int32 lap_number = 1;
+  int32 time_ms = 2;
+}
+
+message UIReplayState {
+  bool is_playing = 1;
+  int32 starting_time_ms = 2;
+  int32 total_time_ms = 3;
+  int32 current_time_ms = 4;
+  float time_multiplier = 5;
+}
+
+message UIDriverState {
+  string driver_name = 8;
+  string driver_surname = 9;
+  string driver_username = 10;
+  string driver_short_name = 11;
+}
+
+message DevUiData {
+  map<string, bool> dialogs = 5;
+}
+
+message UIPenaltyData {
+  PenaltyType type = 1;
+  string time_penalty = 2;
+  int32 lap_count = 3;
+  bool is_active = 4;
+}
+
+message UIPenaltyState {
+  repeated UIPenaltyData penalties = 1;
+}
+
+message PlatformUIPageState {
+  bool can_accept_game_shortcuts = 1;
+  bool can_be_paused = 2;
+}
+
+message OnPageLoaded {
+  string path = 1;
+  string page = 2;
+  string subpage = 3;
+}
+
+message CarOnTrack {
+  int32 car_number = 1;
+  int32 car_position = 2;
+  float coord_x = 3;
+  float coord_y = 4;
+  float multiplier = 8;
+  bool is_focused = 5;
+  int32 car_laps_from_leader = 6;
+  bool in_pit = 7;
+  float car_angle = 9;
+}
+
+message UICarsOnTrackState {
+  repeated CarOnTrack cars_on_track = 1;
+  float focused_car_angle = 2;
+  float trackmap_offset_x = 3;
+  float trackmap_offset_y = 4;
+}
+
+message UIFreeRoamState {
+  FreeRoamActivity activity = 1;
+  GameplayPoi current_poi = 2;
+  repeated GameplayPoi poi = 3;
+  FreeRoamNavigation navigation = 4;
+  FreeRoamTimeAttack time_attack = 5;
+}

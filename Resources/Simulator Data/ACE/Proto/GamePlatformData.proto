@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message GamePlatform {
+  enum PlayerIdType {
+    Error = 0;
+    EvoProfileId = 1;
+    LocalMachineHash = 2;
+    SteamId = 3;
+    DevId = 7;
+    AiId = 8;
+  }
+  message AcquireAuthTokenRequest {
+  }
+  message OnAuthTokenResponse {
+    string auth_token = 1;
+    bool success = 2;
+  }
+}

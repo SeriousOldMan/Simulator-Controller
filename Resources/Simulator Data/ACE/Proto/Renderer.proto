@@ -1,0 +1,902 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+
+enum PixelFormat {
+  PixelFormat_Unknown = 0;
+  PixelFormat_R8UNorm = 1;
+  PixelFormat_R8G8B8A8UNorm = 2;
+  PixelFormat_R8G8B8A8UNormSrgb = 3;
+  PixelFormat_R8G8B8A8SNorm = 4;
+  PixelFormat_B8G8R8A8UNorm = 5;
+  PixelFormat_B8G8R8A8UNormSrgb = 6;
+  PixelFormat_R16Float = 7;
+  PixelFormat_R16UNorm = 28;
+  PixelFormat_R16Typeless = 39;
+  PixelFormat_R16G16Float = 8;
+  PixelFormat_R16G16UNorm = 29;
+  PixelFormat_R16G16SNorm = 43;
+  PixelFormat_R16G16B16A16Float = 9;
+  PixelFormat_R16G16B16A16UNorm = 25;
+  PixelFormat_R32Float = 10;
+  PixelFormat_R32Typeless = 40;
+  PixelFormat_R32G32Float = 31;
+  PixelFormat_R32G32B32A32Float = 11;
+  PixelFormat_BC1UNorm = 12;
+  PixelFormat_BC1UNormSrgb = 13;
+  PixelFormat_BC2UNorm = 14;
+  PixelFormat_BC2UNormSrgb = 15;
+  PixelFormat_BC3UNorm = 16;
+  PixelFormat_BC3UNormSrgb = 17;
+  PixelFormat_BC4UNorm = 27;
+  PixelFormat_BC5UNorm = 35;
+  PixelFormat_BC6HUFloat16 = 26;
+  PixelFormat_BC6HSFloat16 = 32;
+  PixelFormat_BC7UNorm = 33;
+  PixelFormat_BC7UNormSrgb = 34;
+  PixelFormat_ETC2 = 18;
+  PixelFormat_ETC2Srgb = 19;
+  PixelFormat_ETC2EAC = 20;
+  PixelFormat_ETC2SrgbEAC = 21;
+  PixelFormat_D16UNorm = 22;
+  PixelFormat_D24UNormS8UInt = 23;
+  PixelFormat_D32Float = 24;
+  PixelFormat_R11G11B10Float = 30;
+  PixelFormat_R16UInt = 36;
+  PixelFormat_R32UInt = 37;
+  PixelFormat_R32G32B32A32UInt = 38;
+  PixelFormat_R10G10B10A2Unorm = 41;
+  PixelFormat_R10G10B10A2Uint = 42;
+  PixelFormat_R8UInt = 44;
+}
+
+enum MaterialBlendMode {
+  MaterialBlendMode_Opaque = 0;
+  MaterialBlendMode_AlphaTest = 4;
+  MaterialBlendMode_AlphaToCoverage = 1;
+  MaterialBlendMode_AlphaBlend = 2;
+  MaterialBlendMode_RgbBlend = 3;
+  MaterialBlendMode_OrderIndependentTransparency = 5;
+}
+
+enum ShadingRate {
+  ShadingRate_1x1 = 0;
+  ShadingRate_1x2 = 1;
+  ShadingRate_2x1 = 2;
+  ShadingRate_2x2 = 3;
+  ShadingRate_2x4 = 4;
+  ShadingRate_4x2 = 5;
+  ShadingRate_4x4 = 6;
+}
+
+enum MaterialDepthMode {
+  MaterialDepthMode_Normal = 0;
+  MaterialDepthMode_NoWrite = 1;
+  MaterialDepthMode_Off = 2;
+}
+
+enum MaterialCullMode {
+  MaterialCullMode_Front = 0;
+  MaterialCullMode_Back = 1;
+  MaterialCullMode_None = 2;
+  MaterialCullMode_Wireframe = 3;
+}
+
+enum MaterialAlphaToCoverage {
+  MaterialAlphaToCoverage_Base = 0;
+  MaterialAlphaToCoverage_Red = 1;
+  MaterialAlphaToCoverage_Green = 2;
+  MaterialAlphaToCoverage_Blue = 3;
+  MaterialAlphaToCoverage_Blend = 4;
+}
+
+enum MaterialNormalReconstuctionMode {
+  MaterialNormalReconstuctionMode_Default = 0;
+  MaterialNormalReconstuctionMode_Force = 1;
+  MaterialNormalReconstuctionMode_Skip = 2;
+}
+
+enum AmbientOcclusionQuality {
+  AmbientOcclusionQuality_Low = 0;
+  AmbientOcclusionQuality_Medium = 1;
+  AmbientOcclusionQuality_High = 2;
+  AmbientOcclusionQuality_Ultra = 3;
+  AmbientOcclusionQuality_Off = 4;
+}
+
+enum VSync {
+  Adaptive = 0;
+  Off = 1;
+  On = 2;
+}
+
+message TextureMetadata {
+  enum ShrinkFactor {
+    ShrinkFactor_1x = 0;
+    ShrinkFactor_2x = 1;
+    ShrinkFactor_4x = 2;
+    ShrinkFactor_8x = 3;
+  }
+  enum MipmapGeneration {
+    MipmapGeneration_Generate = 0;
+    MipmapGeneration_NoMips = 1;
+    MipmapGeneration_KeepUserProvided = 2;
+  }
+  enum PixelDataType {
+    PixelDataType_SrgbColor_BC7_Alpha = 0;
+    PixelDataType_SrgbColor_BC3_Alpha = 7;
+    PixelDataType_SrgbColor_BC1_NoAlpha = 8;
+    PixelDataType_LinearColor_BC1_NoAlpha = 5;
+    PixelDataType_LinearColor_BC3_Alpha = 6;
+    PixelDataType_LinearColor_BC7_Alpha = 1;
+    PixelDataType_LinearGreyscale_BC4 = 2;
+    PixelDataType_NormalMap_BC5 = 9;
+    PixelDataType_NormalMap_BC6H = 3;
+    PixelDataType_Hdr_BC6H = 4;
+  }
+  enum Priority {
+    Priority_Medium = 0;
+    Priority_Low = 1;
+    Priority_High = 2;
+  }
+  message SourceImages {
+    repeated string importPaths = 1;
+    uint32 width = 2;
+    uint32 height = 3;
+    uint32 mipLevels = 4;
+    uint32 arraySize = 5;
+    PixelFormat format = 6;
+  }
+  message ConversionSettings {
+    TextureMetadata.PixelDataType pixelDataType = 1;
+    TextureMetadata.ShrinkFactor shrinkFactor = 2;
+    MaterialBlendMode transparency = 3;
+    float alphaToCoverageAlphaReference = 11;
+    bool isCubemap = 7;
+    TextureMetadata.MipmapGeneration mipmapGeneration = 8;
+    int32 maxNumberOfGeneratedMips = 13;
+    bool compress = 9;
+    bool gammaOverrideRGBChannels = 14;
+    bool gammaOverrideAlphaChannel = 15;
+    bool invertGammaOverride = 16;
+    reserved 4 to 4;
+    reserved 10 to 10;
+    reserved 12 to 12;
+  }
+  message TilingInfo {
+    int32 tileWidthInTexels = 1;
+    int32 tileHeightInTexels = 2;
+    int32 tileDepthInTexels = 3;
+    int32 legacyTileRowPitch = 6;
+    repeated int32 tileOffsetForSubresource = 4;
+    repeated int32 tileCountForSubresource = 5;
+    repeated int32 rowPitchForTile = 7;
+  }
+  TextureMetadata.SourceImages sourceImages = 10;
+  TextureMetadata.ConversionSettings conversionSettings = 11;
+  TextureMetadata.TilingInfo tilingInfo = 12;
+  uint32 width = 1;
+  uint32 height = 2;
+  uint32 mipLevels = 3;
+  uint32 depthOrArraySize = 6;
+  PixelFormat format = 4;
+  bool isCubemap = 7;
+  bool isVolume = 8;
+  bool isTiled = 13;
+  TextureMetadata.Priority priority = 20;
+}
+
+message MaterialData {
+  message MaterialVar {
+    oneof value {
+      float asFloat = 1;
+      Vector2Data asVector2 = 2;
+      Vector3Data asVector3 = 3;
+      Vector4Data asVector4 = 4;
+      MatrixData asMatrix = 5;
+    }
+  }
+  message MaterialResource {
+    int32 slot = 1;
+    string texture = 2;
+  }
+  message AlphaSettings {
+    float opacityScale = 1;
+    float cutoff = 2;
+    float mipBias = 3;
+  }
+  string materialType = 1;
+  ShadingRate shadingRate = 100;
+  MaterialBlendMode blendMode = 2;
+  MaterialDepthMode depthMode = 3;
+  MaterialCullMode cullMode = 6;
+  bool flipNormalOnBackside = 12;
+  bool doNotInvertNormalOnBackside = 102;
+  bool supersampleAlphaTest = 13;
+  float specularProbeDistance = 27;
+  bool dithering = 25;
+  bool customPrepass = 26;
+  MaterialAlphaToCoverage alphaToCoverage = 8;
+  int32 renderOrder = 18;
+  float alphaToCoverageOpacityScale = 9;
+  float alphaToCoverageCutoff = 10;
+  float alphaToCoverageMipClamp = 11;
+  float screenSpaceShadowContrast = 28;
+  bool useShadowDepthAlphaSettings = 14;
+  float shadowDepthAlphaToCoverageOpacityScale = 15;
+  float shadowDepthAlphaToCoverageCutoff = 16;
+  float shadowDepthAlphaToCoverageMipClamp = 17;
+  repeated MaterialData.AlphaSettings shadowAlphaSettingsPerCascade = 1000;
+  float alphaTestOpacityScale = 110;
+  float alphaTestCutoff = 111;
+  float alphaTestMipClamp = 112;
+  map<string, MaterialData.MaterialVar> variables = 4;
+  map<string, MaterialData.MaterialResource> resources = 5;
+  string baseMaterialPath = 20;
+  map<string, bool> overrideVariables = 21;
+  map<string, bool> overrideResources = 22;
+  reserved 7 to 7;
+}
+
+message AnimationData {
+  message ImportSettings {
+    string importPath = 1;
+    float framesPerSecond = 2;
+    bool ignoreFbxUnits = 3;
+  }
+  message Track {
+    string bone = 1;
+    repeated MatrixData frames = 2;
+  }
+  message Take {
+    string name = 1;
+    float framesPerSecond = 2;
+    repeated AnimationData.Track tracks = 3;
+  }
+  AnimationData.ImportSettings importSettings = 1;
+  repeated AnimationData.Take takes = 2;
+}
+
+message VolumetricFogSettings {
+  float max_density = 13;
+  float directional_inscattering_exponent = 22;
+  float directional_inscattering_scale = 6;
+  string ambient_inscattering_scale_by_sun_degree_curve = 24;
+  float directional_inscattering_boost_scale = 20;
+  float directional_inscattering_boost_end = 21;
+  float bias = 4;
+  float phase_0_weight = 14;
+  float phase_1_weight = 15;
+  float phase_directional_g = 17;
+  float phase_ambient_g = 18;
+  float extinction = 16;
+  string clouds_directional_scattering_by_sun_angle_curve = 23;
+  reserved 9 to 9;
+}
+
+message ShadowCascades {
+  message Split {
+    float distance = 1;
+    float transition = 2;
+    float bias = 3;
+    float normal_offset_scale = 4;
+    int32 resolution = 5;
+    bool is_far = 6;
+  }
+  repeated ShadowCascades.Split splits = 1;
+  ShadowCascades.Split hero_split = 2;
+}
+
+message VeilSettings {
+  float intensity = 1;
+  float threshold = 2;
+  float lensDirtIntensity = 3;
+  string lensDirtTexture = 4;
+}
+
+message VideoSettings {
+  enum UpscalingMode {
+    Upscaling_None = 0;
+    Upscaling_FSR3 = 2;
+    Upscaling_DLSS = 3;
+  }
+  enum UpscalingFSR3Preset {
+    FSR3_NativeAA = 0;
+    FSR3_Quality = 1;
+    FSR3_Balanced = 2;
+    FSR3_Performance = 3;
+    FSR3_UltraQuality = 6;
+    FSR3_Custom = 5;
+  }
+  enum UpscalingDLSSPreset {
+    DLSS_DLAA = 0;
+    DLSS_Quality = 1;
+    DLSS_Balanced = 2;
+    DLSS_Performance = 3;
+    DLSS_UltraQuality = 5;
+    DLSS_Custom = 6;
+  }
+  enum GrassDensity {
+    GrassDensity_Low = 0;
+    GrassDensity_Medium = 1;
+    GrassDensity_High = 2;
+    GrassDensity_Ultra = 4;
+    GrassDensity_Off = 3;
+  }
+  enum LevelOfDetailQuality {
+    LevelOfDetailQuality_Low = 0;
+    LevelOfDetailQuality_Medium = 1;
+    LevelOfDetailQuality_High = 2;
+    LevelOfDetailQuality_Ultra = 3;
+    LevelOfDetailQuality_Custom = 4;
+  }
+  enum StaticLevelOfDetailQuality {
+    StaticLevelOfDetailQuality_Low = 0;
+    StaticLevelOfDetailQuality_Medium = 1;
+    StaticLevelOfDetailQuality_High = 2;
+  }
+  enum VehicleLevelOfDetailQuality {
+    VehicleLevelOfDetailQuality_Low = 0;
+    VehicleLevelOfDetailQuality_Medium = 1;
+    VehicleLevelOfDetailQuality_High = 2;
+    VehicleLevelOfDetailQuality_Ultra = 3;
+  }
+  enum CloudsQuality {
+    CloudsQuality_Low = 0;
+    CloudsQuality_Medium = 1;
+    CloudsQuality_High = 2;
+    CloudsQuality_Ultra = 5;
+    CloudsQuality_Custom = 4;
+  }
+  enum CarReflectionQuality {
+    CarReflectionQuality_Low = 0;
+    CarReflectionQuality_Medium = 1;
+    CarReflectionQuality_High = 2;
+    CarReflectionQuality_Ultra = 4;
+    CarReflectionQuality_Custom = 3;
+  }
+  enum EnvironmentReflectionQuality {
+    EnvironmentReflectionQuality_Low = 0;
+    EnvironmentReflectionQuality_Medium = 1;
+    EnvironmentReflectionQuality_High = 2;
+  }
+  enum AnisotropicFilteringQuality {
+    AnisotropicFilteringQuality_VeryLow = 0;
+    AnisotropicFilteringQuality_Low = 1;
+    AnisotropicFilteringQuality_Medium = 2;
+    AnisotropicFilteringQuality_High = 3;
+    AnisotropicFilteringQuality_Ultra = 4;
+    AnisotropicFilteringQuality_Custom = 5;
+  }
+  enum MSAA {
+    MSAA_2x = 0;
+    MSAA_4x = 1;
+    MSAA_8x = 2;
+    MSAA_Off = 4;
+  }
+  enum GlobalIlluminationUpdateFrequency {
+    GlobalIlluminationUpdateFrequency_Medium = 0;
+    GlobalIlluminationUpdateFrequency_High = 1;
+    GlobalIlluminationUpdateFrequency_Ultra = 2;
+  }
+  enum ShadowResolution {
+    ShadowResolution_512x512 = 0;
+    ShadowResolution_1024x1024 = 1;
+    ShadowResolution_2048x2048 = 2;
+    ShadowResolution_4096x4096 = 3;
+    ShadowResolution_8192x8192 = 4;
+  }
+  enum ShadowQuality {
+    ShadowQuality_VeryLow = 0;
+    ShadowQuality_Low = 1;
+    ShadowQuality_Medium = 2;
+    ShadowQuality_High = 3;
+    ShadowQuality_Ultra = 4;
+  }
+  enum SimShadowQuality {
+    SimShadowQuality_Low = 0;
+    SimShadowQuality_Medium = 1;
+    SimShadowQuality_High = 2;
+  }
+  enum ScreenSpaceShadowQuality {
+    ScreenSpaceShadowQuality_0ff = 0;
+    ScreenSpaceShadowQuality_HalfRes = 1;
+    ScreenSpaceShadowQuality_FullRes = 2;
+  }
+  enum DepthOfFieldQuality {
+    DepthOfFieldQuality_Low = 0;
+    DepthOfFieldQuality_Medium = 1;
+    DepthOfFieldQuality_High = 2;
+    DepthOfFieldQuality_Ultra = 3;
+    DepthOfFieldQuality_Off = 4;
+  }
+  enum Veil {
+    Veil_Soft = 0;
+    Veil_Natural = 1;
+    Veil_Cinematic = 2;
+    Veil_Off = 3;
+  }
+  enum MotionBlurQuality {
+    MotionBlurQuality_Low = 0;
+    MotionBlurQuality_Medium = 1;
+    MotionBlurQuality_High = 2;
+    MotionBlurQuality_Ultra = 3;
+    MotionBlurQuality_Off = 4;
+  }
+  enum TexturePoolSize {
+    TexturePoolSize_Low = 0;
+    TexturePoolSize_Medium = 1;
+    TexturePoolSize_High = 2;
+    TexturePoolSize_Ultra = 3;
+  }
+  enum VolumetricsQuality {
+    VolumetricsQuality_Low = 0;
+    VolumetricsQuality_Medium = 1;
+    VolumetricsQuality_High = 2;
+    VolumetricsQuality_Ultra = 3;
+  }
+  enum ParticlesQuality {
+    ParticlesQuality_Low = 0;
+    ParticlesQuality_Medium = 1;
+    ParticlesQuality_High = 2;
+    ParticlesQuality_Ultra = 3;
+  }
+  enum GroundQuality {
+    GroundQuality_High = 0;
+    GroundQuality_Medium = 1;
+    GroundQuality_Low = 2;
+  }
+  enum TextureQuality {
+    TextureQuality_Medium = 0;
+    TextureQuality_Ultra = 1;
+    TextureQuality_High = 2;
+    TextureQuality_Low = 3;
+    TextureQuality_VeryLow = 4;
+    TextureQuality_Custom = 5;
+  }
+  enum NumDashDisplays {
+    NumDashDisplays_MaxTwo = 0;
+    NumDashDisplays_All = 1;
+    NumDashDisplays_MaxOne = 2;
+  }
+  message Upscaling {
+    VideoSettings.UpscalingMode mode = 1;
+    VideoSettings.UpscalingFSR3Preset fsr3_preset = 4;
+    float fsr3_custom_val = 5;
+    VideoSettings.UpscalingDLSSPreset dlss_preset = 6;
+    float dlss_custom_val = 7;
+    reserved 2 to 2;
+    reserved 3 to 3;
+  }
+  message VirtualReality {
+    enum FoveatedRendering {
+      FoveatedRendering_Medium = 0;
+      FoveatedRendering_Low = 1;
+      FoveatedRendering_Aggressive = 2;
+      FoveatedRendering_Off = 3;
+    }
+    enum Sunglass {
+      Sunglass_Off = 0;
+      Sunglass_Light = 1;
+      Sunglass_Dark = 2;
+    }
+    float pixel_density = 1;
+    VideoSettings.VirtualReality.FoveatedRendering foveated_rendering = 2;
+    float world_scale = 3;
+    bool prefer_framerate_over_latency = 4;
+    bool disable_hidden_area_mask = 5;
+    bool enable_spectator_view = 7;
+    bool eye_tracked_foveated_rendering = 8;
+    bool can_use_eye_tracking = 9;
+    VideoSettings.VirtualReality.Sunglass sunglasses = 10;
+    bool render_to_intermediate_target = 11;
+    bool log_vr_pacing = 12;
+    reserved 6 to 6;
+  }
+  message Display {
+    enum Supersampling {
+      Supersampling_Off = 0;
+      Supersampling_125 = 1;
+      Supersampling_150 = 2;
+      Supersampling_175 = 3;
+      Supersampling_200 = 4;
+    }
+    message FrameRateLimit {
+      int32 gameplay_frame_rate_limit = 1;
+      int32 occluded_frame_rate_limit = 2;
+      bool menu_frame_rate_limit = 3;
+    }
+    message TripleScreen {
+      float width = 1;
+      float distance = 2;
+      float screen_angle = 3;
+      float bezel = 4;
+    }
+    message Panini {
+      float distance = 1;
+      float vertical_compression = 2;
+    }
+    int32 window_width = 1;
+    int32 window_height = 2;
+    VSync v_sync = 44;
+    bool physics_late_latching = 45;
+    VideoSettings.Display.FrameRateLimit frame_rate_limit = 12;
+    VideoSettings.Display.TripleScreen triple_screen = 13;
+    VideoSettings.Display.Panini panini = 3300;
+    VideoSettings.Display.Supersampling supersampling = 16;
+    bool is_fullscreen = 3;
+    int32 child_width = 6;
+    int32 child_height = 7;
+    bool is_maximized = 8;
+    bool is_triple = 11;
+    bool is_stereo = 55;
+    int32 render_width = 14;
+    int32 render_height = 15;
+    int32 output_width = 17;
+    int32 output_height = 18;
+    int32 monitor = 100;
+    int32 aspect_ratio_x = 101;
+    int32 aspect_ratio_y = 102;
+    reserved 123456 to 123456;
+    reserved 4 to 4;
+    reserved 5 to 5;
+  }
+  message CarVisibility {
+    int32 max_ahead_car = 1;
+    int32 max_behind_car = 2;
+    bool skip_filtering_when_driving = 5;
+    bool filter_when_spectating = 6;
+    reserved 3 to 3;
+    reserved 4 to 4;
+  }
+  message LevelOfDetail {
+    message LevelOfDetailCustomSettings {
+      float mainLodDistanceScale = 1;
+      float mirrorLodDistanceScale = 2;
+      float cubemapLodDistanceScale = 3;
+      float shadowLodDistanceScale = 4;
+      float mainLodOutDistanceScale = 11;
+      float mirrorLodOutDistanceScale = 12;
+      float cubemapLodOutDistanceScale = 13;
+      float shadowLodOutDistanceScale = 14;
+      int32 carFixedLodInCubemapRendering = 5;
+      int32 carFixedLodInMirrorRendering = 6;
+      int32 carFixedLodInShadowRendering = 7;
+    }
+    VideoSettings.LevelOfDetailQuality levelOfDetail = 1;
+    bool experimentalStaticLevelOfDetail = 3;
+    VideoSettings.StaticLevelOfDetailQuality staticLevelOfDetail = 4;
+    VideoSettings.LevelOfDetail.LevelOfDetailCustomSettings levelOfDetailCustomSettings = 2;
+    reserved 5 to 5;
+  }
+  message Clouds {
+    message CloudsCustomSettings {
+      int32 resolution = 1;
+      int32 renderingTimeslicedOverFramesNumber = 2;
+    }
+    VideoSettings.CloudsQuality cloudsQuality = 1;
+    VideoSettings.Clouds.CloudsCustomSettings cloudsCustomSettings = 2;
+  }
+  message CarReflection {
+    message CarReflectionCustomSettings {
+      int32 vehicleCubemapResolution = 1;
+      int32 cockpitCubemapResolution = 2;
+      float vehicleCubemapFarPlane = 3;
+      float cockpitCubemapFarPlane = 4;
+    }
+    VideoSettings.CarReflectionQuality carReflectionQuality = 1;
+    VideoSettings.CarReflection.CarReflectionCustomSettings carReflectionCustomSettings = 2;
+  }
+  message AnisotropicFiltering {
+    message AnisotropicFilteringCustomSettings {
+      int32 mainAnisotropicFiltering = 1;
+      int32 mainLowAnisotropicFiltering = 2;
+      int32 cubemapMirrorAnisotropicFiltering = 3;
+      int32 mainAnisotropicMipBias = 4;
+      int32 mainLowAnisotropicMipBias = 5;
+    }
+    VideoSettings.AnisotropicFilteringQuality anisotropicFilteringQuality = 1;
+    VideoSettings.AnisotropicFiltering.AnisotropicFilteringCustomSettings customSettings = 2;
+  }
+  message Shadow {
+    VideoSettings.ShadowQuality shadowQuality = 1;
+    bool experimentalSimShadow = 4;
+    VideoSettings.SimShadowQuality simShadowQuality = 5;
+    VideoSettings.ScreenSpaceShadowQuality screenSpaceShadowQuality = 3;
+    reserved 2 to 2;
+  }
+  message Mirror {
+    enum MirrorMode {
+      Mirror_Off = 0;
+      Mirror_Single = 1;
+      Mirror_Multi = 2;
+    }
+    enum MultiMode {
+      Multi_Fixed = 0;
+      Multi_VR = 1;
+    }
+    enum MirrorResolution {
+      MirrorResolution_Low = 0;
+      MirrorResolution_Medium = 1;
+      MirrorResolution_High = 2;
+    }
+    enum MirrorViewDistance {
+      MirrorViewDistance_Low = 0;
+      MirrorViewDistance_Medium = 1;
+      MirrorViewDistance_High = 2;
+      MirrorViewDistance_Ultra = 3;
+    }
+    enum MirrorLevelOfDetailQuality {
+      MirrorLevelOfDetailQuality_Medium = 0;
+      MirrorLevelOfDetailQuality_Low = 1;
+      MirrorLevelOfDetailQuality_High = 2;
+      MirrorLevelOfDetailQuality_Ultra = 3;
+    }
+    VideoSettings.Mirror.MirrorMode mirror_mode = 4;
+    VideoSettings.Mirror.MirrorResolution mirror_resolution = 8;
+    VideoSettings.Mirror.MirrorViewDistance mirror_view_distance = 10;
+    VideoSettings.Mirror.MirrorLevelOfDetailQuality mirror_level_of_detail = 14;
+    bool alternate_rendering = 5;
+    VideoSettings.Mirror.MultiMode multi_mode = 6;
+    VideoSettings.Mirror.MultiMode multi_mode_vr = 12;
+    reserved 1 to 1;
+    reserved 2 to 2;
+    reserved 3 to 3;
+    reserved 9 to 9;
+  }
+  message FilmicAntialiasing {
+    enum Setting {
+      Type_Off = 0;
+      Type_Balanced = 1;
+      Type_Cinematic = 2;
+      Type_Sharp = 3;
+      Type_Showroom = 4;
+    }
+    VideoSettings.FilmicAntialiasing.Setting setting = 1;
+  }
+  message FastApproximateAntialiasing {
+    bool enable = 1;
+  }
+  message Antialiasing {
+    VideoSettings.FilmicAntialiasing filmicAntialiasing = 1;
+    VideoSettings.FastApproximateAntialiasing fxaa = 2;
+  }
+  message Sharpen {
+    float strength = 1;
+  }
+  message MotionBlur {
+    VideoSettings.MotionBlurQuality quality = 5;
+    float strength = 2;
+    float centralClarity = 3;
+  }
+  message Particles {
+    VideoSettings.ParticlesQuality quality = 1;
+    bool essential = 2;
+  }
+  message Terrain {
+    VideoSettings.GroundQuality groundQuality = 1;
+  }
+  message Graphics {
+    string overallGraphics = 30;
+    VideoSettings.Upscaling upscaling = 100;
+    VideoSettings.MSAA msaa = 11;
+    VideoSettings.Antialiasing antialising = 17;
+    VideoSettings.TextureQuality textureQuality = 49;
+    VideoSettings.AnisotropicFiltering anisotropicFiltering = 12;
+    VideoSettings.TexturePoolSize texturePoolSize = 40;
+    VideoSettings.Sharpen sharpening = 18;
+    VideoSettings.Clouds clouds = 16;
+    VideoSettings.GlobalIlluminationUpdateFrequency giUpdateFrequency = 15;
+    VideoSettings.VolumetricsQuality volumetricsQuality = 41;
+    VideoSettings.CarReflection carReflection = 13;
+    VideoSettings.EnvironmentReflectionQuality enviromentReflection = 42;
+    VideoSettings.GrassDensity grass = 24;
+    VideoSettings.LevelOfDetail levelOfDetail = 14;
+    VideoSettings.VehicleLevelOfDetailQuality vehicleLevelOfDetail = 25;
+    VideoSettings.Particles particles = 48;
+    VideoSettings.Shadow shadow = 19;
+    AmbientOcclusionQuality ambientOcclusion = 26;
+    VideoSettings.Veil veil = 31;
+    VideoSettings.DepthOfFieldQuality depthOfField = 27;
+    VideoSettings.MotionBlur motionBlur = 22;
+    VideoSettings.Mirror mirror = 23;
+    string post_processing_preset = 32;
+    float exposureBias = 200;
+    bool is_dlss_available = 33;
+    bool is_fsr_available = 333;
+    VideoSettings.Terrain terrain = 45;
+    VideoSettings.NumDashDisplays num_dash_displays = 46;
+    VideoSettings.CarVisibility car_visibility = 47;
+    reserved 1 to 1;
+    reserved 2 to 2;
+    reserved 3 to 3;
+    reserved 4 to 4;
+    reserved 5 to 5;
+    reserved 6 to 6;
+    reserved 7 to 7;
+    reserved 8 to 8;
+    reserved 9 to 9;
+    reserved 10 to 10;
+    reserved 20 to 20;
+    reserved 21 to 21;
+    reserved 44 to 44;
+  }
+  VideoSettings.Display display = 1;
+  VideoSettings.Graphics graphics = 2;
+  VideoSettings.Display.TripleScreen triple_screen = 3;
+  VideoSettings.VirtualReality vr = 5;
+  reserved 4 to 4;
+}
+
+message AdditionalSettings {
+  repeated string post_processing_presets = 1;
+}
+
+message VideoSettingsRules {
+  repeated VideoSettingsRules_Adapter adapters = 1;
+  reserved 2 to 2;
+}
+
+message VideoSettingsRules_Adapter {
+  string name = 1;
+  repeated VideoSettingsRules_Monitor monitors = 2;
+}
+
+message VideoSettingsRules_Monitor {
+  message Pair {
+    int32 x = 1;
+    int32 y = 2;
+  }
+  message ResolutionByAspectRatio {
+    VideoSettingsRules_Monitor.Pair aspect_ratio = 1;
+    repeated VideoSettingsRules_Monitor.Pair resolutions = 2;
+  }
+  VideoSettingsRules_Monitor.Pair native_resolution = 1;
+  VideoSettingsRules_Monitor.Pair native_aspect_ratio = 2;
+  repeated VideoSettingsRules_Monitor.ResolutionByAspectRatio resolutions_by_ratio = 3;
+}
+
+message ParticleEmitterData {
+  enum EmitterShape {
+    EmitterShape_Circle = 0;
+    EmitterShape_Square = 1;
+    EmitterShape_Torus = 2;
+  }
+  enum EmitterPlacing {
+    EmitterPlacing_Default = 0;
+    EmitterPlacing_SkipPositionOffset = 1;
+  }
+  message MultiplierParam {
+    bool enable = 1;
+    string curve = 2;
+  }
+  message Multiplier4Param {
+    bool enable = 1;
+    string curve = 2;
+  }
+  message ColorParam {
+    bool enable = 1;
+    string curve = 2;
+    bool over_absolute_value = 3;
+  }
+  message CurveParam {
+    bool enable = 1;
+    Vector2Data end_range = 2;
+    string curve = 3;
+    bool over_absolute_value = 4;
+  }
+  message Curve4Param {
+    bool enable = 1;
+    Vector2Data end_range = 2;
+    string curve = 3;
+    bool over_absolute_value = 4;
+  }
+  message CameraProximityFade {
+    bool enabled = 1;
+    float particle_radius = 2;
+    float percentage = 3;
+    float min_bound = 4;
+    float start_scale = 5;
+    float end_scale = 6;
+  }
+  message EmissionSettings {
+    Vector3Data area_rotation = 1;
+    ParticleEmitterData.EmitterShape area_shape = 13;
+    float area_size = 2;
+    Vector3Data axis_rotation = 14;
+    float axis_spread = 3;
+    bool axis_align_particles = 15;
+    float torus_minor_radius = 20;
+    float torus_major_radius = 21;
+    float burst_duration = 16;
+    Vector2Data lifetime_range = 4;
+    Vector2Data speed_range = 5;
+    Vector2Data scale_range = 6;
+    Vector2Data alpha_range = 7;
+    Vector2Data yaw_speed_range = 8;
+    Vector2Data pitch_speed_range = 9;
+    Vector2Data roll_speed_range = 10;
+    Vector2Data userdata_range = 11;
+    Vector3Data tint = 12;
+    float directional_speed_multiplier = 23;
+    float inherit_linear_velocity_multiplier = 19;
+    float inherit_angular_velocity_multiplier = 22;
+    Vector2Data inherit_velocity_range = 18;
+    bool enable_depth_collision = 30;
+    float collision_bounciness = 31;
+    float collision_speed_loss = 32;
+    float collision_randomness = 34;
+    float collision_start_delay = 36;
+    float collision_radius_scale = 33;
+  }
+  message EvolutionOverStrength {
+    ParticleEmitterData.MultiplierParam particles_per_second_over_strength = 1;
+    ParticleEmitterData.MultiplierParam lifetime_over_strength = 2;
+    ParticleEmitterData.MultiplierParam speed_over_strength = 3;
+    ParticleEmitterData.Multiplier4Param scale_over_strength = 6;
+    ParticleEmitterData.MultiplierParam alpha_over_strength = 4;
+    reserved 5 to 5;
+  }
+  message EvolutionOverEmitterSpeed {
+    Vector2Data emitter_speed_range = 1;
+    ParticleEmitterData.MultiplierParam particles_per_second_over_emitter_speed = 2;
+    ParticleEmitterData.MultiplierParam lifetime_over_emitter_speed = 3;
+    ParticleEmitterData.MultiplierParam speed_over_emitter_speed = 4;
+    ParticleEmitterData.MultiplierParam alpha_over_emitter_speed = 5;
+  }
+  message EvolutionOverLifetime {
+    ParticleEmitterData.CurveParam speed_over_lifetime = 1;
+    ParticleEmitterData.Curve4Param scale_over_lifetime = 9;
+    ParticleEmitterData.CurveParam alpha_over_lifetime = 3;
+    ParticleEmitterData.CurveParam yaw_speed_over_lifetime = 4;
+    ParticleEmitterData.CurveParam pitch_speed_over_lifetime = 5;
+    ParticleEmitterData.CurveParam roll_speed_over_lifetime = 6;
+    ParticleEmitterData.CurveParam userdata_over_lifetime = 7;
+    ParticleEmitterData.ColorParam tint_over_lifetime = 8;
+    ParticleEmitterData.CurveParam inherit_velocity_over_lifetime = 10;
+    reserved 2 to 2;
+  }
+  message ParticlesQualitySettings {
+    float spawn_rate = 8;
+    int32 capacity = 9;
+    float max_lifetime_multipler = 10;
+    float culling_distance = 2;
+    float attenuation_start_distance = 3;
+    float attenuation_power = 4;
+    float min_quality_floor = 5;
+    float out_of_focus_multiplier = 6;
+    reserved 1 to 1;
+    reserved 7 to 7;
+  }
+  ParticleEmitterData.ParticlesQualitySettings low = 660;
+  ParticleEmitterData.ParticlesQualitySettings medium = 661;
+  ParticleEmitterData.ParticlesQualitySettings high = 662;
+  ParticleEmitterData.ParticlesQualitySettings ultra = 663;
+  string particle = 6;
+  Vector3Data gravity = 7;
+  bool keep_in_local_space = 8;
+  ParticleEmitterData.EmissionSettings emission = 10;
+  ParticleEmitterData.EvolutionOverStrength evolution_over_strength = 11;
+  ParticleEmitterData.EvolutionOverEmitterSpeed evolution_over_emitter_speed = 13;
+  ParticleEmitterData.EvolutionOverLifetime evolution_over_lifetime = 12;
+  ParticleEmitterData.CameraProximityFade camera_proximity_fade = 33;
+  bool essential = 400;
+  ParticleEmitterData.EmitterPlacing placing = 401;
+  reserved 1 to 1;
+  reserved 100 to 100;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 30 to 30;
+  reserved 20 to 20;
+}
+
+message PipelineLibraryData {
+  int32 engine_version = 5;
+  string adapter = 1;
+  int32 driver_major_version = 2;
+  int32 driver_minor_version = 3;
+  bytes data = 4;
+}

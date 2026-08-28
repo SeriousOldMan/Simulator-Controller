@@ -1,0 +1,796 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+import "DateTime.proto";
+import "AiCarData.proto";
+import "Weather.proto";
+
+enum EnergySourceType {
+  FuelLiter = 0;
+  Kwh = 1;
+}
+
+enum DataSourceType {
+  Custom = 0;
+  Default = 1;
+  Template = 2;
+}
+
+enum ColliderCategory {
+  ColliderCategoryNone = 0;
+  ColliderCategorySurface = 1;
+  ColliderCategoryWall = 2;
+  ColliderCategoryObject = 3;
+  ColliderCategoryMarbles = 4;
+}
+
+enum ClientCarType {
+  ClientCarType_None = 0;
+  ClientCarType_PhysicsCar = 1;
+  ClientCarType_Netcar = 2;
+}
+
+enum ClientCarControllerType {
+  ClientCarControllerType_None = 0;
+  ClientCarControllerType_ServerControlled = 1;
+  ClientCarControllerType_PlayerControlled = 2;
+  ClientCarControllerType_LocalAIControlled = 3;
+  ClientCarControllerType_EvaluationAI = 5;
+  ClientCarControllerType_ReplayControlled = 6;
+}
+
+enum CarSubCategoryEnum {
+  CarCategoryEnum_fwd = 0;
+  CarCategoryEnum_rwd = 1;
+  CarCategoryEnum_awd = 2;
+  CarCategoryEnum_mid_engine = 10;
+  CarCategoryEnum_front_engine = 11;
+  CarCategoryEnum_rear_engine = 12;
+  CarCategoryEnum_battery = 13;
+  CarCategoryEnum_hydrogen = 14;
+  CarCategoryEnum_concept = 19;
+  CarCategoryEnum_coupe = 20;
+  CarCategoryEnum_hatchback = 21;
+  CarCategoryEnum_sedan = 22;
+  CarCategoryEnum_suv = 23;
+  CarCategoryEnum_estate = 24;
+  CarCategoryEnum_convertible = 25;
+  CarCategoryEnum_cabriolet = 26;
+  CarCategoryEnum_open_wheel = 27;
+  CarCategoryEnum_no_assists = 28;
+  CarCategoryEnum_drift = 29;
+  CarCategoryEnum_time_attack = 30;
+  CarCategoryEnum_cup = 40;
+  CarCategoryEnum_gt2 = 41;
+  CarCategoryEnum_gt3 = 42;
+  CarCategoryEnum_gt4 = 43;
+  CarCategoryEnum_tcx = 44;
+  CarCategoryEnum_rally = 50;
+  CarCategoryEnum_prototype = 51;
+  CarCategoryEnum_formula = 52;
+  CarCategoryEnum_drag = 53;
+  CarCategoryEnum_touring = 54;
+  CarCategoryEnum_hillclimb = 55;
+  CarCategoryEnum_stock = 56;
+  CarCategoryEnum_dirt = 57;
+  CarCategoryEnum_legends = 58;
+  CarCategoryEnum_na = 70;
+  CarCategoryEnum_turbo = 71;
+  CarCategoryEnum_supercharger = 72;
+  CarCategoryEnum_three_wheeler = 73;
+  CarCategoryEnum_lm_prototype = 74;
+}
+
+enum DriverModelType {
+  DriverModelType_Street = 0;
+  DriverModelType_Racing = 1;
+}
+
+enum Content_TestStage {
+  Content_TestStage_Undefined = 0;
+  Content_TestStage_None = 1;
+  Content_TestStage_Barely_Testable = 3;
+  Content_TestStage_Testable = 5;
+  Content_TestStage_ActiveDevelopment = 7;
+  Content_TestStage_LiveContent = 10;
+  Content_TestStage_ReleaseCandidate = 11;
+  Content_TestStage_MaximumAttention = 15;
+}
+
+enum SceneTrackTypeEnum {
+  SceneTrackTypeEnum_None = 0;
+  SceneTrackTypeEnum_Circuit = 1;
+  SceneTrackTypeEnum_Openworld = 2;
+}
+
+enum CarPartType {
+  CarPartType_None = 0;
+  CarPartType_Exterior_Body = 1;
+  CarPartType_Exterior_FrontBumper = 2;
+  CarPartType_Exterior_FrontBumperLip = 3;
+  CarPartType_Exterior_FrontFogLights = 4;
+  CarPartType_Exterior_FrontBumperCanards = 5;
+  CarPartType_Exterior_FrontLights = 6;
+  CarPartType_Exterior_RearLights = 67;
+  CarPartType_Exterior_RearFogLights = 68;
+  CarPartType_Exterior_AuxLights = 69;
+  CarPartType_Exterior_FrontAirIntakeGrid = 7;
+  CarPartType_Exterior_FrontWindshield = 8;
+  CarPartType_Exterior_Hood = 9;
+  CarPartType_Exterior_HoodAirscopes = 10;
+  CarPartType_Exterior_SideFrontBody = 11;
+  CarPartType_Exterior_SideMirrors = 12;
+  CarPartType_Exterior_LeftDoor = 13;
+  CarPartType_Exterior_RightDoor = 14;
+  CarPartType_Exterior_Skirts = 15;
+  CarPartType_Exterior_SideRearBody = 16;
+  CarPartType_Exterior_RearBumper = 17;
+  CarPartType_Exterior_RearDiffuser = 18;
+  CarPartType_Exterior_RearTailgateSpoiler = 19;
+  CarPartType_Exterior_RearSpoiler = 20;
+  CarPartType_Exterior_RoofAirScopes = 21;
+  CarPartType_Exterior_RearWindshield = 22;
+  CarPartType_Exterior_RimFL = 23;
+  CarPartType_Exterior_RimFR = 24;
+  CarPartType_Exterior_RimRL = 25;
+  CarPartType_Exterior_RimRR = 26;
+  CarPartType_Exterior_RimBlurFL = 54;
+  CarPartType_Exterior_RimBlurFR = 55;
+  CarPartType_Exterior_RimBlurRL = 56;
+  CarPartType_Exterior_RimBlurRR = 57;
+  CarPartType_Exterior_TyreFL = 27;
+  CarPartType_Exterior_TyreFR = 28;
+  CarPartType_Exterior_TyreRL = 29;
+  CarPartType_Exterior_TyreRR = 30;
+  CarPartType_Exterior_CaliperFL = 58;
+  CarPartType_Exterior_CaliperFR = 59;
+  CarPartType_Exterior_CaliperRL = 60;
+  CarPartType_Exterior_CaliperRR = 61;
+  CarPartType_Exterior_DiscFL = 62;
+  CarPartType_Exterior_DiscFR = 63;
+  CarPartType_Exterior_DiscRL = 64;
+  CarPartType_Exterior_DiscRR = 65;
+  CarPartType_Exterior_PlateFront = 47;
+  CarPartType_Exterior_PlateRear = 66;
+  CarPartType_Exterior_Exhaust = 71;
+  CarPartType_Exterior_Lumirank = 42;
+  CarPartType_Exterior_FrontSplitter = 100;
+  CarPartType_Exterior_FuelCap = 101;
+  CarPartType_Exterior_Decal = 102;
+  CarPartType_Exterior_Storage = 103;
+  CarPartType_Exterior_Top = 104;
+  CarPartType_Interior_Body = 31;
+  CarPartType_Interior_FrontSeats = 32;
+  CarPartType_Interior_RearSeats = 70;
+  CarPartType_Interior_FireExtinguisher = 35;
+  CarPartType_Interior_SteeringWheelAndHub = 36;
+  CarPartType_Interior_MirrorGadget = 37;
+  CarPartType_Interior_FloorCarpets = 38;
+  CarPartType_Interior_HandbrakeLever = 39;
+  CarPartType_Interior_GearShifterLever = 40;
+  CarPartType_Interior_RollbarOrCage = 41;
+  CarPartType_Interior_CameraDevice = 43;
+  CarPartType_Interior_CockpitLights = 44;
+  CarPartType_Interior_AnalogDashboard = 45;
+  CarPartType_Interior_DigitalDashboard = 46;
+  CarPartType_Interior_SeatbeltOn = 48;
+  CarPartType_Interior_SeatbeltOff = 49;
+  CarPartType_Interior_HarnessOn = 50;
+  CarPartType_Interior_HarnessOff = 51;
+  CarPartType_Interior_SafetyNetOn = 52;
+  CarPartType_Interior_SafetyNetOff = 53;
+  CarPartType_Interior_PedalAccelerator = 300;
+  CarPartType_Interior_PedalBrake = 301;
+  CarPartType_Interior_PedalClutch = 302;
+  CarPartType_Interior_Storage = 303;
+  CarPartType_Interior_CupHolder = 304;
+  CarPartType_Mechanics_SuspensionGeometry_Front = 500;
+  CarPartType_Mechanics_SuspensionGeometry_Rear = 501;
+  CarPartType_Mechanics_SuspensionCoilover_Front = 502;
+  CarPartType_Mechanics_SuspensionCoilover_Rear = 503;
+  CarPartType_Mechanics_Engine = 505;
+  CarPartType_Mechanics_Turbo = 506;
+  CarPartType_Mechanics_Ecu = 517;
+  CarPartType_Mechanics_Pistons = 518;
+  CarPartType_Mechanics_Rod = 519;
+  CarPartType_Mechanics_Cam_Shaft = 520;
+  CarPartType_Mechanics_Crank_Shaft = 521;
+  CarPartType_Mechanics_Head = 522;
+  CarPartType_Mechanics_Injection_System = 523;
+  CarPartType_Mechanics_Radiator = 524;
+  CarPartType_Mechanics_Oil_Radiator = 525;
+  CarPartType_Mechanics_Intercooler = 526;
+  CarPartType_Mechanics_Air_Filter = 527;
+  CarPartType_Mechanics_Intake_Manifold = 528;
+  CarPartType_Mechanics_Exhaust_Manifold = 529;
+  CarPartType_Mechanics_Catalitic_Converter = 530;
+  CarPartType_Mechanics_Center_Pipe = 531;
+  CarPartType_Mechanics_Muffler = 532;
+  CarPartType_Mechanics_Differential = 504;
+  CarPartType_Mechanics_Clutch = 534;
+  CarPartType_Mechanics_Gearbox = 535;
+  CarPartType_Mechanics_Electronics = 536;
+  CarPartType_Mechanics_Drivetrain = 537;
+  CarPartType_Mechanics_Aero_0 = 507;
+  CarPartType_Mechanics_Aero_1 = 508;
+  CarPartType_Mechanics_Aero_2 = 509;
+  CarPartType_Mechanics_Aero_3 = 510;
+  CarPartType_Mechanics_Aero_4 = 511;
+  CarPartType_Mechanics_Aero_5 = 512;
+  CarPartType_Mechanics_Aero_6 = 513;
+  CarPartType_Mechanics_Aero_7 = 514;
+  CarPartType_Mechanics_Aero_8 = 515;
+  CarPartType_Mechanics_Aero_9 = 516;
+  CarPartType_Mechanics_Downforce_0 = 600;
+  CarPartType_Mechanics_Downforce_1 = 601;
+  CarPartType_Mechanics_Downforce_2 = 602;
+  CarPartType_Mechanics_Downforce_3 = 603;
+  CarPartType_Mechanics_PadsFL = 700;
+  CarPartType_Mechanics_PadsFR = 701;
+  CarPartType_Mechanics_PadsRL = 702;
+  CarPartType_Mechanics_PadsRR = 703;
+  CarPartType_Mechanics_CaliperFL = 704;
+  CarPartType_Mechanics_CaliperFR = 705;
+  CarPartType_Mechanics_CaliperRL = 706;
+  CarPartType_Mechanics_CaliperRR = 707;
+  CarPartType_Mechanics_DiscFL = 708;
+  CarPartType_Mechanics_DiscFR = 709;
+  CarPartType_Mechanics_DiscRL = 710;
+  CarPartType_Mechanics_DiscRR = 711;
+}
+
+enum AttachmentType {
+  AttachmentType_Replacement = 0;
+  AttachmentType_Additive = 1;
+}
+
+enum CarLightingCategory {
+  CarLightingCategory_Ignition_On = 0;
+  CarLightingCategory_Main_Lights = 2;
+  CarLightingCategory_Brake_Lights = 4;
+  CarLightingCategory_Rain_Lights = 5;
+  CarLightingCategory_Flashing = 6;
+  CarLightingCategory_Direction_Left_Light = 7;
+  CarLightingCategory_Direction_Right_Light = 8;
+  CarLightingCategory_Reverse_Lights = 9;
+  CarLightingCategory_Warning_Lights = 10;
+  CarLightingCategory_Special_Lights = 20;
+  CarLightingCategory_Cockpit_Lights = 30;
+  CarLightingCategory_Pit_Limiter = 40;
+  CarLightingCategory_Ers_Charging = 41;
+}
+
+enum CarLightingFunction {
+  CarLightingFunction_light_daylight = 0;
+  CarLightingFunction_light_lowbeam = 1;
+  CarLightingFunction_light_highbeam = 2;
+  CarLightingFunction_light_rear = 3;
+  CarLightingFunction_light_brake = 4;
+  CarLightingFunction_light_rainfog = 5;
+  CarLightingFunction_light_reverse = 6;
+  CarLightingFunction_light_lf_indicator = 7;
+  CarLightingFunction_light_rf_indicator = 8;
+  CarLightingFunction_light_lr_indicator = 9;
+  CarLightingFunction_light_rr_indicator = 10;
+  CarLightingFunction_light_lf_special = 11;
+  CarLightingFunction_light_rf_special = 12;
+  CarLightingFunction_light_lr_special = 13;
+  CarLightingFunction_light_rr_special = 14;
+  CarLightingFunction_light_lf_damage = 15;
+  CarLightingFunction_light_rf_damage = 16;
+  CarLightingFunction_light_lr_damage = 17;
+  CarLightingFunction_light_rr_damage = 18;
+}
+
+enum AudioEventDataType {
+  EngineInt = 0;
+  EngineExt = 1;
+  WheelEventInt = 2;
+  WheelEventExt = 3;
+  WindEffect = 6;
+  Bodywork = 7;
+  TurboEvent = 8;
+  Backfire = 9;
+  Brakes = 10;
+  WheelHub = 11;
+  GearBox = 12;
+  Transmission = 13;
+  Horn = 14;
+  Hit = 15;
+  Indicators = 16;
+  GuiEvent = 100;
+}
+
+enum AudioGuiEventType {
+  GUI_NONE = 0;
+  GUI_CONFIRM = 1;
+  GUI_SELECT = 2;
+  GUI_SCROLL = 3;
+  GUI_WARNING = 4;
+  GUI_MUSIC_MENU = 5;
+  GUI_MUSIC_INTRO = 6;
+  GUI_MUSIC_END = 7;
+  GUI_CANCEL = 8;
+  GUI_PAINT_APPLY = 9;
+  GUI_PAINT_REMOVE = 10;
+  GUI_STICKER_APPLY = 11;
+  GUI_STICKER_REMOVE = 12;
+  GUI_PART_APPLY = 13;
+  GUI_PART_REMOVE = 14;
+  GUI_WHEEL_APPLY = 15;
+  GUI_WHEEL_REMOVE = 16;
+  GUI_SWITCH_ON = 17;
+  GUI_SWITCH_OFF = 18;
+  GUI_MUSIC_GAMEPLAY = 19;
+  GUI_MONEY_GAIN = 20;
+  GUI_MONEY_LOSS = 21;
+  GUI_LEVEL_UP = 22;
+  GUI_LEVEL_DOWN = 23;
+  GUI_BUY = 24;
+  GUI_SELL = 25;
+}
+
+enum SkyRules {
+  SkyRules_Procedural = 0;
+  SkyRules_Static = 1;
+}
+
+enum ShowroomType {
+  ShowroomType_Paintshop = 0;
+  ShowroomType_Intro = 1;
+  ShowroomType_Dealership = 2;
+}
+
+enum ShowroomCameraMode {
+  ShowroomCameraMode_Showcase = 0;
+  ShowroomCameraMode_Free = 1;
+}
+
+enum CarParticleEmitterData_EmitterType {
+  CarParticleEmitterData_EmitterType_CarSmoke = 0;
+  CarParticleEmitterData_EmitterType_CarVapor = 1;
+  CarParticleEmitterData_EmitterType_CarGrass = 2;
+  CarParticleEmitterData_EmitterType_CarDirt = 3;
+  CarParticleEmitterData_EmitterType_BackfireType1 = 20;
+  CarParticleEmitterData_EmitterType_BackfireType2 = 21;
+  CarParticleEmitterData_EmitterType_BackfireType3 = 22;
+  CarParticleEmitterData_EmitterType_BackfireType4 = 23;
+  CarParticleEmitterData_EmitterType_BackfireType5 = 24;
+  CarParticleEmitterData_EmitterType_Debris = 30;
+  CarParticleEmitterData_EmitterType_TyreSmoke = 40;
+  CarParticleEmitterData_EmitterType_TyreVapor = 50;
+  CarParticleEmitterData_EmitterType_TyreGrass = 60;
+  CarParticleEmitterData_EmitterType_TyreDirt = 70;
+}
+
+enum CarParticleEmitterEnum {
+  CarParticleEmitterEnum_Car = 0;
+  CarParticleEmitterEnum_Tyre = 1;
+  CarParticleEmitterEnum_Exhaust_1 = 2;
+  CarParticleEmitterEnum_Exhaust_2 = 3;
+  CarParticleEmitterEnum_Exhaust_3 = 4;
+}
+
+enum ColliderType {
+  ColliderType_Mesh = 0;
+  ColliderType_MeshOverride = 3;
+  ColliderType_Box = 1;
+  ColliderType_Capsule = 2;
+}
+
+message PGUID {
+  uint64 a = 1;
+  uint64 b = 2;
+}
+
+message SurfaceDefinitionData {
+  enum SurfaceType {
+    SurfaceType_Asphalt = 0;
+    SurfaceType_ExtraTurf = 1;
+    SurfaceType_Kerb = 2;
+    SurfaceType_Grass = 3;
+    SurfaceType_Sand = 4;
+    SurfaceType_Flat_Kerb = 5;
+  }
+  string surfaceId = 1;
+  ColliderCategory collisionCategory = 2;
+  float gripMod = 3;
+  int32 sectorID = 6;
+  float dirtAdditiveK = 7;
+  bool isValidTrack = 8;
+  float sinHeight = 10;
+  float sinLength = 11;
+  float damping = 12;
+  float granularity = 13;
+  float vibrationGain = 14;
+  float vibrationLength = 15;
+  float wearMult = 16;
+  float frictionRain = 18;
+  float frictionRainGamma = 19;
+  SurfaceDefinitionData.SurfaceType surface_type = 20;
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 9 to 9;
+  reserved 17 to 17;
+}
+
+message TrackLayoutImage {
+  int32 margin = 1;
+  float min_x = 2;
+  float min_y = 3;
+  float k_multiplier = 4;
+  float offset_x = 5;
+  float offset_y = 6;
+}
+
+message CarSubCategorizations {
+  repeated CarSubCategoryEnum categories = 1;
+}
+
+message CarContentData {
+  enum Property1 {
+    Property1_Road = 0;
+    Property1_Race = 1;
+    Property1_Track = 2;
+  }
+  enum Property2 {
+    Property2_Modern = 0;
+    Property2_Vintage = 1;
+    Property2_YoungTimer = 2;
+  }
+  enum Property3 {
+    Property3_ICE = 0;
+    Property3_EV = 1;
+    Property3_Hybrid = 2;
+  }
+  string name = 1;
+  string folder_path = 2;
+  string file_path = 3;
+  string brand = 10;
+  string display_name = 4;
+  int32 year = 5;
+  bool is_default = 7;
+  bool is_track_restricted = 8;
+  bool is_ai_drivable = 9;
+  Content_TestStage test_stage = 23;
+  repeated string sub_tags = 17;
+  CarContentData.Property1 property_1 = 41;
+  CarContentData.Property2 property_2 = 42;
+  CarContentData.Property3 property_3 = 43;
+  repeated CarSubCategorizations sub_categories = 30;
+  string car_data = 6;
+  bool lod = 13;
+  bool is_release = 15;
+  bool is_tunable = 22;
+  bool suitable_no_backend = 16;
+  bool is_wip = 18;
+  bool is_mod = 24;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 14 to 14;
+}
+
+message ModdedCarContentData {
+  enum Property1 {
+    Property1_Road = 0;
+    Property1_Race = 1;
+    Property1_Track = 2;
+  }
+  enum Property2 {
+    Property2_Modern = 0;
+    Property2_Vintage = 1;
+    Property2_YoungTimer = 2;
+  }
+  enum Property3 {
+    Property3_ICE = 0;
+    Property3_EV = 1;
+    Property3_Hybrid = 2;
+  }
+  string brand = 10;
+  string display_name = 4;
+  int32 year = 5;
+  bool is_track_restricted = 8;
+  bool is_ai_drivable = 9;
+  repeated string sub_tags = 17;
+  ModdedCarContentData.Property1 property_1 = 41;
+  ModdedCarContentData.Property2 property_2 = 42;
+  ModdedCarContentData.Property3 property_3 = 43;
+  repeated CarSubCategorizations sub_categories = 30;
+  reserved 1 to 1;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 6 to 6;
+}
+
+message TrackContentData {
+  string name = 1;
+  string nation = 5;
+  string continent = 13;
+  CoordinateData coordinates = 6;
+  TimeZone timezone = 7;
+  string folder_path = 3;
+  string file_path = 4;
+  string track_data_path = 8;
+  SkyRules sky_rules = 11;
+  bool is_release = 10;
+  bool is_testing_disabled = 12;
+  reserved 2 to 2;
+  reserved 9 to 9;
+}
+
+message TrackContainersContentData {
+  string track_name = 10;
+  int32 ui_priority = 20;
+  string layout_name = 14;
+  string event_name = 1;
+  int32 max_drivers = 9;
+  int32 track_length = 8;
+  repeated string container_paths_to_add = 11;
+  repeated string container_paths_to_remove = 12;
+  bool is_base_layout = 15;
+  bool is_cruise = 3;
+  bool is_drift = 4;
+  bool is_instant_race = 5;
+  bool is_time_attack = 6;
+  bool is_hot_stint = 7;
+  bool is_a_to_b = 13;
+  bool is_default = 16;
+  Content_TestStage test_stage = 17;
+  TrackLayoutImage layout_image = 18;
+  bool is_for_development = 19;
+  int32 backend_id = 21;
+  reserved 2 to 2;
+}
+
+message OpponentsContentData {
+  PGUID pguid = 100;
+  string first_name = 1;
+  string last_name = 2;
+  string short_name = 3;
+  string nationality = 5;
+  string gender = 6;
+  float overall_strength = 4;
+  AiDriverData.AggressivnessCategory aggressivness_category = 7;
+  int32 int_id = 8;
+  AiDriverData ai_skill = 10;
+}
+
+message CarSetupPreset {
+  string name = 1;
+  string setup = 2;
+}
+
+message CarSetupContentData {
+  string mechanical = 1;
+  string track_setups = 2;
+}
+
+message TrackCarSetupData {
+  string track_name = 1;
+  string layout_name = 2;
+  string setup_limits = 3;
+  repeated CarSetupPreset setup_presets = 4;
+}
+
+message DateTimeLocation {
+  HumanReadableDateTimeData datetime = 1;
+  CoordinateData coordinates = 2;
+  TimeZone timezone = 3;
+}
+
+message CarPerformanceIndication {
+  float topspeed_ms = 1;
+  float lateral_mechanical_acc_g = 2;
+  float lateral_aero_acc_g = 3;
+  float braking_mechanical_acc_g = 4;
+  float braking_aero_acc_g = 5;
+  float avg_positive_acc_g = 6;
+  AiCarData ai_data = 7;
+}
+
+message AiDriverData {
+  enum AggressivnessCategory {
+    Undefined = 0;
+    Safe = 1;
+    Normal = 5;
+    Competitive = 10;
+  }
+  float strength = 1;
+  float consistency = 2;
+  float aggression = 3;
+  float strategy = 4;
+  float accuracy = 5;
+  float mentalStrength = 6;
+  AiDriverData.AggressivnessCategory aggressivness_category = 7;
+}
+
+message DriverDescriptorData {
+  PGUID guid = 2000;
+  string first_name = 1;
+  string last_name = 2;
+  string nickname = 3;
+  string player_id = 4;
+  string nation = 6;
+  AiDriverData ai_data = 5;
+  int32 year_of_birth = 7;
+}
+
+message DriverCarFinalStateData {
+  string car_final_state_name = 1;
+}
+
+message CoordinateData {
+  double longitude = 1;
+  double latitude = 2;
+}
+
+message SceneTrackInfo {
+  SceneTrackTypeEnum trackType = 1;
+  string displayName = 2;
+  CoordinateData coordinates = 4;
+  TimeZone timeZone = 5;
+  float ai_spline_intersection_y_protection = 6;
+  bool pitlane_spline_ignore_intersection_entry = 7;
+  bool pitlane_spline_ignore_intersection_exit = 8;
+}
+
+message TransitionUpdate {
+  string name = 1;
+  int32 step = 2;
+}
+
+message TranslatedTimestamp {
+  double timestamp = 1;
+}
+
+message LightData {
+  enum LightType {
+    LightType_Point = 0;
+    LightType_Spot = 1;
+  }
+  LightData.LightType type = 1;
+  Vector4Data color = 2;
+  float intensity = 3;
+  float radius = 4;
+  float inner_angle = 5;
+  float outer_angle = 6;
+  float falloff_exponent = 21;
+  float specular_scale = 14;
+  bool project_texture = 12;
+  string texture_path = 13;
+  bool flip_projected_texture = 30;
+  bool cast_shadow = 7;
+  float esm_far_plane = 16;
+  float esm_exponent = 10;
+  float esm_darkening_factor = 9;
+  float esm_mip = 15;
+  bool is_movable = 8;
+  string shadow_texture_path = 11;
+  float volumetric_scattering_intensity = 19;
+  bool volumetric_shadow = 20;
+  bool always_update = 18;
+  bool disable_auto_switch_off = 17;
+  bool is_static_env_light = 31;
+}
+
+message AudioEventData {
+  string event = 1;
+  AudioEventDataType type = 2;
+  bool debug = 4;
+  TransformData transform = 5;
+  string bank = 6;
+  int32 optionalParam = 7;
+  reserved 3 to 3;
+}
+
+message AudioGuiEvents {
+  AudioGuiEventType type = 1;
+  AudioEventData eventData = 2;
+}
+
+message ShowroomData {
+  message SceneCameraOptions {
+    Vector2Data theta_limits = 11;
+    float default_theta = 10;
+    Vector2Data phi_limits = 1;
+    float default_phi = 2;
+    float default_target_y = 4;
+    float default_target_z = 6;
+    Vector2Data radius_limits = 7;
+    float default_radius = 8;
+    float default_fov = 9;
+  }
+  string display_name = 100;
+  bool is_dev_only = 101;
+  string scene_path = 1;
+  SkyRules sky_rules = 10;
+  HumanReadableDateTimeData date_time = 11;
+  CoordinateData coordinates = 15;
+  TimeZone timezone = 16;
+  Vector2Data date_time_limits = 12;
+  repeated string hdri_paths = 14;
+  string default_hdri_path = 24;
+  repeated string weather_paths = 23;
+  string default_weather_path = 25;
+  ShowroomData.SceneCameraOptions current_scene_camera_option = 26;
+  uint32 default_spawn_point = 27;
+  repeated ShowroomData.SceneCameraOptions scene_camera_options = 28;
+  bool hide_weather_selector = 30;
+  bool hide_hdri_selector = 31;
+  bool hide_time_of_day_selector = 32;
+  repeated ShowroomType is_default_for = 105;
+  repeated ShowroomType allowed_in = 104;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 13 to 13;
+  reserved 20 to 20;
+  reserved 21 to 21;
+  reserved 22 to 22;
+  reserved 29 to 29;
+  reserved 102 to 102;
+  reserved 103 to 103;
+}
+
+message CarParticleEmitterData_Emitter {
+  CarParticleEmitterData_EmitterType emitter_type = 1;
+  string emitter_override = 2;
+}
+
+message CarParticleEmitterData_EmittersPack {
+  repeated CarParticleEmitterData_Emitter emitters = 1;
+}
+
+message CarParticleEmitterData {
+  string name = 1;
+  string attachment_bone = 2;
+  TransformData offset_transform = 3;
+  CarParticleEmitterEnum particle_emitter_enum = 7;
+  repeated CarParticleEmitterData_Emitter emitters = 4;
+  reserved 6 to 6;
+}
+
+message PostProcessingPreset {
+  string name = 1;
+  string path = 2;
+  bool is_release = 3;
+  bool is_dev = 4;
+  bool is_tester = 5;
+}
+
+message InstanceBrushData {
+  string name = 1;
+  string path = 2;
+}
+
+message BrushTableData {
+  string name = 1;
+  string path = 2;
+}
+
+message CarHashGUIDData {
+  map<uint64, PGUID> map = 1;
+}
+
+message WeatherPresetData {
+  string name = 1;
+  int32 bad_weather_index = 2;
+  string weather_data_path = 4;
+  reserved 3 to 3;
+}
+
+message ColliderData {
+  ColliderType type = 1;
+  string meshOverride = 7;
+  Vector3Data boxBoundsMin = 5;
+  Vector3Data boxBoundsMax = 6;
+  float capsuleRadius = 3;
+  float capsuleLength = 4;
+  reserved 2 to 2;
+}
+
+message MechanicalPresetIdData {
+  string mechanical_preset = 1;
+  float max_performance_indicator = 2;
+  int32 backend_id = 3;
+}

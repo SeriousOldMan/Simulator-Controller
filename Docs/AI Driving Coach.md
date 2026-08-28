@@ -517,6 +517,8 @@ The following video gives you a good demonstration of this:
 
 This mode also uses the underlying telemtry data system to help you to retain your focus and your motivation to push. Once the Coach detects, that you are loosing pace, he will yell at you and will try to bring your attention back to the tarmac. You can enable this mode by asking the Coach, whether he can help you to keep your focus.
 
+You can activate this mode by asking the Coach "Can you help me to focus?", but it can also be activated using a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), a controller action or by using the tray menu of the "Simulator Controller" process.
+
 You can control the level of verbosity by modifying the *Motivation.TimeLoss* instruction (see above). You can even delete the whole content of this instructions and the Coach will then only tell you that you have lost pace and that you should focus again. But that is only half of the fun, so if the default instruction produces too much output for your taste and distracts you, let's take a look at two alternatives:
 
 	Tell me in which sector I am losing time compared to the other cars.

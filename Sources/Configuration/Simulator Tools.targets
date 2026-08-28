@@ -27,6 +27,7 @@ Release 7.0.1=Release 7.0.0 -> updateConfigurationForV701
 Release 7.1.0=Release 7.0.1 -> updateConfigurationForV710
 Release 7.1.1=Release 7.1.0 -> updateConfigurationForV711
 Release 7.2.0=Release 7.1.1 -> updateConfigurationForV720, renewConsent
+Release 7.2.2=Release 7.2.0 -> updateConfigurationForV722
 [Cleanup]
 Binaries Folder=%kBinariesDirectory%
 Logs Folder=%kLogsDirectory%

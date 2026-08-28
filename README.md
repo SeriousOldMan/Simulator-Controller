@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.2.0-release](https://cutt.ly/4yg2ZtVe) (Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMUAdded Cadillac V-Series.R Evo for LMU.)
+[7.2.2.0-release](https://cutt.ly/4yg2ZtVe) (Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMU, Added meta data for 296 EVO for LMU.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7220) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722) of this version and all the versions you might have skipped, before installing and using this version.
 

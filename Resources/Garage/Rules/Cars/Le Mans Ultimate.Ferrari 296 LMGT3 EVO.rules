@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Le Mans Ultimate                ;;;
-;;;                                         McLaren 720S LMGT3 Evo          ;;;
+;;;                                         Ferrari 296 LMGT3 Evo           ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,5 +11,5 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("Le Mans Ultimate", "McLaren 720S LMGT3 Evo", [Electronics.ABS])),
-				 (Prove: removeSettings("Le Mans Ultimate", "McLaren 720S LMGT3 Evo", [Aero.Splitter.Front]))
+[?Initialize] => (Prove: addSettings("Le Mans Ultimate", "Ferrari 296 LMGT3 Evo", [Electronics.ABS])),
+				 (Prove: removeSettings("Le Mans Ultimate", "Ferrari 296 LMGT3 Evo", [Aero.Splitter.Front]))

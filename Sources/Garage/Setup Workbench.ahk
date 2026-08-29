@@ -2510,9 +2510,6 @@ class DiscreteValuesHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
-		if (rawValue = 10)
-			a := 1
-
 		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
@@ -2614,7 +2611,94 @@ class DecimalHandler extends DiscreteValuesHandler {
 ;;; FloatHandler                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class FloatHandler extends DecimalHandler {
+class FloatHandler extends NumberHandler {
+	iIncrement := false
+	iPrecision := false
+	iFactor := false
+
+	iMinValue := kUndefined
+	iMaxValue := kUndefined
+
+	iReverse := false
+
+	Increment {
+		Get {
+			return this.iIncrement
+		}
+	}
+
+	Precision {
+		Get {
+			return this.iPrecision
+		}
+	}
+
+	Factor {
+		Get {
+			return this.iFactor
+		}
+	}
+
+	Reverse {
+		Get {
+			return this.iReverse
+		}
+	}
+
+	MinValue {
+		Get {
+			return ((this.iMinValue != kUndefined) ? this.iMinValue : super.MinValue)
+		}
+	}
+
+	MaxValue {
+		Get {
+			return ((this.iMaxValue != kUndefined) ? this.iMaxValue : super.MaxValue)
+		}
+	}
+
+	__New(increment := 1, factor := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined) {
+		this.iMinValue := minValue
+		this.iMaxValue := maxValue
+		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
+		this.iIncrement := increment
+		this.iPrecision := precision
+		this.iFactor := factor
+	}
+
+	formatValue(value) {
+		return Round(value, this.Precision)
+	}
+
+	convertToDisplayValue(rawValue) {
+		return this.formatValue(rawValue * this.Factor)
+	}
+
+	convertToRawValue(displayValue) {
+		return (displayValue / this.Factor)
+	}
+
+	increaseValue(displayValue) {
+		local value := (displayValue + this.Increment)
+
+		if this.validValue(value)
+			return value
+		else if this.Reverse
+			return Max(this.MaxValue, Min(this.MinValue, displayValue))
+		else
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
+	}
+
+	decreaseValue(displayValue) {
+		local value := (displayValue - this.Increment)
+
+		if this.validValue(value)
+			return value
+		else if this.Reverse
+			return Max(this.MaxValue, Min(this.MinValue, displayValue))
+		else
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;

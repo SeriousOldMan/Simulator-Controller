@@ -368,7 +368,7 @@ On the right side, you will see the simulator specific content of the setup file
 
 Using the checkboxes on the left side of each setting, you can control which modifications will be included in the modified setup and which are not. The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed, chosen and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione* and *Le Mans Ultimate*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
+Note: The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corsa EVO*, *Le Mans Ultimate* and *rFactor 2*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
 
 ## Comparing Car Setups
 
@@ -472,16 +472,16 @@ Here is an extract from the definition file for the "McLaren 720s GT3":
 	[General]
 	SteerLock=480
 	[Setup.Settings.Handler]
-	Brake.Balance=FloatHandler(47.0, 0.2, 1, 47.0, 68.0)
+	Brake.Balance=DecimalHandler(47.0, 0.2, 1, 47.0, 68.0)
 	Brake.Duct.Front=ClicksHandler(0, 6)
 	Brake.Duct.Rear=ClicksHandler(0, 6)
 	Aero.Height.Front=IntegerHandler(50, 1, 50, 80)
 	Aero.Height.Rear=IntegerHandler(64, 1, 64, 105)
 	Aero.Wing.Rear=IntegerHandler(1, 1, 1, 8)
-	Geometry.Toe.Front.Left=FloatHandler(-0.48, 0.01, 2, -0.48, 0.44)
-	Geometry.Toe.Front.Right=FloatHandler(-0.48, 0.01, 2, -0.48, 0.44)
-	Geometry.Toe.Rear.Left=FloatHandler(-0.1, 0.01, 2, -0.1, 0.4)
-	Geometry.Toe.Rear.Right=FloatHandler(-0.1, 0.01, 2, -0.1, 0.4)
+	Geometry.Toe.Front.Left=DecimalHandler(-0.48, 0.01, 2, -0.48, 0.44)
+	Geometry.Toe.Front.Right=DecimalHandler(-0.48, 0.01, 2, -0.48, 0.44)
+	Geometry.Toe.Rear.Left=DecimalHandler(-0.1, 0.01, 2, -0.1, 0.4)
+	Geometry.Toe.Rear.Right=DecimalHandler(-0.1, 0.01, 2, -0.1, 0.4)
 	...
 	[Setup.Settings.Units.DE]
 	Brake.Balance=% Vorne
@@ -520,13 +520,27 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 
   - **DecimalHandler(baseValue, increment, precision, minValue, maxValue)**
   
-    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed. *FloatHandler* can be used as well, as it is synonym to *DecimalHandler*.
+    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
 	
 	Example:
 	
 		DecimalHandler(0, 0.1, 1, -3.5, 0.1)
 	
 	will create a continuous range of -35 to 1 in the simulator specific setup file, where -35 equals the display value -3.5 and 1 equals the display value 0.1.
+
+  - **FloatHandler(increment, factor, precision, minValue, maxValue)**
+  
+    This handler must be used, when the values in the setup file are stored as floating point numbers, which is currently the case for *Assetto Corsa EVO*. *increment* defines the step between each display value, while *factor* can be used to change the relationship of the internal value to the display value:
+	
+		*display value* = *internal value* \* *factor*
+		
+	*precision* defines, how many places after the decimal point are considered and displayed.
+	
+	Example:
+	
+		FloatHandler(0.25, 1, 2, -3.5, 1.0)
+	
+	will create a range from -3.5 to 1.0 with an increment of 0.25. The values are display with two digits after the decimal point, for example -1.75.
 
   - **EnumerationHandler(baseValue, increment, value1, value2, ...)**
   

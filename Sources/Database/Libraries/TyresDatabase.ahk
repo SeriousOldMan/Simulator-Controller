@@ -433,19 +433,16 @@ class TyresDatabase extends SessionDatabase {
 		return Map()
 	}
 
-	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
-				, compound, compoundColor, maxWear := 75, default := false
-				, community := kUndefined, driver := false) {
-		local settingsDB := SettingsDatabase()
-		local lastLap := 0
-		local tyreWears := []
-		local wears, ignore, wear, lapWear, lastWear, db
+	getTyreWears(simulator, car, track, weather, airTemperature, trackTemperature
+			   , compound, compoundColor, community := kUndefined, driver := false) {
+		local wears, db
 
 		if !driver
 			driver := this.ID
 
 		wears := LapsDatabase(simulator, car, track).getTyreCompoundWears(weather, compound, compoundColor
-																		, ["Front.Left", "Front.Right", "Rear.Left", "Rear.Right"], driver)
+																		, ["Front.Left", "Front.Right"
+																		 , "Rear.Left", "Rear.Right"], driver)
 
 		if (((community == kUndefined) && this.UseCommunityWears[simulator, car, track, weather])
 		 || (community && (community != kUndefined))) {
@@ -457,7 +454,24 @@ class TyresDatabase extends SessionDatabase {
 														   , "Compound", compound, "Compound.Color", compoundColor)}))
 		}
 
+		return wears
+	}
+
+	getUsableLaps(simulator, car, track, weather, airTemperature, trackTemperature
+				, compound, compoundColor, maxWear := 75, default := false
+				, community := kUndefined, driver := false) {
+		local settingsDB := SettingsDatabase()
+		local lastLap := 0
+		local tyreWears := []
+		local wears, ignore, wear, lapWear, lastWear, db
+
+		if !driver
+			driver := this.ID
+
 		try {
+			wears := this.getTyreWears(simulator, car, track, weather, airTemperature, trackTemperature
+									 , compound, compoundColor, community, driver)
+
 			for ignore, wear in bubbleSort(&wears, (w1, w2) => (w1["Tyre.Laps"] > w2["Tyre.Laps"]))
 				if (wear["Tyre.Laps"] < 5)
 					continue

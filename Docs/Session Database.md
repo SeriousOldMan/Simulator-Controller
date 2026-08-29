@@ -276,7 +276,7 @@ Why so complex? There is a strong dependency between the track surface state, ai
 
 Please note, that you can use the "Pencil" button to rename an already uploaded setup file to follow the above conventions, if necessary.
 
-#### Pressures
+#### Tyres
 
 Here you will get a recommendation for initial cold tyre pressures, if a matching setup is available in the database. Depending on the temperature settings the recommended tyre pressures will be marked in dark green for a perfect match, or light green or even yellow, if the values have been extra- or interpolated from different air and/or track temperatures.
 
@@ -287,6 +287,8 @@ Notes:
   1. If you choose a specific driver in the "Driver" menu, only the tyre pressures of this driver are shown, if available.
   2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
   3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
+  
+If this information is provided by the simulator API information about typical tyre wear for each wheel in the currently selected conditions and using the currently selected tyre compound may be displayed in the lower part. The number of laps per tyre will be available as well depending on the the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". By the way, here also applies that only the tyre wear of this driver are shown, if you choose a specific driver in the "Driver" menu.
 
 ##### Browsing and editing Tyre Pressures
 

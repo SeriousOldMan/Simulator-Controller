@@ -1775,6 +1775,32 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV722() {
+	deleteFile(kUserHomeDirectory . "Simulator Data\LMU\Car Data.ini")
+
+	try
+		DirMove(kDatabaseDirectory . "User\LMU\Aston Martin Vantage AMR LMGT", kDatabaseDirectory . "User\LMU\Aston Martin Vantage AMR LMGT3", "R")
+
+	try
+		DirMove(kDatabaseDirectory . "User\LMU\Chevrolet Corvette Z06 LMGT3", kDatabaseDirectory . "User\LMU\Chevrolet Corvette Z06 LMGT3.R", "R")
+
+	try
+		DirMove(kDatabaseDirectory . "User\LMU\Lamborghini Huracan LMGT3 Evo", kDatabaseDirectory . "User\LMU\Lamborghini Huracan LMGT3 Evo2", "R")
+
+	updateConfigurationForV681()
+}
+
+
+updateConfigurationForV720() {
+	local dbConfig := readMultiMap(kUserConfigDirectory . "Session Database.ini")
+
+	removeMultiMapValue(dbConfig, "Database", "Version")
+
+	writeMultiMap(kUserConfigDirectory . "Session Database.ini", dbConfig)
+
+	deleteFile(kDatabaseDirectory . "DOWNLOAD")
+}
+
 updateConfigurationForV711() {
 	local simulator, car, ignore, task, drivers, driver, ignore, candidate
 

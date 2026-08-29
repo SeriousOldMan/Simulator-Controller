@@ -475,7 +475,7 @@ class SimulatorController extends ConfigurationItem {
 
 	iSettings := false
 
-	iPlugins := []
+	iPlugins := CaseInsenseMap()
 	iFunctions := CaseInsenseMap()
 	iFunctionController := []
 
@@ -551,9 +551,9 @@ class SimulatorController extends ConfigurationItem {
 		}
 	}
 
-	Plugins {
+	Plugins[registry := false] {
 		Get {
-			return this.iPlugins
+			return (registry ? this.iPlugins : getValues(this.iPlugins))
 		}
 	}
 
@@ -734,15 +734,31 @@ class SimulatorController extends ConfigurationItem {
 		return false
 	}
 
-	registerPlugin(plugin) {
+	registerPlugin(name, plugin) {
 		if !inList(this.Plugins, plugin) {
+			if this.Plugins[true].Has(name)
+				this.unregisterPlugin(name)
+
 			logMessage(kLogInfo, translate("Plugin ") . translate(getPluginForLogMessage(plugin)) . (this.isActive(plugin) ? translate(" (Active)") : translate(" (Inactive)")) . translate(" registered"))
 
-			this.Plugins.Push(plugin)
+			this.Plugins[true][name] := plugin
 		}
 
 		if this.isActive(plugin)
 			plugin.activate()
+	}
+
+	unregisterPlugin(name) {
+		local plugin
+
+		if this.Plugins[true].Has(name) {
+			plugin := this.Plugins[true][name]
+
+			if this.isActive(plugin)
+				plugin.deactivate()
+
+			this.Plugins[true].Delete(name)
+		}
 	}
 
 	registerMode(plugin, mode) {
@@ -988,7 +1004,7 @@ class SimulatorController extends ConfigurationItem {
 		if first
 			first := false
 		else
-			playSound("SCSoundPlayer.exe", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
+			playSound("SCSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 										 , getAudioSettings("Controller"))
 	}
 
@@ -1724,7 +1740,7 @@ class ControllerPlugin extends Plugin {
 
 		if (this.Active || isDebug())
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 	}
 
 	findMode(name) {

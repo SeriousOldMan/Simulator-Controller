@@ -162,8 +162,15 @@ class SpeechSynthesizer {
 		Get {
 			local voices, voice, lcid, ignore, candidate, name
 
-			if (!language || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "OpenAI") || (this.Synthesizer = "Yandex"))
+			if (!language || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "OpenAI")
+						  || (this.Synthesizer = "Yandex"))
 				return this.iVoices
+			else if (this.Synthesizer = "Piper") {
+				if language
+					return choose(this.iVoices, (v) => (InStr(v, language . "_") == 1))
+				else
+					return this.iVoices
+			}
 			else {
 				voices := []
 
@@ -449,6 +456,30 @@ class SpeechSynthesizer {
 										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 			}
 		}
+		else if (InStr(synthesizer, "Piper|") == 1) {
+			this.iSynthesizer := "Piper"
+
+			try {
+				this.iServerURL := Trim(string2Values("|", synthesizer, 3)[2])
+
+				if (this.iServerURL != "")
+					while (SubStr(this.iServerURL, StrLen(this.iServerURL), 1) = "/")
+						this.iServerURL := SubStr(this.iServerURL, 1, StrLen(this.iServerURL) - 1)
+
+				this.iVoices := this.getVoices()
+
+				this.setVoice(language, this.computeVoice(voice, language))
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, translate("Error while initializing speech synthesizer module - please install the speech synthesizer software"))
+
+				if !kSilentMode
+					showMessage(translate("Error while initializing speech synthesizer module - please install the speech synthesizer software") . translate("...")
+										, translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+		}
 		else
 			throw "Unsupported speech synthesizer service detected in SpeechSynthesizer.__New..."
 
@@ -509,7 +540,7 @@ class SpeechSynthesizer {
 	}
 
 	getVoices() {
-		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element
+		local result, voices, languageCode, voiceInfos, ignore, voiceInfo, element, ignore, voice
 
 		try {
 			if (this.Synthesizer = "Windows") {
@@ -570,6 +601,27 @@ class SpeechSynthesizer {
 				}
 
 				return voices
+			}
+			else if (this.Synthesizer = "Piper") {
+				result := WinHttpRequest().GET(this.iServerURL . "/voices", "", Map(), {Encoding: "UTF-8"})
+
+				if ((result.Status >= 200) && (result.Status < 300)) {
+					voices := []
+
+					result := result.JSON
+
+					if result.Has("voices") {
+						for ignore, voice in result["voices"]
+							voices.Push(voice)
+					}
+					else
+						for voice, ignore in result
+							voices.Push(voice)
+
+					return voices
+				}
+				else
+					return []
 			}
 			else if (this.iGoogleMode = "HTTP") {
 				if (Trim(this.iAPIKey) != "") {
@@ -660,7 +712,7 @@ class SpeechSynthesizer {
 		callback := this.SpeechStatusCallback
 
 		if kSox { ; && (this.Synthesizer != "OpenAI")) {
-			pid := playSound(wait ? "SoundPlayerSync.exe" : "SoundPlayerAsync.exe", soundFile, this.AudioSettings)
+			pid := playSound(wait ? "SoundPlayerSync" : "SoundPlayerAsync", soundFile, this.AudioSettings)
 
 			if callback
 				callback.Call("Start")
@@ -706,7 +758,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Start")
 
-				playSound("System", soundFile, false, "Wait")
+				playSound("SystemPlayer", soundFile, false, "Wait")
 
 				if callback
 					callback.Call("Stop")
@@ -715,7 +767,7 @@ class SpeechSynthesizer {
 				if callback
 					callback.Call("Play")
 
-				playSound("System", soundFile)
+				playSound("SystemPlayer", soundFile)
 			}
 		}
 	}
@@ -908,7 +960,7 @@ class SpeechSynthesizer {
 		}
 		else if (this.Synthesizer = "Windows")
 			this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
-		else if inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex"], this.Synthesizer) {
+		else if inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs", "Yandex", "Piper"], this.Synthesizer) {
 			tempName := (cache ? cacheFileName : temporaryFileName("temp", "wav"))
 
 			this.speakToFile(tempName, text)
@@ -1142,6 +1194,36 @@ class SpeechSynthesizer {
 				}
 			}
 		}
+		else if (this.Synthesizer = "Piper") {
+			try {
+				result := WinHttpRequest().POST(this.iServerURL . "/synthesize"
+											  , JSON.print(Map("voice", this.Voice, "text", text
+															 , "length_scale", Min(2, Max(0.5, 1 - (0.05 * this.iRate)))))
+											  , Map("Content-Type", "application/json")
+											  , {Raw: true})
+
+				if ((result.Status >= 200) && (result.Status < 300)) {
+					file := FileOpen(fileName, "w")
+
+					file.RawWrite(result.Raw)
+
+					file.Close()
+				}
+				else
+					throw "Error during speech synthesis..."
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				try {
+					SpeechSynthesizer("dotNET", true, "EN").speak("Error while calling Piper API.")
+				}
+				catch Any {
+					try
+						SpeechSynthesizer("Windows", true, "EN").speak("Error while calling Piper API.")
+				}
+			}
+		}
 	}
 
 	speakTest(language := false) {
@@ -1228,9 +1310,9 @@ class SpeechSynthesizer {
 
 			return true
 		}
-		else if (this.iPlaysCacheFile || inList(["dotNet", "Azure", "Google", "OpenAI", "ElevenLabs"], this.Synthesizer)) {
-			try
-				playSound("System", "NonExistent.avi")
+		else if (this.iPlaysCacheFile || inList(["dotNet", "Azure", "Google", "OpenAI"
+											   , "ElevenLabs", "Yandex", "Piper"], this.Synthesizer)) {
+			playSound("SystemPlayer", false)
 
 			if this.iPlaysCacheFile {
 				this.iPlaysCacheFile := false
@@ -1263,9 +1345,9 @@ class SpeechSynthesizer {
 		this.iVolume := volume
 
 		if (this.Synthesizer = "Windows")
-			this.iSpeechSynthesizer.Volume := (kSoX ? 100 : this.iVolume)
+			this.iSpeechSynthesizer.Volume := (kSoX ? 100 : volume)
 		else if (this.Synthesizer = "dotNET")
-			this.iSpeechSynthesizer.SetProsody(this.iRate, kSoX ? 100 : this.iVolume)
+			this.iSpeechSynthesizer.SetProsody(this.iRate, kSoX ? 100 : volume)
 	}
 
 	setPitch(pitch) {
@@ -1276,8 +1358,8 @@ class SpeechSynthesizer {
 	}
 
 	computeVoice(voice, language, randomize := true) {
-		local availableVoices := []
 		local voices := this.Voices
+		local availableVoices := []
 		local count, locale, ignore, candidate, id
 
 		if inList(voices, voice)
@@ -1333,6 +1415,8 @@ class SpeechSynthesizer {
 			}
 		}
 		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "Yandex")) {
+			availableVoices := this.Voices
+
 			if (voice == true) {
 				count := availableVoices.Length
 
@@ -1347,6 +1431,20 @@ class SpeechSynthesizer {
 				return voice
 			else if (voice && (InStr(voice, "(") || InStr(voice, "/")))
 				return voice
+		}
+		else if (this.Synthesizer = "Piper") {
+			if ((voice == true) && language) {
+				availableVoices := this.Voices[language]
+
+				count := availableVoices.Length
+
+				if (count == 0)
+					voice := false
+				else if randomize
+					voice := availableVoices[Round(Random(1, count))]
+				else
+					voice := availableVoices[1]
+			}
 		}
 
 		if (availableVoices.Length > 0)
@@ -1385,7 +1483,9 @@ class SpeechSynthesizer {
 			this.iVoice := name[1]
 			this.iLocale := StrReplace(name[2], ")", "")
 		}
-		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs") || (this.Synthesizer = "Yandex")) {
+		else if ((this.Synthesizer = "OpenAI") || (this.Synthesizer = "ElevenLabs")
+											   || (this.Synthesizer = "Yandex")
+											   || (this.Synthesizer = "Piper")) {
 			this.iLanguage := language
 			this.iVoice := name
 		}

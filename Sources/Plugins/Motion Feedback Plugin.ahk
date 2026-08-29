@@ -547,7 +547,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 			}
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 
 			if (motionArguments.Length > 0) {
 				if ((motionArguments[1] == true) || (motionArguments[1] = kTrue))
@@ -572,7 +572,7 @@ class MotionFeedbackPlugin extends ControllerPlugin {
 				this.stopMotion(false, true, false)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 		}
 	}
 

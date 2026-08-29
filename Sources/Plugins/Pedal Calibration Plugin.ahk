@@ -206,7 +206,7 @@ class PedalCalibrationPlugin extends ControllerPlugin {
 				this.createPedalCalibrationAction(controller, this.parseValues(A_Space, substituteString(theAction, "  ", A_Space))*)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 		}
 	}
 

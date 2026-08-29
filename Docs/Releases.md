@@ -1,5 +1,107 @@
 # Latest stable release
 
+## 7.2.2.0
+
+#### Date: 08/28/26
+
+#### Fixes
+
+  - Fixed a very complex bug, which prevented lap or wear based tyre change decision, if tyres could be changed individually for each wheel, but a single tyre compound must be used for all wheels. This is especially the case for *iRacing*.
+  - Fixed a redraw problem on the *Data* tab in "Solo Center".
+  - Fixed selection of pitstop repair requests using controller actions for *Le Mans Ultimate*.
+  - Fixed several car names for *Le Mans Ultimate*, which are reported with incomplete names by the game and therefore had missing information like tyre data:
+    - Chevrolet Corvette Z06 LMGT3.R (the car's name is reported without the trailing "R")
+    - Aston Martin Vantage AMR LMGT3 (the car's name is reported without the trailing "3")
+    - Lamborghini Huracan LMGT3 Evo2 (the car's name is reported without the trailing "2")
+  
+#### Changes
+
+  - The Driving Coach provides a new coaching mode, which is most helpful during a race. He will now praise you for a good lap, but will also blame you and call you back to focus, if you lose your pace. Additionally, he can give you advice where on the track you are losing time and what to change.
+    - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#motivation-on-the-track) has been added for the Driving Coach.
+	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
+	- The motivation mode can also be activated from the tray menu of the "Simulator Controller" process.
+	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
+	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
+  - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Piper) for more information.
+  - Sliders for Volume, Pitch and Speed will now be disabled in voice configuration, if the corresponding option is not supported by the chosen speech synthesis method.
+  - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
+  - A new article has been written for the *News* system.
+  - Added car meta data for the Ferrari 206 LMGT3 EVO, which was *forgotten* to be included and therefore had no tyre information.
+  - New car models for "Setup Workbench" :
+    - Le Mans Ultimate
+	  - Ferrari 296 LMGT3 Evo (has been forgotten on release, sorry)
+    - Automobilista 2 (by @inthebagbud UK)
+	  - Formula V10 Gen2 (has been removed)
+      - Formula V10 Gen2 (B)
+      - Formula V10 Gen2 (M)
+      - Formula V10 Gen3 (B)
+      - Formula V10 Gen3 (M)
+      - Formula V8 Gen1 (B)
+      - Formula V8 Gen1 (M)
+      - Formula V8 Gen2
+      - Gillet Vertigo Streiff
+      - Lister Storm GTM
+      - Maserati GranSport Trofeo
+      - Milano GT55
+      - Panoz Esperante GTLM
+      - Renault R25
+      - Renault R26
+      - Renault R28
+      - Saleen S7-R GT1
+      - Spyker C8 Spyder GT2-R
+      - TVR Tuscan T400R GT2
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722). A few fixes have been applied for cars in *Le Mans Ultimate* and your data may have been moved to an archive.
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 7.2.1.0
+
+#### Date: 08/21/26
+
+#### Fixes
+
+  - Added missing translations for all languages.
+  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
+  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
+  - Fixed the location handling of the diary folder location in "Setup Workbench".
+  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
+  
+#### Changes
+
+  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
+  - [Internal] Sounds that do not require an audio route will now also be played by SoX, if installed.
+  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
+
+## 7.2.0.0
+
+#### Date: 08/14/26
+
+#### Fixes
+
+  - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
+  - Fixed the coordinate system transformation for the Second Monitor connector. Telemetry files acquired from Second Monitor will now be compatible with all position related functions.
+  - Once more we have a fix for the community database synchronization.
+  - Fixed a bug in Second Monitor integration, when no suspension information is available.
+  - Fixed missing lap time information, when Second Monitor is used as telemetry provider.
+  - Fixed a bug in "Simulator Setup" that caused the language selection on the "General settings & voice control" page to reset to the UI language on each run of "Simulator Setup".
+  
+#### Changes
+
+  - The "Setup Workbench" offers a new tool. Using a GPT provider and a high end LLM, an integrated *Setup Engineer* can analyze complete telemetry data and create a detailed analysis and recommendations for setup changes based on this. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) for more information and instructions.
+  
+    The idea of ​​the *Setup Engineer* had been on my mind for a long time, but it was only recently that LLMs became powerful enough to handle the vast amounts of data and mathematical calculations required for a robust analysis of telemetry data. The catch, however, is that you need one of the latest state-of-the-art models from providers like OpenAI, Anthropic, or Google — and those aren't exactly cheap. But the results are worth it, I promise.
+  - A diary (log file) has been implemented for the "Setup Workbench". The diary folder can be [configured in the settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#settings) of the "Setup Workbench".
+  - It is no longer possible to close the settings dialog of the "Session Database", if there is an invalid configuration for a Team Server connection.
+  - The "Session Database" provides a new inspector which gives you detailed information about the tyre wear per lap for each wheel in specific weather conditions. Depending on your settings, the number of usable laps per tyre will be calculated automatically. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres) for more information.
+  - IBT files can now be opened directly from the telemetry select dialog.
+  - Suspension information and the lap time is now included in telemetry data acquired by the Second Monitor provider.
+
 ## 7.1.5.0
 
 #### Date: 08/07/26
@@ -20,26 +122,6 @@
 	- The Second Monitor importer and also the corresponding telemetry provider for the telemetry system will now import suspension deflection information, if available.
   - [Internal] Handling of modal windows has been optimized so that always the window, which was on top before the modal window had been opened, will be on top again.
   - [Internal] A caching has been implemented for loaded telemetry files to prevent to many disc requests.
-
-# Upcoming release
-
-## 7.2.0.0
-
-#### Date: 08/14/26 (planned)
-
-#### Fixes
-
-  - Fixed missing meta information when loading lap telemetries from the session database into the Telemetry Viewer.
-  - Fixed the coordinate system transformation for the Second Monitor connector. Telemetry files acquired from Second Monitor will now be compatible with all position related functions.
-  
-#### Changes
-
-  - The "Setup Workbench" offers a new tool. Using a GPT provider and a high end LLM, an integrated *Setup Engineer* can analyze complete telemetry data and create a detailed analysis and recommendations for setup changes based on this. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) for more information and instructions.
-  
-    The idea of ​​the *Setup Engineer* had been on my mind for a long time, but it was only recently that LLMs became powerful enough to handle the vast amounts of data and mathematical calculations required for a robust analysis of telemetry data. The catch, however, is that you need one of the latest state-of-the-art models from providers like OpenAI, Anthropic, or Google — and those aren't exactly cheap. But the results are worth it, I promise.
-  - A diary (log file) has been implemented for the "Setup Workbench". The diary folder can be configured in the settings of the "Setup Workbench".
-
-# Release history
 
 ## 7.1.4.0
 

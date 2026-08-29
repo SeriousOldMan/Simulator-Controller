@@ -33,9 +33,18 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Note: Some of you probably want to have more control. No problem. All the files in the *Simulator Controller\Config*, *Simulator Controller\Translations*, *Simulator Controller\Grammars*, *Simulator Controller\Rules* and other folders are human readable and using a text editor and some *Diff* tool, you can do everything the automated procedure does on its own. But be sure to make a backup copy of all the files, just for the peace of mind. Attention: These files use a two-byte character set, so be sure to use an editor that can handle this.
 
-## Release 7.2.0
+## Release 7.2.2
+
+1. The data of "Aston Martin Vantage AMR LMGT" and "Chevrolet Corvette Z06 LMGT3" from *Le Mans Ultimate* may have been moved from the session database to an archive. This archive is located in the *Simulator Controller\Database\Archive\LMU* folder which is located in your user *Documents* folder. If you want to merge the data with data collected for cars with the normal naming scheme, open the files with a unicode capable text editor and copy the data to the corresponding files in *Simulator Controller\Database\User\LMU*.
+2. You may want to bind a button on your controller for the new motivation mode of the Driving Coach.
+
+## Release 7.2.1
 
 Nothing to do.
+
+## Release 7.2.0
+
+Everything handled automatically.
 
 ## Release 7.1.5
 

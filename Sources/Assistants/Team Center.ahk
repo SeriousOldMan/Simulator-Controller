@@ -362,7 +362,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					return false
 				}
 				finally {
@@ -426,7 +426,7 @@ class TeamCenter extends ConfigurationItem {
 				}
 				catch Any as exception {
 					logError(exception, true)
-					
+
 					return false
 				}
 				finally {
@@ -3057,13 +3057,19 @@ class TeamCenter extends ConfigurationItem {
 
 			lapTime := lap.LapTime
 			sectorTimes := lap.SectorsTime
-			
+
+			if (!lapTime || isNull(lapTime))
+				lapTime := "-"
+
+			if (!sectorTimes || (isObject(sectorTimes) && (sectorTimes.Length = 0)))
+				sectorTiems := ["-"]
+
 			return true
 		}
 		else {
 			lapTime := "-"
 			sectorTimes := ["-"]
-			
+
 			return false
 		}
 	}

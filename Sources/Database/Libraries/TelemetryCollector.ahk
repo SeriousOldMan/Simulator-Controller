@@ -19,29 +19,35 @@
 ;;;                       Public Constants Section                          ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: []}
-							, {Name: "Speed", Indices: [7], Size: 1, Channels: ["Speed"], Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
-							, {Name: "Throttle", Indices: [2], Size: 0.5, Channels: ["Throttle"]}
-							, {Name: "Brake", Indices: [3], Size: 0.5, Channels: ["Brake"]}
-							, {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5, Channels: ["Throttle", "Brake"]}
-							, {Name: "Steering", Indices: [4], Size: 0.8, Channels: ["Steering"]}
-							, {Name: "TC", Indices: [8], Size: 0.3, Channels: ["TC"]}
-							, {Name: "ABS", Indices: [9], Size: 0.3, Channels: ["ABS"]}
-							, {Name: "TC/ABS", Indices: [8, 9], Size: 0.3, Channels: ["TC", "ABS"]}
-							, {Name: "RPM", Indices: [6], Size: 0.5, Channels: ["RPM"]}
-							, {Name: "Gear", Indices: [5], Size: 0.5, Channels: ["Gear"]}
-							, {Name: "Long G", Indices: [10], Size: 1, Channels: ["Long G"]}
-							, {Name: "Lat G", Indices: [11], Size: 1, Channels: ["Lat G"]}
-							, {Name: "Lat G/Long G", Indices: [10, 11], Size: 1, Channels: ["Long G", "Lat G"]}
-							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1, Channels: ["Curvature"]}
-							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Converter: [normalizeTime]}
-							, {Name: "PosX", Indices: [12], Channels: []}
-							, {Name: "PosY", Indices: [13], Channels: []}
-							, {Name: "YawRate", Indices: [15], Size: 1, Channels: ["YawRate"]}
-							, {Name: "SuspDefl FL", Indices: [16], Size: 1, Channels: ["SuspDefl FL"]}
-							, {Name: "SuspDefl FR", Indices: [17], Size: 1, Channels: ["SuspDefl FR"]}
-							, {Name: "SuspDefl RL", Indices: [18], Size: 1, Channels: ["SuspDefl RL"]}
-							, {Name: "SuspDefl RR", Indices: [19], Size: 1, Channels: ["SuspDefl RR"]}]
+global kTelemetryChannels := [{Name: "Distance", Indices: [1], Channels: [], Units: ["meter"]}
+							, {Name: "Speed", Indices: [7], Size: 1, Channels: ["Speed"], Units: ["km/h"]
+											, Converter: [(s) => isNumber(s) ? convertUnit("Speed", s) : kNull]}
+							, {Name: "Throttle", Indices: [2], Size: 0.5, Channels: ["Throttle"], Units: ["0 - 1"]}
+							, {Name: "Brake", Indices: [3], Size: 0.5, Channels: ["Brake"], Units: ["0 - 1"]}
+							, {Name: "Throttle/Brake", Indices: [2, 3], Size: 0.5
+													 , Channels: ["Throttle", "Brake"], Units: ["0 - 1", "0 - 1"]}
+							, {Name: "Steering", Indices: [4], Size: 0.8, Channels: ["Steering"], Units: ["-1 - 1"]}
+							, {Name: "TC", Indices: [8], Size: 0.3, Channels: ["TC"], Units: ["0 - 1"]}
+							, {Name: "ABS", Indices: [9], Size: 0.3, Channels: ["ABS"], Units: ["0 - 1"]}
+							, {Name: "TC/ABS", Indices: [8, 9], Size: 0.3
+											 , Channels: ["TC", "ABS"], Units: ["0 - 1", "0 - 1"]}
+							, {Name: "RPM", Indices: [6], Size: 0.5, Channels: ["RPM"], Units: ["rot/m"]}
+							, {Name: "Gear", Indices: [5], Size: 0.5, Channels: ["Gear"], Units: ["-1 - N"]}
+							, {Name: "Long G", Indices: [10], Size: 1, Channels: ["Long G"], Units: ["m/s^2"]}
+							, {Name: "Lat G", Indices: [11], Size: 1, Channels: ["Lat G"], Units: ["m/s^2"]}
+							, {Name: "Lat G/Long G", Indices: [10, 11], Size: 1
+												   , Channels: ["Long G", "Lat G"], Units: ["m/s^2", "m/s^2"]}
+							, {Name: "Curvature", Function: computeCurvature, Indices: [false], Size: 1
+												, Channels: ["Curvature"], Units: ["float"]}
+							, {Name: "Time", Indices: [14], Size: 1, Channels: ["Time"], Units: ["ms"]
+										   , Converter: [normalizeTime]}
+							, {Name: "PosX", Indices: [12], Channels: [], Units: ["integer"]}
+							, {Name: "PosY", Indices: [13], Channels: [], Units: ["integer"]}
+							, {Name: "YawRate", Indices: [15], Size: 1, Channels: ["YawRate"], Units: ["rad/s"]}
+							, {Name: "SuspDefl FL", Indices: [16], Size: 1, Channels: ["SuspDefl FL"], Units: ["meter"]}
+							, {Name: "SuspDefl FR", Indices: [17], Size: 1, Channels: ["SuspDefl FR"], Units: ["meter"]}
+							, {Name: "SuspDefl RL", Indices: [18], Size: 1, Channels: ["SuspDefl RL"], Units: ["meter"]}
+							, {Name: "SuspDefl RR", Indices: [19], Size: 1, Channels: ["SuspDefl RR"], Units: ["meter"]}]
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -140,7 +146,7 @@ class TelemetryCollector {
 		}
 
 		loadLap(lap) {
-			local inputFileName, importFileName, text, pid
+			local inputFileName, importFileName, text, pid, info
 
 			lap := Integer(lap)
 
@@ -159,7 +165,7 @@ class TelemetryCollector {
 
 				FileAppend(text, inputFileName)
 
-				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . inputFileName . "`" `"" . importFileName . "`"", , "Hide", &pid)
+				Run("`"" . kBinariesDirectory . "Connectors\Second Monitor Reader\Second Monitor Reader.exe`" `"" . inputFileName . "`" `"" . importFileName . "`" `"" . (importFileName . ".info") . "`"", , "Hide", &pid)
 
 				Sleep(500)
 
@@ -171,14 +177,21 @@ class TelemetryCollector {
 				this.LoadedLaps[lap] := lap
 
 				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
-					
+
+				info := readMultiMap(importFileName . ".info")
+
+				setMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Driver"))
+
+				writeMultiMap(importFileName . ".info", info)
+
 				return importFileName
 			}
 			catch Any as exception {
 				logError(exception)
 			}
 			finally {
-				deleteFile(inputFileName)
+				if !isDebug()
+					deleteFile(inputFileName)
 			}
 		}
 
@@ -209,7 +222,7 @@ class TelemetryCollector {
 					Sleep(100)
 
 				SessionDatabase.normalizeTelemetry(this.TelemetryCollector.Simulator, importFileName)
-					
+
 				return importFileName
 			}
 			catch Any as exception {
@@ -218,7 +231,8 @@ class TelemetryCollector {
 				return false
 			}
 			finally {
-				deleteFile(inputFileName)
+				if !isDebug()
+					deleteFile(inputFileName)
 			}
 		}
 	}

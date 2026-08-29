@@ -1285,8 +1285,7 @@ void collectCarTelemetry(int playerID) {
 																map_buffer->all_drivers_data_1[index].position.x,
 																-map_buffer->all_drivers_data_1[index].position.z);
 
-				fprintf(file, "%d;%f;", (long)round((map_buffer->player.game_simulation_time - startTime) * 1000),
-										(float)map_buffer->player.local_angular_velocity.y);
+				fprintf(file, "%d;%f;", currentTime, (float)map_buffer->player.local_angular_velocity.y);
 				
 				fprintf(file, "%f;", (float)map_buffer->player.local_angular_velocity.y);
 

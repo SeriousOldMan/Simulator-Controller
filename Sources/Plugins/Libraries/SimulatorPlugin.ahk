@@ -387,7 +387,7 @@ class SimulatorPlugin extends ControllerPlugin {
 			}
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 		}
 	}
 
@@ -936,7 +936,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 				this.createRaceAssistantAction(controller, string2Values(A_Space, substituteString(theAction, "  ", A_Space))*)
 
 			if register
-				controller.registerPlugin(this)
+				controller.registerPlugin(name, this)
 		}
 	}
 

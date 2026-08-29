@@ -1199,7 +1199,7 @@ namespace F125UDPSpotter {
                 }
 
                 TimeSpan difference = DateTime.Now.Subtract(startTime);
-                double currentTime = (difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
+                long currentTime = (difference.Minutes * 60000 + difference.Seconds * 1000 + difference.Milliseconds);
 
                 if ((running >= lastRunning) && (currentTime >= lastTime))
                 {

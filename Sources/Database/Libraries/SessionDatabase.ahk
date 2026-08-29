@@ -312,7 +312,7 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerURLs[identifier?] {
 		Get {
-			if (SessionDatabase.sServerURLs.Count = 0) ; isSet(identifier) && !SessionDatabase.sServerURLs.Has(identifier))
+			if (SessionDatabase.sServerURLs.Count = 0)
 				SessionDatabase.sServerURLs := stringToMap("|", "->", getMultiMapValue(SessionDatabase.sConfiguration, "Team Server", "Server.URL", ""), "Standard")
 
 			return (isSet(identifier) ? SessionDatabase.sServerURLs[identifier] : SessionDatabase.sServerURLs)
@@ -354,13 +354,17 @@ class SessionDatabase extends ConfigurationItem {
 
 	static ServerToken[identifier] {
 		Get {
-			return SessionDatabase.ServerTokens[identifier]
+			local token := SessionDatabase.ServerTokens[identifier]
+
+			return (isObject(token) ? false : token)
 		}
 	}
 
 	ServerToken[identifier] {
 		Get {
-			return SessionDatabase.ServerTokens[identifier]
+			local token := SessionDatabase.ServerTokens[identifier]
+
+			return (isObject(token) ? false : token)
 		}
 	}
 
@@ -641,7 +645,7 @@ class SessionDatabase extends ConfigurationItem {
 			return name
 		else if defaultForname
 			return driverName(defaultForname, defaultSurname, defaultNickname
-									, (defaultSurname != ""), (defaultNickname != ""))
+							, (defaultSurname != ""), (defaultNickname != ""))
 		else
 			return this.getUserName()
 	}

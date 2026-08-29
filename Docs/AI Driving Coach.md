@@ -1,6 +1,6 @@
 ## Introduction
 
-Aiden, The AI Driving Coach, is a fully AI based chatbot which plays the role of your personal driving coach. Implemented with state of the art AI technologiy GPT (aka generative pretrained transformer) using a LLM (aka large language model), the AI Driving Coach behaves and interacts as natural as possible. It depends heavily on the concrete LLM which is used, what knowledge is available about the race driving topic and how detailed this knowledge is. Modern LLMs, like GPT 4o and alike are actually very good even in this very special domain.
+Aiden, The AI Driving Coach, is a fully AI based chatbot which plays the role of your personal driving coach. Implemented with state of the art AI technology GPT (aka generative pretrained transformer) using a LLM (aka large language model), the AI Driving Coach behaves and interacts as natural as possible. It depends heavily on the concrete LLM which is used, what knowledge is available about the race driving topic and how detailed this knowledge is. Modern LLMs, like GPT 4o and alike are actually very good even in this very special domain.
 
 Simulator Controller does not provide its own LLM, of course. And this is even not necessary, since there are a dozens of very good models available in the Open Source (see the [Hugging Face website](https://huggingface.co/) for a complete overview what's available). And there are commercial models available as well, first and foremost from OpenAI, the company, that created the famous ChatGPT solutions. Simulator Controller uses API calls to use the services provided by an existing GPT engine to run the LLM used by Aiden, or you can use the integrated "LLM Runtime", to run everything on your own PC, as long as your machine is powerful enough. You can choose in the configuration which provider is used and even which LLM you want to use (see below in the chapters about [installation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) and [configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#configuration)).
 
@@ -234,6 +234,8 @@ Below you find all instruction categories and the supported variables:
 |             | %corner%          | The corner to be reviewed. |
 | Coaching.Reference | Scope            | This is used as an addition for many of the above synthetic questions/commands for telemetry review. It is used, when a reference lap is available, which can be used for comparison against the most recent lap. |
 |             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the reference lap. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#coaching-based-on-lap-telemetry-data) below for more information. |
+| Motivation.TimeLoss | Scope            | This instruction is used when the Coach is active during a race and helps you to keep focus and motivation. |
+|             | %telemetry%       | This variable will be replaced with a condensed representation of the telemetry data in JSON format for the last lap. See the [dedicated chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#motivation-on-the-track) below for more information. |
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
@@ -511,12 +513,38 @@ The following video gives you a good demonstration of this:
    Please note, that all these settings can be defined per car and even per track.
 5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
 
+### Motivation on the track
+
+This mode also uses the underlying telemtry data system to help you to retain your focus and your motivation to push. Once the Coach detects, that you are loosing pace, he will yell at you and will try to bring your attention back to the tarmac. You can enable this mode by asking the Coach, whether he can help you to keep your focus.
+
+You can control the level of verbosity by modifying the *Motivation.TimeLoss* instruction (see above). You can even delete the whole content of this instructions and the Coach will then only tell you that you have lost pace and that you should focus again. But that is only half of the fun, so if the default instruction produces too much output for your taste and distracts you, let's take a look at two alternatives:
+
+	Tell me in which sector I am losing time compared to the other cars.
+	Also tell me the corner where I have lost the most time compared to the
+	reference lap. Please reply in max. 2 very short sentences.
+	Don't call me by name.
+	
+	Here is the data for the last lap:
+	
+	%telemetry%
+
+This short video has been created with this instruction.
+
+[![](https://img.youtube.com/vi/Gls2y3A3-Oc/0.jpg)](https://youtu.be/Gls2y3A3-Oc)
+
+But of course, you can go even shorter:
+
+	Tell me in which sector I am losing time compared to the other cars.
+	Please reply in one very short sentence. Don't call me by name.
+	
+Good to know: Always the telemetry data of the fastest lap of the session will be used as referencewhen using this mode, indepependent of what has been configured elsewhere.
+
 ### Automatic activation of coaching mode
 
 Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the Coach on your side in each practice session. Always having to ask the Coach to come along can become boring with time. As always with Simulator Controller, there are several methods to do this:
 
 1. Actions (e.g. "TrackCoaching", "BrakeCoaching", etc.) can be bound to buttons on your steering wheel or Button Box.
-2. Also, corresponding functions are available for "On-track Coaching" and "Brake Coaching" in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start the coaching mode, once telemetry data is available.
+2. Also, corresponding functions are available for "On-track Coaching", "Brake Coaching" and "Race Motivation" in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start the coaching mode, once telemetry data is available.
 3. Or you use the tray menu of the "Simulator Controller" process to activate a coaching mode.
 4. Lastly, and more as an expert example, it is possible to automate almost anything by using the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 

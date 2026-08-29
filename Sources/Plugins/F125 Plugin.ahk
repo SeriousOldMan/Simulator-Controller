@@ -52,7 +52,7 @@ class F125Plugin extends RaceAssistantSimulatorPlugin {
 
 			writeMultiMap(kUserConfigDirectory . "F125 Configuration.ini", udpConfiguration)
 
-			controller.registerPlugin(this)
+			controller.registerPlugin(name, this)
 		}
 	}
 }

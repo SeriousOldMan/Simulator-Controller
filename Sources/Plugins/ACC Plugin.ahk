@@ -217,7 +217,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			this.iUDPProvider := ACCUDPProvider(this.getArgumentValue("udpConnection", false))
 
-			controller.registerPlugin(this)
+			controller.registerPlugin(name, this)
 		}
 	}
 
@@ -429,10 +429,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				logMessage(kLogCritical, translate("Cannot locate the Pitstop MFD - please consult the documentation for the ACC plugin"))
 
 				loop 2
-					SoundPlay(kResourcesDirectory . "Sounds\Critical.wav", "Wait")
+					playSound("SysSoundPlayer", kResourcesDirectory . "Sounds\Critical.wav", "Wait")
 			}
 
-			SoundPlay(kResourcesDirectory . "Sounds\Critical.wav")
+			playSound("SysSoundPlayer", kResourcesDirectory . "Sounds\Critical.wav")
 
 			this.iNoImageSearch := true
 
@@ -1695,7 +1695,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.iOldChangeBrakes != this.iPSChangeBrakes)
 			loop 3
-				SoundPlay(kResourcesDirectory . "Sounds\Critical.wav", "Wait")
+				playSound("SysSoundPlayer", kResourcesDirectory . "Sounds\Critical.wav", "Wait")
 
 		closePitstopMFD()
 	}

@@ -638,7 +638,7 @@ class TelemetryViewer {
 
 	iCollect := false
 	iSynchronize := false
-	iAnalyze := false
+	iSuspension := false
 
 	iSynchronizeTask := false
 
@@ -869,9 +869,9 @@ class TelemetryViewer {
 		}
 	}
 
-	Analyze {
+	Suspension {
 		Get {
-			return this.iAnalyze
+			return this.iSuspension
 		}
 	}
 
@@ -915,13 +915,13 @@ class TelemetryViewer {
 		}
 	}
 
-	__New(manager, directory, synchronize := true, collect := true, analyze := false) {
+	__New(manager, directory, synchronize := true, collect := true, suspension := false) {
 		this.iManager := manager
 		this.iTelemetryDirectory := (normalizeDirectoryPath(directory) . "\")
 
 		this.iSynchronize := synchronize
 		this.iCollect := collect
-		this.iAnalyze := analyze
+		this.iSuspension := suspension
 
 		this.loadLayouts()
 	}
@@ -1157,14 +1157,14 @@ class TelemetryViewer {
 
 		viewerGui.SetFont("s10 Bold", "Arial")
 
-		viewerGui.Add("Text", "w666 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
+		viewerGui.Add("Text", "w696 H:Center Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(viewerGui, "Telemetry Browser"))
 
 		viewerGui.SetFont("s9 Norm", "Arial")
 
-		viewerGui.Add("Documentation", "x186 YP+20 w336 H:Center Center", translate("Telemetry Viewer")
+		viewerGui.Add("Documentation", "x201 YP+20 w351 H:Center Center", translate("Telemetry Viewer")
 					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
 
-		button := viewerGui.Add("Button", "x653 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
+		button := viewerGui.Add("Button", "x683 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
 			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 														  , "Telemetry Viewer", "Provider", "Internal")
@@ -1199,7 +1199,7 @@ class TelemetryViewer {
 		})
 		setButtonIcon(button, kIconsDirectory . "Connect.ico", 1)
 
-		viewerGui.Add("Text", "x8 yp+25 w676 W:Grow 0x10")
+		viewerGui.Add("Text", "x8 yp+25 w706 W:Grow 0x10")
 
 		viewerGui.SetFont("s8 Norm", "Arial")
 
@@ -1213,17 +1213,20 @@ class TelemetryViewer {
 		viewerGui.Add("Button", "x400 yp w23 h23 Center +0x200 vdeleteButton").OnEvent("Click", deleteLap)
 		setButtonIcon(viewerGui["deleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
-		if this.Analyze {
+		if this.Suspension {
 			viewerGui.Add("Button", "x425 yp w47 h47 +0x200 vsuspensionButton").OnEvent("Click", openSuspensionInspector)
 			setButtonIcon(viewerGui["suspensionButton"], kIconsDirectory . "Suspension.ico", 1, "W32 H32")
 		}
 
-		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Layout"))
-		viewerGui.Add("DropDownList", "x556 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
+		viewerGui.Add("Text", "x515 yp+4 w63 X:Move", translate("Layout"))
+		viewerGui.Add("DropDownList", "x586 yp-4 w96 Choose" . inList(getKeys(this.Layouts), this.SelectedLayout) . " X:Move vlayoutDropDown", getKeys(this.Layouts)).OnEvent("Change", selectLayout)
 
-		viewerGui.Add("Button", "x653 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
+		viewerGui.Add("Button", "x683 yp w23 h23 +0x200 Center X:Move vlayoutButton", translate("...")).OnEvent("Click", editLayouts)
 
-		this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
+		if this.Suspension
+			this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x475 yp+9 w30 h30 vcollectingNotifier Hidden")
+		else
+			this.iCollectingNotifier := viewerGui.Add("HTMLViewer", "x426 yp+9 w30 h30 vcollectingNotifier Hidden")
 
 		this.CollectingNotifier.document.open()
 		this.CollectingNotifier.document.write("<html><body style='background-color: #" . this.Window.Theme.WindowBackColor . "' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'> </body></html>")
@@ -1239,11 +1242,11 @@ class TelemetryViewer {
 
 		viewerGui.Add("Button", "x350 yp w73 h23 vtrackButton", translate("Map...")).OnEvent("Click", openTrackMap)
 
-		viewerGui.Add("Text", "x485 yp+4 w63 X:Move", translate("Zoom"))
-		viewerGui.Add("Slider", "Center Thick15 x556 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
-		viewerGui.Add("Slider", "Center Thick15 x617 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
+		viewerGui.Add("Text", "x515 yp+4 w63 X:Move", translate("Zoom"))
+		viewerGui.Add("Slider", "Center Thick15 x586 yp-2 X:Move w59 0x10 Range100-400 ToolTip vzoomWSlider", 100).OnEvent("Change", changeWidthZoom)
+		viewerGui.Add("Slider", "Center Thick15 x647 yp X:Move w59 0x10 Range100-400 ToolTip vzoomHSlider", 100).OnEvent("Change", changeHeightZoom)
 
-		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w660 h480 W:Grow H:Grow Border")
+		viewerControl := viewerGui.Add("HTMLViewer", "x16 yp+24 w690 h480 W:Grow H:Grow Border")
 
 		viewerControl.document.open()
 		viewerControl.document.write("")
@@ -1341,13 +1344,13 @@ class TelemetryViewer {
 				this.Control["saveButton"].Enabled := !SessionDatabase().hasTelemetry(simulator, car, track, true, false, descriptor[1])
 			}
 
-			if this.Analyze
+			if this.Suspension
 				this.Control["suspensionButton"].Enabled := true
 		}
 		else {
 			this.Control["saveButton"].Enabled := false
 
-			if this.Analyze
+			if this.Suspension
 				this.Control["suspensionButton"].Enabled := true
 		}
 
@@ -1368,15 +1371,18 @@ class TelemetryViewer {
 	}
 
 	getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
-		local info
+		local result, info
 
 		if isObject(lap) {
 			driver := lap[2]
 			lapTime := ((lap[3] != translate("-")) ? lap[3] : false)
 			sectorTimes := lap[4]
+
+			result := true
 		}
-		else if (!this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
-			  && fileName && FileExist(fileName . ".info")) {
+		else if this.Manager.getLapInformation(lap, &driver, &lapTime, &sectorTimes)
+			result := true
+		else if (fileName && FileExist(fileName . ".info")) {
 			info := readMultiMap(fileName . ".info")
 
 			driver := getMultiMapValue(info, "Lap", "Driver"
@@ -1389,6 +1395,15 @@ class TelemetryViewer {
 
 			if sectorTimes
 				sectorTimes := string2Values(",", sectorTimes)
+
+			result := true
+		}
+		else {
+			driver := false
+			lapTime := false
+			sectorTimes := false
+
+			result := false
 		}
 
 		if !driver
@@ -1399,6 +1414,8 @@ class TelemetryViewer {
 
 		if !sectorTimes
 			sectorTimes := ["-"]
+
+		return result
 	}
 
 	createTelemetry(simulator, track, lap) {
@@ -1641,7 +1658,7 @@ class TelemetryViewer {
 			local theLapTime := false
 			local theSectorTimes := false
 			local telemetry := false
-			local name, directory, dataFile, file, size, lap
+			local name, directory, dataFile, file, size, lap, tDriver
 
 			DirCreate(this.TelemetryDirectory . "Imported")
 
@@ -1673,6 +1690,13 @@ class TelemetryViewer {
 				}
 
 				writeMultiMap(fileName . ".info", info)
+			}
+			else {
+				SplitPath(fileName, , , , &name)
+
+				FileCopy(fileName, this.TelemetryDirectory . "Imported\" . name . ".telemetry", 1)
+
+				fileName := (this.TelemetryDirectory . "Imported\" . name . ".telemetry")
 			}
 
 			if (fileName && (fileName != "")) {
@@ -1733,12 +1757,14 @@ class TelemetryViewer {
 						theSectorTimes := false
 				}
 
-				if info
-					lap := [name, theDriver ? theDriver
-											: SessionDatabase.getDriverName(simulator, getMultiMapValue(info, "Telemetry", "Driver"))
+				if info {
+					tDriver := getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false))
+
+					lap := [name, theDriver ? theDriver : SessionDatabase.getDriverName(simulator, tDriver)
 						  , theLapTime ? theLapTime : "-"
 						  , theSectorTimes ? theSectorTimes : []
 						  , telemetry]
+				}
 				else
 					lap := [name, theDriver ? theDriver : "John Doe (JD)"
 						  , theLapTime ? theLapTime : "-"
@@ -1784,9 +1810,12 @@ class TelemetryViewer {
 
 	saveLap(lap := false, prompt := true) {
 		local fileName := false
+		local theDriver := "John Doe (JD)"
+		local theLapTime := "-"
+		local theSectorTimes := ["-"]
 		local simulator, car, track
 		local sessionDB, dirName, fileName, newFileName, file, folder, telemetry, driver, lapTime, sectorTimes
-		local dbFileName
+		local originalFileName
 
 		this.getSessionInformation(&simulator, &car, &track)
 
@@ -1806,7 +1835,11 @@ class TelemetryViewer {
 				dirName := ""
 
 			if isNumber(lap) {
-				this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes)
+				if this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
+					theDriver := driver
+					theLapTime := lapTime
+					theSectorTimes := sectorTimes
+				}
 
 				fileName := (dirName . "\Lap " . lap . translate(" (") . driver . ((lapTime != "-") ? (" - " . lapTime) : "") . translate(")"))
 			}
@@ -1839,9 +1872,11 @@ class TelemetryViewer {
 
 					if (normalizeDirectoryPath(folder) = normalizeDirectoryPath(sessionDB.getTelemetryDirectory(simulator, car, track, "User"))) {
 						if isNumber(lap)
-							file := FileOpen((this.TelemetryDirectory . "Lap " . lap . ".telemetry"), "r-wd")
+							originalFileName := (this.TelemetryDirectory . "Lap " . lap . ".telemetry")
 						else
-							file := FileOpen(lap[5], "r-wd")
+							originalFileName := lap[5]
+
+						file := FileOpen(originalFileName, "r-wd")
 
 						if file {
 							size := file.Length
@@ -1869,10 +1904,6 @@ class TelemetryViewer {
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 
 							if isNumber(lap) {
-								dbFileName := (sessionDB.getTelemetryDirectory(simulator, car, track) . fileName . ".telemetry")
-
-								this.getLapInformation(lap, dbFileName, &driver, &lapTime, &sectorTimes)
-
 								setMultiMapValue(info, "Lap", "Driver", driver)
 
 								if (lapTime && (lapTime != "-"))
@@ -2118,17 +2149,54 @@ class TelemetryViewer {
 
 	loadTelemetry(select := false) {
 		local laps := []
-		local lap, name, index
+		local lap, name, index, driver, lapTime, sectorTimes, info
 
 		newLap(lap) {
-			local file
+			local file, fileName, analyzer, telemetry, lapTime
+			local simulator, car, track
 
 			if !inList(this.Laps, lap) {
 				try {
-					file := FileOpen(this.TelemetryDirectory . "Lap " . lap . ".telemetry", "r-wd")
+					fileName := (this.TelemetryDirectory . "Lap " . lap . ".telemetry")
+					file := FileOpen(fileName, "r-wd")
 
 					if file {
 						file.Close()
+
+						if !FileExist(fileName . ".info") {
+							info := newMultiMap()
+
+							if this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes) {
+								setMultiMapValue(info, "Info", "Driver", driver)
+								setMultiMapValue(info, "Info", "LapTime", lapTime)
+
+								if isObject(sectorTimes)
+									setMultiMapValue(info, "Info", "SectorTimes", values2String(",", sectorTimes*))
+							}
+							else {
+								setMultiMapValue(info, "Info", "Driver", SessionDatabase.getName("Creator"))
+
+								this.getSessionInformation(&simulator, &car, &track)
+
+								analyzer := TelemetryAnalyzer(simulator, track)
+								telemetry := analyzer.createTelemetry(false, fileName, driver, lapTime, sectorTimes)
+
+								if (telemetry && telemetry.Data && (telemetry.Data.Length > 0)) {
+									lapTime := telemetry.getValue(1, "Time", kUndefined)
+
+									if (lapTime != kUndefined) {
+										lapTime := 0
+
+										loop telemetry.Data.Length
+											lapTime := Max(lapTime, telemetry.getValue(A_Index, "Time"))
+
+										setMultiMapValue(info, "Info", "LapTime", Round(lapTime / 1000, 1))
+									}
+								}
+							}
+
+							writeMultiMap(fileName . ".info", info)
+						}
 
 						return true
 					}

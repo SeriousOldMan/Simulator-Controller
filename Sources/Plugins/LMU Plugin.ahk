@@ -197,8 +197,8 @@ class LMUPlugin extends Sector397Plugin {
 						case "Change":
 							if (value < 0)
 								pitstop.setRepairs(false, pitstop.RepairSuspension, pitstop.RepairEngine)
-							else if (value < 0)
-								pitstop.setRepairs(true, pitstop.RepairSuspension, pitstop.RepairEngine)
+							else if (value > 0)
+								pitstop.setRepairs(!pitstop.RepairBodywork, pitstop.RepairSuspension, pitstop.RepairEngine)
 					}
 				case "Repair Suspension":
 					switch operation, false {
@@ -211,8 +211,8 @@ class LMUPlugin extends Sector397Plugin {
 						case "Change":
 							if (value < 0)
 								pitstop.setRepairs(pitstop.RepairBodywork, false, pitstop.RepairEngine)
-							else if (value < 0)
-								pitstop.setRepairs(pitstop.RepairBodywork, true, pitstop.RepairEngine)
+							else if (value > 0)
+								pitstop.setRepairs(pitstop.RepairBodywork, !pitstop.RepairSuspension, pitstop.RepairEngine)
 					}
 				case "Repair Engine":
 					if pitstop.supportsEngineRepair()
@@ -226,8 +226,8 @@ class LMUPlugin extends Sector397Plugin {
 							case "Change":
 								if (value < 0)
 									pitstop.setRepairs(pitstop.RepairBodywork, pitstop.RepairSuspension, false)
-								else if (value < 0)
-									pitstop.setRepairs(pitstop.RepairBodywork, pitstop.RepairSuspension, true)
+								else if (value > 0)
+									pitstop.setRepairs(pitstop.RepairBodywork, pitstop.RepairSuspension, !pitstop.RepairEngine)
 						}
 					else
 						return false
@@ -241,7 +241,7 @@ class LMUPlugin extends Sector397Plugin {
 							if (value < 0)
 								pitstop.setBrakeChange(false)
 							else if (value > 0)
-								pitstop.setBrakeChange(true)
+								pitstop.setBrakeChange(!pitstop.getBrakeChange())
 					}
 				case "Driver":
 					if pitstop.supportsDriverSwap() {

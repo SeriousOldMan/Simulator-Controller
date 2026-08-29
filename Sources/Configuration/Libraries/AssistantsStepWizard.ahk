@@ -371,7 +371,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 
 			window.SetFont("Norm", "Arial")
 
-			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr  Hidden", collect(["Action", "Label", "Function"], translate))
+			widget := window.Add("ListView", "x" . listX . " yp+10 w" . listWidth . " h347 H:Grow(0.66) W:Grow AltSubmit -Multi -LV0x10 NoSort NoSortHdr Hidden", collect(["Action", "Label", "Function"], translate))
 			widget.OnEvent("Click", assistantActionFunctionSelect)
 			widget.OnEvent("DoubleClick", assistantActionFunctionSelect)
 			widget.OnEvent("ContextMenu", assistantActionFunctionMenu)

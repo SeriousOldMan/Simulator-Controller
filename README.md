@@ -34,25 +34,23 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.1.5.0-release](https://cutt.ly/uyo4mIod) (Changes: Optimized handling of modal windows, New suspension dynamics inspector, Caching for large telemetry files, Auto reload of new track maps by Driving Coach, Fixed suspension deflection in IRC telemetry file, Fixed suspension deflection in R3E telemetry file, IBT reader supports suspension deflection, Fixed synchronization of community database, Display lap time in telemtries list, Optimized loading of large telemetry files, Second Monitor Reader supports suspension deflection.)
+[7.2.2.0-release](https://cutt.ly/4yg2ZtVe) (Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMU, Added meta data for 296 EVO for LMU.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7150) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-715) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7220) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.1.4.0-release](https://cutt.ly/byuDM3Nk) (Changes: Fixed issue analyzer audio feedback for PMR and F125, Fixed loading of issue analyzer settings by the Coach, Full customizeable suspension sample in "Setup Workbench", Fixed transfer of issues to the workarea of "Setup Workbench", Optimized recommendations for bottom out issues in "Setup Workbench", Added suspension deflection to standard telemetry files, Optimized handling of analyzer settings in "Setup Workbench", Increased resolution of telmetry files, Fixed saving of reverted instructions, Fixed hiding of basic page in "Simulator Setup".)
+[7.2.1.0-release](https://cutt.ly/zyd8ZJvn) (Changes: Fixed several translations, Fixed minor bugs in telemetry handling, Optical enhancements in "Simulator Setup" and "Simulator Configuration", Fixed diary folder location, Fixed scrolling of Setup Engineer telemetry list, Modified plugin registration method, Prevent crash for sound play failure in "Simulator Setup", Workaround for failing SoundPlay.)
 
-[7.1.3.0-release](https://cutt.ly/RytN3Kas) (Changes: External references in the rule engine, Suspension related issues in the issue analyzer, Suspension related issues detected by the Driving Coach, Changed default for data update frequency, Fixed startup crash in "Strategy Workbench".)
+[7.2.0.0-release](https://cutt.ly/1yaK2KLG) (Changes: Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary, Fixed database synchronization, Fixed Second Monitor Reader, Tyre wear inspector in "Session Database", Suspension info in Second Monitor telemetry provider, Lap time in Second Monitor telemetry provider, Support opening of IBT files directly from browser, Validation for Team Server connection in "Session Database".)
 
 #### Current development build
 
-[7.2.0.0-dev]() (Early build for 7.2.0. Changes: Fixed missing info file when importing laps into the telemetry viewer, Fixed coordinate system for Second Monitor connector, New Setup Engineer in the "Setup Workbench", New workbench diary.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7200) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-720) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 
-A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 700 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
+A very extensive [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki) of more than 900 pages will guide you through the configuration process and will help you to understand the inner concepts and all the functions & features of Simulator Controller. For developers, who want to create their own plugins, a complete [Developers Guide & Reference](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) is available as well.
 
 The markdown files, the so to say source code of this documentation Wiki, can be found in the [Docs](https://github.com/SeriousOldMan/Simulator-Controller/tree/main/Docs) folder.
 
@@ -142,6 +140,8 @@ Beside the quite extensive documentation (more than 500 pages - I know, nobody r
 
 41. [Analyzing handling issues after a session](https://youtu.be/J3C3QMxmA3E) - This video demonstrates how to analyze telemetry data for handling problems after a session and how a new setup can automatically be created based on the telemetry data.
 
+42. [Using the Setup Engineer](https://youtu.be/LlJ-YgZJqFg) - You will learn in this video how to configure and use the new Setup Engineer.
+
 This list will be extended from time to time to cover new functionalities.
 
 ### Discord Community
@@ -214,9 +214,13 @@ Beside the typical duties of a Spotter, this Assistant is also able to automate 
 
 #### Setup Workbench
 
-Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based upon the AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
+Another very useful tool of the Simulator Controller suite is the Setup Workbench. This tool is based on the same AI technology which is used by the Race Assistants and generates recommendations for changing the setup options of a car based on handling problems described by the driver.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench.jpg)
+
+Additionally, an integrated Setup Engineer using GPT technology can also create a detailed analysis of the car handling and your driving style based on the telemetry data of a specific lap. Once an analysis has been created, the recommended setup changes can automatically be applied to a setup file.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Engineer%202.jpg)
 
 #### Support for controllers and devices
 

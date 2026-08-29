@@ -3827,7 +3827,7 @@ class KnowledgeBase {
 		}
 	}
 
-	deregisterRuleFacts(rule) {
+	unregisterRuleFacts(rule) {
 		local facts := this.Facts
 		local ignore, theFact, fRules
 
@@ -3838,10 +3838,10 @@ class KnowledgeBase {
 				fRules.removeRule(rule)
 
 				if (fRules.Rules.Length == 0)
-					facts.deregisterObserver(theFact, fRules)
+					facts.unregisterObserver(theFact, fRules)
 			}
 			else
-				throw "Inconsistency detected in KnowledgeBase.deregisterRuleFacts..."
+				throw "Inconsistency detected in KnowledgeBase.unregisterRuleFacts..."
 		}
 	}
 
@@ -3867,7 +3867,7 @@ class KnowledgeBase {
 		this.Rules.removeRule(rule)
 
 		if (rule.Type == kProduction)
-			this.deregisterRuleFacts(rule)
+			this.unregisterRuleFacts(rule)
 	}
 
 	registerIncludes(includes) {
@@ -4160,7 +4160,7 @@ class Facts {
 		this.iObservers[fact] := observer
 	}
 
-	deregisterObservers(fact, observer) {
+	unregisterObservers(fact, observer) {
 		this.iObservers.Delete(fact)
 	}
 

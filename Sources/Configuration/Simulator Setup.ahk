@@ -258,7 +258,7 @@ class SetupWizard extends ConfiguratorPanel {
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 			}
@@ -2830,22 +2830,17 @@ class StartStepWizard extends StepWizard {
 						if audio {
 							volume := fadeOut(20)
 
-							try {
-								SoundPlay("NonExistent.avi")
-							}
-							catch Any as exception {
-								logError(exception, false, false)
-							}
-
+							playSound("SysSoundPlayer", false)
+							
 							resetVolume(volume)
 
-							SoundPlay(audio)
+							playSound("SysSoundPlayer", audio)
 						}
 					}
 				}
 				catch Any as exception {
 					logError(exception)
-					
+
 					return false
 				}
 			}
@@ -2982,13 +2977,8 @@ class StartStepWizard extends StepWizard {
 		if substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false)) {
 			volume := fadeOut()
 
-			try {
-				SoundPlay("NonExistent.avi")
-			}
-			catch Any as exception {
-				logError(exception, false, false)
-			}
-
+			playSound("SysSoundPlayer", false)
+			
 			resetVolume(volume)
 		}
 	}
@@ -3006,7 +2996,7 @@ class StartStepWizard extends StepWizard {
 			audio := substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))
 
 			if audio
-				SoundPlay(audio)
+				playSound("SysSoundPlayer", audio)
 		}
 
 		super.showPage(page)
@@ -3018,12 +3008,7 @@ class StartStepWizard extends StepWizard {
 		if ((page == 1) && substituteVariables(getMultiMapValue(this.SetupWizard.Definition, "Setup.Start", "Start.Audio", false))) {
 			volume := fadeOut()
 
-			try {
-				SoundPlay("NonExistent.avi")
-			}
-			catch Any as exception {
-				logError(exception, false, false)
-			}
+			playSound("SysSoundPlayer", false)
 
 			resetVolume(volume)
 		}

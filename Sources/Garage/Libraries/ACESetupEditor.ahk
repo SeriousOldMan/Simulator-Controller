@@ -50,7 +50,7 @@ class ACESetup extends FileSetup {
 
 				this.JSONFileName[original] := jsonFile
 
-				editor.convert2JSON(jsonFile, fileName)
+				this.Editor.convert2JSON(jsonFile, value)
 			}
 
 			return (super.FileName[original] := value)
@@ -66,7 +66,7 @@ class ACESetup extends FileSetup {
 		Set {
 			local fileName := this.JSONFileName[original]
 
-			if fileName
+			if (value && fileName)
 				deleteFile(fileName)
 
 			return (original ? (this.iOriginalJSONFileName := value) : (this.iModifiedJSONFileName := value))
@@ -74,7 +74,7 @@ class ACESetup extends FileSetup {
 	}
 
 	__New(editor, originalFileName := false, modifiedFileName := false) {
-		local setup, name, jsonFile
+		deleteDirectory(kTempDirectory . "Setup Workbench\Setups")
 
 		DirCreate(kTempDirectory . "Setup Workbench\Setups")
 
@@ -89,8 +89,8 @@ class ACESetup extends FileSetup {
 		if (this.JSONFileName[false] && FileExist(this.JSONFileName[false]))
 			this.Setup[false] := FileRead(this.JSONFileName[false])
 
-		this.Data[true] := JSON.parse(this.Setup[true])
-		this.Data[false] := JSON.parse(this.Setup[false])
+		this.iOriginalData := JSON.parse(this.Setup[true])
+		this.iModifiedData := JSON.parse(this.Setup[false])
 	}
 
 	__Delete() {
@@ -217,6 +217,10 @@ class ACESetupEditor extends FileSetupEditor {
 		}
 	}
 
+	editableSetup(car) {
+		return (super.editableSetup(car) || isDebug())
+	}
+
 	chooseSetup(load := true) {
 		local directory := (A_MyDocuments . "\Assetto Corsa EVO\Setups")
 		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
@@ -308,11 +312,30 @@ class ACESetupEditor extends FileSetupEditor {
 	}
 
 	convert2JSON(jsonFile, protoFile) {
-		MsgBox "Not yet"
+		local setup
+
+		try {
+			RunWait("`"" . kBinariesDirectory . "ProtoBuf\buf.exe`" convert CarSetup.proto --type=CarSetupData --from=`"" . protoFile . "`" --to=`"" . jsonFile . "`"", kResourcesDirectory . "Simulator Data\ACE\Proto", "Hide")
+
+			setup := JSON.parse(FileRead(jsonFile))
+
+			deleteFile(jsonFile)
+
+			FileAppend(JSON.print(setup, "  "), jsonFile)
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	convert2ProtoBuf(protoFile, jsonFile) {
-		MsgBox "Not yet"
+		try {
+			RunWait("`"" . kBinariesDirectory . "ProtoBuf\buf.exe`" convert CarSetup.proto --type=CarSetupData --from=`"" . jsonFile . "`" --to=`"" . protoFile . "`"", kResourcesDirectory . "Simulator Data\ACE\Proto", "Hide")
+
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 }
 

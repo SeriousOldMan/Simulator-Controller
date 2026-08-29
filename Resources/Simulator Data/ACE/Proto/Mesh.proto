@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+
+enum CameraFacingMode {
+  CameraFacingMode_None = 0;
+  CameraFacingMode_Y = 1;
+  CameraFacingMode_XAndY = 2;
+  CameraFacingMode_Y_KeepParent = 3;
+  CameraFacingMode_XAndY_KeepParent = 4;
+}
+
+enum CullingPriority {
+  CullingPriority_Low = 0;
+  CullingPriority_Medium = 1;
+  CullingPriority_High = 2;
+}
+
+enum OtherPassesSelector {
+  OtherPassesSelector_None = 0;
+  OtherPassesSelector_Mirror = 1;
+  OtherPassesSelector_Cubemap = 2;
+  OtherPassesSelector_CubemapAndMirror = 3;
+}
+
+enum MeshType {
+  MeshType_Default = 0;
+  MeshType_Tree = 1;
+  MeshType_Grass = 2;
+  MeshType_Crowd = 3;
+  MeshType_Car = 4;
+  MeshType_Terrain = 5;
+  MeshType_Road = 6;
+  MeshType_Particle = 7;
+  MeshType_Bush = 8;
+  MeshType_Rain = 9;
+  MeshType_Sky = 10;
+}
+
+message MeshLodData {
+  message Bone {
+    string name = 1;
+    string parent = 2;
+    MatrixData transform = 3;
+  }
+  message MeshBatch {
+    string name = 1;
+    int32 startIndex = 2;
+    int32 indexCount = 3;
+    string material = 4;
+    int32 lodLevel = 5;
+  }
+  bool castShadows = 1;
+  int32 shadowLod = 22;
+  bool isShadowProxy = 10022;
+  int32 layer = 2;
+  float lodIn = 3;
+  float ditheredLodTransition = 23;
+  float instancesDensityScale = 25;
+  Vector3Data boundsMin = 17;
+  Vector3Data boundsMax = 18;
+  CameraFacingMode cameraFacingMode = 20;
+  float customToleranceForHiZOcclusionCulling = 30;
+  string precomputedAnimation = 24;
+  repeated MeshLodData.MeshBatch batches = 4;
+  repeated MeshLodData.Bone bones = 12;
+  repeated float positions = 5;
+  repeated float normals = 6;
+  repeated float texcoords = 7;
+  repeated float texcoords1 = 14;
+  repeated float texcoords2 = 15;
+  repeated float texcoords3 = 16;
+  repeated float tangents = 8;
+  repeated float boneWeights = 9;
+  repeated float boneIndices = 10;
+  repeated uint32 indices = 11;
+  repeated float colors = 13;
+  repeated int32 materialId = 21;
+  reserved 19 to 19;
+}
+
+message StaticLevelOfDetail {
+  int32 low_quality_lod = 1;
+  int32 medium_quality_lod = 2;
+  int32 high_quality_lod = 3;
+}
+
+message MeshData {
+  message ImportSettings {
+    repeated string importPaths = 1;
+    repeated string materialSearchPaths = 3;
+    bool importAllSkeleton = 4;
+    repeated bool importSkeletonPerPath = 9;
+    bool ignoreExistingMaterialAssignments = 2;
+    bool createDefaultsForMissingMaterials = 5;
+    string defaultMaterialsDestinationFolder = 6;
+    bool ignoreFbxUnits = 7;
+    bool multipleLods = 8;
+  }
+  MeshData.ImportSettings importSettings = 1;
+  MeshType type = 14;
+  bool isVisible = 2;
+  bool isRenderable = 3;
+  float lodOut = 4;
+  float ditheredLodOut = 11;
+  Vector3Data boundsMin = 6;
+  Vector3Data boundsMax = 7;
+  int32 renderOrder = 12;
+  repeated MeshLodData lods = 5;
+  bool useFullPrecisionUvs = 100;
+  bool castFarShadow = 8;
+  bool forceShadowLod = 10;
+  OtherPassesSelector doNotRender = 135;
+  OtherPassesSelector extendedVisibility = 134;
+  CullingPriority cullPriority = 17;
+  bool irradianceVolumeGroundLevel = 15;
+  repeated int32 cullInMergedLods = 16;
+  float boundsMaxMultiplier = 18;
+  StaticLevelOfDetail staticLod = 20;
+  reserved 9 to 9;
+  reserved 13 to 13;
+  reserved 133 to 133;
+}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+
+message ReplaceNetcarImplementationCmd {
+  enum NetcarImplementation {
+    Stef = 0;
+    AccPort = 1;
+    Kev = 2;
+  }
+  ReplaceNetcarImplementationCmd.NetcarImplementation netcar_implementation = 1;
+  PGUID car_id = 2;
+}

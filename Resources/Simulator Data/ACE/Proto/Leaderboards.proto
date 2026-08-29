@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "LogicScene.proto";
+import "google/protobuf/timestamp.proto";
+
+message ComboIdentifier {
+  int32 track_layout_id = 1;
+  int32 car_mechanical_id = 2;
+}
+
+message Leaderboards {
+  message EventParams {
+    enum EventType {
+      LeaderboardEventType_TrackDayCombo = 0;
+      LeaderboardEventType_Hotlap = 1;
+      LeaderboardEventType_Hotstint = 2;
+    }
+    PGUID eventId = 1;
+    int32 event_int_id = 4;
+    ComboIdentifier combo = 2;
+    Leaderboards.EventParams.EventType event_type = 3;
+  }
+  message HotstintLap {
+    int32 laptime = 1;
+    repeated int32 splits = 2;
+    int32 lap_flags = 3;
+    int64 lap_snowflake_id = 4;
+  }
+  message HotstintTimePenalty {
+    int64 created_session_time_ms = 1;
+    int32 penalty_time_ms = 2;
+    int32 penalty_type_enum = 3;
+    int32 investigation_type_enum = 4;
+  }
+  message HotlapLap {
+    int32 laptime = 1;
+    repeated int32 splits = 2;
+  }
+  message Entry {
+    int32 position = 1;
+    string driver_name = 2;
+    string driver_surname = 3;
+    string driver_nation = 4;
+    string player_id = 5;
+    int64 lap_snowflake_id = 6;
+    int32 driver_attempts = 7;
+    int32 lap_count = 10;
+    int32 total_time = 11;
+    repeated Leaderboards.HotstintLap hotstint_laps = 12;
+    int32 best_lap_index = 13;
+    repeated Leaderboards.HotstintTimePenalty hotstint_time_penalties = 14;
+    int32 accumulated_penalty_time = 15;
+    int32 hotlap_laptime = 21;
+    repeated int32 hotlap_splits = 22;
+    bool has_shared_setup = 30;
+    bool has_delta_laptime = 31;
+    bool has_ghost = 32;
+    int32 gap_laps = 40;
+    int32 gap_time_ms = 41;
+    Leaderboards.HotlapLap deprecated_hotlap_best_lap = 20;
+  }
+  message Report {
+    int32 event_id = 1;
+    PGUID event_pguid = 99;
+    Leaderboards.EventParams event_params = 2;
+    repeated Leaderboards.Entry leaderboard_lines = 3;
+    int32 player_index = 4;
+    bool is_gap_player_focused = 5;
+    string event_title = 6;
+    int32 global_player_count = 7;
+    int32 global_best_time = 8;
+    int32 global_best_laps = 9;
+    string global_best_name = 10;
+    repeated int32 global_absolute_best_splits = 11;
+  }
+  message MfdEntry {
+    int32 position = 1;
+    string driver_name = 2;
+    bool is_player_entry = 3;
+    bool is_selected_entry = 4;
+    int64 lap_snowflake_id = 5;
+    bool display_laps = 10;
+    int32 laps = 11;
+    string time_string = 12;
+    int32 time_color = 13;
+    bool has_microsectors = 14;
+  }
+  message MfdReport {
+    int32 event_id = 1;
+    string event_title = 2;
+    repeated Leaderboards.MfdEntry leaderboard_lines = 3;
+  }
+  message UserContext {
+    message UserData {
+      int32 player_position = 1;
+      int32 driver_attempts = 2;
+      int32 driver_best_time = 3;
+      int32 driver_best_laps = 4;
+    }
+    int32 event_id = 1;
+    Leaderboards.UserContext.UserData user_info = 2;
+    int32 global_player_count = 3;
+    int32 global_best_time = 4;
+    int32 global_best_laps = 5;
+    string global_best_name = 6;
+  }
+  message UserContextResponse {
+    repeated Leaderboards.UserContext user_contexts = 1;
+  }
+}

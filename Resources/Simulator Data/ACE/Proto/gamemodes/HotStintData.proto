@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "LogicScene.proto";
+import "PenaltySystem.proto";
+import "Scene.proto";
+import "Gameplay.proto";
+
+message HotStint {
+  enum SessionPhase {
+    Waiting_For_Start = 0;
+    Start_Spawn_On_Position = 1;
+    Unlock_Controls = 2;
+    Warmup = 3;
+    Session = 50;
+    Waiting_Last_Lap = 60;
+    Waiting_For_PitBox = 61;
+    Ended = 80;
+    Request_Quit = 90;
+  }
+  message SessionPhasePair {
+    HotStint.SessionPhase phase = 1;
+    TranslatedTimestamp end_timestamp = 2;
+    bool is_set = 3;
+  }
+  message SessionPhaseData {
+    repeated HotStint.SessionPhasePair session_phase_pairs = 1;
+    HotStint.SessionPhase current_phase = 2;
+    double current_gamemode_time = 3;
+    double start_gamemode_time = 4;
+  }
+  message State {
+    message Game {
+      message ReadyToNextMap {
+        message Item {
+          PGUID car_id = 1;
+          bool value = 2;
+        }
+        repeated HotStint.State.Game.ReadyToNextMap.Item items = 1;
+      }
+      HotStint.SessionPhaseData session_data = 1;
+      PlatformRaceLeaderboard leaderboard = 2;
+      PlatformRacePenaltyCollection penalty_collection = 3;
+      RealtimeLeaderboard realtime_leaderboard = 5;
+      RealtimePositions realtime_positions = 6;
+      float traveled_distance = 7;
+      int32 hotstint_time = 8;
+      UnlockCarTime unlock_car_time = 9;
+      HotStint.State.Game.ReadyToNextMap ready_to_next_map = 10;
+      float finish_line_npos = 11;
+      string name = 1000;
+    }
+    message GameCar {
+      message Investigations {
+        repeated InvestigationType types = 1;
+      }
+      HotStint.State.GameCar.Investigations investigations = 1;
+      float last_split_time = 2;
+      bool is_player_spectator = 4;
+      float time_to_recover = 5;
+      float partial_distance = 6;
+      float odo_distance = 7;
+    }
+  }
+  message Message {
+    message ResetGameState {
+    }
+  }
+  message Specialization {
+    enum EndReplayType {
+      None = 0;
+      Standard = 1;
+      Highlights = 2;
+      Delayed = 3;
+    }
+    message Base {
+      uint32 session_duration_ms = 3;
+      uint32 session_laps = 4;
+      uint32 maximum_session_overtime_duration_ms = 6;
+      bool intro_music = 5;
+      bool end_music = 7;
+      HotStint.Specialization.EndReplayType end_replay_type = 8;
+    }
+    message LastEliminated {
+      int32 count = 1;
+    }
+    message Rule {
+      oneof type {
+        HotStint.Specialization.LastEliminated last_eliminated = 50;
+      }
+      reserved 51 to 51;
+      reserved 52 to 52;
+    }
+    HotStint.Specialization.Base base = 200;
+    string base_file = 201;
+    DataSourceType base_source = 202;
+    PenaltyTransformations penalty_transformations = 21;
+    string penalty_transformations_file = 23;
+    DataSourceType penalty_transformations_source = 25;
+    PenaltyInvestigations penalty_investigations = 22;
+    string penalty_investigations_file = 24;
+    DataSourceType penalty_investigations_source = 26;
+    repeated HotStint.Specialization.Rule rules = 100;
+    reserved 3 to 3;
+    reserved 1 to 1;
+    reserved 2 to 2;
+    reserved 20 to 20;
+  }
+}
+
+message HotStintUiData {
+  bool hide_lap_panel = 1;
+  bool hide_gamemode_panel = 2;
+  bool hide_result_panel = 3;
+  bool hide_control_panel = 4;
+  bool hide_realtime_panel = 5;
+  bool hide_leaderboard_panel = 10;
+  bool hide_laptime_list = 11;
+}

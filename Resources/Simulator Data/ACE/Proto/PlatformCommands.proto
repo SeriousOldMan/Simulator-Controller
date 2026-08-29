@@ -1,0 +1,1234 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "PhysicsSnapshot.proto";
+import "LogicScene.proto";
+import "ClientServerProtocol.proto";
+import "CarDataCache.proto";
+import "Scene.proto";
+import "TrackData.proto";
+import "CarSetup.proto";
+import "Options.proto";
+import "Gameplay.proto";
+import "google/protobuf/any.proto";
+import "Customization.proto";
+import "CarBehaviour.proto";
+import "DateTime.proto";
+import "CameraProperties.proto";
+import "Mirrors.proto";
+import "Weather.proto";
+import "PlatformGameState.proto";
+
+enum ReplayCommandType {
+  Replay_StartRecording = 0;
+  Replay_StopRecording = 1;
+  Replay_Start = 2;
+  Replay_Stop = 3;
+  Replay_AutoSave = 4;
+}
+
+enum ReplayCommandStartType {
+  ReplayCommandStartType_None = 0;
+  ReplayCommandStartType_Standard = 1;
+  ReplayCommandStartType_Highlights = 2;
+  ReplayCommandStartType_Delayed = 3;
+}
+
+enum CommandResponse {
+  OK = 0;
+  RESTART = 1;
+  FAILED = 2;
+}
+
+enum AudioCommandType {
+  Audio_FadeIn = 0;
+  Audio_FadeOut = 1;
+  Audio_CycleFadeIn = 2;
+  Audio_ChangeVolume = 3;
+  Audio_Effect = 4;
+  Audio_Load = 5;
+  Audio_Save = 6;
+  Audio_RequestDevices = 7;
+  Audio_ChangeDevice = 8;
+  Audio_Reset = 9;
+  Audio_Request = 10;
+  Audio_Gui_Event = 11;
+  Audio_GameStart = 12;
+  Audio_ToggleCars = 13;
+  Audio_PitlaneAlarm = 14;
+  Audio_PauseForLoading = 15;
+}
+
+enum CameraCommandType {
+  CameraCommandType_RequestGet = 0;
+  CameraCommandType_ResponseGet = 1;
+  CameraCommandType_RequestSet = 2;
+  CameraCommandType_ResponseSet = 3;
+  CameraCommandType_RequestLoad = 4;
+  CameraCommandType_ResponseLoad = 5;
+  CameraCommandType_RequestSave = 6;
+  CameraCommandType_ResponseSave = 7;
+}
+
+enum ViewSettingsCommandType {
+  ViewSettingsCommandType_RequestGet = 0;
+  ViewSettingsCommandType_ResponseGet = 1;
+  ViewSettingsCommandType_RequestSet = 2;
+  ViewSettingsCommandType_ResponseSet = 3;
+  ViewSettingsCommandType_RequestLoad = 4;
+  ViewSettingsCommandType_ResponseLoad = 5;
+  ViewSettingsCommandType_RequestSave = 6;
+  ViewSettingsCommandType_ResponseSave = 7;
+}
+
+enum FreeCameraCommandType {
+  FreeCameraCommandType_RequestGet = 0;
+  FreeCameraCommandType_ResponseGet = 1;
+  FreeCameraCommandType_RequestSet = 2;
+  FreeCameraCommandType_ResponseSet = 3;
+  FreeCameraCommandType_RequestLoad = 4;
+  FreeCameraCommandType_ResponseLoad = 5;
+  FreeCameraCommandType_RequestSave = 6;
+  FreeCameraCommandType_ResponseSave = 7;
+}
+
+enum VideoCommandType {
+  Video_Set_Display = 0;
+  Video_Set_Graphics = 1;
+  Video_Set_VirtualReality = 2;
+}
+
+enum DashCommandType {
+  DashCommandType_RequestGet = 0;
+  DashCommandType_ResponseGet = 1;
+  DashCommandType_RequestSet = 2;
+  DashCommandType_ResponseSet = 3;
+  DashCommandType_RequestLoad = 4;
+  DashCommandType_ResponseLoad = 5;
+  DashCommandType_RequestSave = 6;
+  DashCommandType_ResponseSave = 7;
+}
+
+enum MotionCommandType {
+  MotionCommandType_RequestGet = 0;
+  MotionCommandType_ResponseGet = 1;
+  MotionCommandType_RequestSet = 2;
+  MotionCommandType_ResponseSet = 3;
+  MotionCommandType_RequestLoad = 4;
+  MotionCommandType_ResponseLoad = 5;
+  MotionCommandType_RequestSave = 6;
+  MotionCommandType_ResponseSave = 7;
+}
+
+enum MirrorsCommandType {
+  MirrorsCommandType_RequestGet = 0;
+  MirrorsCommandType_ResponseGet = 1;
+  MirrorsCommandType_RequestSet = 2;
+  MirrorsCommandType_ResponseSet = 3;
+  MirrorsCommandType_RequestLoad = 4;
+  MirrorsCommandType_ResponseLoad = 5;
+  MirrorsCommandType_RequestSave = 6;
+  MirrorsCommandType_ResponseSave = 7;
+}
+
+enum TripleScreenCommandType {
+  TripleScreenCommandType_RequestSet = 0;
+  TripleScreenCommandType_ResponseSet = 1;
+}
+
+enum UIUtilityCommandType {
+  JiggleMouse = 0;
+  ChangeLanguage = 1;
+  OnLoaded = 2;
+  OnIntro = 3;
+  OnIntroEnds = 4;
+  TriggerCore = 5;
+  SplashEnd = 6;
+  OnPauseGameMode = 7;
+  OnResumeGameMode = 8;
+  ShowroomSelectInterior = 9;
+  ShowroomSelectExterior = 10;
+  ShowroomSelectWheels = 11;
+  PageChanged = 12;
+  ShowroomToggleInteriorExterior = 14;
+  OnRoadmapEnd = 15;
+  OnPlayerModeChanged = 16;
+  SelectNextCar = 17;
+  SelectPreviousCar = 18;
+  SelectPlayerCar = 19;
+  ShowroomSelectCameraMode = 20;
+  ShowroomSetType = 21;
+  CurtainState = 22;
+  SelectSpecificCar = 23;
+  RequestMarkers = 24;
+  RequestCamera = 25;
+  SendChat = 26;
+}
+
+enum LoadingStepType {
+  SubStepCompleted = 0;
+  SubStepFailed = 1;
+  StepCompleted = 2;
+  StepFailed = 3;
+  LoadingCompleted = 4;
+  LoadingStarted = 5;
+}
+
+enum ServerResponseType {
+  Ok = 0;
+  WrongCar = 1;
+  ServerFull = 2;
+  WrongPassword = 3;
+  ServerClosed = 4;
+  RequirementsNotMet = 5;
+  ClientOutdated = 6;
+  ServerOutdated = 7;
+  ClientRejected = 8;
+  ContentUnavailable = 9;
+}
+
+enum ReplayCoreResponse {
+  ReplayCoreResponse_OK = 0;
+  ReplayCoreResponse_InvalidReplay = 2;
+  ReplayCoreResponse_ERROR = 100;
+}
+
+enum UITypeRequest {
+  UITypeRequest_None = 0;
+  UITypeRequest_GameUI = 1;
+  UITypeRequest_DevUI = 2;
+  UITypeRequest_MixedUI = 3;
+  UITypeRequest_BlankUI = 4;
+}
+
+enum TimeTableLap_Flag {
+  TimeTableLap_Flag_None = 0;
+  TimeTableLap_Flag_ValidLap = 1;
+  TimeTableLap_Flag_BestPersonalLap = 2;
+  TimeTableLap_Flag_BestSessionLap = 4;
+  TimeTableLap_Flag_HasPitted = 8;
+}
+
+enum GameModeCameraMode {
+  GameModeCameraModeNone = 0;
+  GameModeCameraModeCar = 1;
+  GameModeCameraModeDrivable = 2;
+  GameModeCameraModeTrack = 3;
+  GameModeCameraModeHelicopter = 4;
+  GameModeCameraModeOrbit = 5;
+  GameModeCameraModeFree = 6;
+  GameModeCameraModeOnBoard = 7;
+}
+
+enum ChatMessageType {
+  ChatNormal = 0;
+  ChatDeveloper = 1;
+  ChatCertifiedVIP = 2;
+  ChatServerAdmin = 3;
+  ChatServerMessage = 4;
+  ChatWhisper = 5;
+  ChatPlayer = 6;
+}
+
+enum AdminCommandType {
+  Unknown = 0;
+  Disqualification = 1;
+  AddPenalty = 2;
+  RemovePenalty = 3;
+  AddBallast = 4;
+  AddRestrictor = 5;
+  SendToPit = 6;
+  SetAdmin = 7;
+  SkipPhase = 8;
+  MuteUser = 9;
+  UnMuteUser = 10;
+  AddTime = 11;
+  Kick = 12;
+  Ban = 13;
+  StartingPosition = 14;
+  ResetStartingPositions = 15;
+}
+
+message KeyDescriptionItem {
+  string key = 1;
+  string description = 2;
+}
+
+message ChangeDateTimeCommand {
+  HumanReadableDateTimeData date_time = 1;
+  CoordinateData coordinates = 2;
+  TimeZone timezone = 3;
+}
+
+message CreatePhysicsSceneCommand {
+  SceneConfigurationData scene_data = 1;
+}
+
+message CoreSceneCreatedEvent {
+  SceneConfigurationData scene_configuration_data = 1;
+  bool spawn_defaults = 2;
+  SeasonDefinition season = 3;
+  SceneData scene_data = 6;
+  google.protobuf.Any video_settings = 7;
+  google.protobuf.Any video_settings_rules = 8;
+  google.protobuf.Any dash_settings = 9;
+  google.protobuf.Any additional_settings = 11;
+  bool is_vr_enabled = 12;
+  reserved 10 to 10;
+}
+
+message VideoSettingsChangedEvent {
+  google.protobuf.Any video_settings = 1;
+}
+
+message CreatePhysicsCarCommand {
+  CarSpawnData car_spawn_data = 1;
+  DriverDescriptorData driver_info = 2;
+  PGUID car_id = 3;
+  TransformData spawn_transform = 4;
+  PlatformGameCarState game_car_state = 5;
+  int32 pit_slot = 6;
+}
+
+message UpdatePitLocationCommand {
+  PGUID car_id = 1;
+  TransformData spawn_transform = 2;
+  int32 pit_slot = 3;
+}
+
+message UpdateIgnoreHShifter {
+  PGUID car_id = 1;
+  bool value = 2;
+}
+
+message RemovePhysicsCarCommand {
+  CarSpawnData car_spawn_data = 1;
+  PGUID car_id = 2;
+}
+
+message DevTogglePhysicsCarControllerCommand {
+  PGUID car_id = 1;
+}
+
+message DevSavePhysicsCarSnapshotCommand {
+  PGUID car_id = 1;
+  string path = 2;
+}
+
+message DevLoadPhysicsCarSnapshotCommand {
+  PGUID car_id = 1;
+  string path = 2;
+}
+
+message ReplayCommand {
+  ReplayCommandType command = 1;
+  int32 payload = 2;
+}
+
+message SaveMoTecCommand {
+  PGUID car_id = 1;
+  string file_name = 2;
+}
+
+message ExportDynamicTrackCommand {
+  string file_name = 1;
+  bool compressed = 2;
+}
+
+message ImportDynamicTrackCommand {
+  string file_name = 1;
+  bool compressed = 2;
+}
+
+message InitialDynamicTrackStatusCommand {
+  float wetness = 1;
+  float rubber = 2;
+  float marbles = 3;
+  bool simulate_water = 4;
+  bool full_init = 5;
+}
+
+message DynamicTrackSettingsCommand {
+  DynamicTrackSettingsData settings = 1;
+  bool use_ai_tyre_noise = 2;
+}
+
+message PhysicsCarCreatedEvent {
+  CreatePhysicsCarCommand local_car_data = 1;
+  CreateNetcarCommand netcar_data = 2;
+  CarRuntimeSettings car_settings = 3;
+  bool from_saved_game = 4;
+}
+
+message PhysicsCarRemovedEvent {
+  RemovePhysicsCarCommand local_car_data = 1;
+  CreateNetcarCommand netcar_data = 2;
+}
+
+message PhysicsSceneLoadedEvent {
+  bool is_empty = 1;
+}
+
+message GameCarCreateCommand {
+  CarSpawnData car_spawn_data = 1;
+  DriverDescriptorData driver_info = 2;
+  PGUID car_id = 3;
+  PlatformGameCarState game_car_state = 4;
+  bool replay_car = 5;
+  bool from_saved_game = 6;
+}
+
+message RemoteGameModeRequests {
+  message RequestChangeGameMode {
+    bool soft_reset = 1;
+  }
+  RemoteGameModeRequests.RequestChangeGameMode request_change_game_mode = 1;
+  PGUID master_pguid = 2;
+}
+
+message ResetLocalCarsCommand {
+  bool is_empty = 1;
+}
+
+message AutoSaveReplay {
+  bool is_empty = 1;
+}
+
+message GameCarCreatedEvent {
+  GameCarCreateCommand event = 1;
+  bool only_presentation = 2;
+}
+
+message GameCarRemovedEvent {
+  PGUID car_id = 2;
+}
+
+message SetPlayerCurrentCar {
+  CarSpawnData car_spawn_data = 1;
+  PGUID old_car_id = 2;
+  TransformData spawn_transform = 3;
+  bool generate_thumbnail = 4;
+  bool loaded_from_debug = 5;
+  bool run_camera_sequence = 6;
+}
+
+message UpdateRainDataCommand {
+  float drops_from_track = 1;
+}
+
+message ThumbnailCreateCommand {
+  PGUID car_id = 1;
+  WeatherData weather_data = 2;
+  SetPlayerCurrentCar set_player_car_cmd = 3;
+}
+
+message ThumbnailCreatedEvent {
+  PGUID car_id = 1;
+  bool run_camera_sequence = 2;
+}
+
+message ThumbnailLoadCommand {
+  string car_guid = 1;
+  string car_name = 2;
+  string mech_preset = 3;
+  string visual_preset = 4;
+}
+
+message ThumbnailLoadCommandMulti {
+  repeated ThumbnailLoadCommand commands = 1;
+}
+
+message ThumbnailClearCache {
+  int32 mode = 1;
+}
+
+message CarCollisionEvent {
+  PGUID car_id = 1;
+  float relative_speed = 2;
+  Vector3Data world_location = 3;
+  Vector3Data rel_location = 4;
+  int32 collider_group = 5;
+  bool damages = 6;
+  Vector3Data normal = 7;
+}
+
+message CarOverlapEvent {
+  PGUID car_id = 1;
+  float relative_speed = 2;
+  Vector3Data world_location = 3;
+  Vector3Data rel_location = 4;
+  int32 collider_group = 5;
+  bool is_entering = 7;
+}
+
+message TeleportCarCommand {
+  PGUID car_id = 1;
+  TransformData spawn_transform = 2;
+  int32 slot = 5;
+  bool repair_car = 3;
+  bool reset_car_systems = 4;
+  bool reset_fuel = 6;
+}
+
+message CarTeleportCompleted {
+  TeleportCarCommand original_command = 1;
+}
+
+message EndSessionCarCommand {
+  PGUID car_id = 1;
+}
+
+message LockControlCommand {
+  float add_time_ms = 1;
+  PGUID car_id = 2;
+  bool from_ui = 3;
+  bool gearbox_only = 4;
+}
+
+message CarPhysicsCommand {
+  enum Command {
+    LockControl = 0;
+    DisableCollisions = 1;
+    LockGearbox = 2;
+    SetBallast = 3;
+    SetRestrictor = 4;
+  }
+  CarPhysicsCommand.Command command = 1;
+  PGUID car_id = 2;
+  bool enable = 3;
+  float payload = 4;
+}
+
+message RefuelCarCommand {
+  PGUID car_id = 1;
+  float fuel_to_add = 2;
+  float absolute_fuel = 3;
+}
+
+message CarHasEndedSessionCommand {
+  PGUID car_id = 1;
+  bool send_to_pit = 2;
+  bool teleport_to_pit = 3;
+  bool affect_also_player = 4;
+}
+
+message RepairCarCommand {
+  PGUID car_id = 1;
+  bool repair_body = 2;
+  bool repair_suspension = 3;
+  bool repair_engine = 4;
+}
+
+message CleanCarCommand {
+  PGUID car_id = 1;
+  float clean_value = 2;
+}
+
+message CarRefuelledCommand {
+  PGUID car_id = 1;
+  float fuel_added = 2;
+}
+
+message InputCommand {
+  enum RequestType {
+    None = 0;
+    Add = 1;
+    Edit = 2;
+    Remove = 3;
+  }
+  message ListeningMode {
+    bool enable = 1;
+  }
+  message Request {
+    InputCommand.RequestType type = 1;
+    google.protobuf.Any any = 2;
+    string guid = 3;
+  }
+  oneof type {
+    InputCommand.ListeningMode listening_mode = 1;
+    InputCommand.Request request = 2;
+  }
+}
+
+message AudioCommand {
+  AudioCommandType type = 1;
+  float value = 2;
+  int32 payload = 3;
+  string string = 4;
+  bool is_preset = 5;
+}
+
+message ViewSettingsCommand {
+  ViewSettingsCommandType command_type = 1;
+  CameraCommand camera = 2;
+  MirrorsCommand mirrors = 3;
+  MotionCommand motion = 4;
+  DashCommand dash = 5;
+  bool is_invalid = 6;
+  bool is_vr_enabled = 7;
+  float perspective_correction = 11;
+  float vertical_compression = 12;
+}
+
+message CameraCommand {
+  CameraCommandType camera_command_type = 1;
+  string car_name = 2;
+  int32 camera_mode = 10;
+  int32 camera_index = 11;
+  DrivableCameraUserSettings drivable_camera_user_settings = 12;
+  repeated Vector3Data car_camera_positions = 13;
+  repeated Vector3Data car_camera_rotations = 14;
+  float perspective_correction = 21;
+  float vertical_compression = 22;
+}
+
+message FreeCameraCommand {
+  FreeCameraCommandType command_type = 1;
+  int32 camera_mode = 2;
+  FreeCameraSettings free_camera_settings = 4;
+}
+
+message VideoCommand {
+  VideoCommandType type = 1;
+  google.protobuf.Any any = 2;
+}
+
+message DashCommand {
+  DashCommandType dash_command_type = 1;
+  google.protobuf.Any any = 2;
+}
+
+message MotionCommand {
+  MotionCommandType motion_command_type = 1;
+  CameraSettings motion_settings = 2;
+}
+
+message MirrorsCommand {
+  MirrorsCommandType mirror_command_type = 1;
+  string car_name = 2;
+  int32 mirror_index = 4;
+  CarMirrorsUserSettings car_mirrors_user_settings = 5;
+  int32 mirrors_num = 6;
+}
+
+message TripleScreenCommand {
+  TripleScreenCommandType triple_screen_command_type = 1;
+  google.protobuf.Any any = 2;
+}
+
+message UtilityCommand {
+  UIUtilityCommandType type = 1;
+  string param = 2;
+  int32 payload = 3;
+  PGUID pguid = 4;
+  int32 optional_payload = 5;
+}
+
+message LoadingStepCommand {
+  string name = 1;
+  string subname = 2;
+  LoadingStepType type = 3;
+  float time = 4;
+}
+
+message CarSnapshotCommand {
+  PGUID car_id = 1;
+  ACCCarSnap snapshot = 2;
+  float time = 3;
+}
+
+message PingServersCommand {
+}
+
+message ServerListEntry {
+  string server_ip = 1;
+  int32 tcp_port = 2;
+  int32 udp_port = 3;
+  string server_name = 4;
+  string track_name = 5;
+  int32 ping = 6;
+}
+
+message ServerListUpdateEvent {
+  repeated ServerListEntry servers = 1;
+}
+
+message ConnectToServerCommand {
+  ServerListEntry server_def = 1;
+  bool keep_current_cars = 2;
+  repeated LocalPhysicsCarDefinition local_car_definitions = 3;
+  DriverDescriptorData connection_driver_info = 4;
+  bool keep_fake_current_playercar = 5;
+  string server_password = 6;
+  ClientConnectionRequestPasswordType password_type = 7;
+  bool as_spectator = 8;
+  string user_id = 9;
+  bool request_cars = 10;
+  PGUID car_selected = 11;
+  string choosen_car_mech = 12;
+  string part_hashes = 13;
+  SHADigests car_digests = 14;
+  SHACarDigests car_sha_list = 15;
+}
+
+message ConnectToServerHandshakeResponseEvent {
+  ConnectToServerHandshakeResponse server_response = 1;
+  ConnectToServerCommand connection_request = 2;
+  int32 game_server_id = 3;
+}
+
+message ServerConnectionChangedEvent {
+  int32 game_server_id = 1;
+}
+
+message NetcodeCarUpdateDataRecordSet_DELETE {
+  CarSpawnData car_spawn_data = 1;
+  repeated NetcodeCarUpdateData_DELETE car_updates = 2;
+}
+
+message ServerResponseCommand {
+  ServerResponseType type = 1;
+  ConnectToServerCommand original_request = 2;
+  repeated string allowed_cars = 3;
+  bool need_select_car = 4;
+  bool is_tuning_allowed = 5;
+}
+
+message ContainerListRebuiltEvent {
+  repeated string containers = 1;
+}
+
+message ReplayToClientMessage {
+  message ResetParticles {
+    bool is_empty = 1;
+  }
+  message ReplayStarted {
+    bool is_empty = 1;
+  }
+  message ReplayStopped {
+    bool is_empty = 1;
+  }
+  ReplayToClientMessage.ResetParticles reset_particles = 1;
+  bool reset_skidmarks = 2;
+  ReplayToClientMessage.ReplayStarted replay_started = 3;
+  ReplayToClientMessage.ReplayStopped replay_stopped = 4;
+  ReplayCoreResponse response = 5;
+}
+
+message FocusedCarChangedEvent {
+  PGUID old_car_id = 1;
+  PGUID new_car_id = 2;
+  string old_car_name = 3;
+  string new_car_name = 4;
+}
+
+message CameraChangedEvent {
+  int32 mode = 1;
+  int32 sub_mode = 2;
+}
+
+message StartLocalGamemodeCommand {
+  enum SwitchType {
+    None = 0;
+    Continue = 1;
+    Exit = 2;
+    Save = 3;
+  }
+  SeasonDefinition season = 1;
+  bool keep_current_cars = 2;
+  repeated LocalPhysicsCarDefinition local_car_definitions = 3;
+  StartLocalGamemodeCommand.SwitchType switch_type = 5;
+  bool keep_fake_current_playercar = 6;
+}
+
+message CarZoneEvent {
+  bool is_entering = 1;
+  PGUID car_id = 2;
+  repeated string tags = 3;
+  int32 timestamp = 4;
+  ZoneData zone = 6;
+  int32 zone_index = 7;
+  int32 zones = 8;
+  reserved 5 to 5;
+}
+
+message UIChangeEvent {
+  UITypeRequest request = 1;
+  bool enter = 2;
+  int32 payload = 3;
+}
+
+message FlatPlaneCommand {
+  PGUID car_id = 1;
+  bool is_on_flat_plane = 2;
+}
+
+message DynoCommand {
+  PGUID car_id = 1;
+  bool is_on_dyno = 2;
+}
+
+message CarSetupCommand {
+  PGUID car_id = 1;
+  CarSetupData car_setup = 2;
+  bool exit = 3;
+}
+
+message CarNeedToTeleportCommand {
+  PGUID car_id = 1;
+  int32 spawn_id = 2;
+}
+
+message QuitGameCommand {
+  bool im_empty = 1;
+}
+
+message GamemodeExitCommand {
+  enum ExitType {
+    Continue = 0;
+    Exit = 1;
+    RestartSeason = 2;
+    RestartSession = 3;
+  }
+  PGUID car_id = 1;
+  GamemodeExitCommand.ExitType exit_type = 2;
+  SeasonDefinition last_season_definition = 3;
+  repeated LocalPhysicsCarDefinition cars_definition = 4;
+  bool is_request = 5;
+}
+
+message CommandFromRemote {
+  message Reset {
+    bool soft_reset = 1;
+  }
+}
+
+message CommandFromClient {
+  message ClientLoaded {
+    PGUID car_id = 1;
+  }
+}
+
+message CommandFromUI {
+  enum RestartType {
+    RestartSession = 0;
+    RestartEvent = 1;
+    RestartSeason = 2;
+  }
+  message RequestRestart {
+    CommandFromUI.RestartType type = 1;
+  }
+  message PlayerReady {
+    PGUID car_id = 1;
+    int32 timestamp = 2;
+  }
+  message PlayerReadyToNext {
+    PGUID car_id = 1;
+    int32 timestamp = 2;
+  }
+  message TeleportToPit {
+    PGUID car_id = 1;
+    bool into_box = 2;
+    bool lock_controls = 3;
+    bool disable_collisions = 4;
+    int32 group = 5;
+  }
+  message TerminateSession {
+    PGUID car_id = 1;
+    bool force_end_session = 2;
+  }
+  message ExitCommand {
+    enum ExitType {
+      Continue = 0;
+      Exit = 1;
+      RestartSeason = 2;
+      RestartSession = 3;
+    }
+    PGUID car_id = 1;
+    CommandFromUI.ExitCommand.ExitType exit_type = 2;
+    bool is_request = 3;
+  }
+}
+
+message DebugCommand {
+  message SetGametimeMultiplier {
+    double multiplier = 1;
+  }
+  message SetTimeline {
+    bool enable = 1;
+    int32 element_to_draw = 2;
+  }
+  message SetPhysicsSettings {
+    PGUID car_id = 1;
+    float fuelConsumptionRate = 2;
+    float tyreConsumptionRate = 3;
+    float brakeConsumptionRate = 4;
+  }
+  oneof type {
+    DebugCommand.SetGametimeMultiplier set_gametime_multipier = 1;
+    DebugCommand.SetTimeline set_timeline = 2;
+    DebugCommand.SetPhysicsSettings set_physics_settings = 3;
+  }
+}
+
+message ActorActivationCommand {
+  repeated uint64 activated_guids = 1;
+  repeated uint64 deactivated_guids = 2;
+}
+
+message GameSceneOptions {
+  bool disabled_idle_camera_sequence = 1;
+}
+
+message ResetCollidableObjectsCommand {
+}
+
+message ResetTelemetryCommand {
+}
+
+message LoadingCarListCommand {
+  message Car {
+    PGUID car_id = 10;
+    bool is_loading = 1;
+  }
+  repeated LoadingCarListCommand.Car loading_cars = 1;
+}
+
+message UpdateGameCarCommand {
+  PGUID car_id = 10;
+  CarFinalStateData car_final_state = 1;
+  DriverFinalStateData driver_final_state = 2;
+}
+
+message UpdateCarRendererCommand {
+  message Full {
+    CarFinalStateData car_final_state = 1;
+    DriverFinalStateData driver_final_state = 2;
+  }
+  message Partial {
+    CarFinalStateData car_final_state = 1;
+    DriverFinalStateData driver_final_state = 2;
+    bool set_meshes = 3;
+  }
+  message Tyres {
+    TyreCompound front_tyre_compound = 1;
+    string front_tyre_compound_path = 10;
+    TyreCompound rear_tyre_compound = 3;
+    string rear_tyre_compound_path = 13;
+    reserved 2 to 2;
+  }
+  PGUID car_id = 10;
+  oneof update {
+    UpdateCarRendererCommand.Full full = 1;
+    UpdateCarRendererCommand.Partial partial = 2;
+    UpdateCarRendererCommand.Tyres tyre_change = 3;
+  }
+}
+
+message PlatformRemoteModulesEnabler {
+  message WeatherService {
+    bool use_weather = 1;
+  }
+  PlatformRemoteModulesEnabler.WeatherService weather_service = 1;
+}
+
+message PlatformModulesEnabler {
+  message CameraBehaviour {
+    bool use_only_orbit = 1;
+    float max_distance = 2;
+  }
+  google.protobuf.Any any = 1;
+  PlatformModulesEnabler.CameraBehaviour camera_behaviour = 2;
+  bool mirrors_enabled = 3;
+}
+
+message UIGameModeEvent {
+  string command = 1;
+  repeated string parameters = 2;
+  bool override = 3;
+}
+
+message UIStartingData {
+  google.protobuf.Any any = 1;
+}
+
+message SplineRecorderCommand {
+  enum Type {
+    Start_Recording = 0;
+    Save_References = 2;
+  }
+  SplineRecorderCommand.Type command_type = 1;
+  reserved 2 to 2;
+}
+
+message CommunicationPlatformCommand {
+  bool backend_contacted = 1;
+}
+
+message SetDirectCurrentViewCar {
+  CarFinalStateData car_final_data = 1;
+}
+
+message CommunicationCommand {
+  google.protobuf.Any any = 1;
+}
+
+message UIReplayCommands {
+  message TogglePlay {
+    bool play = 1;
+  }
+  message ReplayQuit {
+    bool empty = 1;
+  }
+  message ReplaySeek {
+    float time_ms = 1;
+  }
+  message Save {
+    string filename = 1;
+  }
+  message Load {
+    string filename = 1;
+  }
+  message TimeMultiplier {
+    float time_multiplier = 1;
+    bool pause = 2;
+  }
+  message ToggleReverse {
+    bool reverse = 1;
+  }
+  message NextCar {
+    bool next = 1;
+  }
+  message NextCamera {
+    bool next = 1;
+    bool change_mode = 2;
+  }
+  message RequestMarkers {
+    int32 type = 1;
+  }
+  oneof request {
+    UIReplayCommands.TogglePlay toggle_play = 1;
+    UIReplayCommands.ReplayQuit quit = 2;
+    UIReplayCommands.ReplaySeek seek = 3;
+    UIReplayCommands.Save save = 4;
+    UIReplayCommands.Load load = 5;
+    UIReplayCommands.TimeMultiplier time_factor = 6;
+    UIReplayCommands.ToggleReverse reverse = 7;
+    UIReplayCommands.NextCar next_car = 9;
+    UIReplayCommands.NextCamera next_camera = 10;
+    UIReplayCommands.RequestMarkers request_markers = 11;
+  }
+}
+
+message UpdateGameCarState {
+  PGUID car_id = 1;
+  oneof update {
+    CarLocation car_location = 2;
+    CarInstrumentationValues instrumentation_values = 3;
+    CarElectronicsValues electronics_values = 4;
+    CarAssistsValues assists_values = 5;
+    CarAnimationValues animation_values = 6;
+    CarOptionalAnimationValues optional_animation_values = 7;
+    CarPitState pit_state = 8;
+    CarBOPData bop_data = 9;
+    CarPitStopValues pit_stop_values = 10;
+    CarVisualSetup visual_setup = 11;
+  }
+}
+
+message FireupAccount {
+  bool im_empty = 1;
+}
+
+message TimeTableSession {
+  PGUID season_id = 1;
+  int32 event_id = 2;
+  int32 session_id = 3;
+  string season_name = 10;
+  string event_name = 11;
+  string session_name = 12;
+  bool have_results = 20;
+  string best_lap = 21;
+}
+
+message TimeTableDriver {
+  PGUID driver_id = 1;
+  bool is_current_driver = 2;
+  int32 position = 10;
+  string driver_name = 11;
+  string driver_surname = 12;
+  string driver_nation = 13;
+  string team = 14;
+  string car_brand = 15;
+  string car_name = 16;
+  int32 car_number = 17;
+  int32 laps = 100;
+  repeated string splits = 101;
+  string best_lap = 102;
+  string total_time = 103;
+  string diff_first = 104;
+  string diff_previous = 105;
+  int32 num_pits = 106;
+  repeated int32 penalties = 107;
+  string high_penalty = 111;
+  int32 ballast = 108;
+  float restrictor = 109;
+  bool has_best_lap = 110;
+}
+
+message TimeTableLap {
+  int32 lap = 1;
+  string lap_time = 2;
+  repeated string splits = 3;
+  string delta_time = 4;
+  bool is_valid = 5;
+  int32 lap_flags = 6;
+  repeated int32 invalid_splits = 7;
+}
+
+message LeaderboardRequest {
+  message RuntimeDrivers {
+    bool im_empty = 1;
+    bool response_as_saved = 2;
+  }
+  message RuntimeLaps {
+    PGUID driver_id = 1;
+    bool response_as_saved = 2;
+  }
+  message SavedSessions {
+    bool im_empty = 1;
+  }
+  message SavedDrivers {
+    int32 event_id = 1;
+    int32 session_id = 2;
+  }
+  message SavedLaps {
+    int32 event_id = 1;
+    int32 session_id = 2;
+    PGUID driver_id = 10;
+  }
+  PGUID car_id = 10;
+  oneof request {
+    LeaderboardRequest.RuntimeDrivers runtime_drivers = 1;
+    LeaderboardRequest.RuntimeLaps runtime_laps = 2;
+    LeaderboardRequest.SavedSessions saved_sessions = 3;
+    LeaderboardRequest.SavedDrivers saved_drivers = 4;
+    LeaderboardRequest.SavedLaps saved_laps = 5;
+  }
+}
+
+message LeaderboardResponse {
+  message RuntimeDrivers {
+    repeated TimeTableDriver drivers = 1;
+  }
+  message RuntimeLaps {
+    bool response_as_saved = 1;
+    TimeTableDriver driver = 2;
+    repeated TimeTableLap laps = 3;
+  }
+  message SavedSessions {
+    repeated TimeTableSession sessions = 1;
+  }
+  message SavedDrivers {
+    TimeTableSession session = 1;
+    repeated TimeTableDriver drivers = 2;
+  }
+  message SavedLaps {
+    TimeTableSession session = 1;
+    TimeTableDriver driver = 2;
+    repeated TimeTableLap laps = 3;
+  }
+  PGUID car_id = 100;
+  oneof request {
+    LeaderboardResponse.RuntimeDrivers runtime_drivers = 1;
+    LeaderboardResponse.RuntimeLaps runtime_laps = 2;
+    LeaderboardResponse.SavedSessions saved_sessions = 3;
+    LeaderboardResponse.SavedDrivers saved_drivers = 4;
+    LeaderboardResponse.SavedLaps saved_laps = 5;
+  }
+}
+
+message ServerGameModeChangedEvent {
+  SeasonDefinition season = 1;
+  bool keep_player_car = 3;
+  int32 game_server_connection_id = 6;
+  ServerSessionChangedEvent initial_session_data = 7;
+  TransformData initial_player_transform = 8;
+  bool is_physics_pausable = 9;
+  bool physics_loaded = 10;
+  CoreSceneCreatedEvent scene_created_event = 11;
+  bool is_spectator = 12;
+  bool keep_car_presenters = 13;
+}
+
+message ConnectToServerHandshakeResponse {
+  ConnectToServerResult handshake_result = 1;
+  ClientConnectionRequest request_data = 2;
+  string error_msg = 3;
+  int32 connection_id = 4;
+  ServerGameModeChangedEvent gamemode_changed_event = 5;
+  int32 car_number = 6;
+  PGUID car_id = 7;
+  bool as_spectator = 8;
+  bool is_admin = 9;
+  int32 server_version = 10;
+  int32 protocol_version = 11;
+  repeated string allowed_cars = 12;
+  bool is_tuning_allowed = 13;
+}
+
+message PhysicsForcedCarPosition {
+  bool is_not_empty = 1;
+  PGUID car_id = 2;
+}
+
+message ReplaySettings {
+  enum ReplayQuality {
+    VeryLow = 0;
+    Low = 1;
+    Medium = 2;
+    High = 3;
+    Insane = 4;
+  }
+  float max_duration = 1;
+  ReplaySettings.ReplayQuality quality = 2;
+  int32 max_autosave_race_slots = 3;
+  int32 max_autosave_other_slots = 4;
+  float min_length_prompt_auto_save = 5;
+  bool enable_autosave = 6;
+}
+
+message MultiplayerChatMessage {
+  ChatMessageType message_type = 1;
+  uint64 timestamp = 2;
+  string sender_name = 3;
+  string msg_text = 4;
+}
+
+message SessionResults {
+  string season = 1;
+  string event = 2;
+  string session = 3;
+  string track = 4;
+  string layout = 5;
+  GameModeSelectionWeatherType weather_type = 6;
+  uint32 hour = 7;
+  uint32 min = 8;
+  repeated TimeTableDriver drivers = 10;
+}
+
+message AdminCommand {
+  AdminCommandType type = 1;
+  int32 int_payload = 2;
+  float float_payload = 3;
+  PGUID car_id_payload = 4;
+}
+
+message NewGhostCarAvailable {
+  int32 laptime = 1;
+}
+
+message AddCustomPoiCommand {
+  repeated ZoneData poi = 1;
+  bool clear_before = 2;
+}

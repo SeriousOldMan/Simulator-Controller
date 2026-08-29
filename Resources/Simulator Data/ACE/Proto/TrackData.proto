@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "Math.proto";
+
+message AISplineHint__to_be_ported {
+  float startPos = 1;
+  float endPos = 2;
+  float value = 3;
+}
+
+message AISplineDanger__to_be_ported {
+  float startPos = 1;
+  float endPos = 2;
+  float left = 3;
+  float right = 4;
+}
+
+message DynamicTrackProtoData {
+  bool isExternal = 1;
+  bool enabled = 2;
+  float sessionStartGrip = 3;
+  float baseGrip = 4;
+  float randomGrip = 5;
+  float gripPerLap = 6;
+  float sessionTransfer = 7;
+  Vector3Data track_center = 8;
+  float track_extension_m = 9;
+  reserved 10 to 10;
+}
+
+message DynamicTrackSettingsData {
+  float rubber_gain = 1;
+  float wetness_reduction_per_speed_per_second = 2;
+  float min_nd_slip = 3;
+  float max_nd_slip = 4;
+  float green_track_grip = 5;
+  float rubbered_grip_increase = 6;
+  float rubbered_grip_reduction_per_wetness = 7;
+  float wetness_per_full_rain_second = 8;
+  float wetness_drain_per_second = 9;
+  float evaporation_rate = 10;
+  float rubber_wash_per_full_rain_second = 11;
+  float air_convection = 13;
+  float air_rain_convection_mult = 14;
+  float sun_mult = 15;
+  float road_thermal_capacity = 16;
+  reserved 12 to 12;
+}
+
+message AiSplineHintsData {
+  repeated AISplineHint__to_be_ported hints = 1;
+  repeated AISplineHint__to_be_ported hintsBrake = 2;
+  repeated AISplineDanger__to_be_ported hintsDanger = 3;
+  repeated AISplineHint__to_be_ported hintsMaxSpeed = 4;
+}
+
+message TrackData {
+  DynamicTrackProtoData dynamicTrack = 1;
+  AiSplineHintsData aiSplineHintsData = 2;
+}
+
+message DynamicTrackPatchPresetData {
+  float rubber = 1;
+  float dirt = 2;
+  float wetness = 3;
+  float marbles = 4;
+}
+
+message HeightPatchPresetData {
+  float height = 1;
+}
+
+message DynamicTrackPresetTileData {
+  repeated DynamicTrackPatchPresetData patches = 1;
+  int32 tile_index = 2;
+}
+
+message TrackHeightPresetTileData {
+  repeated HeightPatchPresetData patches = 1;
+  int32 tile_index = 2;
+}
+
+message DynamicTrackPresetData {
+  Vector3Data min_bound = 1;
+  Vector3Data max_bound = 2;
+  repeated DynamicTrackPresetTileData tiles = 3;
+  repeated TrackHeightPresetTileData h_tiles = 4;
+  repeated int32 existing_tiles = 5;
+}
+
+message DynamicTrackPresetTileCompressedData {
+  bytes patches_blob = 1;
+  int32 tile_index = 2;
+}
+
+message DynamicTrackPresetCompressedData {
+  Vector3Data min_bound = 1;
+  Vector3Data max_bound = 2;
+  repeated DynamicTrackPresetTileCompressedData tiles = 3;
+  repeated TrackHeightPresetTileData h_tiles = 4;
+  repeated int32 existing_tiles = 5;
+}
+
+message DynamicTrackPatchValues {
+  int32 value = 1;
+}
+
+message DynamicTrackLinePatch {
+  repeated DynamicTrackPatchValues patches = 1;
+  int32 line_index = 2;
+}

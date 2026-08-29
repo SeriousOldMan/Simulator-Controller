@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message BackendTestRequest {
+  int32 action_id = 1;
+  string msg = 2;
+}
+
+message BackendTestResponse {
+  int32 action_id = 1;
+  string response_msg = 2;
+  string sender_msg = 3;
+}

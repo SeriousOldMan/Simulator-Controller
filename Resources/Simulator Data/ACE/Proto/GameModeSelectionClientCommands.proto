@@ -1,0 +1,578 @@
+syntax = "proto3";
+
+import "ClientCommandsUtil.proto";
+import "LogicScene.proto";
+import "Gameplay.proto";
+import "Weather.proto";
+import "Customization.proto";
+import "DriverManager.proto";
+import "Leaderboards.proto";
+import "Options.proto";
+import "Scene.proto";
+import "Math.proto";
+
+enum GameModeSelectionDuration {
+  GameModeSelectionDuration_NONE = 0;
+  GameModeSelectionDuration_TIME = 1;
+  GameModeSelectionDuration_LAPS = 2;
+}
+
+enum GameModeSelectionGoBackFrom {
+  GameModeSelectionGoBackFrom_UNKNOWN = 0;
+  GameModeSelectionGoBackFrom_GARAGE = 1;
+  GameModeSelectionGoBackFrom_DEALERSHIP = 2;
+  GameModeSelectionGoBackFrom_PAINTSHOP = 3;
+  GameModeSelectionGoBackFrom_PARTSHOP = 4;
+  GameModeSelectionGoBackFrom_RENTAL = 5;
+  GameModeSelectionGoBackFrom_STATS = 6;
+  GameModeSelectionGoBackFrom_RESULTS = 7;
+  GameModeSelectionGoBackFrom_SPECIAL_EVENTS = 8;
+  GameModeSelectionGoBackFrom_DRIVING_ACADEMY = 9;
+  GameModeSelectionGoBackFrom_SINGLE_PLAYER = 10;
+}
+
+enum GameModeSelectionGridType {
+  GameModeSelectionGridType_AUTO = 0;
+  GameModeSelectionGridType_CUSTOM = 1;
+}
+
+enum GameModeSelectionWeatherBehaviour {
+  GameModeSelectionWeatherBehaviour_STATIC = 0;
+  GameModeSelectionWeatherBehaviour_DYNAMIC = 1;
+}
+
+enum TrackSelectionType {
+  TrackSelectionType_NONE = 0;
+  TrackSelectionType_FREEROAM = 1;
+  TrackSelectionType_DRIFT = 2;
+  TrackSelectionType_INSTANT_RACE = 4;
+  TrackSelectionType_TIME_ATTACK = 8;
+  TrackSelectionType_HOT_STINT = 16;
+  TrackSelectionType_A_TO_B = 32;
+}
+
+enum SpecialEventStatus {
+  SpecialEventStatus_DISABLED = 0;
+  SpecialEventStatus_ENABLED = 1;
+  SpecialEventStatus_DONE = 2;
+}
+
+message TrackItem {
+  string continent = 8;
+  string nation = 1;
+  string name = 2;
+  string layout = 3;
+  string event_name = 6;
+  string image_path = 4;
+  int32 max_drivers = 5;
+  bool is_enabled = 7;
+  int32 track_length = 9;
+  bool is_for_development = 10;
+}
+
+message LastGameMode {
+  GameModeType type = 1;
+  GameModeSelectionWeatherType weather_type = 2;
+  repeated GameModeWeatherData weather_data = 3;
+}
+
+message GameModeSave {
+  GameModeType type = 2;
+  repeated GameModeSelectionSession sessions = 3;
+  reserved 1 to 1;
+}
+
+message SpecialEvent {
+  message Car {
+    string car_final_state = 1;
+    string model = 2;
+    string mech = 3;
+    string visual = 4;
+  }
+  message Opponents {
+    SpecialEvent.Car car = 1;
+    OpponentsContentData driver = 2;
+  }
+  string name = 1;
+  GameModeType type = 2;
+  int32 duration = 3;
+  int32 max_duration = 4;
+  GameModeSelectionDuration duration_type = 5;
+  GameModeSelectionWeatherType weather_preset = 6;
+  GameModeSelectionTimeOfDay time_of_day = 7;
+  InitialGrip initial_grip = 8;
+  TrackItem track_item = 9;
+  SpecialEvent.Car driver_car = 10;
+  repeated SpecialEvent.Opponents opponents = 11;
+  float crowd = 12;
+}
+
+message SpecialEvents {
+  repeated SpecialEvent event = 1;
+}
+
+message CustomGrid {
+  repeated CarModel models = 1;
+  repeated OpponentsContentData opponents = 2;
+  GameModeSelectionClientRequestOpponents opponents_request = 3;
+  int32 pool_size = 4;
+}
+
+message FreeRoamTimeAttackActor {
+  enum Type {
+    Resource = 0;
+    User = 1;
+  }
+  message BestTime {
+    string car_mech = 1;
+    int32 time = 2;
+  }
+  PGUID guid = 100;
+  repeated SceneActorData points = 12;
+  string name = 6;
+  bool is_active = 7;
+  int32 position = 8;
+  repeated FreeRoamTimeAttackActor.BestTime best_times = 9;
+  FreeRoamTimeAttackActor.Type type = 10;
+  bool is_client = 11;
+  reserved 1 to 1;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 4 to 4;
+  reserved 5 to 5;
+}
+
+message TimeAttackElements {
+  repeated FreeRoamTimeAttackActor elements = 1;
+}
+
+message FreeRoamOptions {
+  enum Experience {
+    Easy = 0;
+    Realistic = 1;
+  }
+  GameModeSelectionTimeOfDay time_of_day = 1;
+  GameModeWeatherData weather_preset = 2;
+  int32 starting_spawn_group = 3;
+  int32 starting_spawn_id = 10;
+  repeated string poi_visited = 4;
+  repeated string zones_visited = 8;
+  FreeRoamOptions.Experience experience = 7;
+  reserved 5 to 5;
+  reserved 9 to 9;
+  reserved 6 to 6;
+}
+
+message GameModeSelectionTimeOfDay {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+  int32 hour = 4;
+  int32 minute = 5;
+  int32 second = 6;
+  float time_multiplier = 7;
+}
+
+message GameModeSelectionOpponentChoice {
+  float weight = 2;
+  reserved 1 to 1;
+}
+
+message GameModeSelectionSession {
+  string name = 1;
+  string description = 14;
+  int32 duration = 2;
+  int32 max_duration_time = 16;
+  GameModeSelectionDuration duration_type = 3;
+  GameModeSelectionTimeOfDay time_of_day = 4;
+  TrackItem track_item = 5;
+  GameModeSelectionGridType grid_type = 6;
+  int32 num_opponents = 7;
+  int32 min_strength = 30;
+  int32 max_strength = 31;
+  AiDriverData.AggressivnessCategory aggressivness = 32;
+  repeated CarModel models = 10;
+  repeated OpponentsContentData opponents = 11;
+  repeated CarFinalStateData opponents_car = 15;
+  bool single_make = 12;
+  repeated bool class_filter = 23;
+  float player_pi = 17;
+  float min_pi = 18;
+  float max_pi = 19;
+  float min_evo_pi = 20;
+  float max_evo_pi = 21;
+  int32 starting_position = 22;
+  int32 mandatory_pitstop_count = 24;
+  int32 mandatory_pitstop_window_duration_s = 25;
+  bool mandatory_pitstop_requires_refuelling = 26;
+  bool mandatory_pitstop_requires_tyre_change = 27;
+  reserved 8 to 8;
+}
+
+message GameModeWeather {
+  GameModeSelectionWeatherType type = 1;
+  GameModeSelectionWeatherBehaviour behaviour = 2;
+  string weather_data_path = 7;
+  WeatherNoiseData noise_data = 4;
+  DynamicWeatherData dynamic_weather_data = 5;
+  InitialGrip initial_grip = 6;
+  reserved 3 to 3;
+}
+
+message GameModeWeatherData {
+  GameModeSelectionWeatherType type = 1;
+  GameModeSelectionWeatherBehaviour behaviour = 2;
+  WeatherData weather_data = 3;
+  WeatherNoiseData noise_data = 4;
+  DynamicWeatherData dynamic_weather_data = 5;
+  InitialGrip initial_grip = 6;
+}
+
+message GameModeSpecialEvent {
+  string event_guid = 1;
+  int64 event_id = 50;
+  string player_id = 51;
+  GameModeType type = 2;
+  uint32 duration = 3;
+  GameModeSelectionDuration duration_type = 4;
+  GameModeSelectionTimeOfDay time_of_day = 5;
+  CarModel car_model = 6;
+  TrackItem track_item = 7;
+  GameModeSelectionWeatherType weather_preset = 8;
+  InitialGrip initial_grip = 9;
+  string name = 10;
+  string img_path = 11;
+  SpecialEventStatus status = 12;
+  uint32 player_position = 33;
+  uint32 player_count = 34;
+  int32 max_attempts = 55;
+  uint32 event_index = 25;
+  string golden_time = 20;
+  string silver_time = 21;
+  string bronze_time = 22;
+  string my_time = 23;
+  uint32 my_medal = 24;
+  uint32 my_attempts = 32;
+  uint32 golden_reward_money = 26;
+  uint32 silver_reward_money = 27;
+  uint32 bronze_reward_money = 28;
+  uint32 golden_reward_xp = 29;
+  uint32 silver_reward_xp = 30;
+  uint32 bronze_reward_xp = 31;
+  int32 setup_restrictions = 37;
+  bool are_setups_shared = 38;
+}
+
+message GameModeSpecialEventResult {
+  int32 position = 1;
+  string driver = 2;
+  string time = 3;
+  int32 total_laps = 4;
+}
+
+message GameModeSelectionClientRequestSetGameType {
+  ClientCommandsMode mode = 2;
+  GameModeType type = 3;
+}
+
+message GameModeSelectionClientResponseSetGameType {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  GameModeType type = 3;
+}
+
+message GameModeSelectionClientRequestGameModeParameters {
+  reserved 1 to 1;
+  reserved 2 to 2;
+}
+
+message GameModeSelectionClientResponseGameModeParameters {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  GameModeType type = 3;
+  ClientCommandsMode ui_mode = 7;
+  GameModeType ui_type = 8;
+  repeated GameModeSelectionSession sessions = 4;
+  GameModeSelectionWeatherType weather_type = 5;
+  repeated GameModeWeatherData weather_data = 6;
+  repeated bool user_class_filter = 9;
+  float user_min_pi = 10;
+  float user_max_pi = 11;
+  int32 pool_cars = 12;
+}
+
+message GameModeSelectionClientRequestSetGameModeParameters {
+  ClientCommandsMode mode = 2;
+  repeated GameModeSelectionSession sessions = 10;
+  reserved 1 to 1;
+}
+
+message GameModeSelectionClientResponseSetGameModeParameters {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  repeated GameModeSelectionSession sessions = 10;
+}
+
+message GameModeSelectionClientRequestStart {
+  ClientCommandsMode mode = 2;
+}
+
+message GameModeSelectionClientResponseStart {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+}
+
+message GameModeSelectionClientRequestSpecialEvents {
+}
+
+message GameModeSelectionClientResponseSpecialEvents {
+  ClientCommandsResponse response = 1;
+  repeated GameModeSpecialEvent special_events = 10;
+}
+
+message GameModeSelectionClientRequestSpecialEventResults {
+  string event_guid = 3;
+  int32 num_results = 4;
+}
+
+message GameModeSelectionClientResponseSpecialEventResults {
+  ClientCommandsResponse response = 1;
+  repeated GameModeSpecialEventResult rows = 3;
+  GameModeSpecialEventResult driver_row = 4;
+}
+
+message GameModeSelectionClientRsponseDrivingAcademyCategory {
+  string name = 1;
+  LicenseType license_type = 2;
+  LicenseType license_requested = 3;
+  bool enabled = 4;
+  repeated GameModeSpecialEvent special_events = 10;
+}
+
+message GameModeSelectionClientRequestDrivingAcademy {
+}
+
+message GameModeSelectionClientResponseDrivingAcademy {
+  ClientCommandsResponse response = 1;
+  repeated GameModeSelectionClientRsponseDrivingAcademyCategory categories = 10;
+}
+
+message GameModeSelectionClientRequestJoinSpecialEvent {
+  string event_guid = 1;
+  int32 event_id = 2;
+  bool is_practice_mode = 3;
+}
+
+message GameModeSelectionClientResponseJoinSpecialEvent {
+  ClientCommandsResponse response = 1;
+  string event_guid = 2;
+}
+
+message GameModeSelectionClientRequestJoinDrivingAcademy {
+  string event_guid = 1;
+}
+
+message GameModeSelectionClientResponseJoinDrivingAcademy {
+  ClientCommandsResponse response = 1;
+  string event_guid = 2;
+}
+
+message GameModeSelectionClientRequestTestDrive {
+  CarModel model = 1;
+}
+
+message GameModeSelectionClientResponseTestDrive {
+  ClientCommandsResponse response = 1;
+}
+
+message GameModeSelectionClientRequestGoBack {
+  GameModeSelectionGoBackFrom go_back_from = 1;
+}
+
+message GameModeSelectionClientResponseGoBack {
+  ClientCommandsResponse response = 1;
+}
+
+message GameModeSelectionClientRequestFreeRoamOptions {
+  bool im_empty = 1;
+}
+
+message GameModeSelectionClientResponseFreeRoamOptions {
+  ClientCommandsResponse response = 1;
+  FreeRoamOptions options = 2;
+}
+
+message GameModeSelectionClientRequestSaveFreeRoamOptions {
+  FreeRoamOptions options = 1;
+}
+
+message GameModeSelectionClientResponseSaveFreeRoamOptions {
+  ClientCommandsResponse response = 1;
+  FreeRoamOptions options = 2;
+}
+
+message GameModeSelectionClientRequestOpponents {
+  int32 num_opponents = 1;
+  bool single_make = 2;
+  repeated bool class_filter = 5;
+  AiDriverData.AggressivnessCategory aggressivness_category = 20;
+  int32 min_strength = 21;
+  int32 max_strength = 22;
+  float min_pi = 23;
+  float max_pi = 24;
+}
+
+message GameModeSelectionClientResponseOpponents {
+  ClientCommandsResponse response = 1;
+  repeated CarModel models = 2;
+  repeated OpponentsContentData opponents = 4;
+  repeated CarModel all_ai_models = 3;
+  repeated OpponentsContentData all_opponents = 5;
+}
+
+message GameModeSelectionClientRequestWeatherData {
+}
+
+message GameModeSelectionClientResponseWeatherData {
+  ClientCommandsResponse response = 1;
+  repeated GameModeWeatherData weather_data = 2;
+}
+
+message GameModeSelectionClientRequestSetWeather {
+  GameModeWeatherData weather_data = 2;
+}
+
+message GameModeSelectionClientResponseSetWeather {
+  ClientCommandsResponse response = 1;
+}
+
+message GameModeSelectionClientRequestCurrentTrack {
+  ClientCommandsMode mode = 1;
+}
+
+message GameModeSelectionClientResponseCurrentTrack {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  TrackItem track_item = 10;
+}
+
+message GameModeSelectionClientRequestTrackList {
+  ClientCommandsMode mode = 1;
+}
+
+message GameModeSelectionClientResponseTrackList {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  repeated TrackItem track_item = 10;
+}
+
+message GameModeSelectionClientRequestSetTrack {
+  ClientCommandsMode mode = 1;
+  TrackItem track_item = 10;
+}
+
+message GameModeSelectionClientResponseSetTrack {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  TrackItem track_item = 10;
+}
+
+message GameModeSelectionClientRequestOpenWorld {
+  bool im_empty = 1;
+  FreeRoamOptions options = 2;
+}
+
+message GameModeSelectionClientResponseOpenWorld {
+  bool im_empty = 1;
+}
+
+message GameModeSelectionClientRequestOpenUrl {
+  string url = 1;
+}
+
+message GameModeSelectionClientResponseOpenUrl {
+  ClientCommandsResponse response = 1;
+}
+
+message GameModeSelectionClientRequestClearGridOptions {
+  bool im_empty = 1;
+}
+
+message GameModeSelectionClientResponseClearGridOptions {
+  ClientCommandsResponse response = 1;
+}
+
+message GameModeSelectionClientRequestLeaderboard {
+  PGUID eventPguid = 1;
+  int32 event_id = 2;
+  ComboIdentifier combo = 3;
+  string player_id = 4;
+  int32 showTopN = 5;
+  int32 totalLines = 6;
+  bool sendEntireLeaderboard = 7;
+}
+
+message GameModeSelectionClientResponseLeaderboard {
+  ClientCommandsResponse response = 3;
+  Leaderboards.Report leaderboards_report = 2;
+  reserved 1 to 1;
+}
+
+message GameModeSelectionClientRequestSpecialEventUserContexts {
+  bool nothing = 1;
+}
+
+message GameModeSelectionClientResponseSpecialEventUserContexts {
+  ClientCommandsResponse response = 3;
+  Leaderboards.UserContextResponse special_event_contexts = 2;
+  reserved 1 to 1;
+}
+
+message GameModeSelectionClientCommands {
+  GameModeSelectionClientRequestSetGameType request_set_game_type = 1;
+  GameModeSelectionClientResponseSetGameType response_set_game_type = 1000;
+  GameModeSelectionClientRequestGameModeParameters request_game_mode_parameters = 2;
+  GameModeSelectionClientResponseGameModeParameters response_game_mode_parameters = 1001;
+  GameModeSelectionClientRequestSetGameModeParameters request_set_game_mode_parameters = 3;
+  GameModeSelectionClientResponseSetGameModeParameters response_set_game_mode_parameters = 1002;
+  GameModeSelectionClientRequestStart request_start = 4;
+  GameModeSelectionClientResponseStart response_start = 1003;
+  GameModeSelectionClientRequestSpecialEvents request_special_events = 5;
+  GameModeSelectionClientResponseSpecialEvents response_special_events = 1004;
+  GameModeSelectionClientRequestSpecialEventResults request_special_event_results = 6;
+  GameModeSelectionClientResponseSpecialEventResults response_special_event_results = 1005;
+  GameModeSelectionClientRequestDrivingAcademy request_driving_academy = 7;
+  GameModeSelectionClientResponseDrivingAcademy response_driving_academy = 1006;
+  GameModeSelectionClientRequestJoinSpecialEvent request_join_special_event = 8;
+  GameModeSelectionClientResponseJoinSpecialEvent response_join_special_event = 1007;
+  GameModeSelectionClientRequestJoinDrivingAcademy request_join_driving_academy = 9;
+  GameModeSelectionClientResponseJoinDrivingAcademy response_join_driving_academy = 1008;
+  GameModeSelectionClientRequestTestDrive request_test_drive = 10;
+  GameModeSelectionClientResponseTestDrive response_test_drive = 1009;
+  GameModeSelectionClientRequestGoBack request_go_back = 11;
+  GameModeSelectionClientResponseGoBack response_go_back = 1010;
+  GameModeSelectionClientRequestFreeRoamOptions request_free_roam_options = 12;
+  GameModeSelectionClientResponseFreeRoamOptions response_free_roam_options = 1011;
+  GameModeSelectionClientRequestSaveFreeRoamOptions request_save_free_roam_options = 13;
+  GameModeSelectionClientResponseSaveFreeRoamOptions response_save_free_roam_options = 1012;
+  GameModeSelectionClientRequestOpponents request_opponents = 14;
+  GameModeSelectionClientResponseOpponents response_opponents = 1013;
+  GameModeSelectionClientRequestWeatherData request_weather_data = 15;
+  GameModeSelectionClientResponseWeatherData response_weather_data = 1014;
+  GameModeSelectionClientRequestSetWeather request_set_weather = 16;
+  GameModeSelectionClientResponseSetWeather response_set_weather = 1015;
+  GameModeSelectionClientRequestCurrentTrack request_current_track = 17;
+  GameModeSelectionClientResponseCurrentTrack response_current_track = 1016;
+  GameModeSelectionClientRequestTrackList request_track_list = 18;
+  GameModeSelectionClientResponseTrackList response_track_list = 1017;
+  GameModeSelectionClientRequestSetTrack request_set_track = 19;
+  GameModeSelectionClientResponseSetTrack response_set_track = 1018;
+  GameModeSelectionClientRequestOpenWorld request_open_world = 20;
+  GameModeSelectionClientResponseOpenWorld response_open_world = 1019;
+  GameModeSelectionClientRequestOpenUrl request_open_url = 21;
+  GameModeSelectionClientResponseOpenUrl response_open_url = 1020;
+  GameModeSelectionClientRequestClearGridOptions request_clear_grid_options = 22;
+  GameModeSelectionClientResponseClearGridOptions response_clear_grid_options = 1021;
+  GameModeSelectionClientRequestLeaderboard request_leaderboard = 23;
+  GameModeSelectionClientResponseLeaderboard response_leaderboard = 1022;
+}

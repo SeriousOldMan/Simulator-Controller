@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+import "ClientCommandsUtil.proto";
+import "DriverManager.proto";
+
+message CarSelectionClientRequestCurrentCar {
+}
+
+message CarSelectionClientResponseCurrentCar {
+  ClientCommandsResponse response = 1;
+  CarSelectionOwnerShipState state = 2;
+  CarModel model = 10;
+}
+
+message CarSelectionClientRequestManufacturers {
+  ClientCommandsMode mode = 1;
+  CarSelectionOwnerShipState state = 10;
+}
+
+message CarSelectionClientResponseManufacturers {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  CarSelectionOwnerShipState state = 10;
+  repeated CarManufacturer manufacturers = 20;
+}
+
+message CarSelectionClientRequestModels {
+  ClientCommandsMode mode = 1;
+  CarSelectionOwnerShipState state = 2;
+  string brand = 10;
+}
+
+message CarSelectionClientResponseModels {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  CarSelectionOwnerShipState state = 10;
+  string brand = 11;
+  repeated CarModel car_model = 20;
+}
+
+message CarSelectionClientRequestCarConfigurations {
+  ClientCommandsMode mode = 1;
+  string model = 10;
+}
+
+message CarSelectionClientResponseCarConfigurations {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  string model = 10;
+  repeated CarConfiguration configurations = 20;
+}
+
+message CarSelectionClientRequestCarColorPresets {
+  ClientCommandsMode mode = 1;
+  string model = 10;
+  string configuration = 20;
+}
+
+message CarSelectionClientResponseCarColorPresets {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  string model = 10;
+  string configuration = 11;
+  repeated CarColorPreset color_presets = 20;
+}
+
+message CarSelectionClientRequestSetCurrentCar {
+  ClientCommandsMode mode = 1;
+  CarModel model = 10;
+}
+
+message CarSelectionClientResponseSetCurrentCar {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+}
+
+message CarSelectionClientRequestSetCurrentCarConfiguration {
+  ClientCommandsMode mode = 1;
+  string configuration = 11;
+}
+
+message CarSelectionClientResponseSetCurrentCarConfiguration {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+}
+
+message CarSelectionClientRequestSetCurrentCarColorPreset {
+  ClientCommandsMode mode = 1;
+  string color_preset = 11;
+}
+
+message CarSelectionClientResponseSetCurrentCarColorPreset {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+}
+
+message CarSelectionClientRequestSetPreviewCar {
+  CarModel model = 1;
+}
+
+message CarSelectionClientResponseSetPreviewCar {
+  ClientCommandsResponse response = 1;
+}
+
+message CarSelectionClientCommands {
+  CarSelectionClientRequestCurrentCar request_current_car = 1;
+  CarSelectionClientResponseCurrentCar response_current_car = 1000;
+  CarSelectionClientRequestManufacturers request_manufacturers = 2;
+  CarSelectionClientResponseManufacturers response_manufacturers = 1001;
+  CarSelectionClientRequestModels request_models = 3;
+  CarSelectionClientResponseModels response_models = 1002;
+  CarSelectionClientRequestCarConfigurations request_car_configurations = 4;
+  CarSelectionClientResponseCarConfigurations response_car_configurations = 1003;
+  CarSelectionClientRequestCarColorPresets request_car_color_presets = 5;
+  CarSelectionClientResponseCarColorPresets response_car_color_presets = 1004;
+  CarSelectionClientRequestSetCurrentCar request_set_current_car = 6;
+  CarSelectionClientResponseSetCurrentCar response_set_current_car = 1005;
+  CarSelectionClientRequestSetCurrentCarConfiguration request_set_current_car_configuration = 7;
+  CarSelectionClientResponseSetCurrentCarConfiguration response_set_current_car_configuration = 1006;
+  CarSelectionClientRequestSetCurrentCarColorPreset request_set_current_car_color_preset = 8;
+  CarSelectionClientResponseSetCurrentCarColorPreset response_set_current_car_color_preset = 1007;
+  CarSelectionClientRequestSetPreviewCar request_set_preview_car = 9;
+  CarSelectionClientResponseSetPreviewCar response_set_preview_car = 1008;
+}

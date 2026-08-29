@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+
+message PaintShop {
+  message TeleportCar {
+    PGUID car_pguid = 2;
+    int32 spawn_number = 1;
+  }
+  message State {
+    message Game {
+    }
+  }
+  message Message {
+    message ResetGameState {
+    }
+  }
+  message Specialization {
+    bool customize_car = 1;
+    bool keep_ui_page = 5;
+    ShowroomData showroom_data = 3;
+    bool is_temporary = 4;
+    int32 showroom_type = 6;
+    reserved 2 to 2;
+  }
+  message Command {
+    message SessionInitialization {
+    }
+    message ConnectionLoaded {
+      PGUID car_id = 1;
+    }
+    message RestartSession {
+    }
+  }
+}

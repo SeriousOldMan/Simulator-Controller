@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+import "Scene.proto";
+
+enum TrafficAudioType {
+  TrafficCyl4 = 0;
+  TrafficCyl5 = 1;
+  TrafficCyl6 = 2;
+  TrafficCyl8 = 3;
+  TrafficTruck = 4;
+}
+
+message TrafficParams {
+  enum TrafficBehavior {
+    TrafficBehavior_Standard = 0;
+    TrafficBehavior_Realistic = 1;
+  }
+  int32 max_cars = 1;
+  float spawn_delay = 3;
+  float spawn_radius_min = 25;
+  float spawn_radius_max = 26;
+  float despawn_radius = 27;
+  float average_speed = 6;
+  float safety_distance = 7;
+  float max_acceleration = 8;
+  bool enable_collisions = 9;
+  TrafficParams.TrafficBehavior traffic_behavior = 14;
+  float average_speed_multi_lane = 15;
+  int32 multi_lane_threshold = 16;
+  float curve_max_lateral_accel = 17;
+  float min_speed_kmh = 18;
+  float intersection_speed_factor = 19;
+  float multi_lane_spawn_bias = 24;
+  float max_yaw_rate = 30;
+  float max_steer_angle = 31;
+  reserved 2 to 2;
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 10 to 10;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 13 to 13;
+  reserved 20 to 20;
+  reserved 21 to 21;
+  reserved 22 to 22;
+  reserved 23 to 23;
+  reserved 28 to 28;
+  reserved 29 to 29;
+}
+
+message TrafficVehicle {
+  message BodyColor {
+    Vector3Data body_color = 1;
+    float probability = 2;
+  }
+  string mesh_path = 1;
+  string collider_path = 2;
+  float mesh_up_offset = 3;
+  float light_up_offset = 4;
+  float light_forward_offset = 5;
+  float light_pitch_rotation = 6;
+  repeated TrafficVehicle.BodyColor body_colors = 10;
+  CarActorData.ShadowDecal body_shadow_decal = 8;
+  float probability = 9;
+  TrafficAudioType audio_type = 11;
+  int32 min_rpms = 12;
+  int32 max_rpms = 13;
+  string daytime_curve = 14;
+  string weekday_curve = 15;
+  float mass_kg = 16;
+  float speed_factor = 17;
+  reserved 7 to 7;
+}
+
+message TrafficSettings {
+  TrafficParams params = 1;
+  repeated TrafficVehicle vehicles = 2;
+}

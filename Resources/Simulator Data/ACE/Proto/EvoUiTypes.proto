@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+enum UIBitsetEnum {
+  lock_ui = 0;
+  is_reconnecting = 1;
+  is_guest_mode = 2;
+  no_intro = 3;
+  is_online = 4;
+  is_sandbox = 5;
+  has_no_cars = 6;
+}
+
+message UIDriftState {
+  bool isvisible = 1;
+  int32 total = 2;
+  int32 current = 3;
+  int32 duration = 4;
+  int32 multiplier = 5;
+}
+
+message UIDragState {
+  string time = 1;
+  string delta = 2;
+  string best = 3;
+  int32 speed = 4;
+  int32 reaction = 5;
+}
+
+message UIGarageCar {
+  string name = 1;
+  string model = 2;
+}
+
+message UIGarageState {
+  int32 id = 1;
+  repeated UIGarageCar cars = 2;
+}
+
+message SelectGameMode {
+  string mode = 1;
+}
+
+message ChangeCarModel {
+  string model = 1;
+}
+
+message UIMenuState {
+  string activeMenu = 1;
+  string activeSubMenu = 2;
+  string path = 3;
+  string origin = 4;
+  map<string, string> store = 5;
+  bool is_widget_hovering = 6;
+  bool ignore_gameplay_input_actions = 7;
+  int32 player_mode = 8;
+  bool override_showcase_camera = 9;
+  bool is_chat_active = 10;
+}
+
+message EvoDevUiSave {
+  repeated string descriptor_names = 1;
+}

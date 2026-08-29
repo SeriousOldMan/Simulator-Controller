@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+import "LogicScene.proto";
+import "Customization.proto";
+import "InputEnum.proto";
+
+message CustomTableData {
+  message Value {
+    oneof value {
+      double double = 1;
+      float float = 2;
+      int32 int_32 = 3;
+      int64 int_64 = 4;
+      uint32 unsigned_int_32 = 5;
+      uint64 unsigned_int_64 = 6;
+      bool boolean = 7;
+      string string = 8;
+      string content_path = 9;
+      Vector2Data vector_2 = 20;
+      Vector3Data vector_3 = 21;
+      Vector4Data vector_4 = 22;
+      QuaternionData quaterion = 23;
+      MatrixData matrix = 24;
+      TransformData tranform = 25;
+    }
+  }
+  message Line {
+    repeated CustomTableData.Value values = 1;
+  }
+  message Column {
+    string header = 1;
+    CustomTableData.Value value = 2;
+    string comment = 3;
+  }
+  repeated CustomTableData.Column columns = 1;
+  repeated CustomTableData.Line lines = 2;
+}
+
+message PresetTableData {
+  message Line {
+    oneof line {
+      CarContentData car_content = 1;
+      TrackContentData track_content = 2;
+      TrackContainersContentData track_containers_content = 8;
+      MaterialFinish material_finish = 9;
+      TyreCompoundData tyre_compound_data = 10;
+      BrandData brand_data = 11;
+      AudioGuiEvents audio_gui_events = 12;
+      ShowroomData showroom_content = 13;
+      OpponentsContentData opponents_content = 14;
+      PostProcessingPreset post_processing_preset = 15;
+      InstanceBrushData instance_brush_data = 16;
+      BrushTableData brush_table_data = 17;
+      WeatherPresetData weather_presets_data = 19;
+      InputFilterData input_filter_data = 22;
+      CarSetupContentData car_setups_data = 23;
+      TrackCarSetupData track_car_setup_data = 24;
+      PhysicsTyreCompoundGeneratorData physics_tyre_compound_generator_data = 25;
+      InputActionSorting input_action_sorting = 26;
+      InputAxisSorting input_axis_sorting = 27;
+      MechanicalPresetIdData mechanical_preset_id_data = 28;
+    }
+    reserved 3 to 3;
+    reserved 4 to 4;
+    reserved 5 to 5;
+    reserved 6 to 6;
+    reserved 20 to 20;
+    reserved 21 to 21;
+  }
+  PresetTableData.Line header = 1;
+  repeated PresetTableData.Line lines = 3;
+}
+
+message TableData {
+  string comment = 1;
+  oneof table {
+    PresetTableData preset = 2;
+    CustomTableData custom = 3;
+  }
+}
+
+message InputFilterData {
+  string page_name = 1;
+  string sub_page_name = 100;
+  bool ignore_base = 2;
+  repeated InputAction allowed_input_actions = 3;
+  repeated InputAction not_allowed_input_actions = 7;
+  bool is_base = 4;
+  bool is_tester = 5;
+  bool is_dev = 6;
+  reserved 8 to 8;
+}
+
+message InputActionSorting {
+  InputAction input_action = 1;
+  string name = 2;
+}
+
+message InputAxisSorting {
+  InputAxis input_axis = 1;
+  string name = 2;
+}

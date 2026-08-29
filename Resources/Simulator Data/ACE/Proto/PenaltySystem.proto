@@ -1,0 +1,177 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "google/protobuf/descriptor.proto";
+
+enum PenaltyType {
+  PenaltyType_Warning = 0;
+  PenaltyType_Reprimand = 1;
+  PenaltyType_Fine = 2;
+  PenaltyType_Remove_Best_Laptime = 3;
+  PenaltyType_Drop_Of_Grid_Position = 4;
+  PenaltyType_Start_From_Pitlane = 5;
+  PenaltyType_Time_Penalty_Seconds = 6;
+  PenaltyType_Penalty_Laps = 7;
+  PenaltyType_Drop_Of_Place_In_Classification = 8;
+  PenaltyType_Drive_Through = 9;
+  PenaltyType_Stop_And_Go = 10;
+  PenaltyType_InvalidNextLap = 11;
+  PenaltyType_InvalidLap = 12;
+  PenaltyType_Disqualification = 250;
+  PenaltyType_MP_TeleportToPit = 260;
+}
+
+enum InvestigationType {
+  InvestigationType_Racecar_Cut = 0;
+  InvestigationType_Collision = 1;
+  InvestigationType_Illegal_Overtake = 2;
+  InvestigationType_Pit_Speeding = 3;
+  InvestigationType_Pit_Entry = 4;
+  InvestigationType_Pit_Exit = 5;
+  InvestigationType_Ignored_Mandatory_Pit = 6;
+  InvestigationType_Unsafe_Rejoin = 7;
+  InvestigationType_Race_Control = 8;
+  InvestigationType_Reverse_In_Pitlane = 9;
+  InvestigationType_Wrong_Way = 10;
+  InvestigationType_Ignored_Driver_Stint = 11;
+  InvestigationType_Exceeded_Driver_Stint_Limit = 12;
+  InvestigationType_Driver_Ran_No_Stint = 13;
+  InvestigationType_Damaged_Car = 14;
+  InvestigationType_Lights_Off = 15;
+  InvestigationType_Speeding_On_Start = 16;
+  InvestigationType_Wrong_Position_On_Start = 17;
+  InvestigationType_Speeding = 18;
+  InvestigationType_StartFromPit = 19;
+}
+
+enum PenaltyTransformation_TriggerType {
+  PenaltyTransformation_TriggerType_Lap = 0;
+  PenaltyTransformation_TriggerType_Time_ms = 1;
+  PenaltyTransformation_TriggerType_Count = 2;
+}
+
+message PenaltyData {
+  PenaltyType type = 1;
+  int32 penalty_time_ms = 2;
+  int32 laps_for_clearing = 3;
+}
+
+message PenaltyTransformation {
+  message PostSession {
+    bool add_pitlane_time = 10;
+  }
+  PenaltyType type = 1;
+  PenaltyTransformation_TriggerType trigger_type = 2;
+  int32 trigger_countdown = 3;
+  PenaltyData triggered_data = 4;
+  PenaltyTransformation_TriggerType optional_clearing_type = 5;
+  int32 optional_clearing_countdown = 6;
+  PenaltyTransformation.PostSession post_session_transformation = 7;
+}
+
+message PenaltyTransformations {
+  repeated PenaltyTransformation transformations = 101;
+}
+
+message PenaltyInvestigations {
+  message LevelByThreshold {
+    float threshold = 1;
+    uint32 level = 2;
+  }
+  message RaceCarCut {
+    int32 tyres_out = 1;
+    float wet_multiplier = 3;
+    reserved 2 to 2;
+  }
+  message Collision {
+  }
+  message IllegalOvertake {
+  }
+  message PitSpeeding {
+    string const_speed_pitlane_zone_name = 1;
+    string avg_speed_pitlane_zone_name = 2;
+    int32 required_speed = 3;
+  }
+  message Speeding {
+    int32 required_speed = 1;
+    bool check_if_higher = 2;
+  }
+  message PitEntry {
+    int32 tyres_out = 1;
+  }
+  message PitExit {
+    int32 tyres_out = 1;
+  }
+  message IgnoredMandatoryPit {
+  }
+  message UnsafeRejoin {
+  }
+  message RaceControl {
+  }
+  message ReverseInPitlane {
+  }
+  message WrongWay {
+    float min_speed = 1;
+    float speed_multiplier = 2;
+    float out_of_track_multiplier = 3;
+  }
+  message IgnoredDriverStint {
+  }
+  message ExceededDriverStintLimit {
+  }
+  message DriverRanNoStint {
+  }
+  message DamagedCar {
+  }
+  message LightsOff {
+  }
+  message SpeedingOnStart {
+  }
+  message StartFromPit {
+  }
+  message WrongPositionOnStart {
+    repeated PenaltyInvestigations.LevelByThreshold distance_on_grid_thresholds = 1;
+    repeated PenaltyInvestigations.LevelByThreshold distance_on_start_thresholds = 2;
+    repeated PenaltyInvestigations.LevelByThreshold rotation_thresholds = 3;
+  }
+  message Trigger {
+    message Check {
+      PenaltyData data = 1;
+      int32 weight = 2;
+    }
+    string command_name = 2;
+    repeated PenaltyInvestigations.Trigger.Check checks = 100;
+    oneof investigation {
+      PenaltyInvestigations.RaceCarCut race_car_cut = 20;
+      PenaltyInvestigations.Collision collision = 21;
+      PenaltyInvestigations.IllegalOvertake illegal_overtake = 22;
+      PenaltyInvestigations.PitSpeeding pit_speeding = 23;
+      PenaltyInvestigations.PitEntry pit_entry = 24;
+      PenaltyInvestigations.PitExit pit_exit = 25;
+      PenaltyInvestigations.IgnoredMandatoryPit ignored_mandatory_pit = 26;
+      PenaltyInvestigations.UnsafeRejoin unsafe_rejoin = 27;
+      PenaltyInvestigations.RaceControl race_control = 28;
+      PenaltyInvestigations.ReverseInPitlane reverse_in_pitline = 29;
+      PenaltyInvestigations.WrongWay wrong_way = 30;
+      PenaltyInvestigations.IgnoredDriverStint ignored_driver_stint = 31;
+      PenaltyInvestigations.ExceededDriverStintLimit exceeded_driver_stint_limit = 32;
+      PenaltyInvestigations.DriverRanNoStint driver_ran_no_stint = 33;
+      PenaltyInvestigations.DamagedCar damaged_car = 34;
+      PenaltyInvestigations.LightsOff lights_off = 35;
+      PenaltyInvestigations.SpeedingOnStart speeding_on_start = 36;
+      PenaltyInvestigations.WrongPositionOnStart wrong_position_on_start = 37;
+      PenaltyInvestigations.Speeding speeding = 38;
+      PenaltyInvestigations.StartFromPit start_from_pit = 39;
+    }
+    reserved 10 to 10;
+  }
+  repeated PenaltyInvestigations.Trigger triggers = 1;
+}
+
+message SessionPenaltyData {
+  PenaltyData penalty_data = 1;
+  InvestigationType investigation = 2;
+  uint32 given_lap_count = 7;
+  uint64 given_session_time_ms = 5;
+  uint64 cleared_session_time_ms = 6;
+}

@@ -87,6 +87,7 @@ Data Provider.48=%kBinariesDirectory%Providers\LMU SHM Provider.exe <- %kSources
 Data Provider.49=%kBinariesDirectory%Connectors\LMU SHM Connector.dll <- %kSourcesDirectory%Special\LMU SHM Connector\Release\LMU SHM Connector.dll
 Data Provider.50=%kBinariesDirectory%Providers\LMU SHM Spotter.exe <- %kSourcesDirectory%Special\LMU SHM Spotter\Release\LMU SHM Spotter.exe
 Data Provider.51=%kBinariesDirectory%Providers\LMU SHM Coach.exe <- %kSourcesDirectory%Special\RF2 SHM Coach\Release\RF2 SHM Coach.exe
+Data Provider.52=%kBinariesDirectory%ProtoBuf\buf.exe <- %kHomeDirectory%Utilities\3rd Party\ProtoBuf Tool\buf.exe
 Speech Interface.1=%kBinariesDirectory%Microsoft\Microsoft.Speech.Recognizer.dll <- %kSourcesDirectory%Special\Microsoft Speech Recognizer\Release\x64\Speech Recognizer.dll
 Speech Interface.2=%kBinariesDirectory%Microsoft\Microsoft.Speech.dll <- %kSourcesDirectory%Special\Microsoft Speech Recognizer\Release\x64\Microsoft.Speech.dll
 Speech Interface.3=%kBinariesDirectory%Microsoft\ <- %kSourcesDirectory%Special\Microsoft Speech Recognizer\Release\x64\Microsoft.*

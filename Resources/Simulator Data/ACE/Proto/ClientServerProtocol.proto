@@ -1,0 +1,404 @@
+syntax = "proto3";
+
+import "Scene.proto";
+import "LogicScene.proto";
+import "Weather.proto";
+import "Math.proto";
+import "google/protobuf/any.proto";
+import "Gameplay.proto";
+import "BackendMessage.proto";
+import "PlatformGameState.proto";
+import "ClientCommandsUtil.proto";
+import "GameModeSelectionClientCommands.proto";
+
+enum ClientConnectionRequestPasswordType {
+  ClientConnectionRequestPasswordType_Any = 0;
+  ClientConnectionRequestPasswordType_Driver = 1;
+  ClientConnectionRequestPasswordType_Spectator = 2;
+}
+
+enum ConnectToServerResult {
+  ConnectToServerResult_None = 0;
+  ConnectToServerResult_Success = 1;
+  ConnectToServerResult_ConnectionTimeout = 2;
+  ConnectToServerResult_HandshakeTimeout = 3;
+  ConnectToServerResult_HandshakeError = 4;
+  ConnectToServerResult_ClientOutdated = 5;
+  ConnectToServerResult_ServerOutdated = 6;
+  ConnectToServerResult_ClientRejected = 7;
+  ConnectToServerResult_WrongPassword = 8;
+  ConnectToServerResult_ServerFull = 9;
+  ConnectToServerResult_ContentUnavailable = 10;
+}
+
+enum VehicleTagFilters {
+  VehicleTagFilters_NO_FILTER = 0;
+  VehicleTagFilters_EVO = 1;
+  VehicleTagFilters_HERITAGE = 2;
+  VehicleTagFilters_RACING = 3;
+  VehicleTagFilters_LUXURY = 4;
+}
+
+enum MultiplayerServerListSessionType {
+  MultiplayerServerListSessionType_BOTH = 0;
+  MultiplayerServerListSessionType_UNRANKED = 1;
+  MultiplayerServerListSessionType_RANKED = 2;
+}
+
+enum RequestServerResult {
+  RequestServerResult_Success = 0;
+  RequestServerResult_Error = 1;
+  RequestServerResult_Undefined = 2;
+}
+
+message ShaData {
+  repeated bytes sha256 = 1;
+  string optional_url_key = 2;
+}
+
+message SHACarDigests {
+  repeated ShaData data = 1;
+  string unique_sha = 2;
+  string version = 3;
+}
+
+message SHADigests {
+  repeated bytes sha256 = 1;
+  repeated string optional_url_keys = 2;
+}
+
+message AssociateUDPSocketResponse {
+  int32 connectionId = 1;
+  bool success = 2;
+}
+
+message LocalPhysicsCarDefinition {
+  DriverDescriptorData driver_info = 1;
+  CarSpawnData initial_car_spawn_data = 2;
+  PGUID car_id = 3;
+  PlatformGameCarState initial_car_state = 4;
+}
+
+message ClientConnectionRequest {
+  ClientConnectionRequestPasswordType password_type = 1;
+  string password = 2;
+  repeated LocalPhysicsCarDefinition local_physics_cars = 3;
+  bool as_spectator = 4;
+  int32 protocol_version = 5;
+  int32 server_version = 6;
+  string user_id = 7;
+  bool is_request_cars_only = 8;
+  string choosen_car_mech = 9;
+  string part_hashes = 10;
+  SHADigests car_digests = 11;
+  SHACarDigests car_sha_list = 12;
+}
+
+message ServerSessionChangedEvent {
+  google.protobuf.Any gamemode_session_data = 1;
+  WeatherDataUpdate weather_update = 2;
+}
+
+message ServerConnectionLost {
+  ConnectToServerResult connectionResult = 1;
+  google.protobuf.Any payload = 2;
+}
+
+message RequestPlayerCar {
+  CarSpawnData car_spawn_data = 1;
+  DriverDescriptorData driver_info = 2;
+  SHADigests car_digests = 3;
+  SHACarDigests car_sha_list = 4;
+}
+
+message ChangePlayerCarResponseEvent {
+  CarSpawnData car_spawn_data = 1;
+  DriverDescriptorData driver_info = 2;
+  PGUID car_id = 3;
+  int32 car_number = 4;
+  TransformData spawn_transform = 5;
+  ConnectToServerResult result = 6;
+}
+
+message AssociateCarNumberEvent {
+  PGUID car_id = 1;
+  int32 car_number = 2;
+}
+
+message RequestSpawnAiCarCommand {
+  CarSpawnData car_spawn_data = 1;
+  AiDriverData ai_data = 2;
+}
+
+message CreateNetcarCommand {
+  CarSpawnData car_spawn_data = 1;
+  DriverDescriptorData driver_info = 2;
+  PGUID car_id = 3;
+  TransformData spawn_transform = 4;
+  int32 netcode_projection_delay_ms = 5;
+  int32 netcar_update_interval = 6;
+  int32 car_number = 7;
+  PlatformGameCarState game_car_state = 8;
+}
+
+message DespawnNetcarsCommand {
+  repeated PGUID car_ids = 1;
+}
+
+message SplitFromRemoteMessage {
+  PGUID car_id = 1;
+  bool is_finish_line = 2;
+  int32 split_id = 3;
+  int32 laptime = 4;
+  float n_pos = 5;
+  bool is_valid = 6;
+  int32 laps_count = 7;
+  bool is_start_line = 8;
+  int32 split_time = 9;
+}
+
+message UpdateVisualDamages {
+  PGUID car_id = 1;
+  repeated float visual_damages = 2;
+}
+
+message UpdateCarStarter {
+  PGUID car_id = 1;
+}
+
+message UpdateDirtStatus {
+  PGUID car_id = 1;
+  fixed64 dirt_values = 2;
+}
+
+message UpdateTyreStatus {
+  PGUID car_id = 1;
+  fixed64 tyre_dirt_and_wetness = 2;
+  fixed64 tyre_dmg_and_wear = 3;
+}
+
+message NetcodeCarUpdateData_DELETE {
+  fixed32 paket_id = 1;
+  double client_now = 2;
+  TransformData body_transform = 4;
+  float steer = 5;
+  float throttle = 6;
+  float brake = 7;
+  sfixed32 gear = 8;
+  fixed32 rpm = 9;
+  sfixed32 speed_kmh = 10;
+  Vector3Data velocity = 11;
+  repeated float tyre_angular_speed = 12;
+  fixed32 car_number = 13;
+  float n_pos = 15;
+}
+
+message NetcodeCarPhysicsUpdateData_DELETE {
+  NetcodeCarUpdateData_DELETE net_data = 1;
+  PGUID car_id = 2;
+}
+
+message NetcodeCarUpdateBroadcast_DELETE {
+  double target_ping = 1;
+  double netcar_ping = 2;
+  NetcodeCarUpdateData_DELETE netcar_data = 3;
+  double local_client_now = 4;
+}
+
+message WeatherDataUpdate {
+  double server_time_from = 1;
+  double server_time_to = 2;
+  WeatherData weather_from = 3;
+  WeatherData weather_to = 4;
+}
+
+message RequestDateTimeJumpCommand {
+  int64 forward_seconds = 1;
+  float transition_seconds = 2;
+  int32 time_mult_hack = 3;
+}
+
+message SessionConfiguration {
+  int32 event_id = 1;
+  int32 event_season = 2;
+  string display_name = 3;
+  GameModeConfigurationData gamemode = 6;
+  bool hide_in_event_list = 4;
+}
+
+message TriggerEvent {
+  google.protobuf.Any payload = 1;
+}
+
+message AllowedCar {
+  string car_name = 1;
+  int32 ballast = 2;
+  float restrictor = 3;
+}
+
+message RuntimeZoneData {
+  ZoneGeometricData geometric_data = 1;
+  double timestamp = 2;
+  bool in_use = 3;
+  int32 intersections = 4;
+  int32 zone_index = 5;
+  ZoneData.Instance zone_instance = 6;
+}
+
+message ConnectionClosedEvent {
+}
+
+message PlatformUserDataRequest {
+  string user_id = 1;
+}
+
+message LoadingMultiplayerSession {
+  MultiplayerServerListEntry server_entry = 1;
+}
+
+message MultiplayerServerListEntry {
+  string server_name = 1;
+  string server_ip = 2;
+  int32 server_tcp_port = 3;
+  int32 server_udp_port = 4;
+  string server_id = 5;
+  bool driver_password = 6;
+  bool spectator_password = 7;
+  int32 max_players = 8;
+  int32 game_mode_type = 10;
+  string event_name = 11;
+  string current_session = 12;
+  string track = 13;
+  string layout = 14;
+  string time_of_day = 15;
+  int32 session_ends_in = 17;
+  int32 safety_requirements = 20;
+  int32 level_requirements = 21;
+  MultiplayerServerListSessionType type = 31;
+  repeated string friends = 32;
+  repeated string players = 33;
+  repeated string allowed_cars_list = 34;
+  repeated AllowedCar allowed_cars_list_full = 36;
+  int32 ping = 35;
+  GameModeSelectionWeatherType weather_type = 40;
+  GameModeSelectionWeatherBehaviour weather_behaviour = 41;
+  InitialGrip initial_grip = 42;
+  GameModeSelectionDuration duration_type = 43;
+  int32 duration = 44;
+  float ambient_temperature = 45;
+  float pi_min = 46;
+  float pi_max = 47;
+  repeated bool property_1 = 48;
+  repeated bool property_2 = 49;
+  repeated bool property_3 = 50;
+  bool is_car_eligible = 51;
+  int32 protocol_version = 52;
+  int32 server_version = 53;
+  bool is_tuning_allowed = 54;
+  map<string, string> entry_list = 55;
+  SHADigests digest_list = 56;
+  SHACarDigests cars_sha_list = 57;
+  reserved 16 to 16;
+  reserved 22 to 22;
+  reserved 30 to 30;
+}
+
+message MultiplayerServerListUpdateEvent {
+  repeated MultiplayerServerListEntry servers = 1;
+}
+
+message MultiplayerServerListRequestRegisterServer {
+  MultiplayerServerListEntry server_entry = 1;
+}
+
+message MultiplayerServerListResponseRegisterServer {
+  BackendResponse response = 1;
+  string server_ip = 2;
+  string server_id = 3;
+}
+
+message MultiplayerServerListRequestUpdateServer {
+  MultiplayerServerListEntry server_entry = 1;
+}
+
+message MultiplayerServerListResponseUpdateServer {
+  BackendResponse response = 1;
+  string server_ip = 2;
+  string server_id = 3;
+}
+
+message BackendRequestSeasonGuid {
+  SeasonDefinition season_definition = 1;
+}
+
+message BackendResponseSeasonGuid {
+  BackendResponse response = 1;
+  PGUID season_guid = 2;
+}
+
+message BackendRequestUpdateLeaderboard {
+  PGUID season_guid = 1;
+  int32 event_index = 2;
+  int32 session_index = 3;
+  BackendLeaderboardSessionType session_type = 4;
+  int32 split_count = 5;
+  repeated BackendLeaderboardShortcut shortcuts = 10;
+  repeated BackendLeaderboardLine lines = 11;
+}
+
+message BackendResponseUpdateLeaderboard {
+  BackendResponse response = 1;
+}
+
+message PlatformChangeTimeMultiplier {
+  float time = 1;
+  RequestServerResult result = 2;
+}
+
+message NetcodeDebug {
+  bool show_prediction_window = 1;
+  bool show_virtual_ai_controls = 2;
+  bool show_simulation_window = 4;
+}
+
+message Netcode {
+  message VirtualAI {
+    message SpawnVAICommand {
+      PGUID car_id_sender = 1;
+      string carfinalstate_preset_filename = 2;
+      CarSpawnData car_spawn_data = 3;
+      PGUID optional_driver_id = 4;
+    }
+    message DespawnVAICommand {
+      PGUID car_id_sender = 1;
+      PGUID car_id_to_despawn = 2;
+    }
+    message SuppressUDPTrafficCommand {
+      PGUID car_id_sender = 1;
+      PGUID car_id_to_change = 2;
+      float seconds_to_suppress = 3;
+    }
+    message UpdateArtificalLatencyMessage {
+      PGUID car_id_sender = 1;
+      PGUID car_id_to_change = 2;
+      int32 artificial_latency_ms = 3;
+      int32 artificial_jtter_ms = 4;
+    }
+  }
+}
+
+message BackendDisableClientCommand {
+  enum TypeEnum {
+    BackendDisableClientCommand_None = 0;
+    BackendDisableClientCommand_Disable_Backend = 1;
+    BackendDisableClientCommand_Exit_Process = 2;
+  }
+  BackendDisableClientCommand.TypeEnum type = 1;
+  string message = 2;
+}
+
+message BackendHeartbeat {
+  bool is_empty = 1;
+  int32 tcp_port = 2;
+  int32 udp_port = 3;
+}

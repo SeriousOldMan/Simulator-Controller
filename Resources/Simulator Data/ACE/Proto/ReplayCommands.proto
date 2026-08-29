@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+enum ReplayCommandsResponse {
+  ReplayCommandsResponse_OK = 0;
+  ReplayCommandsResponse_PositionNotValid = 1;
+  ReplayCommandsResponse_InvalidReplay = 2;
+  ReplayResponse_CRITICAL_ERROR = 100;
+}
+
+enum ReplayCommandsMarkerType {
+  ReplayMarkerTypeAll = 0;
+  ReplayMarkerTypeLaps = 1;
+  ReplayMarkerTypeIncidents = 2;
+}
+
+message ReplayRequestTogglePlay {
+  bool play = 1;
+}
+
+message ReplayRequestQuit {
+  bool im_empty = 1;
+}
+
+message ReplayRequestGoToPosition {
+  int32 msec = 1;
+}
+
+message ReplayResponseTogglePlay {
+  ReplayCommandsResponse response = 1;
+  bool is_playing = 2;
+}
+
+message ReplayResponseQuit {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayResponseGoToPosition {
+  ReplayCommandsResponse response = 1;
+  int32 msec = 2;
+}
+
+message ReplayRequestSave {
+  string filename = 1;
+}
+
+message ReplayResponseSave {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayRequestLoad {
+  string filename = 1;
+}
+
+message ReplayResponseLoad {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayRequestSetTimeMultiplier {
+  float time_mutiplayer = 1;
+  bool pause = 2;
+}
+
+message ReplayResponseSetTimeMultiplier {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayRequestToggleReverse {
+  bool reverse = 1;
+}
+
+message ReplayResponseToggleReverse {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayRequestNextCamera {
+  bool next = 1;
+  bool keep_mode = 2;
+}
+
+message ReplayResponseNextCamera {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayRequestNextCar {
+  bool next = 1;
+}
+
+message ReplayResponseNextCar {
+  ReplayCommandsResponse response = 1;
+}
+
+message ReplayRequestFocusedCarMarker {
+  ReplayCommandsMarkerType request_type = 1;
+}
+
+message ReplayLapMarker {
+  int32 lap_number = 1;
+  int32 timestamp = 2;
+}
+
+message ReplayIncidentMarker {
+  int32 is_empty = 1;
+  int32 timestamp = 2;
+}
+
+message ReplayResponseFocusedCarMarker {
+  repeated ReplayLapMarker laps = 1;
+  repeated ReplayIncidentMarker incidents = 2;
+  ReplayCommandsResponse response = 3;
+}
+
+message ReplayCommands {
+  ReplayRequestTogglePlay request_toggle_play = 1;
+  ReplayRequestQuit request_quit = 2;
+  ReplayRequestGoToPosition request_go_to_position = 3;
+  ReplayResponseTogglePlay response_toggle_play = 1000;
+  ReplayResponseQuit response_quit = 1001;
+  ReplayResponseGoToPosition response_go_to_position = 1002;
+  ReplayRequestSave request_save = 4;
+  ReplayResponseSave response_save = 1003;
+  ReplayRequestLoad request_load = 5;
+  ReplayResponseLoad response_load = 1004;
+  ReplayRequestSetTimeMultiplier request_set_time_multiplier = 6;
+  ReplayResponseSetTimeMultiplier response_set_time_multiplier = 1005;
+  ReplayRequestToggleReverse request_toggle_reverse = 7;
+  ReplayResponseToggleReverse response_toggle_reverse = 1006;
+  ReplayRequestNextCamera request_change_camera = 9;
+  ReplayResponseNextCamera response_change_camera = 1008;
+  ReplayRequestNextCar request_change_car = 10;
+  ReplayResponseNextCar response_change_car = 1009;
+  ReplayRequestFocusedCarMarker request_markers = 11;
+  ReplayResponseFocusedCarMarker response_markers = 1010;
+}

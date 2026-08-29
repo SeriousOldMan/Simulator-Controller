@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+
+enum DriftChallengeSectionResult {
+  DriftChallengeSectionResult_NO_DATA = 0;
+  DriftChallengeSectionResult_ACTIVE = 1;
+  DriftChallengeSectionResult_FAILED = 2;
+  DriftChallengeSectionResult_SUCCESSFUL = 3;
+}
+
+message PlatformDriftChallengeSection {
+  int32 sectionId = 1;
+  DriftChallengeSectionResult result = 2;
+  float driftPoints = 3;
+}
+
+message PlatformDriftChallengeSectionCollection {
+  repeated PlatformDriftChallengeSection sections = 1;
+  int32 totalDriftPoints = 2;
+  float progress = 3;
+  int32 currentMultiplier = 4;
+}
+
+message PlatformDriftChallengeGameCarState {
+  PlatformDriftChallengeSectionCollection sectionCollection = 1;
+  float currentDriftAngle = 5;
+  float currentDriftAngleSmooth = 6;
+}
+
+message PlatformDriftChallengeLeaderboardLine {
+  string name = 1;
+  int32 driftPoints = 2;
+  repeated PlatformDriftChallengeSection sections = 3;
+}
+
+message PlatformDriftChallengeLeaderboard {
+  repeated PlatformDriftChallengeLeaderboardLine lines = 1;
+}
+
+message PlatformDriftChallengeGameState {
+  PlatformDriftChallengeLeaderboard leaderboard = 1;
+}
+
+message PlatformDriftChallengeGameCarDriftCompletedMessage {
+  PGUID car_id = 1;
+  PlatformDriftChallengeSection section_completed = 2;
+}
+
+message PlatformDriftChallengeLeaderboardUpdateMessage {
+  PlatformDriftChallengeLeaderboard leaderboard = 1;
+}
+
+message PlatformDriftChallengeRequestRestartMessage {
+}
+
+message PlatformDriftChallengeResetGameStateMessage {
+}
+
+message GamemodeDriftChallengeData {
+}
+
+message DriftChallengeExitMessage {
+}

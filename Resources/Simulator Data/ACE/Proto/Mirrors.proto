@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+message CarMirrorInfo {
+  enum Type {
+    Center = 0;
+    Left = 1;
+    Right = 2;
+  }
+  CarMirrorInfo.Type type = 1;
+  float yaw = 6;
+  float pitch = 7;
+  float fov = 8;
+  float vr_yaw = 10;
+  float vr_pitch = 11;
+  float vr_fov = 12;
+  bool is_disabled = 13;
+}
+
+message RearCameraInfo {
+  float yaw = 2;
+  float pitch = 3;
+  float fov = 4;
+  bool is_disabled = 5;
+}
+
+message CarMirrorsInfo {
+  repeated CarMirrorInfo mirrors = 1;
+  RearCameraInfo rearCamera = 2;
+}
+
+message VirtualMirrorSettings {
+  bool enabled = 1;
+  float scale = 2;
+  float offset_horizontal = 3;
+  float offset_vertical = 4;
+}
+
+message CarMirrorsUserSettings {
+  map<string, CarMirrorsInfo> mapCarMirrorData = 1;
+  float singleModeFov = 2;
+  VirtualMirrorSettings virtualMirror = 3;
+}

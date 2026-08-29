@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "Math.proto";
+import "LogicScene.proto";
+
+message NoiseParams {
+  float frequency = 1;
+  float density = 3;
+  float sharpness = 4;
+  reserved 2 to 2;
+}
+
+message TerrainBuildSettings {
+  int32 quadrant_size_npot = 1;
+  int32 splatmap_size_npot = 2;
+  int32 satview_runtime_size_npot = 5;
+  int32 satview_editor_size_npot = 6;
+  int32 satview_reference_size_npot = 7;
+  int32 rendertile_size_npot = 3;
+  reserved 4 to 4;
+}
+
+message TerrainRenderSettings {
+  float lod_factor = 1;
+  float world_uv_scale = 5;
+  int32 vegetation_splatmap_lod = 6;
+  int32 ignore_holes_from_lod = 7;
+  bool hide_ground = 8;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 4 to 4;
+}
+
+message TerrainPhysicsSettings {
+  bool disable_ground = 1;
+}
+
+message TerrainGisData {
+  string gis_elevation_folder = 1;
+  string gis_digital_ortho_photos_folder = 4;
+  string gis_parcels_path = 2;
+  string gis_buildings_path = 3;
+}
+
+message TerrainSplatmapData {
+  enum SplatmapMaskChannel {
+    SplatmapMaskChannel_Red = 0;
+    SplatmapMaskChannel_Green = 1;
+    SplatmapMaskChannel_Blue = 2;
+    SplatmapMaskChannel_Alpha = 3;
+  }
+  message SplatmapMaterial {
+    string name = 1;
+    string material = 2;
+    string primary_debug_material = 3;
+    string secondary_debug_material = 4;
+    SurfaceDefinitionData surface = 5;
+  }
+  message SplatmapParcel {
+    string parcel_category = 1;
+    int32 material_index = 2;
+  }
+  message SplatmapMesh {
+    string container_path = 1;
+    int32 material_index = 2;
+    bool apply_materials = 5;
+    bool apply_elevation = 3;
+    bool apply_holes = 4;
+    bool apply_clear_vegetation = 6;
+    string material_name = 7;
+  }
+  message SplatmapMask {
+    string image_path = 1;
+    TerrainSplatmapData.SplatmapMaskChannel channel = 11;
+    int32 channel_minimum_value = 12;
+    int32 channel_maximum_value = 13;
+    int32 top_in_quadrants = 6;
+    int32 left_in_quadrants = 7;
+    int32 width_in_quadrants = 8;
+    int32 height_in_quadrants = 9;
+    int32 material_index = 2;
+    bool apply_materials = 10;
+    bool apply_holes = 5;
+    bool apply_clear_vegetation = 14;
+    string material_name = 15;
+    reserved 3 to 3;
+    reserved 4 to 4;
+  }
+  repeated TerrainSplatmapData.SplatmapMaterial materials = 6;
+  repeated TerrainSplatmapData.SplatmapParcel splatmap_parcels = 7;
+  repeated TerrainSplatmapData.SplatmapMesh splatmap_meshes = 2;
+  repeated TerrainSplatmapData.SplatmapMask splatmap_masks = 3;
+  reserved 1 to 1;
+  reserved 4 to 4;
+  reserved 5 to 5;
+}
+
+message TerrainVegatationData {
+  message VegetationLayer {
+    string name = 1;
+    bool enabled = 2;
+    repeated string meshes = 4;
+    string collider = 19;
+    int32 lod = 5;
+    float spacing = 6;
+    bool direction_on_normal = 16;
+    bool limit_by_slope = 17;
+    bool randomize_presence = 10;
+    bool randomize_rotation = 7;
+    bool randomize_scale = 8;
+    bool randomize_tint = 12;
+    NoiseParams presence_noise = 11;
+    Vector2Data scale_random_bounds = 9;
+    Vector2Data slope_limits = 18;
+    NoiseParams tint_noise = 13;
+    Vector4Data tint_color_min = 14;
+    Vector4Data tint_color_max = 15;
+    reserved 3 to 3;
+  }
+  message MaterialVegetation {
+    int32 material_id = 1;
+    repeated TerrainVegatationData.VegetationLayer layers = 2;
+    string material_name = 3;
+  }
+  message Collider {
+    string name = 1;
+    ColliderData collider = 2;
+  }
+  repeated TerrainVegatationData.MaterialVegetation material_vegetations = 2;
+  repeated TerrainVegatationData.Collider colliders = 4;
+  reserved 1 to 1;
+}
+
+message TerrainDataNew {
+  TerrainBuildSettings build_settings = 1;
+  TerrainRenderSettings render_settings = 5;
+  TerrainPhysicsSettings physics_settings = 7;
+  TerrainGisData gis = 2;
+  TerrainSplatmapData splatmap = 4;
+  TerrainVegatationData vegetation = 6;
+  reserved 3 to 3;
+}

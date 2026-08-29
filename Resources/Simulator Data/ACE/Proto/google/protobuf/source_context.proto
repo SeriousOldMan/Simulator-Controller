@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package google.protobuf;
+
+option java_package = "com.google.protobuf";
+message SourceContext {
+  string file_name = 1;
+}

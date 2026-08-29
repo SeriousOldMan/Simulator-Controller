@@ -2,7 +2,7 @@
 Version=7.2.3.0-dev
 Target=7.2.3.0-release
 Date=08/28/26
-Download=Filter for unknown LMU cars in database synchronization, Migrated to AHK 2.1-Alpha.31
+Download=Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31
 Changes=Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMU, Added meta data for 296 EVO for LMU
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.0.3
 [Release]

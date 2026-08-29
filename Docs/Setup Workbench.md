@@ -518,9 +518,9 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
   
     This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file. Each step will correspond to an increment by **1** in the underlying raw value.
 
-  - **DecimalHandler(baseValue, increment, precision, minValue, maxValue)**
+  - **DecimalHandler(baseValue, increment, places, minValue, maxValue)**
   
-    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed.
+    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *places* defines, how many places after the decimal point are considered and displayed.
 	
 	Example:
 	
@@ -528,19 +528,20 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	will create a continuous range of -35 to 1 in the simulator specific setup file, where -35 equals the display value -3.5 and 1 equals the display value 0.1.
 
-  - **FloatHandler(increment, factor, precision, minValue, maxValue)**
   
-    This handler must be used, when the values in the setup file are stored as floating point numbers, which is currently the case for *Assetto Corsa EVO*. *increment* defines the step between each display value, while *factor* can be used to change the relationship of the internal value to the display value:
+  - **FloatHandler(increment, multiplier, places, minValue, maxValue)**
+    
+	This handler must be used, when the values in the setup file are stored as floating point numbers, which is the case for *Assetto Corsa EVO*, for example. *increment* defines the step between each display value, while *multiplier* can be used to change the relationship of the internal value to the display value:
 	
-		*display value* = *internal value* \* *factor*
+		display_value = internal_value * multiplier
 		
-	*precision* defines, how many places after the decimal point are considered and displayed.
+	*places* defines, how many places after the decimal point are considered and displayed.
 	
 	Example:
 	
 		FloatHandler(0.25, 1, 2, -3.5, 1.0)
 	
-	will create a range from -3.5 to 1.0 with an increment of 0.25. The values are display with two digits after the decimal point, for example -1.75.
+	will create a range from -3.5 to 1.0 with an increment of 0.25. The values are display with two digits after the decimal point, for example -1.75. The value is stored as is in the setup file, becuase the *multiplier* has been specified as **1**. If the value range in the setup file is -350 to 100 for example, the multiplier must be specified as **0.01**
 
   - **EnumerationHandler(baseValue, increment, value1, value2, ...)**
   

@@ -292,7 +292,7 @@ Sets the display format for the given format type. *format* must be one of "#.##
 Calls a given function with supplied parameters while the supplied format choice is active. *format* must be one of "#.##" or "#,##" for numbers or one of "[H:]M:S.##" or "[H:]M:S,##" for time values.
 
 #### *displayValue(type :: OneOf("Float", "Time"), value :: Number, ...)*
-Converts an internal value of the given *type* to its display representation, which is always a string. For floating point numbers, this might involve a change of the floating point character. For time values, which must be supplied as seconds with an optional fraction, the conversion might be even more complex. For floating point number you may supply the precision for an optional rounding step.
+Converts an internal value of the given *type* to its display representation, which is always a string. For floating point numbers, this might involve a change of the floating point character. For time values, which must be supplied as seconds with an optional fraction, the conversion might be even more complex. For floating point number you may supply the number of decimal places for an optional rounding step.
 
 #### *internalValue(type :: OneOf("Float", "Time"), value :: String)*
 Converts a display representation of the given *type* to its internal value, which is always a number.

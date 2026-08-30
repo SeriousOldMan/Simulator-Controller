@@ -509,14 +509,20 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
   - **RawHandler(increment, minValue, maxValue)**
   
     This handler implements a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+	
+	*increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
 
   - **ClicksHandler(minValue, maxValue)**
   
     Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0** in the underlying simulator specific setup file.
+	
+	*minValue* defaults to **0** and *maxValue* default to a reasonably large value.
 
   - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   
-    This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file. Each step will correspond to an increment by **1** in the underlying raw value.
+    This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file. Each step will correspond to an increment by **1** in the internal raw value.
+	
+	*baseValue* defaults to **0**, *increment* to **1**, *minValue* and *maxValue* to reasonably large values.
 
   - **DecimalHandler(baseValue, increment, places, minValue, maxValue)**
   
@@ -527,9 +533,11 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 		DecimalHandler(0, 0.1, 1, -3.5, 0.1)
 	
 	will create a continuous range of -35 to 1 in the simulator specific setup file, where -35 equals the display value -3.5 and 1 equals the display value 0.1.
+	
+	*baseValue* defaults to **0.0**, *increment* to **1.0**, *places* to **0**, *minValue* and *maxValue* to reasonably large values.
 
   
-  - **FloatHandler(increment, multiplier, places, minValue, maxValue)**
+  - **FloatHandler(increment, places, minValue, maxValue, base, step)**
     
 	This handler must be used, when the values in the setup file are stored as floating point numbers, which is the case for *Assetto Corsa EVO*, for example. *increment* defines the step between each display value, while *multiplier* can be used to change the relationship of the internal value to the display value:
 	
@@ -541,17 +549,23 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 		FloatHandler(0.25, 1, 2, -3.5, 1.0)
 	
-	will create a range from -3.5 to 1.0 with an increment of 0.25. The values are display with two digits after the decimal point, for example -1.75. The value is stored as is in the setup file, becuase the *multiplier* has been specified as **1**. If the value range in the setup file is -350 to 100 for example, the multiplier must be specified as **0.01**
+	will create a range from -3.5 to 1.0 with an increment of 0.25. The values are display with two digits after the decimal point, for example -1.75. The value is stored as is in the setup file, becuase the *multiplier* has been specified as **1**. If the value range in the setup file is -350 to 100 for example, the multiplier must be specified as **0.01**.
+	
+	*base* is optional and defaults to **0** and **step** defines the increment of the internal value for each full integer of the display value. Default here is **1**.
+	
+	Example: You have a range of display values from **1** to **10**. They should map internally to **60000** to **700000**. *base* must be **58000**, because the lowest display value is **1**, not **0**. *step* must be **0.0005**, because **1** / **0.0005** is **2000**, the required increment.
 
-  - **EnumerationHandler(baseValue, increment, value1, value2, ...)**
+  - **EnumerationHandler(baseValue, step, value1, value2, ...)**
   
-    Using this handler, you can define a set of discrete values, which will then be mapped to a value in the underlying simulator specific setup file. *baseValue* will be used as the anchor, which corresponds to the first *value1* and *increment* specify the change of the underlying value for each step in supplied list of discrete values.
+    Using this handler, you can define a set of discrete values, which will then be mapped to a value in the underlying simulator specific setup file. *baseValue* will be used as the anchor, which corresponds to the first *value1* and *step* specify the change of the internal value for each step in supplied list of discrete values.
 	
 	Example:
 	
 		Electronics.MGUK.Delivery=EnumerationHandler(0, 1, No Deploy, Build, Low, Balanced, High, Attack)
 	
 	defines six discrete values. *No Deploy* will be mapped to **0** and *Attack* will be mapped to **5**.
+	
+	*baseValue* defaults to **0** and *step* to **1**.
 
   - **ScriptHandler(scriptFileName, arg1, arg2, ...)**
   

@@ -2614,7 +2614,7 @@ class DecimalHandler extends DiscreteValuesHandler {
 class FloatHandler extends NumberHandler {
 	iIncrement := false
 	iPrecision := false
-	iFactor := false
+	iStep := false
 
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
@@ -2633,9 +2633,15 @@ class FloatHandler extends NumberHandler {
 		}
 	}
 
-	Factor {
+	Step {
 		Get {
-			return this.iFactor
+			return this.iStep
+		}
+	}
+
+	Base {
+		Get {
+			return this.iBase
 		}
 	}
 
@@ -2657,13 +2663,16 @@ class FloatHandler extends NumberHandler {
 		}
 	}
 
-	__New(increment := 1, factor := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined) {
+	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined, base := 0, step := 1) {
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
+
 		this.iIncrement := increment
 		this.iPrecision := precision
-		this.iFactor := factor
+
+		this.iBase := base
+		this.iStep := step
 	}
 
 	formatValue(value) {
@@ -2671,11 +2680,11 @@ class FloatHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
-		return this.formatValue(rawValue * this.Factor)
+		return this.formatValue((rawValue - this.Base) * this.Step)
 	}
 
 	convertToRawValue(displayValue) {
-		return (displayValue / this.Factor)
+		return ((displayValue / this.Step) + this.Base)
 	}
 
 	increaseValue(displayValue) {

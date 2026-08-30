@@ -15,6 +15,7 @@
 				 (Prove: addSettings("Assetto Corsa EVO", *, *)),
 				 (Prove: removeSettings("Assetto Corsa EVO", *, [Aero.Splitter.Front,
 																 Brake.Duct.Front, Brake.Duct.Rear,
+																 Geometry.Caster.Left, Geometry.Caster.Right,
 																 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery,
 																 Electronics.MGUH.Mode,
 																 Electronics.Engine.Brake, Electronics.Engine.Limiter,

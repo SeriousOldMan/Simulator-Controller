@@ -27,7 +27,7 @@
   - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
   - A new article has been written for the *News* system.
   - Added car meta data for the Ferrari 206 LMGT3 EVO, which was *forgotten* to be included and therefore had no tyre information.
-  - New car models for "Setup Workbench" :
+  - New car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - Ferrari 296 LMGT3 Evo (has been forgotten on release, sorry)
     - Automobilista 2 (by @inthebagbud UK)
@@ -65,9 +65,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*- For now, only one car is supported, the Porsche 992 Cup. More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
+  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*- For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
   - Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*. Tracks with UTF coding errors are suppressed as well.
   - [Internal] Migrated to AHK 2.1-alpha.31.
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Porsche 911 GT3 Cup (992)
 
 # Release history
 

@@ -36,22 +36,17 @@ class ACESetup extends FileSetup {
 
 	FileName[original := false] {
 		Set {
-			local jsonFile, name
-
-			this.JSONFileName[original] := false
+			local jsonFile
 
 			if value {
-				SplitPath(value, , , , &name)
+				jsonFile := temporaryFileName("Setup", "json")
 
-				jsonFile := (kTempDirectory . "Setup Workbench\Setups\" . name . ".json")
-
-				while FileExist(jsonFile)
-					jsonFile := (kTempDirectory . "Setup Workbench\Setups\" . name . " (" . A_Index . ").json")
-
-				this.JSONFileName[original] := jsonFile
-
-				this.Editor.convert2JSON(jsonFile, value)
+				ACESetup.convert2JSON(jsonFile, value)
 			}
+			else
+				jsonFile := false
+
+			this.JSONFileName[original] := jsonFile
 
 			return (super.FileName[original] := value)
 		}
@@ -64,20 +59,11 @@ class ACESetup extends FileSetup {
 		}
 
 		Set {
-			local fileName := this.JSONFileName[original]
-
-			if (value && fileName)
-				deleteFile(fileName)
-
 			return (original ? (this.iOriginalJSONFileName := value) : (this.iModifiedJSONFileName := value))
 		}
 	}
 
 	__New(editor, originalFileName := false, modifiedFileName := false) {
-		deleteDirectory(kTempDirectory . "Setup Workbench\Setups")
-
-		DirCreate(kTempDirectory . "Setup Workbench\Setups")
-
 		super.__New(editor, originalFileName, modifiedFileName, false)
 
 		this.FileName[true] := originalFileName
@@ -93,12 +79,31 @@ class ACESetup extends FileSetup {
 		this.iModifiedData := JSON.parse(this.Setup[false])
 	}
 
-	__Delete() {
-		if this.JSONFileName[true]
-			deleteFile(this.JSONFileName[true])
+	static convert2JSON(jsonFile, protoFile) {
+		local setup
 
-		if this.JSONFileName[false]
-			deleteFile(this.JSONFileName[false])
+		try {
+			RunWait("`"" . kBinariesDirectory . "ProtoBuf\buf.exe`" convert CarSetup.proto --type=CarSetupData --from=`"" . protoFile . "`" --to=`"" . jsonFile . "`"", kResourcesDirectory . "Simulator Data\ACE\Proto", "Hide")
+
+			setup := JSON.parse(FileRead(jsonFile))
+
+			deleteFile(jsonFile)
+
+			FileAppend(JSON.print(setup, "  "), jsonFile)
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
+	}
+
+	static convert2ProtoBuf(protoFile, jsonFile) {
+		try {
+			RunWait("`"" . kBinariesDirectory . "ProtoBuf\buf.exe`" convert CarSetup.proto --type=CarSetupData --from=`"" . jsonFile . "`" --to=`"" . protoFile . "`"", kResourcesDirectory . "Simulator Data\ACE\Proto", "Hide")
+
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	getValue(setting, original := false, default := false) {
@@ -296,7 +301,7 @@ class ACESetupEditor extends FileSetupEditor {
 
 				FileAppend(text, jsonFile)
 
-				this.convert2ProtoBuf(fileName, jsonFile)
+				ACESetup.convert2ProtoBuf(fileName, jsonFile)
 			}
 			finally {
 				if !isDebug()
@@ -309,33 +314,6 @@ class ACESetupEditor extends FileSetupEditor {
 		}
 		else
 			return false
-	}
-
-	convert2JSON(jsonFile, protoFile) {
-		local setup
-
-		try {
-			RunWait("`"" . kBinariesDirectory . "ProtoBuf\buf.exe`" convert CarSetup.proto --type=CarSetupData --from=`"" . protoFile . "`" --to=`"" . jsonFile . "`"", kResourcesDirectory . "Simulator Data\ACE\Proto", "Hide")
-
-			setup := JSON.parse(FileRead(jsonFile))
-
-			deleteFile(jsonFile)
-
-			FileAppend(JSON.print(setup, "  "), jsonFile)
-		}
-		catch Any as exception {
-			logError(exception, true)
-		}
-	}
-
-	convert2ProtoBuf(protoFile, jsonFile) {
-		try {
-			RunWait("`"" . kBinariesDirectory . "ProtoBuf\buf.exe`" convert CarSetup.proto --type=CarSetupData --from=`"" . jsonFile . "`" --to=`"" . protoFile . "`"", kResourcesDirectory . "Simulator Data\ACE\Proto", "Hide")
-
-		}
-		catch Any as exception {
-			logError(exception, true)
-		}
 	}
 }
 
@@ -373,7 +351,7 @@ class ACESetupComparator extends FileSetupComparator {
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
-			theSetup := ACCSetup(this, fileName)
+			theSetup := ACESetup(this, fileName)
 
 			if load {
 				if (type = "A")

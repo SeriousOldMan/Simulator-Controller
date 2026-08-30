@@ -17,6 +17,8 @@
 				 (Prove: removeSettings("Assetto Corsa EVO", "Ferrari SF-25",
 										[Brake.Pressure,
 										 Geometry.Caster.Left, Geometry.Caster.Right,
+										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
+										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,

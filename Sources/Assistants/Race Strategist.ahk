@@ -219,7 +219,7 @@ startupRaceStrategist() {
 		showLogo(strategistName)
 
 	if remotePID
-		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kInterruptPriority))
 
 	startupProcess()
 }
@@ -234,9 +234,9 @@ shutdownRaceStrategist(shutdown := false) {
 		ExitApp(0)
 
 	if (RaceStrategist.Instance.Session == kSessionFinished)
-		Task.startTask(shutdownRaceStrategist.Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownRaceStrategist.Bind(true), 10000, kInterruptPriority)
 	else
-		Task.startTask(shutdownRaceStrategist, 1000, kLowPriority)
+		Task.startTask(shutdownRaceStrategist, 1000, kInterruptPriority)
 
 	return false
 }
@@ -246,7 +246,7 @@ handleStrategistMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask(shutdownRaceStrategist, 20000, kLowPriority)
+			Task.startTask(shutdownRaceStrategist, 20000, kInterruptPriority)
 
 			return true
 		}
@@ -254,7 +254,7 @@ handleStrategistMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceStrategist.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask(shutdownRaceStrategist, 20000, kLowPriority)
+		Task.startTask(shutdownRaceStrategist, 20000, kInterruptPriority)
 	else
 		return withProtection(ObjBindMethod(RaceStrategist.Instance, data))
 }

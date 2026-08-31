@@ -219,7 +219,7 @@ startupRaceEngineer() {
 		showLogo(engineerName)
 
 	if remotePID
-		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kInterruptPriority))
 
 	startupProcess()
 }
@@ -234,9 +234,9 @@ shutdownRaceEngineer(shutdown := false) {
 		ExitApp(0)
 
 	if (RaceEngineer.Instance.Session == kSessionFinished)
-		Task.startTask(shutdownRaceEngineer.Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownRaceEngineer.Bind(true), 10000, kInterruptPriority)
 	else
-		Task.startTask(shutdownRaceEngineer, 1000, kLowPriority)
+		Task.startTask(shutdownRaceEngineer, 1000, kInterruptPriority)
 
 	return false
 }
@@ -246,7 +246,7 @@ handleEngineerMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask(shutdownRaceEngineer, 20000, kLowPriority)
+			Task.startTask(shutdownRaceEngineer, 20000, kInterruptPriority)
 
 			return true
 		}
@@ -254,7 +254,7 @@ handleEngineerMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceEngineer.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask(shutdownRaceEngineer, 20000, kLowPriority)
+		Task.startTask(shutdownRaceEngineer, 20000, kInterruptPriority)
 	else
 		return withProtection(ObjBindMethod(RaceEngineer.Instance, data))
 }

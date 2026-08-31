@@ -3325,6 +3325,7 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	saveSessionInfo(simulator, car, track, lapNumber, sessionInfo) {
+		local start := A_TickCount
 		local fileName
 
 		if this.RemoteHandler {
@@ -3334,6 +3335,8 @@ class RaceAssistant extends ConfigurationItem {
 
 			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
 		}
+
+		logMessage(kLogWarn, "Save session info took " . (A_TickCount - start) . " ms...")
 	}
 
 	createSessionKnowledge(lapNumber) {

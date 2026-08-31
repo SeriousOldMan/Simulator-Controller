@@ -219,7 +219,7 @@ startupDrivingCoach() {
 		showLogo(coachName)
 
 	if remotePID
-		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kInterruptPriority))
 
 	startupProcess()
 }
@@ -234,9 +234,9 @@ shutdownDrivingCoach(shutdown := false) {
 		ExitApp(0)
 
 	if (DrivingCoach.Instance.Session == kSessionFinished)
-		Task.startTask(shutdownDrivingCoach.Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownDrivingCoach.Bind(true), 10000, kInterruptPriority)
 	else
-		Task.startTask(shutdownDrivingCoach, 1000, kLowPriority)
+		Task.startTask(shutdownDrivingCoach, 1000, kInterruptPriority)
 
 	return false
 }
@@ -246,7 +246,7 @@ handleCoachMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask(shutdownDrivingCoach, 20000, kLowPriority)
+			Task.startTask(shutdownDrivingCoach, 20000, kInterruptPriority)
 
 			return true
 		}
@@ -254,7 +254,7 @@ handleCoachMessage(category, data) {
 			return withProtection(ObjBindMethod(DrivingCoach.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask(shutdownDrivingCoach, 20000, kLowPriority)
+		Task.startTask(shutdownDrivingCoach, 20000, kInterruptPriority)
 	else
 		return withProtection(ObjBindMethod(DrivingCoach.Instance, data))
 }

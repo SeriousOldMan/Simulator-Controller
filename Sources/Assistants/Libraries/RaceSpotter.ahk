@@ -3451,7 +3451,8 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 		}
 
-		logMessage(kLogWarn, (update ? "Full " : "Reduced ") . "update driver took " . (A_TickCount - start) . " ms...")
+		if isDebug()
+			logMessage(kLogWarn, "Update driver (" . (update ? "Full" : "Reduced") . ") took " . (A_TickCount - start) . " ms...")
 	}
 
 	pendingAlert(alert, match := false) {
@@ -4228,7 +4229,6 @@ class RaceSpotter extends GridRaceAssistant {
 
 	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
 		local knowledgeBase := this.KnowledgeBase
-		local start := A_TickCount
 		local sessionInfo := super.createSessionInfo(simulator, car, track, lapNumber, valid, data)
 		local position, classPosition
 
@@ -4251,8 +4251,6 @@ class RaceSpotter extends GridRaceAssistant {
 			if this.BestTopSpeed
 				setMultiMapValue(sessionInfo, "Stint", "Speed.Best", Round(this.BestTopSpeed, 1))
 		}
-
-		logMessage(kLogWarn, "Create session info took " . (A_TickCount - start) . " ms...")
 
 		return sessionInfo
 	}
@@ -4322,7 +4320,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		result := super.addLap(lapNumber, &data)
 
-		logMessage(kLogWarn, "General add lap took " . (A_TickCount - start) . " ms...")
+		if isDebug()
+			logMessage(kLogWarn, "Add Assistant lap took " . (A_TickCount - start) . " ms...")
 
 		knowledgeBase := this.KnowledgeBase
 
@@ -4381,7 +4380,8 @@ class RaceSpotter extends GridRaceAssistant {
 																		, lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true), data))
 					 , 1000, kLowPriority)
 
-		logMessage(kLogWarn, "Full add lap took " . (A_TickCount - start) . " ms...")
+		if isDebug()
+			logMessage(kLogWarn, "Add Spotter lap took " . (A_TickCount - start) . " ms...")
 
 		return result
 	}
@@ -4463,7 +4463,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		result := super.updateLap(lapNumber, &data)
 
-		logMessage(kLogWarn, "General update lap took " . (A_TickCount - start) . " ms...")
+		if isDebug()
+			logMessage(kLogWarn, "Update Assistant lap took " . (A_TickCount - start) . " ms...")
 
 		if this.DriverUpdateTime {
 			if (A_TickCount >= this.iNextDriverUpdate) {
@@ -4505,7 +4506,8 @@ class RaceSpotter extends GridRaceAssistant {
 																		, lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true), data))
 					 , 1000, kLowPriority)
 
-		logMessage(kLogWarn, "Full update lap took " . (A_TickCount - start) . " ms...")
+		if isDebug()
+			logMessage(kLogWarn, "Update Spotter lap took " . (A_TickCount - start) . " ms...")
 
 		return result
 	}

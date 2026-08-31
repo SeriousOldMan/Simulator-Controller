@@ -3166,7 +3166,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
-		local result, newValue
+		local result, newValue, start
 
 		data := this.prepareData(lapNumber, data)
 
@@ -3206,7 +3206,15 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("Update", true)
 
-		result := knowledgeBase.produce()
+		if isDebug() {
+			start := A_TickCount
+
+			result := knowledgeBase.produce()
+
+			logMessage(kLogWarn, "Update lap knowledge took " . (A_TickCount - start) . " ms...")
+		}
+		else
+			result := knowledgeBase.produce()
 
 		if (dump && this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledgeBase(knowledgeBase)
@@ -3325,7 +3333,6 @@ class RaceAssistant extends ConfigurationItem {
 	}
 
 	saveSessionInfo(simulator, car, track, lapNumber, sessionInfo) {
-		local start := A_TickCount
 		local fileName
 
 		if this.RemoteHandler {
@@ -3335,8 +3342,6 @@ class RaceAssistant extends ConfigurationItem {
 
 			this.RemoteHandler.saveSessionInfo(lapNumber, fileName)
 		}
-
-		logMessage(kLogWarn, "Save session info took " . (A_TickCount - start) . " ms...")
 	}
 
 	createSessionKnowledge(lapNumber) {

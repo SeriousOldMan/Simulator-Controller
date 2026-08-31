@@ -1,9 +1,9 @@
 [Development]
 Version=7.2.3.0-dev
 Target=7.2.3.0-release
-Date=08/30/26
+Date=08/31/26
 Download=
-Changes=Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for "Setup Workbench", Added tyre data for new ACE cars
+Changes=Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for "Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.0.3
 [Release]
 Version=7.2.2.0-release

@@ -158,7 +158,7 @@ Elisa tracks the positions, lap times and the deltas to your own car for four di
 
 When you approach a car in front of you, Elisa will gather all available information for the given car, whether the driver is quite inconsistent or is doing a lot of mistakes, and so on. Depending on the situation, Elisa might give you this information and will ask you to be careful, if necessary.
 
-Elise uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". See the table below for the thresholds and their default values.
+Elisa uses different delta thresholds to decide, whether the situation changed to an extent that an update will be of any value for you. You can define your own thresholds in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". See the table below for the thresholds and their default values.
 
 | Threshold                | Default Value (Seconds) |
 | ------------------------ | ----------------------- |
@@ -172,6 +172,10 @@ Elise uses different delta thresholds to decide, whether the situation changed t
 | Gained on car behind     | 1.5                     |
 
 Please note, that the corresponding settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) will follow the naming conventions for Session settings, for example: "Spotter: Threshold for Lap Up car in range".
+
+### Optimizing Performance
+
+Processing all this information is time consuming by itself, but on a typical gaming PC we are talking only about a few hundred milliseconds. The real issue, if you encounter late or outdated information like a faster car notification which already had overtook you a second ago, will be speech processing. Especially, if you are using a long processing pipeline with remote speech synthesis, a *Rephrasing* booster and possibly a LLM filter post-processor, this can easily add a few seconds. So you have to find the best compromise between immersive speech and perfect alert timing.
 
 ## Simulator Integration
 

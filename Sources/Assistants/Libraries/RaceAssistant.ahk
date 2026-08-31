@@ -5243,6 +5243,117 @@ getTime(*) {
 	return A_Now
 }
 
+computeGrid(context, lapNumber) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local prefix := ("Standings.Lap." . lapNumber)
+	local sCarPrefix, cCarPrefix
+
+	knowledgeBase.setFact(prefix . ".Weather", knowledgeBase.getValue("Weather.Weather.Now", "Dry"))
+	knowledgeBase.setFact(prefix . ".Time", A_Now)
+	knowledgeBase.setFact(prefix . ".Car.Count", carCount)
+
+	loop carCount {
+		sCarPrefix := (prefix . ".Car." . A_Index)
+		cCarPrefix := ("Car." . A_Index)
+
+		knowledgeBase.setFact(sCarPrefix . ".Nr", knowledgeBase.getValue(cCarPrefix . ".Nr"))
+		knowledgeBase.setFact(sCarPrefix . ".ID", knowledgeBase.getValue(cCarPrefix . ".ID", A_Index))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Forname", knowledgeBase.getValue(cCarPrefix . ".Driver.Forname"))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Surname", knowledgeBase.getValue(cCarPrefix . ".Driver.Surname"))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Nickname", knowledgeBase.getValue(cCarPrefix . ".Driver.Nickname"))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Category", knowledgeBase.getValue(cCarPrefix . ".Driver.Category"
+																					, "Unknown"))
+	}
+
+	return true
+}
+
+computePositions(context, lapNumber) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local driverCar := knowledgeBase.getValue("Driver.Car", 0)
+	local driverRunning := knowledgeBase.getValue("Car." . driverCar . ".Lap.Running", 0)
+	local driverLaps := (knowledgeBase.getValue("Car." . driverCar . ".Laps"
+											  , knowledgeBase.getValue("Car." . driverCar . ".Lap", 0))
+					   + driverRunning)
+	local driverLapTime := knowledgeBase.getValue("Car." . driverCar . ".Time")
+	local position, prefix, carLaps
+
+	loop carCount {
+		prefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
+		position := knowledgeBase.getValue("Car." . A_Index . ".Position")
+
+		knowledgeBase.setFact(prefix . ".Position", position)
+		knowledgeBase.setFact(prefix . ".Time", knowledgeBase.getValue("Car." . A_Index . ".Time"))
+		knowledgeBase.setFact(prefix . ".Time.Sectors", knowledgeBase.getValue("Car." . A_Index . ".Time.Sectors"))
+
+		if (A_Index == driverCar) {
+			knowledgeBase.setFact("Standings.Lap." . lapNumber . ".Position", position)
+			knowledgeBase.setFact("Position", position)
+
+			knowledgeBase.setFact(prefix . ".Laps", driverLaps)
+			knowledgeBase.setFact(prefix . ".Delta", 0)
+		}
+		else {
+			carLaps := (knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0)
+					  + knowledgeBase.getValue("Car." . A_Index . ".Laps"
+											 , knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)))
+
+			knowledgeBase.setFact(prefix . ".Laps", carLaps)
+			knowledgeBase.setFact(prefix . ".Delta", driverLapTime * (carLaps - driverLaps))
+		}
+	}
+
+	return true
+}
+
+computeTrackAhead(context, driverRemaining) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local driverCar := knowledgeBase.getValue("Driver.Car", 0)
+	local lapTime := knowledgeBase.getValue("Car." . driverCar . ".Time", 0)
+	local running, distance
+
+	loop carCount
+		if (A_Index != driverCar) {
+			running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0)
+			distance := (driverRemaining + running)
+
+			if ((knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Track.Ahead.Distance") > (- distance))) {
+				knowledgeBase.setFact("Position.Track.Ahead.Car", A_Index)
+				knowledgeBase.setFact("Position.Track.Ahead.Distance", (- distance))
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", lapTime * distance)
+			}
+		}
+
+	return true
+}
+
+computeTrackBehind(context, driverRunning) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local driverCar := knowledgeBase.getValue("Driver.Car", 0)
+	local lapTime := knowledgeBase.getValue("Car." . driverCar . ".Time", 0)
+	local running, distance
+
+	loop carCount
+		if (A_Index != driverCar) {
+			running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0)
+			distance := ((1 - running) + driverRunning)
+
+			if ((knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined) == kUndefined)
+			 || (distance < knowledgeBase.getValue("Position.Track.Behind.Distance"))) {
+				knowledgeBase.setFact("Position.Track.Behind.Car", A_Index)
+				knowledgeBase.setFact("Position.Track.Behind.Distance", distance)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", lapTime * (- distance))
+			}
+		}
+
+	return true
+}
+
 callAssistant(context, method, arguments*) {
 	local script := isInstance(context, RaceAssistant)
 	local assistant := (script ? context : context.KnowledgeBase.RaceAssistant)

@@ -1361,13 +1361,13 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			try {
 				wait := settingsDB.readSettingValue(simulator, car, track
 												  , (teamSession ? "Team" : "Solo"), weather
-												  , "Assistant", "Session.Data.Frequency", 4)
+												  , "Assistant", "Session.Data.Frequency", 2)
 
 				if (teamServer && teamServer.Connected[true])
 					wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																  , "Team Server", "Update Frequency", 10))
 
-				this.CollectorTask.Sleep := (wait * 1000)
+				this.CollectorTask.Sleep := Round(wait * 1000)
 			}
 			catch Any as exception {
 				logError(exception)

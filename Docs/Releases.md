@@ -73,6 +73,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO
 	  - Porsche 911 GT3 Cup (992)
+	  - Ferrari SF-25
 
 # Release history
 

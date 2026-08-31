@@ -3404,6 +3404,7 @@ class RaceSpotter extends GridRaceAssistant {
 	updateDriver(lastLap, sector, update, newSector, positions) {
 		local session := this.Session
 		local isRace := ((session = kSessionRace) && (lastLap > 2))
+		local start := A_TickCount
 		local hadInfo := false
 		local deltaInformation
 
@@ -3449,6 +3450,8 @@ class RaceSpotter extends GridRaceAssistant {
 				this.tacticalAdvice(lastLap, sector, positions, !hadInfo)
 			}
 		}
+
+		logMessage(kLogWarn, (update ? "Full " : "Reduced ") . "update driver took " . (A_TickCount - start) . " ms...")
 	}
 
 	pendingAlert(alert, match := false) {
@@ -4225,6 +4228,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 	createSessionInfo(simulator, car, track, lapNumber, valid, data) {
 		local knowledgeBase := this.KnowledgeBase
+		local start := A_TickCount
 		local sessionInfo := super.createSessionInfo(simulator, car, track, lapNumber, valid, data)
 		local position, classPosition
 
@@ -4247,6 +4251,8 @@ class RaceSpotter extends GridRaceAssistant {
 			if this.BestTopSpeed
 				setMultiMapValue(sessionInfo, "Stint", "Speed.Best", Round(this.BestTopSpeed, 1))
 		}
+
+		logMessage(kLogWarn, "Create session info took " . (A_TickCount - start) . " ms...")
 
 		return sessionInfo
 	}
@@ -4304,6 +4310,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastPenalty := false
 		local wasValid := true
 		local lastWarnings := 0
+		local start := A_TickCount
 		local laps, lastPitstop, result
 		local simulator, car, track, sector, running
 
@@ -4314,6 +4321,8 @@ class RaceSpotter extends GridRaceAssistant {
 		}
 
 		result := super.addLap(lapNumber, &data)
+
+		logMessage(kLogWarn, "General add lap took " . (A_TickCount - start) . " ms...")
 
 		knowledgeBase := this.KnowledgeBase
 
@@ -4372,6 +4381,8 @@ class RaceSpotter extends GridRaceAssistant {
 																		, lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true), data))
 					 , 1000, kLowPriority)
 
+		logMessage(kLogWarn, "Full add lap took " . (A_TickCount - start) . " ms...")
+
 		return result
 	}
 
@@ -4382,6 +4393,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local lastWarnings := knowledgeBase.getValue("Lap.Warnings", 0)
 		local hasGaps := false
 		local started := (lapNumber > 0)
+		local start := A_TickCount
 		local sector, sectorDesc, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
@@ -4451,6 +4463,8 @@ class RaceSpotter extends GridRaceAssistant {
 
 		result := super.updateLap(lapNumber, &data)
 
+		logMessage(kLogWarn, "General update lap took " . (A_TickCount - start) . " ms...")
+
 		if this.DriverUpdateTime {
 			if (A_TickCount >= this.iNextDriverUpdate) {
 				this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
@@ -4490,6 +4504,8 @@ class RaceSpotter extends GridRaceAssistant {
 												 , this.createSessionInfo(simulator, car, track
 																		, lapNumber, knowledgeBase.getValue("Lap." . lapNumber . ".Valid", true), data))
 					 , 1000, kLowPriority)
+
+		logMessage(kLogWarn, "Full update lap took " . (A_TickCount - start) . " ms...")
 
 		return result
 	}

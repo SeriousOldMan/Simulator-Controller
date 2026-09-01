@@ -24,7 +24,7 @@
 										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
-										 Radiator.Blanket.Water,
+										 Radiator.Blanket.Water, Radiator.Blanket.Oil,
 										 Differential.Coast, Differential.Power,
 										 Geometry.Caster.Left, Geometry.Caster.Right]))
 

@@ -79,6 +79,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - Ferrari SF-25
 	  - BMW M4 GT3 Evo
 	  - Ferrari 296 GT3
+	  - Ford Mustang GT3
 
 # Release history
 

@@ -65,12 +65,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*- For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
+  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*. For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
     - [Experts] The definition and behavior of *FloatHandler* in the [car definition files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) of "Setup Workbench" has changed. This handler was never used so far and is now the main handler for all car definition files of *Assetto Corsa EVO*.
   - [Important] Huge performance improvements for all standings and track gap computations. This will allow even lower data update frequencies.
     - As a result, the default for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has changed from 4 to 3 seconds now. If this causes problems on your computer, change the value in the "Session Database".
   - [Internal] Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*. Tracks with UTF coding errors are suppressed as well.
-  - Tyre information has been added for the cars of *Assetto Corsa EVO 0.9*.
+  - Tyre information has been added for the new cars of *Assetto Corsa EVO 0.9*.
   - Thanks to @inthebagbud UK we have a fully updated list of cars and tyre data information for *RaceRoom Racing Experience*.
   - [Internal] Migrated to AHK 2.1-alpha.31.
   - New car models for "Setup Workbench":

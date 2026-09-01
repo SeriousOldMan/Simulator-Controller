@@ -15,7 +15,6 @@
 				 (Prove: addSettings("RaceRoom Racing Experience", *, *)),
 				 (Prove: removeSettings("RaceRoom Racing Experience", *,
 										[Electronics.Turbo,
-										 Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 										 Brake.Duct.Front, Brake.Duct.Rear,
 										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
 										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,

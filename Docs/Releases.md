@@ -76,6 +76,8 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Assetto Corsa EVO
 	  - Porsche 911 GT3 Cup (992)
 	  - Ferrari SF-25
+	  - BMW M4 GT3 Evo
+	  - Ferrari 296 GT3
 
 # Release history
 

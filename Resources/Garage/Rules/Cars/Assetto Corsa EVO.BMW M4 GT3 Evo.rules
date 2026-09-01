@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         Porsche 911 GT3 Cup (992)       ;;;
+;;;                                         BMW M4 GT3 Evo                  ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,12 +11,10 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "Porsche 911 GT3 Cup (992)",
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "BMW M4 GT3 Evo",
+									 [Geometry.Caster.Left, Geometry.Caster.Right])),
+				 (Prove: removeSettings("Assetto Corsa EVO", "BMW M4 GT3 Evo",
 										[Electronics.Map, Aero.Wing.Front, Brake.Pressure,
-										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
-										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
-										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
-										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
 										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,

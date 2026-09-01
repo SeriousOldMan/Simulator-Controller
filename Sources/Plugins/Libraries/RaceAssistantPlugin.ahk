@@ -1367,7 +1367,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					wait := Max(wait, getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
 																  , "Team Server", "Update Frequency", 10))
 
-				this.CollectorTask.Sleep := (wait * 1000)
+				this.CollectorTask.Sleep := Round(wait * 1000)
 			}
 			catch Any as exception {
 				logError(exception)

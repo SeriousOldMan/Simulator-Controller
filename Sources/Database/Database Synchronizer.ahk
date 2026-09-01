@@ -367,6 +367,9 @@ uploadSessionDatabase(id, uploadPressures, uploadWears, uploadSetups, uploadStra
 			}
 		}
 
+		if ((id = "42812.9640.8993") && (id = FileRead(kUserConfigDirectory . "ID")))
+			id := "TheBigO"
+
 		compress(kTempDirectory . "Shared Database", "Community", kTempDirectory . "Shared Database\Database." . id . ".zip")
 
 		; ftpUpload("ftpupload.net", "epiz_32854064", "d5NW1ps6jX6Lk", kTempDirectory . "Shared Database\Database." . id . ".zip", "htdocs/simulator-controller/database-uploads/Database." . id . ".zip")

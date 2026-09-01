@@ -14,17 +14,11 @@
 				 (Prove: addCharacteristics("RaceRoom Racing Experience", *, *, *)),
 				 (Prove: addSettings("RaceRoom Racing Experience", *, *)),
 				 (Prove: removeSettings("RaceRoom Racing Experience", *,
-										[Electronics.Turbo,
+										[Electronics.Turbo, Electronics.MGUH.Mode,
 										 Brake.Duct.Front, Brake.Duct.Rear,
-										 Damper.Compression.Slow.Front.Heave, Damper.Compression.Slow.Rear.Heave,
-										 Damper.Compression.Fast.Front.Heave, Damper.Compression.Fast.Rear.Heave,
-										 Damper.Rebound.Slow.Front.Heave, Damper.Rebound.Slow.Rear.Heave,
-										 Damper.Rebound.Fast.Front.Heave, Damper.Rebound.Fast.Rear.Heave,
-										 Spring.Rate.Front.Heave, Spring.Rate.Rear.Heave,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,
 										 Bumpstop.Range.Rear.Left, Bumpstop.Range.Rear.Right,
 										 Radiator.Blanket.Water, Radiator.Blanket.Oil,
-										 Differential.Coast, Differential.Power,
 										 Geometry.Caster.Left, Geometry.Caster.Right]))
 
 

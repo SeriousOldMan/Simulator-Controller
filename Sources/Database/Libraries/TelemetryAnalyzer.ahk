@@ -1844,7 +1844,7 @@ class TelemetryAnalyzer {
 		local injectOversteer := !inList(["RF2", "LMU"], SessionDatabase.getSimulatorCode(this.Simulator))
 		local type, speed, severity, where, count, phase, key
 		local yawRate, steerAngle, speed, acceleration, accAverage, accCount, slip
-		local steerAngleRadians, steerAngleRadians, radius, perimeter, perimeterSpeed, idealYawRate
+		local steerAngleRadians, radius, perimeter, perimeterSpeed, idealYawRate
 		local ignore, theTelemetry, corner
 
 		pushValue(values, value) {
@@ -1863,7 +1863,15 @@ class TelemetryAnalyzer {
         }
 
         smoothValue(values, value) {
-            return value
+			local ignore
+
+			if false {
+				pushValue(values, value)
+
+				return averageValue(values, &ignore)
+			}
+			else
+				return value
         }
 
 		if !thresholds
@@ -1888,7 +1896,7 @@ class TelemetryAnalyzer {
 					pushValue(accelerations, acceleration)
 
 					yawRate := smoothValue(yawRates, yawRate)
-					steerAngleRadians := (- (steerAngle * steerLock / 2 / steerRatio) / 57.2958)
+					steerAngleRadians := (- (((steerAngle * steerLock) / 2) / steerRatio) / 57.2958)
 					radius := (wheelBaseMeter / steerAngleRadians)
 					perimeter := (radius * PI * 2)
 					perimeterSpeed := (lastSpeed / 3.6)

@@ -1008,14 +1008,13 @@ class SetupWorkbench extends ConfigurationItem {
 							cars.Push(SessionDatabase.getCarName(simulator, car))
 					}
 
-			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
+			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*"))
 				for ignore, car in SessionDatabase().getCars(simulator) {
 					car := SessionDatabase.getCarName(simulator, car)
 
 					if !inList(cars, car)
 						cars.Push(car)
 				}
-			}
 		}
 
 		bubbleSort(&cars)
@@ -1029,19 +1028,18 @@ class SetupWorkbench extends ConfigurationItem {
 		local tracks := []
 		local ignore, track
 
-		if (car && (car != true)) {
+		if (car && (car != true))
 			tracks := SessionDatabase().getTracks(simulator, car)
 
-			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Tracks", false) = "*")) {
-				for ignore, track in SessionDatabase().getTracks(simulator, car, true) {
-					if !inList(tracks, track)
-						tracks.Push(track)
-				}
-			}
-		}
+		if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Tracks", false) = "*"))
+			for ignore, track in SessionDatabase().getTracks(simulator, , true)
+				if !inList(tracks, track)
+					tracks.Push(track)
 
 		loop tracks.Length
 			tracks[A_Index] := SessionDatabase.getTrackName(simulator, tracks[A_Index])
+
+		bubbleSort(&tracks)
 
 		tracks.InsertAt(1, "*")
 

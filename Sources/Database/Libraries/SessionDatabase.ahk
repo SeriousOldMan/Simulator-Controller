@@ -1187,12 +1187,12 @@ class SessionDatabase extends ConfigurationItem {
 			return []
 	}
 
-	getTracks(simulator, car, all := false) {
+	getTracks(simulator, car := false, all := false) {
 		local code := this.getSimulatorCode(simulator)
 		local tracks, trackData, codes
 
 		if code {
-			tracks := this.getEntries(code . "\" . car . "\*.*")
+			tracks := (car ? this.getEntries(code . "\" . car . "\*.*") : [])
 			tracks := ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
 
 			if all {

@@ -77,11 +77,12 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - [Internal] Migrated to AHK 2.1-alpha.31.
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO
-	  - Porsche 911 GT3 Cup (992)
 	  - Ferrari SF-25
 	  - BMW M4 GT3 Evo
 	  - Ferrari 296 GT3
 	  - Ford Mustang GT3
+	  - Porsche 911 GT3 R Rennsport (992)
+	  - Porsche 911 GT3 Cup (992)
 
 # Release history
 

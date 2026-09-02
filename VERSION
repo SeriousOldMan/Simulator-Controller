@@ -1,9 +1,9 @@
 [Development]
-Version=7.2.3.0-dev
+Version=7.2.3.0-alpha
 Target=7.2.3.0-release
 Date=09/01/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/cgFTIt_Q/Releases/Simulator%20Controller%207.2.3.0-dev.zip
-Changes=Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for "Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data
+Download=
+Changes=Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for "Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data, Fixed issue analyzer for ACC and ACE
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.2.0-release
@@ -27,5 +27,5 @@ Utilities.7.2.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/publi
 [Current]
 Type=Development
 [Version]
-Development=7.2.3.0-dev
+Development=7.2.3.0-alpha
 Release=7.2.2.0-release

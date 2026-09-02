@@ -61,7 +61,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Fixed a critical bug introduced two releases ago, that caused the issue analyzer of the "Setup Workbench" to report superfluous heavy oversteer events for *Assetto Corsa EVO* and *Assetto Corsa Competizione*.
   
 #### Changes
 

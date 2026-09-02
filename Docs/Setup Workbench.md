@@ -512,11 +512,15 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	*increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
 
-  - **ClicksHandler(minValue, maxValue)**
+  - **ClicksHandler(minValue, maxValue)** or **ClicksHandler(minValue, value1, value2, ...)**
   
-    Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0** in the underlying simulator specific setup file.
+	This handler comes in two flavors:
 	
-	*minValue* defaults to **0** and *maxValue* default to a reasonably large value.
+	- The first defines a range of discrete integer values, which are mapped to a corresponding range of integer values in the underlying simulator specific setup file. Available values range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0**.
+	
+	  *minValue* defaults to **0** and *maxValue* default to a reasonably large value.
+	  
+	- The second variant maps a range of discrete integer values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. Of course, there must be more than one value in this list.
 
   - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   

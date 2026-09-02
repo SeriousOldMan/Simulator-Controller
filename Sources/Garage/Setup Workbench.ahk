@@ -2722,13 +2722,50 @@ class FloatHandler extends NumberHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ClicksHandler extends IntegerHandler {
-	__New(minValue := 0, maxValue := kUndefined) {
-		super.__New(minValue, 1, minValue, maxValue)
+	iValues := false
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+
+	__New(minValue := 0, maxValue := kUndefined, values*) {
+		if (values.Length > 0) {
+			values.InsertAt(1, maxValue)
+
+			this.iValues := values
+
+			super.__New(minValue, 1, minValue, minValue + values.Length - 1)
+		}
+		else
+			super.__New(minValue, 1, minValue, maxValue)
+	}
+
+	validValue(displayValue) {
+		if this.Values
+			return inList(this.Values, this.convertToRawValue(displayValue))
+		else
+			return super.validValue(displayValue)
+	}
+
+	convertToDisplayValue(rawValue) {
+		if this.Values
+			return (this.MinValue + (inList(this.Values, rawValue) - 1))
+		else
+			return super.convertToDisplayValue(rawValue)
+	}
+
+	convertToRawValue(displayValue) {
+		if this.Values
+			return this.Values[this.MinValue - displayValue + 1]
+		else
+			return super.convertToRawValue(displayValue)
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ClicksHandler                                                           ;;;
+;;; EnumerationHandler                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class EnumerationHandler extends SettingHandler {

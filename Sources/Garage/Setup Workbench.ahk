@@ -1027,9 +1027,18 @@ class SetupWorkbench extends ConfigurationItem {
 
 	getTracks(simulator, car) {
 		local tracks := []
+		local ignore, track
 
-		if (car && (car != true))
+		if (car && (car != true)) {
 			tracks := SessionDatabase().getTracks(simulator, car)
+
+			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Tracks", false) = "*")) {
+				for ignore, track in SessionDatabase().getTracks(simulator, car, true) {
+					if !inList(tracks, track)
+						tracks.Push(track)
+				}
+			}
+		}
 
 		loop tracks.Length
 			tracks[A_Index] := SessionDatabase.getTrackName(simulator, tracks[A_Index])
@@ -2614,7 +2623,7 @@ class DecimalHandler extends DiscreteValuesHandler {
 class FloatHandler extends NumberHandler {
 	iIncrement := false
 	iPrecision := false
-	iStep := false
+	iMultiplier := false
 
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
@@ -2633,9 +2642,9 @@ class FloatHandler extends NumberHandler {
 		}
 	}
 
-	Step {
+	Multiplier {
 		Get {
-			return this.iStep
+			return this.iMultiplier
 		}
 	}
 
@@ -2663,7 +2672,7 @@ class FloatHandler extends NumberHandler {
 		}
 	}
 
-	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined, base := 0, step := 1) {
+	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined, base := 0, multiplier := 1) {
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
@@ -2672,7 +2681,7 @@ class FloatHandler extends NumberHandler {
 		this.iPrecision := precision
 
 		this.iBase := base
-		this.iStep := step
+		this.iMultiplier := multiplier
 	}
 
 	formatValue(value) {
@@ -2680,11 +2689,11 @@ class FloatHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
-		return this.formatValue((rawValue - this.Base) * this.Step)
+		return this.formatValue((rawValue - this.Base) * this.Multiplier)
 	}
 
 	convertToRawValue(displayValue) {
-		return ((displayValue / this.Step) + this.Base)
+		return ((displayValue / this.Multiplier) + this.Base)
 	}
 
 	increaseValue(displayValue) {

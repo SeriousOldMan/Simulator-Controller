@@ -537,23 +537,24 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	*baseValue* defaults to **0.0**, *increment* to **1.0**, *places* to **0**, *minValue* and *maxValue* to reasonably large values.
 
   
-  - **FloatHandler(increment, places, minValue, maxValue, base, step)**
+  - **FloatHandler(increment, places, minValue, maxValue, base, multiplier)**
     
-	This handler must be used, when the values in the setup file are stored as floating point numbers, which is the case for *Assetto Corsa EVO*, for example. *increment* defines the step between each display value, while *multiplier* can be used to change the relationship of the internal value to the display value:
-	
-		display_value = internal_value * multiplier
-		
-	*places* defines, how many places after the decimal point are considered and displayed.
+	This handler must be used, when the values in the setup file are stored as floating point numbers, which is the case for *Assetto Corsa EVO*, for example. *increment* defines the step between each display value and *places* defines, how many places after the decimal point are considered and displayed. *minValue* and *maxValue* specifies the lower and upper bound of the allowed display values.
 	
 	Example:
 	
-		FloatHandler(0.25, 1, 2, -3.5, 1.0)
+		FloatHandler(0.25, 2, -3.5, 1.0)
 	
-	will create a range from -3.5 to 1.0 with an increment of 0.25. The values are display with two digits after the decimal point, for example -1.75. The value is stored as is in the setup file, becuase the *multiplier* has been specified as **1**. If the value range in the setup file is -350 to 100 for example, the multiplier must be specified as **0.01**.
+	will create a range from **-3.5** to **1.0** with an increment of **0.25**. The values are display with two digits after the decimal point, for example **-1.75**. The value is stored as is in the setup file. But sometimes, the range of internal values used in the setup file is different from that of the displayed values. In this case you can use the last two optional parameters:
 	
-	*base* is optional and defaults to **0** and **step** defines the increment of the internal value for each full integer of the display value. Default here is **1**.
+	- *base* specifies the internal values which corresponds to **0** of the display values.
+	- *multiplier* defines the increment of the internal value for each increment of the display value by **1**.
 	
-	Example: You have a range of display values from **1** to **10**. They should map internally to **60000** to **700000**. *base* must be **58000**, because the lowest display value is **1**, not **0**. *step* must be **0.0005**, because **1** / **0.0005** is **2000**, the required increment.
+	Example: You have a discrete range of integer display values from **1** to **10** (clicks on a damper, for example). They should map internally to **60000** to **70000**. *base* must be **58000**, because the lowest display value is **1**, not **0**. *multiplier* must be **0.0005**, because **1** / **0.0005** is **2000**, the required increment of the internal value for each step of the display value.
+	
+	Let's express the relationship as an equation:
+	
+		display_value := Round(internal_value - base) * multiplier, places)
 
   - **EnumerationHandler(baseValue, step, value1, value2, ...)**
   
@@ -751,9 +752,10 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 
 ## Notes
 
-  1. Only *Assetto Corsa*, *Assetto Corsa Competizione*, *Le Mans Ultimate* and *rFactor 2* are supported at the moment, when it comes to editing, comparing and saving setup files. For *rFactor 2* only a few cars are supported in the standard distribution of Simulator Controller, but you can define your own cars as described above. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
+  1. Only *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corrsa EVO*, *Le Mans Ultimate* and *rFactor 2* are supported at the moment, when it comes to editing, comparing and saving setup files. For *rFactor 2* only a few cars are supported in the standard distribution of Simulator Controller, but you can define your own cars as described above. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
   2. The implementations for *Assetto Corsa Competizione* provides a generic car model and detailed car specifications for all currently available cars. More cars will be added when additional DLCs become availabble.
   3. The implementation for *Assetto Corsa* currently provides a generic car model and many detailed car models at the moment. More detailed car models will be added over time. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
-  4. The implementation for *Le Mans Ultimate* currently provides a generic car model and detailed car models for all cars from the simulator including all current extensions. Working with *Le Mans Ultimate* setup is a bit different than for the other simulators, since setups are not stored car specific, but only track specific. So be sure to include the car model name in the name of the setup file to help identifying the correct setup later on.
-  5. As said, not many cars are available for *rFactor 2* but you may define your own car meta data. Once done and tested, I will be happy to add your car to the package as a community contribution. The comments for *Le Mans Ultimate* apply here as well.
-  6. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 
+  4. The same is true for *Assetto Corsa EVO*, espcially because the support for this simulator has just been added at the time of this writing.
+  5. The implementation for *Le Mans Ultimate* currently provides a generic car model and detailed car models for all cars from the simulator including all current extensions. Working with *Le Mans Ultimate* setup is a bit different than for the other simulators, since setups are not stored car specific, but only track specific. So be sure to include the car model name in the name of the setup file to help identifying the correct setup later on.
+  6. As said, not many cars are available for *rFactor 2* but you may define your own car meta data. Once done and tested, I will be happy to add your car to the package as a community contribution. The comments for *Le Mans Ultimate* apply here as well.
+  7. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 

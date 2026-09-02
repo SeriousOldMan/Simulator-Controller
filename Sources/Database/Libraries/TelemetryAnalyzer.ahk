@@ -1878,7 +1878,7 @@ class TelemetryAnalyzer {
 			loop theTelemetry.Data.Length {
 				yawRate := theTelemetry.getValue(A_Index, "YawRate")
 
-				if (yawRate != kUndefined) {
+				if isNumber(yawRate) {
 					steerAngle := theTelemetry.getValue(A_Index, "Steering")
 					speed := theTelemetry.getValue(A_Index, "Speed")
 					acceleration := ((lastSpeed == kUndefined) ? 0 : (speed - lastSpeed))

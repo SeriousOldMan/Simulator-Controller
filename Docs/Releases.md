@@ -65,9 +65,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - All known tracks are now shown in "Setup Workbench", not only the ones which already had been driven.
   - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*. For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
     - [Experts] The definition and behavior of *FloatHandler* in the [car definition files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) of "Setup Workbench" has changed. This handler was never used so far and is now the main handler for all car definition files of *Assetto Corsa EVO*.
+  - All ever driven cars will now show up in the "Setup Workbench" for moddable simulators, not only the cars, which have a setup file definition.
+  - All known tracks are now shown in "Setup Workbench", not only the ones which already had been driven.
   - [Important] Huge performance improvements for all standings and track gap computations. This will allow even lower data update frequencies.
     - As a result, the default for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has changed from 4 to 3 seconds now. If this causes problems on your computer, change the value in the "Session Database".
   - [Internal] Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*. Tracks with UTF coding errors are suppressed as well.

@@ -506,15 +506,25 @@ In the "[General]" section, values for *SteerLock*, *SteerRatio*, *Wheelbase* an
 
 The most important part is the "[Setup.Settings.Handler]" section. Here you specify a special handler for each setting, which manages this specific setting. If you don't supply a handler for an active setting of the given car, a default *ClicksHandler* with an unrestricted range will be active. You can also supply *false* as a handler, which means that this setting will be unavailable. The following handlers are available:
 
-  - **RawHandler(increment, minValue, maxValue)**
+  - **ValuesHandler(value1, value2, ...)**
   
-    This handler implements a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+    The values, both internally and also for the display are defined as the list of supplied values and no conversion will be applied. If a conversion is necessary, see the next two handlers.
+
+  - **RawHandler(increment, minValue, maxValue)** or **RawHandler(increment, minValue, value1, value2, ...)**
+  
+    This handler comes in two flavors:
 	
-	*increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
+	- The first defines a range of numbers, which are mapped to a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+	
+	  *increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
+	  
+	- The second variant maps a range of values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. Of course, there must be more than one value in this list.
+	
+	  Good to know: The special case, where *increment* is **1** and *minValue* is an integer, this handler will be identical in behavior to the second variant of *ClicksHandler*.
 
   - **ClicksHandler(minValue, maxValue)** or **ClicksHandler(minValue, value1, value2, ...)**
   
-	This handler comes in two flavors:
+	This handler also comes also in two flavors:
 	
 	- The first defines a range of discrete integer values, which are mapped to a corresponding range of integer values in the underlying simulator specific setup file. Available values range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0**.
 	
@@ -541,7 +551,7 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	*baseValue* defaults to **0.0**, *increment* to **1.0**, *places* to **0**, *minValue* and *maxValue* to reasonably large values.
 
   
-  - **FloatHandler(increment, places, minValue, maxValue, base, multiplier)**
+  - **FloatHandler(increment, places, minValue, maxValue, base, multiplier, round)**
     
 	This handler must be used, when the values in the setup file are stored as floating point numbers, which is the case for *Assetto Corsa EVO*, for example. *increment* defines the step between each display value and *places* defines, how many places after the decimal point are considered and displayed. *minValue* and *maxValue* specifies the lower and upper bound of the allowed display values.
 	
@@ -549,16 +559,21 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 		FloatHandler(0.25, 2, -3.5, 1.0)
 	
-	will create a range from **-3.5** to **1.0** with an increment of **0.25**. The values are display with two digits after the decimal point, for example **-1.75**. The value is stored as is in the setup file. But sometimes, the range of internal values used in the setup file is different from that of the displayed values. In this case you can use the last two optional parameters:
+	will create a range from **-3.5** to **1.0** with an increment of **0.25**. The values are display with two digits after the decimal point, for example **-1.75**. Without additional arguments, the value is stored as is in the setup file. But sometimes, the range of internal values used in the setup file is different from that of the displayed values. In this case you can use the last two optional parameters:
 	
-	- *base* specifies the internal values which corresponds to **0** of the display values.
+	- *base* specifies the internal values which corresponds to the **minValue** of the display values.
 	- *multiplier* defines the increment of the internal value for each increment of the display value by **1**.
+	- *round*, if supplied, specify the number of places after the decimal point allowed for the internal values. If not supplied, no rounding will be applied.
 	
-	Example: You have a discrete range of integer display values from **1** to **10** (clicks on a damper, for example). They should map internally to **60000** to **70000**. *base* must be **58000**, because the lowest display value is **1**, not **0**. *multiplier* must be **0.0005**, because **1** / **0.0005** is **2000**, the required increment of the internal value for each step of the display value.
+	Example: You have a discrete range of integer display values from **1** to **10** (clicks on a damper, for example). They should map internally to **60000** to **70000**. *base* must be **60000** and *multiplier* will be **2000**, the required increment of the internal value for each step of the display value.
 	
 	Let's express the relationship as an equation:
 	
-		display_value := Round(internal_value - base) * multiplier, places)
+		internal_value := base + (display_value - minValue) * multiplier (possibly rounded, see above)
+	
+	or
+	
+		display_value = (interval_value - base) / multiplier + minValue
 
   - **EnumerationHandler(baseValue, step, value1, value2, ...)**
   

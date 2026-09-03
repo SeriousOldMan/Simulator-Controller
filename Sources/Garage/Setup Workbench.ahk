@@ -2555,16 +2555,92 @@ class DiscreteValuesHandler extends NumberHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RawHandler extends DiscreteValuesHandler {
-	__New(increment := 1, minValue := kUndefined, maxValue := kUndefined) {
-		super.__New(0, increment, minValue, maxValue)
+	iValues := false
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+
+	__New(increment := 1, minValue := kUndefined, maxValue := kUndefined, values*) {
+		if (values.Length > 0) {
+			values.InsertAt(1, maxValue)
+
+			this.iValues := values
+
+			super.__New(minValue, increment, minValue, minValue + values.Length - 1)
+		}
+		else
+			super.__New(0, increment, minValue, maxValue)
+	}
+
+	valueIndex(rawValue) {
+		local index, candidate
+
+		try {
+			return inList(this.Values, rawValue)
+		}
+		catch Any {
+			for index, candidate in this.Values
+				if ((rawValue - candidate) < 0.00001)
+					return index
+
+			return false
+		}
+	}
+
+	validValue(displayValue) {
+		if this.Values
+			return (this.valueIndex(this.convertToRawValue(displayValue)) != false)
+		else
+			return super.validValue(displayValue)
 	}
 
 	convertToDisplayValue(rawValue) {
-		return rawValue
+		local index
+
+		if this.Values {
+			index := this.valueIndex(rawValue)
+
+			return (this.MinValue + (index ? ((index - 1) * this.Increment) : false))
+		}
+		else
+			return rawValue
 	}
 
 	convertToRawValue(displayValue) {
-		return displayValue
+		local index
+
+		if this.Values {
+			index := Round(((displayValue - this.MinValue) / this.Increment) + 1)
+
+			return (this.Values.Has(index) ? this.Values[index] : false)
+		}
+		else
+			return displayValue
+	}
+
+	increaseValue(displayValue) {
+		if this.Values {
+			if this.Values.Has(Round(displayValue - this.MinValue + this.Increment + 1))
+				return super.increaseValue(displayValue)
+			else
+				return displayValue
+		}
+		else
+			return super.increaseValue(displayValue)
+	}
+
+	decreaseValue(displayValue) {
+		if this.Values {
+			if this.Values.Has(Round(displayValue - this.MinValue - this.Increment + 1))
+				return super.decreaseValue(displayValue)
+			else
+				return displayValue
+		}
+		else
+			return super.decreaseValue(displayValue)
 	}
 }
 
@@ -2621,10 +2697,13 @@ class DecimalHandler extends DiscreteValuesHandler {
 class FloatHandler extends NumberHandler {
 	iIncrement := false
 	iPrecision := false
-	iMultiplier := false
 
 	iMinValue := kUndefined
 	iMaxValue := kUndefined
+
+	iBase := false
+	iMultiplier := false
+	iPlaces := kUndefined
 
 	iReverse := false
 
@@ -2640,24 +2719,6 @@ class FloatHandler extends NumberHandler {
 		}
 	}
 
-	Multiplier {
-		Get {
-			return this.iMultiplier
-		}
-	}
-
-	Base {
-		Get {
-			return this.iBase
-		}
-	}
-
-	Reverse {
-		Get {
-			return this.iReverse
-		}
-	}
-
 	MinValue {
 		Get {
 			return ((this.iMinValue != kUndefined) ? this.iMinValue : super.MinValue)
@@ -2670,7 +2731,32 @@ class FloatHandler extends NumberHandler {
 		}
 	}
 
-	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined, base := 0, multiplier := 1) {
+	Base {
+		Get {
+			return this.iBase
+		}
+	}
+
+	Multiplier {
+		Get {
+			return this.iMultiplier
+		}
+	}
+
+	Places {
+		Get {
+			return this.iPlaces
+		}
+	}
+
+	Reverse {
+		Get {
+			return this.iReverse
+		}
+	}
+
+	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined
+		, base := 0, multiplier := 1, places := kUndefined) {
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
@@ -2680,6 +2766,7 @@ class FloatHandler extends NumberHandler {
 
 		this.iBase := base
 		this.iMultiplier := multiplier
+		this.iPlaces := places
 	}
 
 	formatValue(value) {
@@ -2687,11 +2774,13 @@ class FloatHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
-		return this.formatValue((rawValue - this.Base) * this.Multiplier)
+		return this.formatValue(((rawValue - this.Base) / this.Multiplier) + this.MinValue)
 	}
 
 	convertToRawValue(displayValue) {
-		return ((displayValue / this.Multiplier) + this.Base)
+		local value := (this.Base + ((displayValue - this.MinValue) * this.Multiplier))
+
+		return ((this.Places != kUndefined) ? Round(value, this.Places) : value)
 	}
 
 	increaseValue(displayValue) {
@@ -2742,25 +2831,136 @@ class ClicksHandler extends IntegerHandler {
 			super.__New(minValue, 1, minValue, maxValue)
 	}
 
+	valueIndex(rawValue) {
+		local index, candidate
+
+		try {
+			return inList(this.Values, rawValue)
+		}
+		catch Any {
+			for index, candidate in this.Values
+				if ((rawValue - candidate) < 0.00001)
+					return index
+
+			return false
+		}
+	}
+
 	validValue(displayValue) {
 		if this.Values
-			return inList(this.Values, this.convertToRawValue(displayValue))
+			return (this.valueIndex(this.convertToRawValue(displayValue)) != false)
 		else
 			return super.validValue(displayValue)
 	}
 
 	convertToDisplayValue(rawValue) {
-		if this.Values
-			return (this.MinValue + (inList(this.Values, rawValue) - 1))
+		local index
+
+		if this.Values {
+			index := this.valueIndex(rawValue)
+
+			return (this.MinValue + (index ? (index - 1) : 0))
+		}
 		else
 			return super.convertToDisplayValue(rawValue)
 	}
 
 	convertToRawValue(displayValue) {
-		if this.Values
-			return this.Values[this.MinValue - displayValue + 1]
+		if this.Values {
+			try {
+				return this.Values[Round(displayValue - this.MinValue + 1)]
+			}
+			catch Any {
+				return this.Values[1]
+			}
+		}
 		else
 			return super.convertToRawValue(displayValue)
+	}
+
+	increaseValue(displayValue) {
+		if this.Values {
+			if this.Values.Has(Round(displayValue - this.MinValue + this.Increment + 1))
+				return super.increaseValue(displayValue)
+			else
+				return displayValue
+		}
+		else
+			return super.increaseValue(displayValue)
+	}
+
+	decreaseValue(displayValue) {
+		if this.Values {
+			if this.Values.Has(Round(displayValue - this.MinValue - this.Increment + 1))
+				return super.decreaseValue(displayValue)
+			else
+				return displayValue
+		}
+		else
+			return super.decreaseValue(displayValue)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; ValuesHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ValuesHandler extends NumberHandler {
+	iValues := false
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+
+	__New(values*) {
+		this.iValues := values
+	}
+
+	valueIndex(rawValue) {
+		local index, candidate
+
+		try {
+			return inList(this.Values, rawValue)
+		}
+		catch Any {
+			for index, candidate in this.Values
+				if ((rawValue - candidate) < 0.00001)
+					return index
+
+			return false
+		}
+	}
+
+	validValue(displayValue) {
+		return (this.valueIndex(this.convertToRawValue(displayValue)) != false)
+	}
+
+	convertToDisplayValue(rawValue) {
+		return rawValue
+	}
+
+	convertToRawValue(displayValue) {
+		return displayValue
+	}
+
+	increaseValue(displayValue) {
+		try {
+			return this.convertToDisplayValue(this.Values[this.valueIndex(this.convertToRawValue(displayValue)) + 1])
+		}
+		catch Any {
+			return displayValue
+		}
+	}
+
+	decreaseValue(displayValue) {
+		try {
+			return this.convertToDisplayValue(this.Values[this.valueIndex(this.convertToRawValue(displayValue)) - 1])
+		}
+		catch Any {
+			return displayValue
+		}
 	}
 }
 

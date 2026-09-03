@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.2.3.0-alpha](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VPcqbP1O/Releases/Simulator%20Controller%207.2.3.0-alpha.zip) (Test build for 7.2.3. Changes: Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data, Fixed issue analyzer for ACC and ACE.)
+[7.2.3.0-alpha](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/VPcqbP1O/Releases/Simulator%20Controller%207.2.3.0-alpha.zip) (Test build for 7.2.3. Changes: Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data, Fixed issue analyzer for ACC and ACE, Extended handler in the "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7230) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-723) of this version and all the versions you might have skipped, before installing and using this version.
 

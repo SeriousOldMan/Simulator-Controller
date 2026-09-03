@@ -86,7 +86,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	  - BMW M4 GT3 Evo
 	  - Ferrari 296 GT3
 	  - Ford Mustang GT3
-	  - Porsche 911 GT3 R Rennsport (992)
+	  - Porsche 911 GT3 R Rennsport
 	  - Porsche 911 GT3 Cup (992)
 
 # Release history

@@ -2756,13 +2756,19 @@ class FloatHandler extends NumberHandler {
 	}
 
 	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined
-		, base := 0, multiplier := 1, places := kUndefined) {
+		, base := kUndefined, multiplier := 1, places := kUndefined) {
 		this.iMinValue := minValue
 		this.iMaxValue := maxValue
 		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
 
 		this.iIncrement := increment
 		this.iPrecision := precision
+
+		if (base == kUndefined)
+			if (minValue != kUndefined)
+				base := minValue
+			else
+				base := 0
 
 		this.iBase := base
 		this.iMultiplier := multiplier

@@ -1,5 +1,45 @@
 # Latest stable release
 
+## 7.2.3.0
+
+#### Date: 09/04/26
+
+#### Fixes
+
+  - Fixed a critical bug introduced two releases ago, that caused the issue analyzer of the "Setup Workbench" to report superfluous heavy oversteer handling problems for *Assetto Corsa EVO* and *Assetto Corsa Competizione*.
+  
+#### Changes
+
+  - Several important improvements for the "Setup Workbench":
+    - All known tracks are now shown in "Setup Workbench", not only the ones which already had been driven.
+	- All tracks are now available for the *All* cars selection, which allows you to use the telemetry system and also the Setup Engineer for a car that has no definition in the "Setup Workbench".
+    - All ever driven cars will now show up in the "Setup Workbench" for moddable simulators, not only the cars, which have a setup file definition.
+  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*. For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
+    - The current implementation is to be considered in *Alpha* state. There are still cases where it is also possible that a generated setup file is not accepted by *Assetto Corsa EVO*. This will be fixed with the next release.
+    - [Experts] The definition and behavior of *FloatHandler* in the [car definition files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) of "Setup Workbench" has changed. This handler was never used so far and is now the main handler for all car definition files of *Assetto Corsa EVO*.
+	- [Experts] The *ClicksHandler* and *RawHandler* both support a second variant which is also used for *Assetto Corsa EVO*. With this variant a list of values can be defined to be used in the setup file for each click.
+	- [Experts] A new handler *ValuesHandler* has been added, which allows you to define a list of allowed values, which are used for both the internal, as well as the display values,
+  - [Important] Huge performance improvements for all standings and track gap computations. This will allow even lower data update frequencies.
+    - As a result, the default for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has changed from 4 to 3 seconds now. If this causes problems on your computer, change the value in the "Session Database".
+  - [Internal] Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*. Tracks with UTF coding errors are suppressed as well.
+  - Tyre information has been added for the new cars of *Assetto Corsa EVO 0.9*.
+  - Thanks to @inthebagbud UK we have a fully updated list of cars and tyre data information for *RaceRoom Racing Experience*.
+  - [Internal] Migrated to AHK 2.1-alpha.31.
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Ferrari SF-25
+	  - BMW M4 GT3 Evo
+	  - Ferrari 296 GT3
+	  - Ford Mustang GT3
+	  - Porsche 911 GT3 R Rennsport
+	  - Porsche 911 GT3 Cup (992)
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.2.2.0
 
 #### Date: 08/28/26
@@ -52,44 +92,6 @@
       - TVR Tuscan T400R GT2
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722). A few fixes have been applied for cars in *Le Mans Ultimate* and your data may have been moved to an archive.
-
-# Upcoming release
-
-## 7.2.3.0
-
-#### Date: 09/04/26 (planned)
-
-#### Fixes
-
-  - Fixed a critical bug introduced two releases ago, that caused the issue analyzer of the "Setup Workbench" to report superfluous heavy oversteer handling problems for *Assetto Corsa EVO* and *Assetto Corsa Competizione*.
-  
-#### Changes
-
-  - Several important improvements for the "Setup Workbench":
-    - All known tracks are now shown in "Setup Workbench", not only the ones which already had been driven.
-	- All tracks are now available for the *All* cars selection, which allows you to use the telemetry system and also the Setup Engineer for a car that has no definition in the "Setup Workbench".
-    - All ever driven cars will now show up in the "Setup Workbench" for moddable simulators, not only the cars, which have a setup file definition.
-  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*. For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
-    - The current implementation is to be considered in *Alpha* state. There are still cases where it is also possible that a generated setup file is not accepted by *Assetto Corsa EVO*. This will be fixed with the next release.
-    - [Experts] The definition and behavior of *FloatHandler* in the [car definition files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) of "Setup Workbench" has changed. This handler was never used so far and is now the main handler for all car definition files of *Assetto Corsa EVO*.
-	- [Experts] The *ClicksHandler* and *RawHandler* both support a second variant which is also used for *Assetto Corsa EVO*. With this variant a list of values can be defined to be used in the setup file for each click.
-	- [Experts] A new handler *ValuesHandler* has been added, which allows you to define a list of allowed values, which are used for both the internal, as well as the display values,
-  - [Important] Huge performance improvements for all standings and track gap computations. This will allow even lower data update frequencies.
-    - As a result, the default for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has changed from 4 to 3 seconds now. If this causes problems on your computer, change the value in the "Session Database".
-  - [Internal] Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*. Tracks with UTF coding errors are suppressed as well.
-  - Tyre information has been added for the new cars of *Assetto Corsa EVO 0.9*.
-  - Thanks to @inthebagbud UK we have a fully updated list of cars and tyre data information for *RaceRoom Racing Experience*.
-  - [Internal] Migrated to AHK 2.1-alpha.31.
-  - New car models for "Setup Workbench":
-    - Assetto Corsa EVO
-	  - Ferrari SF-25
-	  - BMW M4 GT3 Evo
-	  - Ferrari 296 GT3
-	  - Ford Mustang GT3
-	  - Porsche 911 GT3 R Rennsport
-	  - Porsche 911 GT3 Cup (992)
-
-# Release history
 
 ## 7.2.1.0
 

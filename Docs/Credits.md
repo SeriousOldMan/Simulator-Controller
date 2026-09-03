@@ -23,7 +23,7 @@ Simulator Controller today supports multiple different languages for the user in
 
 Also very important are several contributions to the code base of Simulator Controller by @alejandrocq, @Awesome-XV and @EightOhFour. And I want to thank Jordan Moss (@Mossi) for the initial version of his great plugin, which provides most of the Simulator Controller data and state information to SimHub to support building dashboards and overlays.
 
-Then we have the contributors to the car meta data, especially Chris Matthews, Mirko Lesko, @neophyte, @inthebagbud UK, @rysimabd and @alejandrocq, who provided many car definitions for *Assetto Corsa*, *Assetto Corsa EVO*, *Automobilista 2*, *Le Mans Ultimate* and *RaceRoom Racing Experience*, and I also want to thank @mOellemeister for the *Le Mans Ultimate* data.
+Then we have the contributors to the car meta data, especially Chris Matthews, Mirko Lesko, @neophyte, @inthebagbud UK, @rysimabd and @alejandrocq, who provided many car definitions for *Assetto Corsa*, *Assetto Corsa EVO*, *Automobilista 2*, *Le Mans Ultimate* and *RaceRoom Racing Experience*, and I also want to thank @mOellemeister important parts of the *Le Mans Ultimate* data.
 
 And I don't want to forget Matus Celko (@winzarten), who was so kind to provide a special export format and also a REST API for telemetry data in his "Second Monitor" app.
 
@@ -33,7 +33,7 @@ And I don't want forget to mention Martin Moser, who contributed large parts of 
 
 Also, a big thank you goes out to @Caleidosttk for providing his excellent NAS solution and some of his precious bandwidth for an additional download mirror for installation and update packages.
 
-And another contribution must be mentioned here: Maurice Bish (@bishman) has made a tool available on [GitHub](https://github.com/mauricebish/SimControllerCreator), which makes it really easy also for beginners to create the car meta data required by the "Setup Workbench" for cars of *Assetto Corsa*.
+And more contributions must be mentioned here: Maurice Bish (@bishman) has made a tool available on [GitHub](https://github.com/mauricebish/SimControllerCreator), which makes it really easy also for beginners to create the car meta data required by the "Setup Workbench" for cars of *Assetto Corsa*. Another great addition is the CSP integration by @neophyte for *Assetto Corsa*, which is available on our Discord in the #share-your-mods channel.
 
 Some icons used by Simulator Controller are licensed for free from [Icons8.com](https://icons8.com) and from [Icon-Icons.com](https://icon-icons.com).
 

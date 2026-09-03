@@ -514,7 +514,7 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
   
     This handler comes in two flavors:
 	
-	- The first defines a range of numbers, which are mapped to a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+	- The first defines a range of numbers specified by a lower and an upper bound. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
 	
 	  *increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
 	  

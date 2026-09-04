@@ -739,7 +739,7 @@ registerLocalizationCallback(callback) {
 getUnit(type, translate := false) {
 	switch isObject(type) ? type.Type : type, false {
 		case "Pressure":
-			return getPressureUnit(isObject(type) ? type.Unit : gPressureUnit, translate)
+			return getPressureUnit(isObject(type) ? type.Unit : gPressureUnit, false)
 		case "Temperature":
 			return getTemperatureUnit(isObject(type) ? type.Unit : gTemperatureUnit, translate)
 		case "Length":
@@ -894,6 +894,32 @@ withFormat(type, format, function, arguments*) {
 	finally {
 		setFormat(type, oldFormat)
 	}
+}
+
+chooseUnits(unitsSet) {
+	local configuration := readMultiMap(kUserConfigDirectory . "Units.ini")
+
+	unitsSet := getMultiMapValues(readMultiMap(kUserConfigDirectory . "Units.ini"), unitsSet, false)
+
+	if unitsSet {
+		configuration := readMultiMap(kSimulatorConfigurationFile)
+
+		setMultiMapValues(configuration, "Localization", unitsSet)
+
+		writeMultiMap(kSimulatorConfigurationFile, configuration)
+	}
+
+	initializeLocalization()
+}
+
+allUnits() {
+	local units := getKeys(readMultiMap(kUserConfigDirectory . "Units.ini"))
+
+	return ((units.Length > 0) ? units : [translate("Standard")])
+}
+
+currentUnits() {
+	return translate("Standard")
 }
 
 

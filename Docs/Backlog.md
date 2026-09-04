@@ -1,6 +1,5 @@
 #### General
-  1. Support for unit conversions per simulator
-  2. Increase compatibility for installations, where the user is Administrator by default
+  1. Increase compatibility for installations, where the user is Administrator by default
 
 #### Simulation Support
   1. Better integration with the weather forecast data of *rFactor 2*

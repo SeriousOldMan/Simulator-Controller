@@ -46,6 +46,8 @@ global gTargetLanguageCode := "en"
 
 global gLocalizationCallbacks := []
 
+global gTargetUnits := translate("Standard")
+
 global gMassUnit := "Kilogram"
 global gTemperatureUnit := "Celcius"
 global gPressureUnit := "PSI"
@@ -376,10 +378,13 @@ internalTimeValue(timeFormat, time, arguments*) {
 	}
 }
 
-initializeLocalization() {
-	global gMassUnit, gTemperatureUnit, gPressureUnit, gVolumeUnit, gLengthUnit, gSpeedUnit, gNumberFormat, gTimeFormat
+initializeLocalization(fromMemory := false) {
+	global gTargetUnits, gMassUnit, gTemperatureUnit, gPressureUnit
+	global gVolumeUnit, gLengthUnit, gSpeedUnit, gNumberFormat, gTimeFormat
 
-	local configuration := readMultiMap(kSimulatorConfigurationFile)
+	local configuration := (fromMemory ? kSimulatorConfiguration : readMultiMap(kSimulatorConfigurationFile))
+
+	gTargetUnits := getMultiMapValue(configuration, "Localization", "Units", translate("Standard"))
 
 	gMassUnit := getMultiMapValue(configuration, "Localization", "MassUnit", "Kilogram")
 	gTemperatureUnit := getMultiMapValue(configuration, "Localization", "TemperatureUnit", "Celsius")
@@ -896,20 +901,25 @@ withFormat(type, format, function, arguments*) {
 	}
 }
 
-chooseUnits(unitsSet) {
+chooseUnits(units) {
 	local configuration := readMultiMap(kUserConfigDirectory . "Units.ini")
+	local unitsSet
 
-	unitsSet := getMultiMapValues(readMultiMap(kUserConfigDirectory . "Units.ini"), unitsSet, false)
+	unitsSet := getMultiMapValues(readMultiMap(kUserConfigDirectory . "Units.ini"), units, false)
 
 	if unitsSet {
 		configuration := readMultiMap(kSimulatorConfigurationFile)
 
 		setMultiMapValues(configuration, "Localization", unitsSet)
+		setMultiMapValues(configuration, "Localization", "Units", units)
 
 		writeMultiMap(kSimulatorConfigurationFile, configuration)
+
+		setMultiMapValues(kSimulatorConfiguration, "Localization", unitsSet)
+		setMultiMapValues(kSimulatorConfiguration, "Localization", "Units", units)
 	}
 
-	initializeLocalization()
+	initializeLocalization(true)
 }
 
 allUnits() {
@@ -919,7 +929,7 @@ allUnits() {
 }
 
 currentUnits() {
-	return translate("Standard")
+	return gTargetUnits
 }
 
 

@@ -207,6 +207,8 @@ class FormatsEditor extends ConfiguratorPanel {
 	saveToConfiguration(configuration) {
 		super.saveToConfiguration(configuration)
 
+		setMultiMapValue(configuration, "Localization", "Units", this.SelectedUnitSet)
+
 		setMultiMapValue(configuration, "Localization", "TemperatureUnit", kTemperatureUnits[this.Control["temperatureUnitDropDown"].Value])
 		setMultiMapValue(configuration, "Localization", "MassUnit", kMassUnits[this.Control["massUnitDropDown"].Value])
 		setMultiMapValue(configuration, "Localization", "PressureUnit", kPressureUnits[this.Control["pressureUnitDropDown"].Value])
@@ -246,6 +248,8 @@ class FormatsEditor extends ConfiguratorPanel {
 				this.saveUnitSet(this.SelectedUnitSet)
 
 				writeMultiMap(kUserConfigDirectory . "Units.ini", this.UnitSets)
+
+				chooseUnits(this.SelectedUnitSet)
 
 				return configuration
 			}

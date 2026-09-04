@@ -249,7 +249,7 @@ class FormatsEditor extends ConfiguratorPanel {
 
 				writeMultiMap(kUserConfigDirectory . "Units.ini", this.UnitSets)
 
-				chooseUnits(this.SelectedUnitSet)
+				chooseUnits(this.SelectedUnitSet, true)
 
 				return configuration
 			}
@@ -284,6 +284,8 @@ class FormatsEditor extends ConfiguratorPanel {
 													   , getMultiMapValue(unitSets, unitSet, "VolumeUnit")))
 		this.Control["speedUnitDropDown"].Choose(inList(kSpeedUnits
 													  , getMultiMapValue(unitSets, unitSet, "SpeedUnit")))
+		this.Control["lengthUnitDropDown"].Choose(inList(kLengthUnits
+													  , getMultiMapValue(unitSets, unitSet, "LengthUnit")))
 		this.Control["numberFormatDropDown"].Choose(inList(kNumberFormats
 														 , getMultiMapValue(unitSets, unitSet, "NumberFormat")))
 		this.Control["timeFormatDropDown"].Choose(inList(kTimeFormats
@@ -316,14 +318,13 @@ class FormatsEditor extends ConfiguratorPanel {
 		}
 	}
 
-	chooseUnitSet(unitSet) {
-		this.saveUnitSet(this.SelectedUnitSet)
+	chooseUnitSet(unitSet, save := true) {
+		if save
+			this.saveUnitSet(this.SelectedUnitSet)
 
 		this.loadUnitSet(unitSet)
 
-		this.iSelectedUnitSet := unitSet
-
-		this.Control["unitSetsDropDown"].Choose(inList(getKeys(this.UnitSets), this.SelectedUnitSet))
+		this.Control["unitSetsDropDown"].Choose(inList(getKeys(this.UnitSets), unitSet))
 
 		this.updatetState()
 	}
@@ -362,7 +363,7 @@ class FormatsEditor extends ConfiguratorPanel {
 			this.Control["unitSetsDropDown"].Delete()
 			this.Control["unitSetsDropDown"].Add(getKeys(this.UnitSets))
 
-			this.chooseUnitSet(getKeys(this.UnitSets)[1])
+			this.chooseUnitSet(getKeys(this.UnitSets)[1], false)
 		}
 	}
 }

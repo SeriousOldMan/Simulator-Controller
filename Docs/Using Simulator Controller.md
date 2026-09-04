@@ -166,6 +166,8 @@ Good to know: If you hold down the Control key when clicking on the "Download" b
 
 You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or ["Team Center Lite"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#normal-vs-simple-user-interface) (a simplified version of "Team Center") automatically during startup. Please note, that running the "Team Center" is only useful in a team session.
 
+The set of units you choose here will be active for all applications and Assistants run by the selected startup profile. This can be very helpful, when a simulator is using specific units that cannot be changed and you want Simulator Controller to match those units.
+
 If you choose one of a the simulators that have been registered for Simulator Controller, this simulator will be started automatically after all other startup tasks have finished.
 
 And you can choose furthermore, which Assistants will be available and whether they will talk and listen to you.

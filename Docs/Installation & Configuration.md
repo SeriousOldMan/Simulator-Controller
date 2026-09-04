@@ -317,7 +317,7 @@ All Simulator Controller applications can handle different units and data format
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Localization.JPG)
 
-Please be aware, that choosing a specifc unit or field format here does only change the handling on the user interface level. The internal data format is not changed, which is to keep in mind, when you are looking at some of the data files of Simulator Controller. The internal units and formats are:
+Please be aware, that choosing a specific unit or field format here does only change the handling on the user interface level. The internal data format is not changed, which is to keep in mind, when you are looking at some of the data files of Simulator Controller. The internal units and formats are:
 
 | Setting     | Value      |
 | ----------- | ---------- |
@@ -334,6 +334,8 @@ Please be aware, that choosing a specifc unit or field format here does only cha
 This choices are also the default, if you don't change anything here, except lap time, which is stored in milliseconds in the data files.
 
 Please be also aware, that changing any of the units in the user interface of Simulator Controller does not change the corresponding unit in your simulator. If you set the pressure unit to *Bar* here and your simulator is working with *PSI*, the conversion for all entered values in the applications of Simulator Controller will be handled automatically, but if you look at the info in your simulator, you will still see *PSI*, of course.
+
+Good to know: You can create several named sets of units and formats. The set that is selected here is the default when running applications from "Simulator Startup", but you can switch to a specific set, when starting using a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This can be very helpful, when a simulator is using specific units that cannot be changed and you want Simulator Controller to match those units.
 
 #### Tab *Voice Control*
 

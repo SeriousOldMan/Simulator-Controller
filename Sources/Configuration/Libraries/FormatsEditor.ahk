@@ -334,7 +334,7 @@ class FormatsEditor extends ConfiguratorPanel {
 
 		this.saveUnitSet(this.SelectedUnitSet)
 
-		result := withBlockedWindows(InputDlg, translate("Please enter the name for the units:"), translate("Units"), "w200 h80")
+		result := withBlockedWindows(InputDlg, translate("Please enter the name for the new units:"), translate("Units"), "w200 h80")
 
 		if (result.Result = "Ok") {
 			this.iSelectedUnitSet := result.Value
@@ -352,7 +352,7 @@ class FormatsEditor extends ConfiguratorPanel {
 	deleteUnitSet() {
 		local msgResult
 
-		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete this units?")
+		msgResult := withBlockedWindows(MsgDlg, translate("Do you really want to delete these units?")
 											  , translate("Delete")
 											  , {Options: 262436, Mode: "Question"
 											   , Buttons: collect(["Yes", "No"], translate)})

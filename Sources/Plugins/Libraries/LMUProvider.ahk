@@ -324,7 +324,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData, paused, fuelAmount, tyreWear, brakeWear
+		local sessionData, paused, fuelAmount, tyreWear, brakeWear, active
 
 		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	  , kUserConfigDirectory, kConfigDirectory))
@@ -351,6 +351,9 @@ class LMUProvider extends Sector397Provider {
 
 		static nextUpdate := 0
 		static lastFuelAmount := 0
+
+		static wasActive := false
+		static waitForFinish := false
 
 		if !tyreTypes {
 			tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
@@ -563,8 +566,25 @@ class LMUProvider extends Sector397Provider {
 						throw "Unknown session state detected in LMUProvider.readSessionData..."
 				}
 
-				if (logRequests && !getMultiMapValue(data, "Session Data", "Active", false))
+				active := getMultiMapValue(data, "Session Data", "Active", false)
+
+				if (logRequests && !active)
 					logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionData.State . "](" . sessionData.State[true] . ")...")
+
+				if !active {
+					if (wasActive && (getMultiMapValue(data, "Stint Data", "InPit", false)
+								   || getMultiMapValue(data, "Stint Data", "InPitLane", false)))
+						waitForFinish := (A_TickCount + 5000)
+
+					if (waitForFinish && (A_TickCount < waitForFinish)) {
+						setMultiMapValue(data, "Session Data", "Paused", true)
+						setMultiMapValue(data, "Session Data", "Active", true)
+					}
+					else
+						waitForFinish := false
+				}
+
+				wasActive := active
 
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)

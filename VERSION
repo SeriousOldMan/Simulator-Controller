@@ -3,7 +3,7 @@ Version=7.2.4.0-dev
 Target=7.2.4.0-release
 Date=09/05/26
 Download=
-Changes=Support for multiple unit sets, Fixed premature end of LMU sessions
+Changes=Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed spring rate for ACE BMW M4
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.3.0-release

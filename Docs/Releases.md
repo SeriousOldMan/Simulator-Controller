@@ -36,7 +36,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.4.0
+
+#### Date: 09/11/26 (planned)
+
+#### Fixes
+
+  - Implemented a workaround for a sporadic premature session end in *Le Mans Ultimate* that is caused by the game sometimes reporting to be in the main menu while the car is actually pitting at that moment.
+  
+#### Changes
+
+  - It is now possible to define several sets of units, for example "Metric" and "Imperial". Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
+  - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
 
 # Release history
 

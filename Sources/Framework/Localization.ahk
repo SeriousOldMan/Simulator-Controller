@@ -772,7 +772,7 @@ registerLocalizationCallback(callback) {
 getUnit(type, translate := false) {
 	switch isObject(type) ? type.Type : type, false {
 		case "Pressure":
-			return getPressureUnit(isObject(type) ? type.Unit : gPressureUnit, false)
+			return getPressureUnit(isObject(type) ? type.Unit : gPressureUnit, translate)
 		case "Temperature":
 			return getTemperatureUnit(isObject(type) ? type.Unit : gTemperatureUnit, translate)
 		case "Length":

@@ -1212,7 +1212,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("Text", "x400 ys w60 h23 X:Move(0.1) +0x200", translate("Chart"))
 		workbenchGui.Add("DropDownList", "x464 yp w80 X:Move(0.1) Choose1 +0x200 vchartSourceDropDown", collect(["Telemetry", "Strategy", "Comparison"], translate)).OnEvent("Change", chooseChartSource)
-		workbenchGui.Add("DropDownList", "x549 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		workbenchGui.Add("DropDownList", "x549 yp w80 X:Move(0.1) Choose1 vchartTypeDropDown", collect(["Scatter", "Bar ", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		this.iChartViewer := workbenchGui.Add("HTMLViewer", "x400 yp+24 w950 h350 Border vchartViewer X:Move(0.1) W:Grow(0.9) H:Grow(0.2)")
 

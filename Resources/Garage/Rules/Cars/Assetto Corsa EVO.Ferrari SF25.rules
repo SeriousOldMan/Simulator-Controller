@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         Ferrari SF-25                   ;;;
+;;;                                         Ferrari SF25                    ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,10 +11,10 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "Ferrari SF-25",
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "Ferrari SF25",
 									 [Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 									  Differential.Coast, Differential.Power])),
-				 (Prove: removeSettings("Assetto Corsa EVO", "Ferrari SF-25",
+				 (Prove: removeSettings("Assetto Corsa EVO", "Ferrari SF25",
 										[Brake.Pressure,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
 										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,

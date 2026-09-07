@@ -44,7 +44,7 @@
 
   - Implemented a workaround for a sporadic premature session end in *Le Mans Ultimate* that is caused by the game sometimes reporting to be in the main menu while the car is actually pitting at that moment.
   - Fixed several wrong setting units in the car setup definitions added for *Assetto Corsa EVO* in the last release.
-  - Added tyre data information for several missing cars in *Assetto Corsa EVO*.
+  - Added tyre data information for several missing or wrongly spelled cars in *Assetto Corsa EVO*.
   
 #### Changes
 
@@ -52,6 +52,7 @@
   - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO
+	  - Ferrari SF25 (renamed, was formerly SF-25)
 	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)
 	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
 	  - Audi R8 LMS GT3 Evo II

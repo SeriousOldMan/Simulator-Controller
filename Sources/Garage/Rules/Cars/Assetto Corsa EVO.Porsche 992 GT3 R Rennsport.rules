@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         Porsche 911 GT3 R Rennsport     ;;;
+;;;                                         Porsche 992 GT3 R Rennsport     ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,9 +11,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "Porsche 911 GT3 R Rennsport",
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "Porsche 992 GT3 R Rennsport",
 									 [Geometry.Caster.Left, Geometry.Caster.Right])),
-				 (Prove: removeSettings("Assetto Corsa EVO", "Porsche 911 GT3 R Rennsport",
+				 (Prove: removeSettings("Assetto Corsa EVO", "Porsche 992 GT3 R Rennsport",
 										[Aero.Wing.Front, Brake.Pressure,
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
 										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,

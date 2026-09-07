@@ -43,12 +43,13 @@
 #### Fixes
 
   - Implemented a workaround for a sporadic premature session end in *Le Mans Ultimate* that is caused by the game sometimes reporting to be in the main menu while the car is actually pitting at that moment.
+  - Fixed several wrong setting units in the car setup definitions added for *Assetto Corsa EVO* in the last release.
+  - Added tyre data information for several missing cars in *Assetto Corsa EVO*.
   
 #### Changes
 
   - It is now possible to define several sets of units, for example "Metric", "Imperial" or whatever you like. Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
   - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
-  - Added tyre data information for several missing cars in *Assetto Corsa EVO*.
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO
 	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)

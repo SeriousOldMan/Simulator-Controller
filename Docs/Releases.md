@@ -48,12 +48,16 @@
 
   - It is now possible to define several sets of units, for example "Metric", "Imperial" or whatever you like. Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
   - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
+  - Added tyre data information for several missing cars in *Assetto Corsa EVO*.
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO
+	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)
 	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
+	  - Audi R8 LMS GT3 Evo II
 	  - Maserati GT2
 	  - Mercedes-AMG GT2
 	  - KTM X-Bow GT2
+	  - Porsche 911 GT2 RS Clubsport EVO
 
 # Release history
 

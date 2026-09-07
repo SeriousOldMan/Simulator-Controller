@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         KTM X-Bow GT2                   ;;;
+;;;                                         Mercedes-AMG GT2                ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,9 +11,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "KTM X-Bow GT2",
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "Mercedes-AMG GT2",
 									 [Geometry.Caster.Left, Geometry.Caster.Right])),
-				 (Prove: removeSettings("Assetto Corsa EVO", "KTM X-Bow GT2",
+				 (Prove: removeSettings("Assetto Corsa EVO", "Mercedes-AMG GT2",
 										[Electronics.Map, Aero.Wing.Front, Brake.Pressure,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,

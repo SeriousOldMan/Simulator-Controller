@@ -50,7 +50,7 @@
 
   - It is now possible to define several sets of units, for example "Metric", "Imperial" or whatever you like. Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
   - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
-  - New car models for "Setup Workbench":
+  - New and updated car models for "Setup Workbench":
     - Assetto Corsa EVO
 	  - Ferrari SF25 (renamed, was formerly SF-25)
 	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)

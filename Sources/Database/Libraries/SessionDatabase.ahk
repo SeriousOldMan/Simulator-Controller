@@ -1238,6 +1238,17 @@ class SessionDatabase extends ConfigurationItem {
 					for key, value in values
 						setMultiMapValue(data, section, key, value)
 
+			if (cache == this.sTrackData) {
+				for key, value in getMultiMapValues(data, "Track Names Long")
+					setMultiMapValue(data, "Track Codes", value, key)
+
+				for key, value in getMultiMapValues(data, "Track Names Short")
+					setMultiMapValue(data, "Track Codes", value, key)
+			}
+			else if (cache == this.sCarData)
+				for key, value in getMultiMapValues(data, "Car Names")
+					setMultiMapValue(data, "Car Codes", value, key)
+
 			cache[simulator] := data
 
 			return data

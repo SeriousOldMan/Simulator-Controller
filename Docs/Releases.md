@@ -56,9 +56,9 @@
     - Assetto Corsa EVO
 	  - Ferrari SF25 (renamed, was formerly SF-25)
 	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)
+	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
 	  - Porsche 911 Turbo 3.6 (964)
 	  - Ferrari Daytona SP3
-	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
 	  - Audi R8 LMS GT3 Evo II
 	  - Maserati GT2
 	  - Mercedes-AMG GT2

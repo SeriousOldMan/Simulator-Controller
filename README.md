@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.2.4.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/yyaXf6up/Releases/Simulator%20Controller%207.2.4.0-dev.zip) (Early build for 7.2.4. Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New cars models for "Setup Workbench".)
+[7.2.4.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f8Z-YueE/Releases/Simulator%20Controller%207.2.4.0-beta.zip) (Test build for 7.2.4. Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New cars models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7240) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-724) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.3.0-release](https://cutt.ly/Fyj4wrqO) (Changes: Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data, Fixed issue analyzer for ACC and ACE, Extended handler in the "Setup Workbench".)
+[7.2.4.0-release]() (Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New cars models for "Setup Workbench".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7230) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-723) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7240) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-724) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.2.2.0-release](https://cutt.ly/4yg2ZtVe) (Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMU, Added meta data for 296 EVO for LMU.)
+[7.2.3.0-release](https://cutt.ly/Fyj4wrqO) (Changes: Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data, Fixed issue analyzer for ACC and ACE, Extended handler in the "Setup Workbench".)
 
-[7.2.1.0-release](https://cutt.ly/zyd8ZJvn) (Changes: Fixed several translations, Fixed minor bugs in telemetry handling, Optical enhancements in "Simulator Setup" and "Simulator Configuration", Fixed diary folder location, Fixed scrolling of Setup Engineer telemetry list, Modified plugin registration method, Prevent crash for sound play failure in "Simulator Setup", Workaround for failing SoundPlay.)
+[7.2.2.0-release](https://cutt.ly/4yg2ZtVe) (Changes: Updated R3E car meta data, Race motivation support by the Driving Coach, Updated and added car meta data for AMS2, Fixed lap-based tyre change, Support for Piper TTS, Fixed Data redraw in "Solo Center", Disable unavailable voice options during configuration, Fixed repair requests for LMU, Added meta data for 296 EVO for LMU.)
 
 #### Current development build
 
-[7.2.4.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/f8Z-YueE/Releases/Simulator%20Controller%207.2.4.0-beta.zip) (Test build for 7.2.4. Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New cars models for "Setup Workbench".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7240) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-724) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

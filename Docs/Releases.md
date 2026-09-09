@@ -1,5 +1,42 @@
 # Latest stable release
 
+## 7.2.4.0
+
+#### Date: 09/11/26
+
+#### Fixes
+
+  - Implemented a workaround for a sporadic premature session end in *Le Mans Ultimate* that is caused by the game sometimes reporting to be in the main menu while the car is actually pitting at that moment.
+  - Fixed several wrong setting units in the car setup definitions added for *Assetto Corsa EVO* in the last release.
+  - Added tyre data information for several missing or wrongly spelled cars in *Assetto Corsa EVO*.
+  
+#### Changes
+
+  - It is now possible to define several sets of units, for example "Metric", "Imperial" or whatever you like. Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
+  - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
+  - Updated track names database for *Automobilista 2* by @inthebagbud UK.
+  - Updated track names database as well as car database for *RaceRoom Racing Experience* by @inthebagbud UK. All cars and tracks are now visible in the "Session Database", for example, if so chosen in the settings.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Ferrari SF25 (renamed, was formerly SF-25)
+	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)
+	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
+	  - Porsche 911 Turbo 3.6 (964)
+	  - Ferrari Daytona SP3
+	  - Ferrari F40 LM
+	  - Ferrari 288 GTO
+	  - Audi R8 LMS GT3 Evo II
+	  - Maserati GT2
+	  - Mercedes-AMG GT2
+	  - KTM X-Bow GT2
+	  - Porsche 911 GT2 RS Clubsport EVO
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.2.3.0
 
 #### Date: 09/04/26
@@ -33,39 +70,6 @@
 	  - Ford Mustang GT3
 	  - Porsche 911 GT3 R Rennsport
 	  - Porsche 911 GT3 Cup (992)
-
-# Upcoming release
-
-## 7.2.4.0
-
-#### Date: 09/11/26 (planned)
-
-#### Fixes
-
-  - Implemented a workaround for a sporadic premature session end in *Le Mans Ultimate* that is caused by the game sometimes reporting to be in the main menu while the car is actually pitting at that moment.
-  - Fixed several wrong setting units in the car setup definitions added for *Assetto Corsa EVO* in the last release.
-  - Added tyre data information for several missing or wrongly spelled cars in *Assetto Corsa EVO*.
-  
-#### Changes
-
-  - It is now possible to define several sets of units, for example "Metric", "Imperial" or whatever you like. Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
-  - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
-  - Updated track names database for *Automobilista 2* by @inthebagbud UK.
-  - Updated track names database as well as car database for *RaceRoom Racing Experience* by @inthebagbud UK. All cars and tracks are now visible in the "Session Database", for example, if so chosen in the settings.
-  - New and updated car models for "Setup Workbench":
-    - Assetto Corsa EVO
-	  - Ferrari SF25 (renamed, was formerly SF-25)
-	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)
-	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
-	  - Porsche 911 Turbo 3.6 (964)
-	  - Ferrari Daytona SP3
-	  - Audi R8 LMS GT3 Evo II
-	  - Maserati GT2
-	  - Mercedes-AMG GT2
-	  - KTM X-Bow GT2
-	  - Porsche 911 GT2 RS Clubsport EVO
-
-# Release history
 
 ## 7.2.2.0
 

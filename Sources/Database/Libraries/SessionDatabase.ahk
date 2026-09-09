@@ -1234,18 +1234,16 @@ class SessionDatabase extends ConfigurationItem {
 			name := (kUserHomeDirectory . "Simulator Data\" . simulator . "\" . fileName)
 
 			if FileExist(name)
-				for section, values in readMultiMap(name)
-					for key, value in values
-						setMultiMapValue(data, section, key, value)
+				addMultiMapValues(data, readMultiMap(name))
 
-			if (cache == this.sTrackData) {
+			if (fileName = "Track Data.ini") {
 				for key, value in getMultiMapValues(data, "Track Names Long")
 					setMultiMapValue(data, "Track Codes", value, key)
 
 				for key, value in getMultiMapValues(data, "Track Names Short")
 					setMultiMapValue(data, "Track Codes", value, key)
 			}
-			else if (cache == this.sCarData)
+			else if (fileName = "Car Data.ini")
 				for key, value in getMultiMapValues(data, "Car Names")
 					setMultiMapValue(data, "Car Codes", value, key)
 

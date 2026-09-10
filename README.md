@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.4.0-release]() (Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New cars models for "Setup Workbench".)
+[7.2.4.0-release](https://cutt.ly/CylXW1AW) (Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New car models for "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7240) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-724) of this version and all the versions you might have skipped, before installing and using this version.
 

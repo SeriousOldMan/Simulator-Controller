@@ -33,7 +33,19 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.5.0
+
+#### Date: 09/18/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Porsche 718 Cayman GT4 Clubsport
 
 # Release history
 

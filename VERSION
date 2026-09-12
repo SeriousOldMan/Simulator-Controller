@@ -1,8 +1,8 @@
 [Development]
 Version=7.2.5.0-dev
 Target=7.2.5.0-release
-Date=09/11/26
-Download=New car models for "Setup Workbench"
+Date=09/12/26
+Download=New car models for "Setup Workbench", Fixed Driving Coach reference lap saving
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.4.0-release

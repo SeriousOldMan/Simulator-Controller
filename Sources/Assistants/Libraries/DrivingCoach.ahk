@@ -1805,7 +1805,7 @@ class DrivingCoach extends GridRaceAssistant {
 					addMultiMapValues(info, bestInfo)
 
 					setMultiMapValue(info, "Lap", "Driver", getMultiMapValue(bestInfo, "Info", "Driver"))
-					setMultiMapValue(info, "Lap", "LapTime", bestLapTime)
+					setMultiMapValue(info, "Lap", "LapTime", bestSessionLapTime)
 
 					if (getMultiMapValue(bestInfo, "Info", "SectorTimes", kUndefined) != kUndefined)
 						setMultiMapValue(info, "Lap", "SectorTimes", getMultiMapValue(bestInfo, "Info", "SectorTimes"))

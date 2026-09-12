@@ -39,7 +39,7 @@
 
 #### Fixes
 
-  - None this time...
+  - Fixed a bug for the Driving Coach, that prevented to store the correct lap time, when auto-saving a reference lap.
   
 #### Changes
 

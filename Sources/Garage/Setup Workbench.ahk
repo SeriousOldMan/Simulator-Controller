@@ -1009,7 +1009,7 @@ class SetupWorkbench extends ConfigurationItem {
 					}
 
 			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*"))
-				for ignore, car in SessionDatabase().getCars(simulator) {
+				for ignore, car in SessionDatabase().getCars(simulator, true) {
 					car := SessionDatabase.getCarName(simulator, car)
 
 					if !inList(cars, car)

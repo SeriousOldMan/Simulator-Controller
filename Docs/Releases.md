@@ -40,9 +40,11 @@
 #### Fixes
 
   - Fixed a bug for the Driving Coach, that prevented to store the correct lap time, when auto-saving a reference lap.
+  - Fixed a bug in the "Setup Workbench", that prevented to show up cars that have not been driven yet.
   
 #### Changes
 
+  - Updated car database for *RaceRoom Racing Experience* by @inthebagbud UK.
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO
 	  - Porsche 718 Cayman GT4 Clubsport

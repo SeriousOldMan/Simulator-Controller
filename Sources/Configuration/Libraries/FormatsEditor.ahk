@@ -24,7 +24,7 @@ class FormatsEditor extends ConfiguratorPanel {
 	iClosed := false
 
 	iUnitSets := newMultiMap()
-	iSelectedUnitSet := "Standard"
+	iSelectedUnitSet := translate("Standard")
 
 	UnitSets {
 		Get {

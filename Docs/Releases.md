@@ -45,9 +45,14 @@
 #### Changes
 
   - Updated car database for *RaceRoom Racing Experience* by @inthebagbud UK.
-  - New car models for "Setup Workbench":
+  - New and updated car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - BMW M4 LMGT3 (update with differential preload setting)
     - Assetto Corsa EVO
 	  - Porsche 718 Cayman GT4 Clubsport
+	  - KTM X Bow GT4
+    - Assetto Corsa EVO (by @\|FuZzYyY\|)
+	  - Ford Escort RS Cosworth
 
 # Release history
 

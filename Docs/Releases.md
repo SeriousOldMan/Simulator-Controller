@@ -41,6 +41,10 @@
 
   - Fixed a bug for the Driving Coach, that prevented to store the correct lap time, when auto-saving a reference lap.
   - Fixed a bug in the "Setup Workbench", that prevented to show up cars that have not been driven yet.
+  - Fixed handling for over long car names in *Assetto Corsa EVO*. This relates to the cars:
+    - BMW M3 E30 Sport Evo (Evolution III)
+    - Lancia Delta HF integrale Evoluzione II
+    - Toyota Sprinter Trueno 1600GT-Apex (AE89)
   
 #### Changes
 
@@ -49,6 +53,7 @@
     - Le Mans Ultimate
 	  - BMW M4 LMGT3 (update with differential preload setting)
     - Assetto Corsa EVO
+	  - BMW M3 E30 Sport Evo (Evolution III)
 	  - Audi R8 LMS GT4 Evo
 	  - Porsche 718 Cayman GT4 Clubsport
 	  - KTM X Bow GT4

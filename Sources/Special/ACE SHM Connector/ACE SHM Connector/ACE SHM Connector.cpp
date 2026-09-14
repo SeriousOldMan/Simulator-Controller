@@ -150,7 +150,19 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 	return true;
 }
 
-std::string normalizeName(string result) {
+string trim(const std::string& str) {
+	const string WHITESPACE = " \n\r\t\f\v";
+	size_t start = str.find_first_not_of(WHITESPACE);
+
+	if (start == string::npos)
+		return ""; // String is all whitespace
+
+	size_t end = str.find_last_not_of(WHITESPACE);
+
+	return str.substr(start, end - start + 1);
+}
+
+string normalizeName(string result) {
 	replace(result, "/", "");
 	replace(result, ":", "");
 	replace(result, "*", "");
@@ -159,7 +171,7 @@ std::string normalizeName(string result) {
 	replace(result, ">", "");
 	replace(result, "|", "");
 
-	return result;
+	return trim(result);
 }
 
 inline const string getSession(int sessionType, string phaseName) {

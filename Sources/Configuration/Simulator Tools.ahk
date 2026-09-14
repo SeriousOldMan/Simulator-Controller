@@ -1775,6 +1775,10 @@ updateInstallationForV500() {
 }
 */
 
+updateConfigurationForV725() {
+	deleteFile(kUserHomeDirectory . "Simulator Data\ACE\Car Data.ini")
+}
+
 updateConfigurationForV722() {
 	deleteFile(kUserHomeDirectory . "Simulator Data\LMU\Car Data.ini")
 

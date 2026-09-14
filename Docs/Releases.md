@@ -49,6 +49,7 @@
     - Le Mans Ultimate
 	  - BMW M4 LMGT3 (update with differential preload setting)
     - Assetto Corsa EVO
+	  - Audi R8 LMS GT4 Evo
 	  - Porsche 718 Cayman GT4 Clubsport
 	  - KTM X Bow GT4
     - Assetto Corsa EVO (by @\|FuZzYyY\|)

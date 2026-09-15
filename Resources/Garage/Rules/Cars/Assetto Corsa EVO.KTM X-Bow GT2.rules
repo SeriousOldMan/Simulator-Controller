@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         Ferrari SF25                    ;;;
+;;;                                         KTM X-Bow GT2                   ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,13 +11,10 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "Ferrari SF25",
-									 [Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
-									  Differential.Coast, Differential.Power])),
-				 (Prove: removeSettings("Assetto Corsa EVO", "Ferrari SF25",
-										[Brake.Pressure,
-										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
-										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "KTM X-Bow GT2",
+									 [Geometry.Caster.Left, Geometry.Caster.Right])),
+				 (Prove: removeSettings("Assetto Corsa EVO", "KTM X-Bow GT2",
+										[Electronics.Map, Aero.Wing.Front, Brake.Pressure,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
 										 Bumpstop.Range.Front.Left, Bumpstop.Range.Front.Right,

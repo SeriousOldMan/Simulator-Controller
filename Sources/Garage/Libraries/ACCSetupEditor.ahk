@@ -156,12 +156,19 @@ class ACCSetupEditor extends FileSetupEditor {
 
 	chooseSetup(load := true) {
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
+		local car := this.Workbench.SelectedCar[false]
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local fileName, theSetup
 
-		if (car && (car != true))
-			directory .= ("\" . car)
+		if (car && (car != true)) {
+			car := SessionDatabase.getCarName(this.Workbench.SelectedSimulator[false], car)
+
+			if FileExist(directory . "\" . car)
+				directory .= ("\" . car)
+			else
+				directory .= ("\" . SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false]
+															 , this.Workbench.SelectedCar[false]))
+		}
 
 		if (track && (track != true))
 			directory .= ("\" . track)
@@ -238,12 +245,19 @@ class ACCSetupEditor extends FileSetupEditor {
 class ACCSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
 		local directory := (A_MyDocuments . "\Assetto Corsa Competizione\Setups")
-		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
+		local car := this.Workbench.SelectedCar[false]
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local fileName, theSetup, ignore
 
-		if (car && (car != true))
-			directory .= ("\" . car)
+		if (car && (car != true)) {
+			car := SessionDatabase.getCarName(this.Workbench.SelectedSimulator[false], car)
+
+			if FileExist(directory . "\" . car)
+				directory .= ("\" . car)
+			else
+				directory .= ("\" . SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false]
+															 , this.Workbench.SelectedCar[false]))
+		}
 
 		if (track && (track != true))
 			directory .= ("\" . track)

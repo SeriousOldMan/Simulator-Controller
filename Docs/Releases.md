@@ -45,6 +45,7 @@
 #### Changes
 
   - Updated car database for *RaceRoom Racing Experience* by @inthebagbud UK.
+  - Introduced extended car name handling for *Assetto Corsa EVO*, so the cars like "KTM X-Bow GT4", which is named without the hyphen internally by *Assetto Corsa EVO*, are named correctly.
   - New and updated car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - BMW M4 LMGT3 (update with differential preload setting)

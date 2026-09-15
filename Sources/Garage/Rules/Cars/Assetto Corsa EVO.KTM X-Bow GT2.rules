@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         KTM X Bow GT4                   ;;;
+;;;                                         KTM X-Bow GT2                   ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,10 +11,9 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "KTM X Bow GT4",
-									 [Geometry.Caster.Left, Geometry.Caster.Right,
-									  Differential.Coast, Differential.Power])),
-				 (Prove: removeSettings("Assetto Corsa EVO", "KTM X Bow GT4",
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "KTM X-Bow GT2",
+									 [Geometry.Caster.Left, Geometry.Caster.Right])),
+				 (Prove: removeSettings("Assetto Corsa EVO", "KTM X-Bow GT2",
 										[Electronics.Map, Aero.Wing.Front, Brake.Pressure,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,
 										 Bumpstop.Rate.Rear.Left, Bumpstop.Rate.Rear.Right,
@@ -23,5 +22,4 @@
 										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
 										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
 										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
-										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
-										 Differential.Preload]))
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))

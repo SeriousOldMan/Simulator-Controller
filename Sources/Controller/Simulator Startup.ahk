@@ -3179,11 +3179,11 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200", translate("Mode"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
-		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Control Center"))
-		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Solo Center", "Team Center", "Team Center Lite"] : ["None", "Solo Center"], translate))
-
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Units"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileUnitsDropDown", allUnits()).OnEvent("Change", editStartupProfiles.Bind("Update State"))
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Control Center"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Solo Center", "Team Center", "Team Center Lite"] : ["None", "Solo Center"], translate))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Simulator"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . (392 - (x1 - x0)) . " vprofileSimulatorDropDown", concatenate([translate("None")], string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", ""))))

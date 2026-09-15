@@ -1,17 +1,17 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
-;;;                                         Porsche 911 Turbo 3.6 (964)     ;;;
-;;;                                         Setup Rules                     ;;;
-;;;                                                                         ;;;
-;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
-;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competizione           ;;;
+;;;                                         BMW M3 E30 Sport Evo (Evolution III) ;;;
+;;;                                         Setup Rules                          ;;;
+;;;                                                                              ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                         ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                             ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;-------------------------------------------------------------------------;;;
-;;;                            Initialization                               ;;;
-;;;-------------------------------------------------------------------------;;;
+;;;------------------------------------------------------------------------------;;;
+;;;                            Initialization                                    ;;;
+;;;------------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "Porsche 911 Turbo 3.6 (964)",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "BMW M3 E30 Sport Evo (Evolution III)",
 										[Electronics.Map, Electronics.TC, Electronics.ABS,
 										 Brake.Balance, Brake.Pressure,
 										 Aero.Height.Front, Aero.Height.Rear, Aero.Wing.Front, Aero.Wing.Rear,

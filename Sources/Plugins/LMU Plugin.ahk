@@ -110,7 +110,7 @@ class LMUPlugin extends Sector397Plugin {
 								this.iRemainingFuelAmount := this.iLastFuelAmount
 
 							if isDebug()
-								logMessage(kLogDebug, (initial ? "Initial" : "Updated") . " fuel plan - Remaining: " . Round(this.iLastFuelAmount, 1) . "; Refuel: " . Round(value, 1))
+								logMessage(kLogWarn, (initial ? "Initial" : "Updated") . " fuel plan - Remaining: " . Round(this.iLastFuelAmount, 1) . "; Refuel: " . Round(value, 1))
 
 							pitstop.setRefuelLevel(value + this.iRemainingFuelAmount)
 						case "Change":

@@ -49,6 +49,7 @@
 #### Changes
 
   - Updated car database for *RaceRoom Racing Experience* by @inthebagbud UK.
+  - [Internal] Migrated to AHK 2.1-alpha.31.
   - New and updated car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - BMW M4 LMGT3 (update with differential preload setting)

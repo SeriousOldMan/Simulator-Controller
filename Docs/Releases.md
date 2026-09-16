@@ -45,11 +45,11 @@
     - BMW M3 E30 Sport Evo (Evolution III)
     - Lancia Delta HF integrale Evoluzione II
     - Toyota Sprinter Trueno 1600GT-Apex (AE89)
-  - {Experts] Fixed a bug in the *RawHandler* used in car setup definition files and clarified the documentation.
+  - [Experts] Fixed a bug in the *RawHandler* used in car setup definition files and clarified the documentation.
   
 #### Changes
 
-  - Updated car database for *RaceRoom Racing Experience* by @inthebagbud UK.
+  - Updated car database and also the the tyre information for *RaceRoom Racing Experience* by @inthebagbud UK.
   - Introduced extended car name handling for *Assetto Corsa EVO*, so the cars like "KTM X-Bow GT4", which is named without the hyphen internally by *Assetto Corsa EVO*, are named correctly.
   - [Internal] Migrated to AHK 2.1-alpha.31.
   - New and updated car models for "Setup Workbench":

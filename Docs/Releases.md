@@ -57,6 +57,7 @@
     - Assetto Corsa EVO
 	  - BMW M3 E30 Sport Evo (Evolution III)
 	  - Lotus Exige V6 Cup
+	  - Mazda MX-5 ND Cup
 	  - Audi R8 LMS GT4 Evo
 	  - Porsche 718 Cayman GT4 Clubsport
 	  - KTM X Bow GT4

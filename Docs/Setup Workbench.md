@@ -510,7 +510,7 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
   
     The values, both internally and also for the display are defined as the list of supplied values and no conversion will be applied. If a conversion is necessary, see the next two handlers.
 
-  - **RawHandler(increment, minValue, maxValue)** or **RawHandler(increment, minValue, value1, value2, ...)**
+  - **RawHandler(increment, minValue, maxValue)** or **RawHandler(increment, value1, value2, ...)**
   
     This handler comes in two flavors:
 	
@@ -520,9 +520,9 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	  Good to know: The special case, where *increment* is **1** and *minValue* is an integer, this handler will be identical in behavior to the second variant of *ClicksHandler*.
 	  
-	- The second variant maps a range of values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. Of course, there must be more than one value in this list.
+	- The second variant maps a range of values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. For technical reasons, there must be more than two values in this list.
 
-      Please note, that in this variant the first two arguments *increment* and *minValue* are ignored.
+      Please note, that in this variant the first argument *increment* is ignored.
 
   - **ClicksHandler(minValue, maxValue)** or **ClicksHandler(minValue, value1, value2, ...)**
   

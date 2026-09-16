@@ -45,6 +45,7 @@
     - BMW M3 E30 Sport Evo (Evolution III)
     - Lancia Delta HF integrale Evoluzione II
     - Toyota Sprinter Trueno 1600GT-Apex (AE89)
+  - {Experts] Fixed a bug in the *RawHandler* used in car setup definition files and clarified the documentation.
   
 #### Changes
 

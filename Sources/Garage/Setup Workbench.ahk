@@ -2566,10 +2566,11 @@ class RawHandler extends DiscreteValuesHandler {
 	__New(increment := 1, minValue := kUndefined, maxValue := kUndefined, values*) {
 		if (values.Length > 0) {
 			values.InsertAt(1, maxValue)
+			values.InsertAt(1, minValue)
 
 			this.iValues := values
 
-			super.__New(minValue, increment, minValue, minValue + values.Length - 1)
+			super.__New(minValue, increment, minValue, values[values.Length])
 		}
 		else
 			super.__New(0, increment, minValue, maxValue)
@@ -2603,7 +2604,7 @@ class RawHandler extends DiscreteValuesHandler {
 		if this.Values {
 			index := this.valueIndex(rawValue)
 
-			return (this.MinValue + (index ? ((index - 1) * this.Increment) : false))
+			return (index ? this.Values[index] : false)
 		}
 		else
 			return rawValue
@@ -2613,34 +2614,36 @@ class RawHandler extends DiscreteValuesHandler {
 		local index
 
 		if this.Values {
-			index := Round(((displayValue - this.MinValue) / this.Increment) + 1)
+			index := this.valueIndex(displayValue)
 
-			return (this.Values.Has(index) ? this.Values[index] : false)
+			return (index ? this.Values[index] : false)
 		}
 		else
 			return displayValue
 	}
 
 	increaseValue(displayValue) {
+		local index
+
 		if this.Values {
-			if this.Values.Has(Round(displayValue - this.MinValue + this.Increment + 1))
-				return super.increaseValue(displayValue)
-			else
-				return displayValue
+			index := this.ValueIndex(this.convertToRawValue(displayValue))
+
+			return (index ? this.Values[Min(this.Values.Length, index + 1)] : displayValue)
 		}
 		else
 			return super.increaseValue(displayValue)
 	}
 
 	decreaseValue(displayValue) {
+		local index
+
 		if this.Values {
-			if this.Values.Has(Round(displayValue - this.MinValue - this.Increment + 1))
-				return super.decreaseValue(displayValue)
-			else
-				return displayValue
+			index := this.ValueIndex(this.convertToRawValue(displayValue))
+
+			return (index ? this.Values[Max(1, index - 1)] : displayValue)
 		}
 		else
-			return super.decreaseValue(displayValue)
+			return super.increaseValue(displayValue)
 	}
 }
 

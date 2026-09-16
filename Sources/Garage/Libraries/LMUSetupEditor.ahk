@@ -195,7 +195,6 @@ class LMUSetupEditor extends FileSetupEditor {
 
 	chooseSetup(load := true) {
 		local lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
-		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local directory := ""
 		local fileName, theSetup
@@ -208,7 +207,7 @@ class LMUSetupEditor extends FileSetupEditor {
 
 		if (track && (track != true))
 			loop Files, directory . "\*.*", "D"
-				if (InStr(track, A_LoopFileName) == 1) {
+				if ((InStr(track, A_LoopFileName) == 1) || (InStr(A_LoopFileName, track) == 1)) {
 					directory .= ("\" . A_LoopFileName)
 
 					break
@@ -289,7 +288,6 @@ class LMUSetupEditor extends FileSetupEditor {
 class LMUSetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
 		local lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
-		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local directory := ""
 		local fileName, theSetup, ignore
@@ -302,7 +300,7 @@ class LMUSetupComparator extends FileSetupComparator {
 
 		if (track && (track != true))
 			loop Files, directory . "\*.*", "D"
-				if (InStr(track, A_LoopFileName) == 1) {
+				if ((InStr(track, A_LoopFileName) == 1) || (InStr(A_LoopFileName, track) == 1)) {
 					directory .= ("\" . A_LoopFileName)
 
 					break

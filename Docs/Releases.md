@@ -55,6 +55,7 @@
 	  - BMW M4 LMGT3 (update with differential preload setting)
     - Assetto Corsa EVO
 	  - BMW M3 E30 Sport Evo (Evolution III)
+	  - Lotus Exige V6 Cup
 	  - Audi R8 LMS GT4 Evo
 	  - Porsche 718 Cayman GT4 Clubsport
 	  - KTM X Bow GT4

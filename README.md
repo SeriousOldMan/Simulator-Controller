@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.2.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/-y_FQ8dY?inline=true) (Test build for 7.2.5. Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench".)
+[7.2.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/-y_FQ8dY?inline=true) (Test build for 7.2.5. Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7250) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-725) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -4931,47 +4931,56 @@ class SetupEngineer extends ConfigurationItem {
 		this.TelemetriesListView.Opt("-Redraw")
 
 		try {
+			do(availableTelemetries, (name) {
+				if !inList(loadedTelemetries, name)
+					this.TelemetriesListView.Add("", name)
+			})
+
 			do(telemetries, (fileName) {
 				SplitPath(fileName, , , , &name)
 
-				if !inList(loadedTelemetries, name) {
-					if FileExist(fileName . ".info") {
-						info := readMultiMap(fileName . ".info")
+				if FileExist(fileName . ".info") {
+					info := readMultiMap(fileName . ".info")
 
-						lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+					lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
 
-						driver := getMultiMapValue(info, "Lap", "Driver", false)
+					driver := getMultiMapValue(info, "Lap", "Driver", false)
 
-						if !driver
-							if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
-								driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+					if !driver
+						if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+							driver := getMultiMapValue(info, "Telemetry", "Driver", false)
 
-								if driver
-									driver := SessionDatabase.getDriverName(this.Simulator, driver)
-								else
-									driver := getMultiMapValue(info, "Info", "Driver", false)
-							}
-
-						if !driver
-							driver := SessionDatabase.getName("Creator")
-
-						try {
-							date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
+							if driver
+								driver := SessionDatabase.getDriverName(this.Simulator, driver)
+							else
+								driver := getMultiMapValue(info, "Info", "Driver", false)
 						}
-						catch Any {
-							date := FormatTime(A_Now, "ShortDate")
-						}
+
+					if !driver
+						driver := SessionDatabase.getName("Creator")
+
+					try {
+						date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
 					}
-					else {
-						info := false
-
-						lapTime := translate("-")
-						driver := translate("-")
+					catch Any {
 						date := FormatTime(A_Now, "ShortDate")
 					}
-
-					this.TelemetriesListView.Add("", name, driver, lapTimeDisplayValue(lapTime), date)
 				}
+				else {
+					info := false
+
+					lapTime := translate("-")
+					driver := translate("-")
+					date := FormatTime(A_Now, "ShortDate")
+				}
+
+
+				loop this.TelemetriesListView.GetCount()
+					if (this.TelemetriesListView.GetText(A_Index) = name) {
+						this.TelemetriesListView.Modify(A_Index, "Col2", driver, lapTimeDisplayValue(lapTime), date)
+
+						break
+					}
 			})
 
 			loop this.TelemetriesListView.GetCount()

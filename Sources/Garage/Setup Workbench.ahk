@@ -3233,6 +3233,12 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
+	MaxIncrement {
+		Get {
+			return this.Control["applyIncrementEdit"].Text
+		}
+	}
+
 	__New(workbench, configuration := false) {
 		local simulator, car, fileName
 
@@ -3259,6 +3265,11 @@ class SetupEditor extends ConfigurationItem {
 	createGui(configuration) {
 		local editor := this
 		local settingsListView, editorGui
+
+		validateInteger(minValue, maxValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+		}
 
 		closeEditor(*) {
 			editor.close()
@@ -3336,6 +3347,11 @@ class SetupEditor extends ConfigurationItem {
 		editorGui.Add("Button", "x16 ys+420 w80 Y:Move", translate("&Apply")).OnEvent("Click", applyRecommendations)
 		editorGui.Add("Slider", "x100 ys+422 w60 Thick15 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
 		editorGui.Add("Text", "x162 ys+425 Y:Move", translate("%"))
+
+		editorGui.Add("Text", "x178 ys+425 Y:Move", translate("/"))
+
+		editorGui.Add("Edit", "x190 ys+422 w40 Number Y:Move vapplyIncrementEdit", 3).OnValidate("LoseFocus", validateInteger.Bind(1, 10))
+		editorGui.Add("UpDown", "x217 yp w30 0x80 Range1-10 Y:Move", 3)
 
 		editorGui.Add("Button", "x380 ys+420 w80 Y:Move X:Move(0.5)", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
 
@@ -3728,7 +3744,7 @@ class SetupEditor extends ConfigurationItem {
 		}
 
 		for setting, delta in settings {
-			increment := Round((delta / theMin) * (percentage / 100))
+			increment := Max(- this.MaxIncrement, Min(this.MaxIncrement, Round((delta / theMin) * (percentage / 100))))
 
 			if (increment != 0) {
 				if getMultiMapValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)

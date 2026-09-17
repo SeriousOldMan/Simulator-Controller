@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.5.0-release]() (Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Max increment setting for setup changes.)
+[7.2.5.0-release]() (Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer, Max increment setting for setup changes.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7250) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-725) of this version and all the versions you might have skipped, before installing and using this version.
 

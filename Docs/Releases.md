@@ -8,6 +8,7 @@
 
   - Fixed a bug for the Driving Coach, that prevented to store the correct lap time, when auto-saving a reference lap.
   - Fixed a bug in the "Setup Workbench", that prevented to show up cars that have not been driven yet.
+  - Fixed the Setup Engineer in "Setup Workbench" sometimes not showing driver names and lap times in the list of available telemetry data.
   - Fixed handling for over long car names in *Assetto Corsa EVO*. This relates to the cars:
     - BMW M3 E30 Sport Evo (Evolution III)
     - Lancia Delta HF integrale Evoluzione II

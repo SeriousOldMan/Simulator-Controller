@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "GameModeSelectionClientCommands.proto";
+import "ClientCommandsUtil.proto";
+import "LogicScene.proto";
+import "Gameplay.proto";
+
+message SessionInformation {
+  bool is_ended = 1;
+  bool is_current = 2;
+  int32 event_id = 3;
+  int32 session_id = 4;
+  string session_name = 5;
+  int32 time_of_day_hours = 6;
+  int32 time_of_day_minutes = 7;
+  int32 time_of_day_seconds = 8;
+  InitialGrip initial_grip = 9;
+  GameModeSelectionWeatherType initial_weather = 10;
+  GameModeSelectionDuration duration_type = 11;
+  int32 duration = 12;
+  TrackItem track_item = 13;
+}
+
+message SeasonInfoRequestSessionInfo {
+  int32 version = 1;
+}
+
+message SeasonInfoResponseSessionInfo {
+  ClientCommandsMode mode = 19;
+  GameModeType type = 20;
+  repeated string cars = 3;
+  TrackItem track_item = 4;
+  InitialGrip initial_grip = 22;
+  string season_name = 5;
+  string event_name = 6;
+  string session_name = 7;
+  int32 duration = 8;
+  GameModeSelectionDuration duration_type = 9;
+  GameModeSelectionTimeOfDay time_of_day = 10;
+  float ambient_temperature = 11;
+  float track_temperature = 12;
+  GameModeSelectionWeatherType weather_type = 13;
+  GameModeSelectionWeatherBehaviour weather_behaviour = 14;
+  string players = 15;
+  int32 min_strength = 21;
+  int32 max_strength = 23;
+  AiDriverData.AggressivnessCategory aggressivness = 24;
+  float personal_best_lap = 16;
+  string last_race_result = 17;
+  int32 laps_driven = 18;
+  int32 debug = 1000;
+  reserved 2 to 2;
+}
+
+message SeasonInfoRequestSeasonInfo {
+  int32 version = 1;
+}
+
+message SeasonInfoResponseSeasonInfo {
+  ClientCommandsMode mode = 1;
+  GameModeType type = 2;
+  int32 event_id = 10;
+  int32 session_id = 11;
+  string season_name = 12;
+  repeated SessionInformation sessions = 20;
+}
+
+message SeasonInfoCommands {
+  SeasonInfoRequestSessionInfo request_session_info = 1;
+  SeasonInfoResponseSessionInfo response_session_info = 1000;
+  SeasonInfoRequestSeasonInfo request_season_info = 2;
+  SeasonInfoResponseSeasonInfo response_season_info = 1001;
+}

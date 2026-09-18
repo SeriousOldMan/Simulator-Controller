@@ -159,19 +159,21 @@ Looking at the above table, you can understand when and why a tyre change will b
 
 ### Usable life of a Tyre Compound
 
-Depending on the given car and track combination, and also depending on the personal driving style, each tyre compound will have a specific number of laps, after which it will be beneficial to change the tyres. This information is used in the "Stratgy Workbench" and also, if you run a race using *simple* race rules defined in "Race Settings". You can specifiy the default values for the tyre life in the "Session Database" using the "Pitstop: Tyre Compound Usage" setting. The format is as follows:
+Depending on the given car and track combination, and also depending on the personal driving style, each tyre compound will have a specific number of laps, after which it will be beneficial to change the tyres. This information is used in the "Stratgy Workbench" and also, if you run a race using *simple* race rules defined in "Race Settings". You can specifiy the default values for the tyre life in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) using the ["Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#Pitstop-Settings) setting. The format is as follows:
 
 	Dry (S)->15;Dry (M)->25;Dry (H)->40
 
 where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.
 	
-Important: If a strategy is active or if race rules have been activated in "Race Settings", the values defined there will be used. But any applicable "Pitstop: Tyre Compound Usage" setting will have been used to initialize those values, though.
+Important: If a strategy is active or if race rules have been activated in "Race Settings", the values defined there will be used. But any applicable "Pitstop: Tyre Compound Usage" setting will have been used to initialize those values in the first place.
 
-Another way to handle tyre life, which is available in simulators which provide the current tyre wear in the API, is to provide a threshold for the maximum tyre wear (or the minimum available tyre tread depth, whatever you prefer). You can specifiy the default values for the minimum available tyre tread depth in the "Session Database" using the "Pitstop: Minimum tyre tread depth" setting. The format is similar:
+Another way to handle tyre life, which is available in simulators which provide the current tyre wear in the API, is to provide a threshold for the maximum tyre wear (or the minimum available tyre tread depth, whatever you prefer). You can specifiy the default values for the minimum available tyre tread depth in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) using the ["Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#Pitstop-Settings) setting. The format is similar:
 
 	Dry (S)->60;Dry (M)->45;Dry (H)->30
 
 where the number specifies the tyre tread depth percentage, up to which a tyre shows a reasonable performance.
+
+You have to choose which method you want to use using the setting ["Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#Pitstop-Settings), depending on the capabilities of the simulator in use. Default is "Wear", so you want to change that for simulators, that do not report tyre wear in the data, likr *iRacing* or *Assetto Corsa Competizione*. Normally you want like to set it at simulator level in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but of course you can decide car by car or even track by track.
 
 ### Default Tyre Compound
 

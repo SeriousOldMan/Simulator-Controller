@@ -1008,14 +1008,13 @@ class SetupWorkbench extends ConfigurationItem {
 							cars.Push(SessionDatabase.getCarName(simulator, car))
 					}
 
-			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*")) {
-				for ignore, car in SessionDatabase().getCars(simulator) {
+			if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Cars", false) = "*"))
+				for ignore, car in SessionDatabase().getCars(simulator, true) {
 					car := SessionDatabase.getCarName(simulator, car)
 
 					if !inList(cars, car)
 						cars.Push(car)
 				}
-			}
 		}
 
 		bubbleSort(&cars)
@@ -1027,12 +1026,20 @@ class SetupWorkbench extends ConfigurationItem {
 
 	getTracks(simulator, car) {
 		local tracks := []
+		local ignore, track
 
 		if (car && (car != true))
 			tracks := SessionDatabase().getTracks(simulator, car)
 
+		if (this.SimulatorDefinition && (getMultiMapValue(this.SimulatorDefinition, "Simulator", "Tracks", false) = "*"))
+			for ignore, track in SessionDatabase().getTracks(simulator, , true)
+				if !inList(tracks, track)
+					tracks.Push(track)
+
 		loop tracks.Length
 			tracks[A_Index] := SessionDatabase.getTrackName(simulator, tracks[A_Index])
+
+		bubbleSort(&tracks)
 
 		tracks.InsertAt(1, "*")
 
@@ -2361,7 +2368,7 @@ class FileSetup extends Setup {
 		}
 	}
 
-	__New(editor, originalFileName := false, modifiedFileName := false) {
+	__New(editor, originalFileName := false, modifiedFileName := false, read := true) {
 		local setup
 
 		super.__New(editor)
@@ -2369,16 +2376,18 @@ class FileSetup extends Setup {
 		this.iOriginalFileName := originalFileName
 		this.iModifiedFileName := modifiedFileName
 
-		if (originalFileName && FileExist(originalFileName)) {
-			setup := FileRead(originalFileName)
+		if read {
+			if (originalFileName && FileExist(originalFileName)) {
+				setup := FileRead(originalFileName)
 
-			this.iOriginalSetup := setup
-		}
+				this.iOriginalSetup := setup
+			}
 
-		if (modifiedFileName && FileExist(modifiedFileName)) {
-			setup := FileRead(modifiedFileName)
+			if (modifiedFileName && FileExist(modifiedFileName)) {
+				setup := FileRead(modifiedFileName)
 
-			this.iModifiedSetup := setup
+				this.iModifiedSetup := setup
+			}
 		}
 	}
 
@@ -2508,9 +2517,6 @@ class DiscreteValuesHandler extends NumberHandler {
 	}
 
 	convertToDisplayValue(rawValue) {
-		if (rawValue = 10)
-			a := 1
-
 		return this.formatValue(this.Zero + (rawValue * this.Increment))
 	}
 
@@ -2549,16 +2555,95 @@ class DiscreteValuesHandler extends NumberHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RawHandler extends DiscreteValuesHandler {
-	__New(increment := 1, minValue := kUndefined, maxValue := kUndefined) {
-		super.__New(0, increment, minValue, maxValue)
+	iValues := false
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+
+	__New(increment := 1, minValue := kUndefined, maxValue := kUndefined, values*) {
+		if (values.Length > 0) {
+			values.InsertAt(1, maxValue)
+			values.InsertAt(1, minValue)
+
+			this.iValues := values
+
+			super.__New(minValue, increment, minValue, values[values.Length])
+		}
+		else
+			super.__New(0, increment, minValue, maxValue)
+	}
+
+	valueIndex(rawValue) {
+		local index, candidate
+
+		try {
+			return inList(this.Values, rawValue)
+		}
+		catch Any {
+			for index, candidate in this.Values
+				if ((rawValue - candidate) < 0.00001)
+					return index
+
+			return false
+		}
+	}
+
+	validValue(displayValue) {
+		if this.Values
+			return (this.valueIndex(this.convertToRawValue(displayValue)) != false)
+		else
+			return super.validValue(displayValue)
 	}
 
 	convertToDisplayValue(rawValue) {
-		return rawValue
+		local index
+
+		if this.Values {
+			index := this.valueIndex(rawValue)
+
+			return (index ? this.Values[index] : false)
+		}
+		else
+			return rawValue
 	}
 
 	convertToRawValue(displayValue) {
-		return displayValue
+		local index
+
+		if this.Values {
+			index := this.valueIndex(displayValue)
+
+			return (index ? this.Values[index] : false)
+		}
+		else
+			return displayValue
+	}
+
+	increaseValue(displayValue) {
+		local index
+
+		if this.Values {
+			index := this.ValueIndex(this.convertToRawValue(displayValue))
+
+			return (index ? this.Values[Min(this.Values.Length, index + 1)] : displayValue)
+		}
+		else
+			return super.increaseValue(displayValue)
+	}
+
+	decreaseValue(displayValue) {
+		local index
+
+		if this.Values {
+			index := this.ValueIndex(this.convertToRawValue(displayValue))
+
+			return (index ? this.Values[Max(1, index - 1)] : displayValue)
+		}
+		else
+			return super.increaseValue(displayValue)
 	}
 }
 
@@ -2612,7 +2697,122 @@ class DecimalHandler extends DiscreteValuesHandler {
 ;;; FloatHandler                                                            ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class FloatHandler extends DecimalHandler {
+class FloatHandler extends NumberHandler {
+	iIncrement := false
+	iPrecision := false
+
+	iMinValue := kUndefined
+	iMaxValue := kUndefined
+
+	iBase := false
+	iMultiplier := false
+	iPlaces := kUndefined
+
+	iReverse := false
+
+	Increment {
+		Get {
+			return this.iIncrement
+		}
+	}
+
+	Precision {
+		Get {
+			return this.iPrecision
+		}
+	}
+
+	MinValue {
+		Get {
+			return ((this.iMinValue != kUndefined) ? this.iMinValue : super.MinValue)
+		}
+	}
+
+	MaxValue {
+		Get {
+			return ((this.iMaxValue != kUndefined) ? this.iMaxValue : super.MaxValue)
+		}
+	}
+
+	Base {
+		Get {
+			return this.iBase
+		}
+	}
+
+	Multiplier {
+		Get {
+			return this.iMultiplier
+		}
+	}
+
+	Places {
+		Get {
+			return this.iPlaces
+		}
+	}
+
+	Reverse {
+		Get {
+			return this.iReverse
+		}
+	}
+
+	__New(increment := 1, precision := 0, minValue := kUndefined, maxValue := kUndefined
+		, base := kUndefined, multiplier := 1, places := kUndefined) {
+		this.iMinValue := minValue
+		this.iMaxValue := maxValue
+		this.iReverse := ((isNumber(minValue) && isNumber(maxValue)) && (maxValue < minValue))
+
+		this.iIncrement := increment
+		this.iPrecision := precision
+
+		if (base == kUndefined)
+			if (minValue != kUndefined)
+				base := minValue
+			else
+				base := 0
+
+		this.iBase := base
+		this.iMultiplier := multiplier
+		this.iPlaces := places
+	}
+
+	formatValue(value) {
+		return Round(value, this.Precision)
+	}
+
+	convertToDisplayValue(rawValue) {
+		return this.formatValue(((rawValue - this.Base) / this.Multiplier) + this.MinValue)
+	}
+
+	convertToRawValue(displayValue) {
+		local value := (this.Base + ((displayValue - this.MinValue) * this.Multiplier))
+
+		return ((this.Places != kUndefined) ? Round(value, this.Places) : value)
+	}
+
+	increaseValue(displayValue) {
+		local value := (displayValue + this.Increment)
+
+		if this.validValue(value)
+			return value
+		else if this.Reverse
+			return Max(this.MaxValue, Min(this.MinValue, displayValue))
+		else
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
+	}
+
+	decreaseValue(displayValue) {
+		local value := (displayValue - this.Increment)
+
+		if this.validValue(value)
+			return value
+		else if this.Reverse
+			return Max(this.MaxValue, Min(this.MinValue, displayValue))
+		else
+			return Min(this.MaxValue, Max(this.MinValue, displayValue))
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -2620,13 +2820,161 @@ class FloatHandler extends DecimalHandler {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class ClicksHandler extends IntegerHandler {
-	__New(minValue := 0, maxValue := kUndefined) {
-		super.__New(minValue, 1, minValue, maxValue)
+	iValues := false
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+
+	__New(minValue := 0, maxValue := kUndefined, values*) {
+		if (values.Length > 0) {
+			values.InsertAt(1, maxValue)
+
+			this.iValues := values
+
+			super.__New(minValue, 1, minValue, minValue + values.Length - 1)
+		}
+		else
+			super.__New(minValue, 1, minValue, maxValue)
+	}
+
+	valueIndex(rawValue) {
+		local index, candidate
+
+		try {
+			return inList(this.Values, rawValue)
+		}
+		catch Any {
+			for index, candidate in this.Values
+				if ((rawValue - candidate) < 0.00001)
+					return index
+
+			return false
+		}
+	}
+
+	validValue(displayValue) {
+		if this.Values
+			return (this.valueIndex(this.convertToRawValue(displayValue)) != false)
+		else
+			return super.validValue(displayValue)
+	}
+
+	convertToDisplayValue(rawValue) {
+		local index
+
+		if this.Values {
+			index := this.valueIndex(rawValue)
+
+			return (this.MinValue + (index ? (index - 1) : 0))
+		}
+		else
+			return super.convertToDisplayValue(rawValue)
+	}
+
+	convertToRawValue(displayValue) {
+		if this.Values {
+			try {
+				return this.Values[Round(displayValue - this.MinValue + 1)]
+			}
+			catch Any {
+				return this.Values[1]
+			}
+		}
+		else
+			return super.convertToRawValue(displayValue)
+	}
+
+	increaseValue(displayValue) {
+		if this.Values {
+			if this.Values.Has(Round(displayValue - this.MinValue + this.Increment + 1))
+				return super.increaseValue(displayValue)
+			else
+				return displayValue
+		}
+		else
+			return super.increaseValue(displayValue)
+	}
+
+	decreaseValue(displayValue) {
+		if this.Values {
+			if this.Values.Has(Round(displayValue - this.MinValue - this.Increment + 1))
+				return super.decreaseValue(displayValue)
+			else
+				return displayValue
+		}
+		else
+			return super.decreaseValue(displayValue)
 	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; ClicksHandler                                                           ;;;
+;;; ValuesHandler                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class ValuesHandler extends NumberHandler {
+	iValues := false
+
+	Values {
+		Get {
+			return this.iValues
+		}
+	}
+
+	__New(values*) {
+		this.iValues := values
+	}
+
+	valueIndex(rawValue) {
+		local index, candidate
+
+		try {
+			return inList(this.Values, rawValue)
+		}
+		catch Any {
+			for index, candidate in this.Values
+				if ((rawValue - candidate) < 0.00001)
+					return index
+
+			return false
+		}
+	}
+
+	validValue(displayValue) {
+		return (this.valueIndex(this.convertToRawValue(displayValue)) != false)
+	}
+
+	convertToDisplayValue(rawValue) {
+		return rawValue
+	}
+
+	convertToRawValue(displayValue) {
+		return displayValue
+	}
+
+	increaseValue(displayValue) {
+		try {
+			return this.convertToDisplayValue(this.Values[this.valueIndex(this.convertToRawValue(displayValue)) + 1])
+		}
+		catch Any {
+			return displayValue
+		}
+	}
+
+	decreaseValue(displayValue) {
+		try {
+			return this.convertToDisplayValue(this.Values[this.valueIndex(this.convertToRawValue(displayValue)) - 1])
+		}
+		catch Any {
+			return displayValue
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; EnumerationHandler                                                      ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class EnumerationHandler extends SettingHandler {
@@ -2885,6 +3233,12 @@ class SetupEditor extends ConfigurationItem {
 		}
 	}
 
+	MaxIncrement {
+		Get {
+			return this.Control["applyIncrementEdit"].Text
+		}
+	}
+
 	__New(workbench, configuration := false) {
 		local simulator, car, fileName
 
@@ -2911,6 +3265,11 @@ class SetupEditor extends ConfigurationItem {
 	createGui(configuration) {
 		local editor := this
 		local settingsListView, editorGui
+
+		validateInteger(minValue, maxValue, field, operation, value?) {
+			if (operation = "Validate")
+				return (isInteger(value) && (value >= minValue) && (value <= maxValue))
+		}
 
 		closeEditor(*) {
 			editor.close()
@@ -2988,6 +3347,11 @@ class SetupEditor extends ConfigurationItem {
 		editorGui.Add("Button", "x16 ys+420 w80 Y:Move", translate("&Apply")).OnEvent("Click", applyRecommendations)
 		editorGui.Add("Slider", "x100 ys+422 w60 Thick15 0x10 Y:Move Range20-100 ToolTip vapplyStrengthSlider", 100)
 		editorGui.Add("Text", "x162 ys+425 Y:Move", translate("%"))
+
+		editorGui.Add("Text", "x178 ys+425 Y:Move", translate("/"))
+
+		editorGui.Add("Edit", "x190 ys+422 w40 Number Y:Move vapplyIncrementEdit", 3).OnValidate("LoseFocus", validateInteger.Bind(1, 10))
+		editorGui.Add("UpDown", "x217 yp w30 0x80 Range1-10 Y:Move", 3)
 
 		editorGui.Add("Button", "x380 ys+420 w80 Y:Move X:Move(0.5)", translate("&Save...")).OnEvent("Click", saveModifiedSetup)
 
@@ -3380,7 +3744,7 @@ class SetupEditor extends ConfigurationItem {
 		}
 
 		for setting, delta in settings {
-			increment := Round((delta / theMin) * (percentage / 100))
+			increment := Max(- this.MaxIncrement, Min(this.MaxIncrement, Round((delta / theMin) * (percentage / 100))))
 
 			if (increment != 0) {
 				if getMultiMapValue(this.Configuration, "Setup.Settings", setting . ".Reverse", false)
@@ -4583,47 +4947,56 @@ class SetupEngineer extends ConfigurationItem {
 		this.TelemetriesListView.Opt("-Redraw")
 
 		try {
+			do(availableTelemetries, (name) {
+				if !inList(loadedTelemetries, name)
+					this.TelemetriesListView.Add("", name)
+			})
+
 			do(telemetries, (fileName) {
 				SplitPath(fileName, , , , &name)
 
-				if !inList(loadedTelemetries, name) {
-					if FileExist(fileName . ".info") {
-						info := readMultiMap(fileName . ".info")
+				if FileExist(fileName . ".info") {
+					info := readMultiMap(fileName . ".info")
 
-						lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
+					lapTime := getMultiMapValue(info, "Info", "LapTime", getMultiMapValue(info, "Lap", "LapTime", translate("-")))
 
-						driver := getMultiMapValue(info, "Lap", "Driver", false)
+					driver := getMultiMapValue(info, "Lap", "Driver", false)
 
-						if !driver
-							if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
-								driver := getMultiMapValue(info, "Telemetry", "Driver", false)
+					if !driver
+						if getMultiMapValue(info, "Info", "Driver", getMultiMapValue(info, "Telemetry", "Driver", false)) {
+							driver := getMultiMapValue(info, "Telemetry", "Driver", false)
 
-								if driver
-									driver := SessionDatabase.getDriverName(this.Simulator, driver)
-								else
-									driver := getMultiMapValue(info, "Info", "Driver", false)
-							}
-
-						if !driver
-							driver := SessionDatabase.getName("Creator")
-
-						try {
-							date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
+							if driver
+								driver := SessionDatabase.getDriverName(this.Simulator, driver)
+							else
+								driver := getMultiMapValue(info, "Info", "Driver", false)
 						}
-						catch Any {
-							date := FormatTime(A_Now, "ShortDate")
-						}
+
+					if !driver
+						driver := SessionDatabase.getName("Creator")
+
+					try {
+						date := FormatTime(getMultiMapValue(info, "Telemetry", "Date"), "ShortDate")
 					}
-					else {
-						info := false
-
-						lapTime := translate("-")
-						driver := translate("-")
+					catch Any {
 						date := FormatTime(A_Now, "ShortDate")
 					}
-
-					this.TelemetriesListView.Add("", name, driver, lapTimeDisplayValue(lapTime), date)
 				}
+				else {
+					info := false
+
+					lapTime := translate("-")
+					driver := translate("-")
+					date := FormatTime(A_Now, "ShortDate")
+				}
+
+
+				loop this.TelemetriesListView.GetCount()
+					if (this.TelemetriesListView.GetText(A_Index) = name) {
+						this.TelemetriesListView.Modify(A_Index, "Col2", driver, lapTimeDisplayValue(lapTime), date)
+
+						break
+					}
 			})
 
 			loop this.TelemetriesListView.GetCount()
@@ -6079,6 +6452,7 @@ if kLogStartup
 #Include "Libraries\F125IssueAnalyzer.ahk"
 #Include "Libraries\ACCSetupEditor.ahk"
 #Include "Libraries\ACSetupEditor.ahk"
+#Include "Libraries\ACESetupEditor.ahk"
 #Include "Libraries\LMUSetupEditor.ahk"
 #Include "Libraries\RF2SetupEditor.ahk"
 

@@ -1793,6 +1793,8 @@ class Window extends Gui {
 
 	iTheme := false
 
+	iInitialized := false
+
 	iCloseable := false
 	iResizeable := false
 	iScrollable := false
@@ -2557,6 +2559,12 @@ class Window extends Gui {
 		}
 	}
 
+	Initialized {
+		Get {
+			return this.iInitialized
+		}
+	}
+
 	Descriptor {
 		Get {
 			return this.iDescriptor
@@ -2825,17 +2833,19 @@ class Window extends Gui {
 
 	Block() {
 		if (this.iBlockLevel++ = 0)
-			try
-				this.Opt("+Disabled")
+			if this.Initialized
+				try
+					this.Opt("+Disabled")
 	}
 
 	Unblock() {
-		if (--this.iBlockLevel <= 0) {
-			this.iBlockLevel := 0
+		if (--this.iBlockLevel <= 0)
+			if this.Initialized {
+				this.iBlockLevel := 0
 
-			try
-				this.Opt("-Disabled")
-		}
+				try
+					this.Opt("-Disabled")
+			}
 	}
 
 	Opt(options) {
@@ -2996,6 +3006,8 @@ class Window extends Gui {
 
 				this.Scrollbar.UpdateScrollBars()
 			}
+
+			this.iInitialized := true
 		}
 	}
 
@@ -3501,12 +3513,7 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 	create := !FileExist(modifiedFileName)
 
 	if !create
-		try {
-			create := (FileGetTime(modifiedFileName, "M") < FileGetTime(fileName, "M"))
-		}
-		catch Any as exception {
-			logError(exception)
-		}
+		create := (FileGetTime(modifiedFileName, "M") < FileGetTime(fileName, "M"))
 
 	if create {
 		deleteFile(modifiedFileName)

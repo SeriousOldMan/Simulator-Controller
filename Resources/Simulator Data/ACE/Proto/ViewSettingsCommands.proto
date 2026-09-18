@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+import "GameplaySettings.proto";
+import "CameraProperties.proto";
+
+enum ViewSettingsCommandsResponse {
+  ViewSettingsCommandsResponse_OK = 0;
+  ViewSettingsCommandResponse_CRITICAL_ERROR = 100;
+}
+
+enum ViewSettingsOptions {
+  ViewSettingsOptions_Camera = 0;
+  ViewSettingsOptions_Motion = 1;
+  ViewSettingsOptions_Dash = 2;
+  ViewSettingsOptions_Mirrors = 3;
+}
+
+message SeatSettings {
+  float fov = 1;
+  float seat_distance = 2;
+  float seat_height = 3;
+  float seat_lateral = 4;
+  float seat_pitch = 5;
+  float perspective_correction = 11;
+  float vertical_compression = 12;
+}
+
+message ViewSettingsRequestOptions {
+  bool is_auto_request = 1;
+  int32 mirror_index = 2;
+}
+
+message ViewSettingsResponseOptions {
+  ViewSettingsCommandsResponse response = 1;
+  DashSettings dash_settings = 2;
+  SeatSettings seat_settings = 3;
+  MirrorsSettings mirrors_settings = 4;
+  CameraSettings motion_settings = 5;
+  int32 mirror_index = 6;
+  bool is_vr_enabled = 7;
+  bool is_invalid = 8;
+}
+
+message ViewSettingsRequestSetOptions {
+  SeatSettings seat_settings = 1;
+}
+
+message ViewSettingsResponseSetOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestSetDashOptions {
+  DashSettings dash_settings = 1;
+}
+
+message ViewSettingsResponseSetDashOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestSetMirrorsOptions {
+  MirrorsSettings mirrors_settings = 1;
+}
+
+message ViewSettingsResponseSetMirrorsOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestSetMotionOptions {
+  CameraSettings motion_settings = 1;
+}
+
+message ViewSettingsResponseSetMotionOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestSetTripleScreenOptions {
+  TripleScreenSettings triple_screen_settings = 1;
+}
+
+message ViewSettingsResponseSetTripleScreenOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestSaveOptions {
+  DashSettings dash_settings = 2;
+}
+
+message ViewSettingsResponseSaveOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestCancelOptions {
+  DashSettings dash_settings = 2;
+}
+
+message ViewSettingsResponseCancelOptions {
+  ViewSettingsCommandsResponse response = 1;
+}
+
+message ViewSettingsRequestDefaultOptions {
+  ViewSettingsOptions options = 3;
+}
+
+message ViewSettingsResponseDefaultOptions {
+  ViewSettingsCommandsResponse response = 1;
+  DashSettings dash_settings = 2;
+  SeatSettings seat_settings = 3;
+  CameraSettings motion_settings = 4;
+}
+
+message ViewSettingsCommands {
+  ViewSettingsRequestOptions request_options = 1;
+  ViewSettingsResponseOptions response_options = 1000;
+  ViewSettingsRequestSetOptions request_set_options = 2;
+  ViewSettingsResponseSetOptions response_set_options = 1001;
+  ViewSettingsRequestSetDashOptions request_set_dash_options = 3;
+  ViewSettingsResponseSetDashOptions response_set_dash_options = 1002;
+  ViewSettingsRequestSetMirrorsOptions request_set_mirrors_options = 4;
+  ViewSettingsResponseSetMirrorsOptions response_set_mirrors_options = 1003;
+  ViewSettingsRequestSetMotionOptions request_set_motion_options = 5;
+  ViewSettingsResponseSetMotionOptions response_set_motion_options = 1004;
+  ViewSettingsRequestSetTripleScreenOptions request_set_triple_screen_options = 6;
+  ViewSettingsResponseSetTripleScreenOptions response_set_triple_screen_options = 1005;
+  ViewSettingsRequestSaveOptions request_save_options = 7;
+  ViewSettingsResponseSaveOptions response_save_options = 1006;
+  ViewSettingsRequestCancelOptions request_cancel_options = 8;
+  ViewSettingsResponseCancelOptions response_cancel_options = 1007;
+  ViewSettingsRequestDefaultOptions request_default_options = 9;
+  ViewSettingsResponseDefaultOptions response_default_options = 1008;
+}

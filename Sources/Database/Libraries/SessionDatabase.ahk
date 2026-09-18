@@ -1203,12 +1203,12 @@ class SessionDatabase extends ConfigurationItem {
 			return []
 	}
 
-	getTracks(simulator, car, all := false) {
+	getTracks(simulator, car := false, all := false) {
 		local code := this.getSimulatorCode(simulator)
 		local tracks, trackData, codes
 
 		if code {
-			tracks := this.getEntries(code . "\" . car . "\*.*")
+			tracks := (car ? this.getEntries(code . "\" . car . "\*.*") : [])
 			tracks := ((tracks.Length > 0) ? tracks : this.getEntries(code . "\" . this.getCarCode(simulator, car) . "\*.*"))
 
 			if all {
@@ -1250,9 +1250,18 @@ class SessionDatabase extends ConfigurationItem {
 			name := (kUserHomeDirectory . "Simulator Data\" . simulator . "\" . fileName)
 
 			if FileExist(name)
-				for section, values in readMultiMap(name)
-					for key, value in values
-						setMultiMapValue(data, section, key, value)
+				addMultiMapValues(data, readMultiMap(name))
+
+			if (fileName = "Track Data.ini") {
+				for key, value in getMultiMapValues(data, "Track Names Long")
+					setMultiMapValue(data, "Track Codes", value, key)
+
+				for key, value in getMultiMapValues(data, "Track Names Short")
+					setMultiMapValue(data, "Track Codes", value, key)
+			}
+			else if (fileName = "Car Data.ini")
+				for key, value in getMultiMapValues(data, "Car Names")
+					setMultiMapValue(data, "Car Codes", value, key)
 
 			cache[simulator] := data
 

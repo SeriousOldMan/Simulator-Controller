@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+enum SeatVisibility {
+  SeatVisibility_AllVisible = 0;
+  SeatVisibility_HideDriver = 1;
+  SeatVisibility_LockSteeringWheel = 2;
+  SeatVisibility_HideSteeringWheel = 3;
+}
+
+enum HaloVisibility {
+  HaloVisibility_Visible = 0;
+  HaloVisibility_Hidden = 1;
+}
+
+message DashSettings {
+  SeatVisibility visibility = 1;
+  HaloVisibility halo_visibility = 4;
+  bool render_dash_display = 2;
+  float dash_display_transparency = 3;
+}
+
+message DashSettingsMap {
+  map<string, DashSettings> mapDashSettings = 1;
+}
+
+message MirrorsSettings {
+  float yaw = 1;
+  float pitch = 2;
+  float fov = 3;
+  repeated int32 mirrors_set = 5;
+  int32 mirror_type = 6;
+  bool is_single_mirror = 7;
+  bool is_vr = 8;
+  float vr_yaw = 9;
+  float vr_pitch = 10;
+  float vr_fov = 11;
+  float single_mode_fov = 12;
+  bool disable = 13;
+  bool virtual_mirror_enabled = 15;
+  float virtual_mirror_scale = 16;
+  float virtual_mirror_horizontal_offset = 17;
+  float virtual_mirror_vertical_offset = 18;
+}
+
+message TripleScreenSettings {
+  float bezel = 1;
+  float width = 2;
+  float distance = 3;
+  float screen_angle = 4;
+}

@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+import "PlatformCommands.proto";
+import "BackendMessage.proto";
+import "ClientServerProtocol.proto";
+import "ClientCommandsUtil.proto";
+import "LogicScene.proto";
+
+enum MultiplayerServerListCommandsResponse {
+  MultiplayerServerListCommandsResponse_OK = 0;
+  MultiplayerServerListCommandsResponse_BACKEND_DISCONNECTED = 98;
+  MultiplayerServerListCommandsResponse_CRITICAL_ERROR = 100;
+  MultiplayerServerListCommandsResponse_SERVER_NOT_REGISTERED = 99;
+}
+
+enum SearchingSessionFilters {
+  SearchingSessionFilters_RATING = 0;
+  SearchingSessionFilters_VEHICLE = 8;
+  SearchingSessionFilters_TRACKS = 16;
+  SearchingSessionFilters_GAMEMODE = 32;
+  SearchingSessionFilters_FRIENDS = 64;
+}
+
+enum SortyByFilters {
+  SortByFilters_PING = 0;
+  SortByFilters_PLAYERS = 1;
+}
+
+enum PasswordFilter {
+  PasswordFilter_ALL = 0;
+  PasswordFilter_WITH_PASSWORD = 1;
+  PasswordFilter_WITHOUT_PASSWORD = 2;
+}
+
+enum JoinErrorMessage {
+  JoinErrorMessage_OK = 0;
+  JoinErrorMessage_WRONG_CAR = 1;
+  JoinErrorMessage_SERVER_FULL = 2;
+  JoinErrorMessage_WRONG_PASSWORD = 3;
+  JoinErrorMessage_SERVER_CLOSED = 4;
+  JoinErrorMessage_REQUIREMENTS_NOT_MET = 5;
+  JoinErrorMessage_WRONG_CAR_CATEGORY = 6;
+  JoinErrorMessage_WRONG_CAR_PERFORMANCE_INDICATOR = 7;
+  JoinErrorMessage_CLIENT_OUTDATED = 8;
+  JoinErrorMessage_SERVER_OUTDATED = 9;
+  JoinErrorMessage_CLIENT_REJECTED = 10;
+  JoinErrorMessage_CONTENT_UNAVAILABLE = 11;
+}
+
+message MultiplayerServerListRequestServerList {
+  MultiplayerServerListSessionType server_ranking_filter = 1;
+  repeated bool property_1_filter = 11;
+  repeated bool property_2_filter = 12;
+  repeated bool property_3_filter = 13;
+  float pi_min_filter = 14;
+  float pi_max_filter = 15;
+  bool show_favorites_filter = 3;
+  PasswordFilter password_filter = 4;
+  bool is_driveable_filter = 5;
+  string track_filter = 6;
+  string track_layout_filter = 7;
+  repeated GameModeType game_mode_filters = 8;
+  bool friends_filter = 9;
+  bool is_lite = 10;
+  bool show_eligible_with_current_car = 16;
+  int32 request_no = 17;
+  int32 dev_feature_repetition = 18;
+  bool dev_feature_include_live_servers = 19;
+  reserved 2 to 2;
+}
+
+message MultiplayerServerListResponseServerList {
+  BackendResponse response = 1;
+  repeated MultiplayerServerListEntry entry = 2;
+  int32 request_no = 3;
+}
+
+message MultiplayerServerListRequestServerEntry {
+  string server_ip = 2;
+  int32 server_tcp_port = 3;
+  int32 server_udp_port = 4;
+  reserved 1 to 1;
+}
+
+message MultiplayerServerListResponseServerEntry {
+  BackendResponse response = 1;
+  MultiplayerServerListEntry entry = 2;
+}
+
+message MultiplayerServerListRequestPing {
+  string server_id = 1;
+}
+
+message MultiplayerServerListResponsePing {
+  BackendResponse response = 1;
+  string server_id = 2;
+  int32 ping = 17;
+}
+
+message MultiplayerServerListRequestPingServers {
+}
+
+message MultiplayerServerListResponsePingServers {
+  BackendResponse response = 1;
+  string server_id = 2;
+  int32 ping = 17;
+}
+
+message MultiplayerServerListRequestConnectToServer {
+  string server_id = 1;
+  string server_password = 2;
+  PGUID car_pguid = 3;
+  bool as_spector = 4;
+}
+
+message MultiplayerServerListResponseConnectToServer {
+  JoinErrorMessage response = 1;
+  ServerResponseCommand server_response = 2;
+  repeated string missing_cars = 3;
+}
+
+message MultiplayerServerListRequestConnectToSimgrid {
+  PGUID car_pguid = 3;
+}
+
+message MultiplayerServerListResponseConnectToSimgrid {
+  JoinErrorMessage response = 1;
+}
+
+message MultiplayerServerListRequestSelectServer {
+  string server_id = 1;
+}
+
+message MultiplayerServerListResponseSelectServer {
+  JoinErrorMessage response = 1;
+}
+
+message MultiplayerServerListRequestChangeCar {
+  VehicleTagFilters vehicles = 1;
+}
+
+message MultiplayerServerListResponseChangeCar {
+}
+
+message MultiplayerRequestGoToServer {
+  string message = 1;
+}
+
+message MultiplayerResponseGoToServer {
+  MultiplayerServerListCommandsResponse response = 1;
+  string url = 2;
+}
+
+message MultiplayerServerListCommands {
+  MultiplayerServerListRequestServerList request_server_list = 1;
+  MultiplayerServerListResponseServerList response_server_list = 1000;
+  MultiplayerServerListRequestServerEntry request_server_entry = 2;
+  MultiplayerServerListResponseServerEntry response_server_entry = 1001;
+  MultiplayerServerListRequestPing request_ping = 3;
+  MultiplayerServerListResponsePing response_ping = 1002;
+  MultiplayerServerListRequestPingServers request_ping_servers = 4;
+  MultiplayerServerListResponsePingServers response_ping_servers = 1003;
+  MultiplayerServerListRequestConnectToServer request_connect_to_server = 5;
+  MultiplayerServerListResponseConnectToServer response_connect_to_server = 1004;
+  MultiplayerServerListRequestSelectServer request_select_server = 6;
+  MultiplayerServerListResponseSelectServer response_select_server = 1005;
+  MultiplayerServerListRequestChangeCar request_change_car = 7;
+  MultiplayerServerListResponseChangeCar response_change_car = 1006;
+  MultiplayerServerListRequestConnectToSimgrid request_direct_server = 8;
+  MultiplayerServerListResponseConnectToSimgrid response_direct_server = 1007;
+  MultiplayerRequestGoToServer request_go_to_server = 9;
+  MultiplayerResponseGoToServer response_go_to_server = 1008;
+}

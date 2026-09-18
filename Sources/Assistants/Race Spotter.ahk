@@ -226,7 +226,7 @@ startupRaceSpotter() {
 		showLogo(spotterName)
 
 	if remotePID
-		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kLowPriority))
+		Task.startTask(PeriodicTask(checkRemoteProcessAlive.Bind(remotePID), 10000, kInterruptPriority))
 
 	startupProcess()
 }
@@ -241,9 +241,9 @@ shutdownRaceSpotter(shutdown := false) {
 		ExitApp(0)
 
 	if (RaceSpotter.Instance.Session == kSessionFinished)
-		Task.startTask(shutdownRaceSpotter.Bind(true), 10000, kLowPriority)
+		Task.startTask(shutdownRaceSpotter.Bind(true), 10000, kInterruptPriority)
 	else
-		Task.startTask(shutdownRaceSpotter, 1000, kLowPriority)
+		Task.startTask(shutdownRaceSpotter, 1000, kInterruptPriority)
 
 	return false
 }
@@ -253,7 +253,7 @@ handleSpotterMessage(category, data) {
 		data := StrSplit(data, ":", , 2)
 
 		if (data[1] = "Shutdown") {
-			Task.startTask(shutdownRaceSpotter, 20000, kLowPriority)
+			Task.startTask(shutdownRaceSpotter, 20000, kInterruptPriority)
 
 			return true
 		}
@@ -261,7 +261,7 @@ handleSpotterMessage(category, data) {
 			return withProtection(ObjBindMethod(RaceSpotter.Instance, data[1]), string2Values(";", data[2])*)
 	}
 	else if (data = "Shutdown")
-		Task.startTask(shutdownRaceSpotter, 20000, kLowPriority)
+		Task.startTask(shutdownRaceSpotter, 20000, kInterruptPriority)
 	else
 		return withProtection(ObjBindMethod(RaceSpotter.Instance, data))
 }

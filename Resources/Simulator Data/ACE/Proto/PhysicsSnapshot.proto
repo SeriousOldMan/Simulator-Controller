@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+import "Math.proto";
+
+message ACCRigidBodySnap {
+  MatrixData matrix = 1;
+  Vector3Data velocity = 2;
+  Vector3Data angular_velocity = 3;
+}
+
+message ACCDrivetrainSnap {
+  float engine_vel = 1;
+  float drive_vel = 2;
+  float out_shaft_l_vel = 3;
+  float out_shaft_r_vel = 4;
+  float root_vel = 5;
+  int32 current_gear_index = 6;
+  float engine_life_left = 7;
+  float drive_vel_2 = 8;
+}
+
+message ACCAISnap {
+  float brake_target_speed = 1;
+  float brake_target_normalized = 2;
+  bool brake_was_obstacle = 3;
+  float brake_lateral_offset = 4;
+  float brake_speed_diff = 5;
+  int32 current_spline = 6;
+}
+
+message ACCTyreStatus {
+  float grain = 1;
+  float blister = 2;
+  float marblesLevel = 3;
+  float flatSpot = 4;
+  float pressure_static = 5;
+  float pressure_dynamic = 6;
+  float dirty_level = 7;
+  repeated float patches_temp = 8;
+  float core_temp = 9;
+  repeated float tread = 10;
+  float inflation = 11;
+}
+
+message ACCCarSnap {
+  ACCRigidBodySnap body = 1;
+  repeated ACCRigidBodySnap susp_bodies = 2;
+  ACCDrivetrainSnap drivetrain = 3;
+  ACCRigidBodySnap fuel_tank_body = 4;
+  float fuel = 5;
+  ACCAISnap ai = 6;
+  repeated ACCTyreStatus tyres_status = 7;
+  bool is_engine_ignition_on = 8;
+  repeated ACCRigidBodySnap susp_strut_bodies = 9;
+  ACCDamageSnap damage = 10;
+  repeated float brake_temps = 11;
+  repeated float brake_core_temps = 12;
+  repeated float brake_duct = 13;
+  float brake_bias = 14;
+  float brake_total_torque = 15;
+  repeated float brake_pad_wear = 16;
+  repeated float brake_disc_wear = 17;
+  repeated ACCRigidBodySnap susp_arm_bodies = 18;
+  repeated ACCRigidBodySnap susp_axle_bodies = 19;
+}
+
+message ACCPhysicsSnap {
+  int32 version = 1;
+  repeated ACCCarSnap cars = 2;
+}
+
+message ACCDamageSnap {
+  repeated float zone_level = 1;
+  repeated float susp_level = 2;
+}

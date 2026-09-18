@@ -1,0 +1,238 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "Weather.proto";
+import "google/protobuf/any.proto";
+import "Scene.proto";
+import "CarData.proto";
+import "CarDataCache.proto";
+import "RuntimeStats.proto";
+import "CarSetup.proto";
+import "CarBehaviour.proto";
+import "RatingData.proto";
+import "Customization.proto";
+import "CarInstrumentationData.proto";
+import "CarSetupLimits.proto";
+import "Leaderboards.proto";
+import "gamemodes/InstantRaceData.proto";
+import "gamemodes/TimeAttackData.proto";
+import "gamemodes/HotStintData.proto";
+import "gamemodes/PaintShopGameModeData.proto";
+import "gamemodes/VehicleAnalysisMode.proto";
+import "gamemodes/FreeRoamData.proto";
+import "gamemodes/DriftChallengeData.proto";
+
+message BroadcastStateMessage {
+  int32 field_number = 1;
+  google.protobuf.Any message = 2;
+  string descriptor_name = 3;
+}
+
+message BroadcastCarStateMessage {
+  int32 field_number = 1;
+  google.protobuf.Any message = 2;
+  PGUID car_id = 3;
+  string descriptor_name = 4;
+}
+
+message CarBOPData {
+  int32 ballast = 1;
+  float restrictor = 2;
+}
+
+message PlatformZoneData {
+  ZoneData actor = 1;
+  google.protobuf.Any zone_payload = 2;
+}
+
+message CarZoneState {
+  TranslatedTimestamp entered_timestamp = 1;
+  PlatformZoneData zone = 4;
+}
+
+message CarPitState {
+  enum PitStopStep {
+    None = 0;
+    Steady = 1;
+    Entering = 2;
+    Inside = 3;
+    Pitting = 4;
+    OutOfTolerance = 5;
+  }
+  bool is_enabled = 1;
+  int32 pit_slot = 2;
+  CarPitState.PitStopStep pit_step = 3;
+  float pit_time_ms = 4;
+  float start_pit_time_ms = 5;
+  float total_pit_time_ms = 6;
+}
+
+message PlatformCarStrategyData {
+  float to_next_ai_event_ms = 1;
+  float now_ms = 2;
+}
+
+message CarRaceData {
+  int32 flag_type = 1;
+}
+
+message CarAnimationValues {
+  message State {
+    CarAnimationType animation_type = 1;
+    int32 target_stage = 2;
+    bool instant = 10;
+  }
+  repeated CarAnimationValues.State values = 1;
+}
+
+message CarOptionalAnimationValues {
+  message State {
+    int32 target_stage = 2;
+    bool instant = 10;
+  }
+  map<string, CarOptionalAnimationValues.State> values = 21;
+}
+
+message TrackGameModeStatus {
+  message StartingSemaphoreStatus {
+    bool green = 1;
+    bool yellow = 2;
+    bool blue = 3;
+    int32 reds_on = 4;
+  }
+  message PitLaneSemaphoreStatus {
+    enum PitSemaphoreColorState {
+      Green = 0;
+      Red = 1;
+      Blue = 2;
+      Yellow = 3;
+      Black = 4;
+    }
+    TrackGameModeStatus.PitLaneSemaphoreStatus.PitSemaphoreColorState state = 1;
+  }
+  TrackGameModeStatus.StartingSemaphoreStatus starting_semaphore = 1;
+  TrackGameModeStatus.PitLaneSemaphoreStatus pit_semaphore = 2;
+  bool no_intro = 1000;
+}
+
+message GameCarRenderingRules {
+  bool render_car = 1;
+  bool render_driver = 2;
+  bool render_driver_head = 5;
+  bool is_driver_outside = 3;
+  bool render_driver_helmet = 4;
+  bool are_seat_belts_on = 6;
+  bool is_safety_net_on = 7;
+  bool is_halo_visibile = 8;
+}
+
+message CarVisualSetup {
+  int32 front_compound = 1;
+  int32 rear_compound = 2;
+}
+
+message PlatformGameCarState {
+  PGUID car_id = 1;
+  CarElectronicsValues electronics_values = 4;
+  CarAssistsValues assists_values = 5;
+  repeated CarZoneState active_zones = 6;
+  CarStance driver_stance = 7;
+  CarInstrumentationValues instrumentation_values = 8;
+  CarLocation car_location = 9;
+  CarLocationTarget car_location_target = 10;
+  PlatformCarStrategyData car_strategy_data = 11;
+  CarRatingState car_rating_state = 12;
+  CarPitState pit_state = 13;
+  CarRaceData race_data = 14;
+  CarBOPData bop_data = 15;
+  CarVisualSetup visual_setup = 16;
+  CarAnimationValues animation_values = 20;
+  CarOptionalAnimationValues optional_animation_values = 21;
+  InstantRace.State.GameCar race_gamecar_state = 22;
+  TimeAttack.State.GameCar time_attack_gamecar_state = 23;
+  HotStint.State.GameCar hot_stint_gamecar_state = 24;
+  VehicleAnalysis.State.GameCar vehicle_analysis_gamecar_state = 25;
+  FreeRoam.State.GameCar freeroam_gamecar_state = 26;
+  PlatformDriftChallengeGameCarState drift_challenge_gamecar_state = 27;
+  reserved 2 to 2;
+  reserved 3 to 3;
+}
+
+message PlatformGreenLightItem {
+  int32 color_code = 1;
+  TranslatedTimestamp light_on = 2;
+  TranslatedTimestamp light_off = 3;
+}
+
+message PlatformGreenLightState {
+  bool is_vertical = 1;
+  bool is_ui_visible = 2;
+  repeated PlatformGreenLightItem lights = 3;
+}
+
+message RuntimeStats {
+  PhysicsRuntimeStats physics_stats = 1;
+  GameRuntimeStats game_stats = 2;
+  AudioRuntimeStats audio_stats = 3;
+}
+
+message PlatformUserData {
+  string user_id = 1;
+  google.protobuf.Any car_final_state = 2;
+  google.protobuf.Any driver_final_state = 5;
+  CarSetupData car_setup = 6;
+  uint32 odo_meters = 3;
+  float fuel = 4;
+}
+
+message PlatformGameState {
+  InstantRace.State.Game race_game_state = 17;
+  TimeAttack.State.Game time_attack_game_state = 18;
+  HotStint.State.Game hot_stint_game_state = 19;
+  PaintShop.State.Game paint_shop_game_state = 20;
+  VehicleAnalysis.State.Game vehicle_analysis_game_state = 21;
+  FreeRoam.State.Game freeroam_game_state = 22;
+  PlatformDriftChallengeGameState drift_challenge_game_state = 23;
+  PGUID player_controlled_car_id = 2;
+  PGUID focused_car_id = 3;
+  WeatherData weather = 4;
+  float global_wetness = 27;
+  bool is_gamemode_change_in_progress = 6;
+  bool recordable = 8;
+  double current_game_mode_time = 12;
+  bool is_replay = 13;
+  bool is_editing = 14;
+  bool force_track_camera = 15;
+  int32 num_retries = 9;
+  bool is_player_admin = 16;
+  bool is_soft_lock = 24;
+  Leaderboards.MfdReport leaderboard_event_report = 25;
+  Leaderboards.MfdReport leaderboard_trackday_report = 26;
+  reserved 5 to 5;
+  reserved 7 to 7;
+  reserved 1 to 1;
+}
+
+message ClientRestoreGameStateCommand {
+  PlatformGameState game_state = 1;
+}
+
+message GameCarDataCommand {
+  PGUID car_id = 100;
+  CarFinalStateData car_final_state = 101;
+  PlatformGameCarState car_game_state = 1;
+  ActorData actor_data = 4;
+  CarInstrumentationValues instrumentation_values_min_limit = 2;
+  CarInstrumentationValues instrumentation_values_max_limit = 3;
+  bool has_pit_limiter = 5;
+  CarElectronicsValues electronics_values_min_limit = 12;
+  CarElectronicsValues electronics_values_max_limit = 13;
+  CarElectronicsValues electronics_is_modifiable = 16;
+  CarSetupData car_setup_data = 15;
+  CarSetupDataLimits car_setup_data_limits = 19;
+  CarData car_data = 17;
+  bool is_shifter_supported = 14;
+  CarPitStopValues pit_stop_values_min_limit = 20;
+  CarPitStopValues pit_stop_values_max_limit = 21;
+  CarPitStopValues pit_stop_values_is_modifiable = 22;
+}

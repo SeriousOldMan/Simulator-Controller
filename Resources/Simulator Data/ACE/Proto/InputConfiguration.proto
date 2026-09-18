@@ -1,0 +1,210 @@
+syntax = "proto3";
+
+import "InputEnum.proto";
+import "Options.proto";
+
+enum TimedCommandType {
+  TimedCommandType_OnPress = 0;
+  TimedCommandType_OnRelease = 1;
+  TimedCommandType_OnHold = 2;
+  TimedCommandType_RepeatOnHold = 3;
+  TimedCommandType_Constant = 4;
+}
+
+enum JoypadSteerAssistMode {
+  Direct = 0;
+  Assisted = 1;
+  Smart = 2;
+  EvoDeprecated = 3;
+}
+
+message SharedCommands_Action_Input {
+  string guid = 1;
+  int32 index = 4;
+  TimedCommandType timed_command_type = 5;
+  bool required_shift = 6;
+  repeated uint32 required_modifiers = 7;
+}
+
+message SharedCommands_Axis_Input {
+  string guid = 1;
+  int32 index = 4;
+}
+
+message SharedCommands_Action_Inputs {
+  InputActionPayload action_payload = 1;
+  repeated SharedCommands_Action_Input inputs = 2;
+  repeated SharedCommands_Action_Input it_blocks = 3;
+  repeated SharedCommands_Action_Input blocked_by = 4;
+}
+
+message SharedCommands_Input_Actions {
+  SharedCommands_Action_Input input = 1;
+  repeated InputActionPayload action_payloads = 2;
+  repeated InputActionPayload it_blocks = 3;
+  repeated InputActionPayload blocked_by = 4;
+}
+
+message SharedCommands_Axis_Inputs {
+  InputAxis axis = 1;
+  repeated SharedCommands_Axis_Input inputs = 2;
+}
+
+message SharedCommands_Input_Axii {
+  SharedCommands_Axis_Input input = 1;
+  repeated InputAxis axii = 2;
+}
+
+message SharedCommands {
+  repeated SharedCommands_Action_Inputs action_inputs = 1;
+  repeated SharedCommands_Input_Actions input_actions = 2;
+  repeated SharedCommands_Axis_Inputs axis_inputs = 3;
+  repeated SharedCommands_Input_Axii input_axii = 4;
+}
+
+message InputActionPayload {
+  InputAction action = 1;
+  int32 payload = 2;
+}
+
+message ControlDefinition {
+  bool is_axis = 1;
+  int32 number = 2;
+  string name = 3;
+  int32 payload = 4;
+}
+
+message ControlGroup {
+  string name = 1;
+  repeated ControlDefinition definitions = 2;
+}
+
+message InputDeviceAxisSettings {
+  float deadzone = 1;
+  float saturation_x = 2;
+  float saturation_y = 3;
+  float curvature = 4;
+  bool is_slider = 5;
+  bool is_inverted = 6;
+  bool deprecated_use_curve = 7;
+}
+
+message InputDeviceAxis {
+  uint32 index = 1;
+  InputAxis input = 2;
+  InputDeviceAxisSettings settings = 3;
+  int32 number = 4;
+}
+
+message ActionBase {
+  InputAction input = 1;
+  uint32 trigger_time_ms = 2;
+  int32 payload = 3;
+  int32 repeat_time_ms = 4;
+  int32 number = 5;
+}
+
+message InputDeviceController {
+  string product_name = 1;
+  string instance_guid = 2;
+  bool xinput = 4;
+  string product_guid = 5;
+  reserved 3 to 3;
+}
+
+message KeyboardCommand {
+  ActionBase action = 1;
+  uint32 key = 2;
+  repeated uint32 required_modifiers = 3;
+}
+
+message InputDeviceCommand {
+  ActionBase action = 1;
+  uint32 index = 2;
+  bool require_shift = 3;
+}
+
+message InputDeviceCommandList {
+  InputDeviceController controller = 1;
+  repeated InputDeviceCommand commands = 2;
+  repeated InputDeviceAxis axii = 3;
+  repeated uint32 shifts = 4;
+}
+
+message KeyboardSettings {
+  bool mouse_steering = 1;
+  float mouse_speed = 3;
+  float look_ahead = 4;
+  float steer_speed = 5;
+  float steer_opposite_direction_factor = 6;
+  float steer_gain = 7;
+  float steer_reset_ractor = 8;
+}
+
+message InputDeviceSettings {
+  float ffb_gain = 1;
+  float steer_lock = 2;
+  float dynamic_damping = 3;
+  float min_damper = 5;
+  float damper_gain = 6;
+  float true_force_gain = 7;
+  bool deprecated_is_steering_wheel = 9;
+  float speed_sensitivity = 10;
+  float steer_filter = 11;
+  float steer_assist_weight = 12;
+  float vibrations = 13;
+  float gear_shift_debouncing_ms = 17;
+  bool use_manufacturers_extras = 14;
+  bool soft_lock = 16;
+  JoypadSteerAssistMode joypad_steer_assist_mode = 15;
+  reserved 8 to 8;
+  reserved 4 to 4;
+}
+
+message ForceFeedbackEnhancements {
+  float curbs_gain = 1;
+  float gforce_gain = 2;
+  float slips_gain = 3;
+  float abs_gain = 4;
+  float rumble_gain = 5;
+}
+
+message InputDeviceConfiguration {
+  repeated InputDeviceCommandList input_controllers = 1;
+}
+
+message KeyboardInputConfiguration {
+  repeated uint32 allowed_keyboard_modifiers = 1;
+  repeated KeyboardCommand keyboard_commands = 2;
+  KeyboardSettings keyboard_settings = 3;
+}
+
+message TrackIRConfiguration {
+  float sensitivity = 1;
+}
+
+message InputSettings {
+  InputDeviceSettings device_settings = 2;
+  ForceFeedbackEnhancements ffb_enhancements = 4;
+  TrackIRConfiguration track_ir = 5;
+  uint32 version = 6;
+  reserved 1 to 1;
+  reserved 3 to 3;
+}
+
+message InputConfiguration {
+  KeyboardInputConfiguration keyboard = 2;
+  InputSettings settings = 50;
+  InputDeviceConfiguration input_devices = 1;
+  reserved 3 to 3;
+  reserved 10 to 10;
+  reserved 20 to 20;
+  reserved 21 to 21;
+  reserved 22 to 22;
+  reserved 23 to 23;
+}
+
+message InputConfigurationChangeEvent {
+  InputConfiguration input_configuration = 1;
+  bool is_soft_set = 2;
+}

@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "CarData.proto";
+import "LogicScene.proto";
+import "Options.proto";
+
+message TuningPart {
+  message EngineTune {
+    float multiplier = 1;
+    float add = 2;
+    float cos_ampl = 3;
+    float cos_period = 4;
+    float cos_phase = 5;
+  }
+  message EngineData {
+    string path = 1;
+  }
+  message GearboxData {
+    string path = 1;
+  }
+  message DrivetrainData {
+    string path = 1;
+  }
+  message ClutchData {
+    string path = 1;
+  }
+  message BrakesData {
+    string front_path = 1;
+    string rear_path = 2;
+  }
+  message BrakeSystemData {
+    string path = 1;
+  }
+  message ElectronicsData {
+    string path = 1;
+  }
+  message WingData {
+    string path = 1;
+    int32 wing_index_override = 2;
+  }
+  message AeroPackage {
+    AeroData data = 1;
+  }
+  message SetupData {
+    string path = 1;
+  }
+  message SetupLimitsData {
+    string path = 1;
+  }
+  message SuspensionsTuning {
+    string coilover_path_front = 1;
+    string coilover_path_rear = 4;
+    reserved 2 to 2;
+    reserved 3 to 3;
+    reserved 5 to 5;
+    reserved 6 to 6;
+  }
+  message SuspensionsGeometryTuning {
+    string geometry_path_front = 1;
+    string geometry_path_rear = 2;
+  }
+  message BodyWeightReduction {
+    float weight_change = 1;
+    Vector3Data cg_change = 2;
+  }
+  message HubWeightReduction {
+    float weight_change = 1;
+  }
+  message PerformanceModeTuning {
+    repeated PerformanceModeData performance_modes = 1;
+  }
+  CarPartType car_part_type = 201;
+  oneof physics_tuning {
+    TuningPart.EngineTune engine_tune = 1;
+    TuningPart.EngineData engine = 2;
+    TuningPart.GearboxData gearbox = 3;
+    TuningPart.DrivetrainData drivetrain = 4;
+    TuningPart.ClutchData clutch = 5;
+    TuningPart.BrakesData brakes = 6;
+    TuningPart.BrakeSystemData brake_system = 36;
+    TuningPart.ElectronicsData electronics = 35;
+    TuningPart.SuspensionsTuning suspensions = 7;
+    TuningPart.SuspensionsGeometryTuning suspensions_geometry = 34;
+    TuningPart.WingData wing = 8;
+    TuningPart.AeroPackage aero_package = 9;
+    TuningPart.SetupData setup = 30;
+    TuningPart.SetupLimitsData setup_limits = 31;
+    TuningPart.PerformanceModeTuning performance_modes_tuning = 32;
+  }
+}

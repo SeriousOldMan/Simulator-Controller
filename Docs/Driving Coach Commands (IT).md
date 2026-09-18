@@ -92,15 +92,17 @@ Information=informazioni sulla sessione, informazioni sul turno, informazioni su
 
 	[(CanYou) dammi {raccomandazioni, suggerimenti, una guida, istruzioni} {mentre guido, per ogni curva}, {Per favore dimmi, Dimmi} {davanti, per} ogni curva quello che {posso, dovrebbe} cambiare, (CanYou) allenami {in pista, mentre guido}]
 	
-	[(CanWe) {concentrarci, esercitarci} {sulla curva numero, sulla curva} (Number), Concentriamoci {sulla curva numero, sulla curva} (Number), (CanYou) dammi {raccomandazioni, suggerimenti, una guida, istruzioni} per la {curva numero, curva} (Number)]
-	
 	[(CanYou) dirmi dove sono i punti di frenata, {Per favore dimmi, Dimmi} dove frenare, (CanWe) esercitarci {sulla frenata, sui punti di frenata}]
+	
+	[(CanYou) aiutarmi a rimanere concentrato, (CanYou) motivarmi se necessario, Ti prego di aiutarmi a mantenere la concentrazione]
 
 	[{Grazie adesso, Adesso} voglio concentrarmi, {Okay lasciami, Lasciami} {applicare, provare} {i tuoi consigli, le tue istruzioni, quello} ora, {Per favore fermati, Fermati} dandomi {raccomandazioni, suggerimenti, istruzioni, consigli per ogni curva, suggerimenti per ogni curva, istruzioni per ogni curva}, {Per favore no, No} altro {istruzioni, istruzioni per favore}]
 
 	[(CanWe) utilizzare il giro {più veloce, ultimo} come {riferimento, giro di riferimento}, {Per favore utilizzare, Utilizzare} il giro {più veloce, ultimo} come {riferimento, giro di riferimento}]
 
 	[{Per favore non, Non} utilizzare un {giro di riferimento, riferimento, giro di riferimento per favore, riferimento per favore}]
+	
+	[(CanWe) {concentrarci, esercitarci} {sulla curva numero, sulla curva} (Number), Concentriamoci {sulla curva numero, sulla curva} (Number), (CanYou) dammi {raccomandazioni, suggerimenti, una guida, istruzioni} per la {curva numero, curva} (Number)]
 	
 	[(CanWe) {concentrarci, concentrarci di nuovo} sull'intera traccia, {Concentriamoci ancora, Concentriamoci} sull'intera traccia]
 

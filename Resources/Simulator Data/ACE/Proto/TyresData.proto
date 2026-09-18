@@ -1,0 +1,339 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "Customization.proto";
+
+enum TyreGeneratorSection {
+  TyreGeneratorSection_all = 0;
+  TyreGeneratorSection_general = 1;
+  TyreGeneratorSection_speed_sens = 2;
+  TyreGeneratorSection_thermal = 3;
+}
+
+message TyreInitializerData {
+  float width = 1;
+  float aspect_ratio = 2;
+  float diameter = 3;
+  float load_index = 4;
+  float pressure = 6;
+  reserved 7 to 7;
+  reserved 5 to 5;
+}
+
+message TyreCompoundGeneratorGeneralData {
+  float contact_patch_magic = 1;
+  float aspect_ratio_divisor = 2;
+  float cp_len_divisor = 3;
+  float cp_var_c1 = 4;
+  float cp_var_c2 = 5;
+  float dy_c1 = 6;
+  float dx_c1 = 7;
+  float dx_c2 = 8;
+  float dx_scale = 100;
+  float dy_scale = 101;
+  float ls_esp_c1 = 9;
+  float ls_esp_c2 = 10;
+  float ls_esp_c3 = 11;
+  float SA_limit_c1 = 13;
+  float SA_limit_c2 = 14;
+  float SA_limit_c3 = 15;
+  float add_ls_esp_y = 16;
+  float add_ls_esp_x = 17;
+  float groove_factor = 18;
+  float groove_sa_factor = 19;
+  float groove_sr_factor = 20;
+  float brush_exponent = 21;
+  float tyre_damp_const = 22;
+  float friction_limit_load_gain = 24;
+  float grip_slip = 25;
+  float brake_dxmod = 26;
+  float lateral_flex_k = 27;
+  float long_flex_k = 28;
+  float radius_raise_k = 29;
+  float contact_camber_c1 = 30;
+  float contact_camber_c2 = 31;
+  float contact_flex_c1 = 32;
+  float contact_vertical_flex_c1 = 33;
+  float fz0 = 34;
+  float fz0_c1 = 35;
+  float fz0_c2 = 36;
+  float flat_spot_k = 37;
+  float rate_scale = 38;
+  float grain_factor = 39;
+  float contact_wear_imo = 40;
+  float relaxation_length_x = 41;
+  float relaxation_length_y = 42;
+  float mz_tweak_mult = 43;
+  float mz_scale = 44;
+  float mz_trail_ndslip_reduction = 45;
+  float mz_trail_remap = 46;
+  float pressure_flex_gain = 47;
+  float rolling_resistance_gain = 48;
+  float rolling_heat_gain = 49;
+  float gain_d = 50;
+  float ideal_pressure = 51;
+  float pressure_reference = 52;
+  float tread_h = 53;
+  float camber_gain = 54;
+  float tyre_mass = 55;
+  float d_camber_1 = 56;
+  float d_camber_0 = 57;
+  float camber_vertical_k_range = 58;
+  float camber_vertical_k_gain = 59;
+  float blanket_t = 60;
+  float damping_coeff = 61;
+  float curb_pressure_loss_mult = 62;
+  float curb_pressure_loss_threshold = 63;
+  float width_ref_rr = 64;
+  float diameter_ref_rr = 65;
+  float sidewall_ref_rr = 66;
+  float rr0_ref = 67;
+  float rr1 = 68;
+  float rr_slip = 69;
+  float rr_wear_mult = 70;
+  float damping_threshold_spring = 71;
+  float speed_damping_factor = 72;
+  float deflection_damping_factor = 73;
+  float cfxmult = 74;
+  float combined_factor = 75;
+  float lat_flex_c = 76;
+  float lon_flex_c = 77;
+  float tread_cons = 78;
+  float grain_slip_angle_th_addable = 79;
+  float explosion_temperature = 80;
+  string wear_curve = 81;
+  string pressure_spring_curve = 82;
+  reserved 12 to 12;
+  reserved 23 to 23;
+}
+
+message TyreCompoundGeneratorThermalData {
+  float surface_transfer_c1 = 1;
+  float graingain = 2;
+  float graingamma = 3;
+  float grainslipangle_gain = 4;
+  float grainslipangle_gamma = 5;
+  float cool_factor = 6;
+  float heat_partition = 7;
+  float surface_core_mass_ratio = 8;
+  float road_conductivity = 9;
+  float termal_conductivity = 10;
+  float rolling_factor = 11;
+  float t_ref_friction_limit_angle = 12;
+  float density = 13;
+  float specific_heat = 14;
+  float vertical_spring = 15;
+  float wear_mult = 16;
+  float practical_temp_source = 17;
+  float contact_imo = 18;
+  string thermal_performance_curve = 19;
+}
+
+message TyreCompoundGeneratorSpeedSensitivityData {
+  float mu0t1 = 1;
+  float ref_speed1 = 2;
+  float muss1 = 3;
+  float mus1 = 4;
+  float t_ref_mut1 = 5;
+  float mu0t1x = 6;
+  float ref_speed1x = 7;
+  float muss1x = 8;
+  float mus1x = 9;
+  float t_ref_mut1x = 10;
+}
+
+message TyreCompoundGeneratorData {
+  TyreCompoundGeneratorGeneralData general_data = 1;
+  TyreCompoundGeneratorThermalData thermal_data = 2;
+  TyreCompoundGeneratorSpeedSensitivityData speed_sens_data = 3;
+}
+
+message TyresPressureData {
+  float pressure_limit_angle_gain = 1;
+  float rollingResistanceGain = 2;
+  float rollingHeatGain = 3;
+  float gainD = 4;
+  float idealPressure = 5;
+  float pressureReference = 6;
+  string pressureSpringCurve = 7;
+  float pressureSpringGain = 8;
+  float curbPressureLossMult = 9;
+  float curbPressureLossThreshold = 10;
+}
+
+message RollingResistanceData {
+  float rr0 = 1;
+  float rr1 = 2;
+  float rr_slip = 3;
+  float rrWearMult = 4;
+}
+
+message TyresGrooveData {
+  float grooveFactor = 1;
+  float grooveSAFactor = 2;
+  float grooveSRFactor = 3;
+}
+
+message TyresCamberData {
+  float camberGain = 1;
+  float camberVerticalKRangeDeg = 2;
+  float camberVerticalKGain = 3;
+  float dcamber0 = 4;
+  float dcamber1 = 5;
+  reserved 6 to 6;
+  reserved 7 to 7;
+}
+
+message TyresSpeedSensitivityData {
+  float mu0T = 11;
+  float ref_speed = 8;
+  float muSpeedSensitivity = 9;
+  float muTSensitivity = 12;
+  float TrefMuT = 13;
+  float mu0T_x = 112;
+  float ref_speed_x = 113;
+  float muSpeedSensitivity_x = 114;
+  float muTSensitivity_x = 115;
+  float TrefMuT_x = 116;
+  reserved 10 to 10;
+  reserved 7 to 7;
+  reserved 5 to 5;
+  reserved 6 to 6;
+  reserved 1 to 1;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 4 to 4;
+}
+
+message TyresThermalPatchData {
+  float verticalSpringK = 1;
+  float verticalDampK = 2;
+  float wearMult = 3;
+  float density = 110;
+  float specific_heat = 111;
+  float surface_core_mass_ratio = 112;
+  float cool_factor_rain = 113;
+  float cool_factor = 114;
+  float heat_partition_coeff = 115;
+  float road_conduction = 116;
+  float thermal_conductivity = 117;
+  float rolling_factor = 118;
+  float grainGain = 16;
+  float grainGamma = 17;
+  float grainSlipAngleGain = 18;
+  float grainSlipAngleGamma = 19;
+  float grainSlipAngleThreshold = 20;
+  float blisterGain = 21;
+  float blisterGamma = 22;
+  float practicalTempSource = 23;
+  float brakeTransferFactor = 24;
+  string thermalPerformanceCurve = 25;
+  float contactIMO = 26;
+  float TrefFrictionLimitAngle = 27;
+  float frictionLimitAngleTSensitivity = 28;
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 6 to 6;
+  reserved 7 to 7;
+  reserved 8 to 8;
+  reserved 9 to 9;
+  reserved 10 to 10;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 13 to 13;
+  reserved 14 to 14;
+  reserved 15 to 15;
+  reserved 29 to 29;
+  reserved 30 to 30;
+}
+
+message TyresModelData {
+  float Dy0 = 1;
+  float Dx0 = 2;
+  float lsExpY = 3;
+  float lsExpX = 4;
+  float Fz0 = 5;
+  float friction_limit_angle = 6;
+  float friction_limit_angle_load_gain = 7;
+  float slip_ratio_limit = 60;
+  float slip_ratio_limit_load_gain = 70;
+  bool new_combined = 73;
+  float fx_shift_SA = 74;
+  float fx_scale_SA = 75;
+  float fy_shift_SR = 76;
+  float fy_scale_SR = 77;
+  bool use_sr_limit = 71;
+  float cfXmult = 8;
+  float brakeDXMod = 9;
+  float combinedFactor = 10;
+  float gripSlipFactor = 13;
+  string wearCurve = 14;
+  float grainFactor = 16;
+  float contactWearIMO = 17;
+  float relaxationLengthY = 18;
+  float relaxationLengthX = 19;
+  float mzTweakMult = 15;
+  float mzScale = 20;
+  float mzTrailNdSlipReduction = 21;
+  float mzTrailRemap = 22;
+  float brushExponent = 23;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 72 to 72;
+}
+
+message TyresData {
+  enum DampingMode {
+    simple = 0;
+    hystereticNando = 2;
+  }
+  float width = 1;
+  float radius = 2;
+  float rate = 3;
+  float progressive_rate = 300;
+  float damping = 4;
+  float angularInertia = 5;
+  float rimRadius = 6;
+  float radiusRaiseK = 7;
+  float treadHeightMM = 8;
+  float treadConsumptionK = 9;
+  float mass = 10;
+  float lateralFlexK = 11;
+  float lateralFlexC = 12;
+  float longitudinalFlexK = 13;
+  float longitudinalFlexC = 14;
+  float explosionTemperature = 15;
+  float blanketTemperature = 16;
+  float FlatSpotK = 17;
+  float normalToFlexRatio = 18;
+  TyresData.DampingMode dampingMode = 29;
+  float dampingThresholdSpeedMs = 30;
+  float speedDampingFactor = 31;
+  float deflectionDampingFactor = 32;
+  reserved 19 to 19;
+  reserved 20 to 20;
+  reserved 21 to 21;
+  reserved 22 to 22;
+  reserved 23 to 23;
+  reserved 24 to 24;
+  reserved 25 to 25;
+  reserved 26 to 26;
+  reserved 27 to 27;
+  reserved 28 to 28;
+}
+
+message TyresCompoundData {
+  string name = 1;
+  string shortName = 2;
+  PhysicsTyreCompound tyre_compound = 21;
+  TyresData tyreData = 3;
+  TyresModelData modelData = 4;
+  TyresThermalPatchData thermalData = 5;
+  TyresPressureData pressureData = 6;
+  TyresCamberData camberData = 7;
+  TyresSpeedSensitivityData speedSensitivity = 8;
+  RollingResistanceData rollingResistance = 9;
+  TyresGrooveData grooveData = 10;
+  float pressure = 11;
+  TyreInitializerData init_data = 12;
+}

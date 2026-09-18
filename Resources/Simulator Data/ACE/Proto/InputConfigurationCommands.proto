@@ -1,0 +1,526 @@
+syntax = "proto3";
+
+import "InputConfiguration.proto";
+import "PlatformCommands.proto";
+import "InputEnum.proto";
+import "Options.proto";
+
+enum InputSource {
+  InputSource_Keyboard = 0;
+  InputSource_XInput = 1;
+  InputSource_DirectInput = 2;
+}
+
+message InputWrapper_ActionItem_Keyboard {
+  bool is_set = 100;
+  int32 button_code = 1;
+  uint32 trigger_time_ms = 2;
+  int32 repeat_time_ms = 3;
+  repeated int32 required_modifiers = 4;
+}
+
+message InputWrapper_ActionItem_XInput {
+  bool is_set = 100;
+  string product_name = 1;
+  string instance_guid = 10;
+  string product_guid = 11;
+  int32 button_index = 2;
+  uint32 trigger_time_ms = 3;
+  int32 repeat_time_ms = 4;
+  bool require_shift = 5;
+}
+
+message InputWrapper_ActionItem_DirectInput {
+  bool is_set = 100;
+  string product_name = 1;
+  string instance_guid = 2;
+  string product_guid = 10;
+  int32 button_index = 3;
+  uint32 trigger_time_ms = 4;
+  int32 repeat_time_ms = 5;
+  bool require_shift = 6;
+}
+
+message InputWrapper_ActionItem {
+  bool is_set = 100;
+  string group = 101;
+  int32 number = 102;
+  string name = 103;
+  InputAction action = 1;
+  int32 payload = 2;
+  InputWrapper_ActionItem_Keyboard keyboard = 10;
+  InputWrapper_ActionItem_XInput x_input = 11;
+  InputWrapper_ActionItem_DirectInput direct_input = 12;
+  bool is_mandatory = 13;
+  bool is_forced_const = 14;
+  bool is_forced_repeated = 15;
+  bool is_forced_on_release = 16;
+}
+
+message InputWrapper_AxisItem_XInput {
+  bool is_set = 100;
+  string product_name = 1;
+  string instance_guid = 2;
+  string product_guid = 3;
+  int32 axis_index = 4;
+  InputDeviceAxisSettings settings = 5;
+}
+
+message InputWrapper_AxisItem_DirectInput {
+  bool is_set = 100;
+  string product_name = 1;
+  string instance_guid = 2;
+  string product_guid = 3;
+  int32 axis_index = 4;
+  InputDeviceAxisSettings settings = 5;
+}
+
+message InputWrapper_AxisItem {
+  bool is_set = 100;
+  string group = 101;
+  int32 number = 102;
+  string name = 103;
+  InputAxis axis = 1;
+  InputWrapper_AxisItem_XInput x_input = 11;
+  InputWrapper_AxisItem_DirectInput direct_input = 12;
+}
+
+message InputWrapper_ShiftItem_Keyboard {
+  bool is_set = 100;
+  repeated int32 modifiers = 1;
+}
+
+message InputWrapper_ShiftItem_XInput {
+  bool is_set = 100;
+  string product_name = 1;
+  string instance_guid = 10;
+  string product_guid = 11;
+  int32 button_index = 2;
+}
+
+message InputWrapper_ShiftItem_DirectInput {
+  bool is_set = 100;
+  string product_name = 1;
+  string instance_guid = 2;
+  string product_guid = 10;
+  int32 button_index = 3;
+}
+
+message InputWrapper_ShiftItem {
+  bool is_set = 100;
+  InputWrapper_ShiftItem_Keyboard keyboard = 10;
+  InputWrapper_ShiftItem_XInput x_input = 11;
+  InputWrapper_ShiftItem_DirectInput direct_input = 12;
+}
+
+message InputWrapper {
+  repeated InputWrapper_ActionItem action_items = 1;
+  repeated InputWrapper_AxisItem axis_items = 2;
+  InputWrapper_ShiftItem shift_items = 3;
+  InputSettings settings = 4;
+  KeyboardSettings keyboard_settings = 5;
+}
+
+message InputConfigurationRequestListeningMode {
+  bool enable = 1;
+}
+
+message InputConfigurationResponseListeningMode {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestPage {
+  bool is_enter = 1;
+}
+
+message InputConfigurationResponsePage {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestApply {
+  bool im_empty = 1;
+}
+
+message InputConfigurationResponseApply {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestCancel {
+  bool im_empty = 1;
+}
+
+message InputConfigurationResponseCancel {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  repeated string connected_guids = 3;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestEraseDisconnectedControllers {
+  bool im_empty = 1;
+}
+
+message InputConfigurationResponseEraseDisconnectedControllers {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestEraseController {
+  string controller_guid = 1;
+}
+
+message InputConfigurationResponseEraseController {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestClearController {
+  string controller_guid = 1;
+}
+
+message InputConfigurationResponseClearController {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestClearKeyboard {
+  bool im_empty = 1;
+}
+
+message InputConfigurationResponseClearKeyboard {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestRefresh {
+  bool im_empty = 1;
+  bool is_soft_set = 2;
+}
+
+message InputDeviceItem {
+  string product_name = 1;
+  string instance_guid = 2;
+  string product_guid = 3;
+  bool is_xbox = 4;
+}
+
+message InputConfigurationResponseRefresh {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  repeated string connected_guids = 3;
+  SharedCommands shared_commands = 5;
+  bool is_soft_set = 6;
+  InputWrapper wrapper = 7;
+  repeated InputDeviceItem input_devices = 8;
+}
+
+message InputConfigurationRequestReset {
+  bool im_empty = 1;
+}
+
+message InputConfigurationResponseReset {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  repeated string connected_guids = 3;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestGroups {
+  bool im_empty = 1;
+}
+
+message InputConfigurationResponseGroups {
+  CommandResponse response = 1;
+  repeated ControlGroup groups = 2;
+}
+
+message SettingsRequestInputConfigurationPresetList {
+  int32 version = 1;
+}
+
+message SettingsResponseInputConfigurationPresetList {
+  CommandResponse response = 1;
+  repeated string filenames = 2;
+}
+
+message SettingsRequestInputConfigurationLoadPreset {
+  string filename = 1;
+}
+
+message SettingsResponseInputConfigurationLoadPreset {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message SettingsRequestInputConfigurationSavePreset {
+  string filename = 1;
+  int32 version = 2;
+}
+
+message SettingsResponseInputConfigurationSavePreset {
+  CommandResponse response = 1;
+}
+
+message SettingsRequestInputConfigurationDeletePreset {
+  string filename = 1;
+}
+
+message SettingsResponseInputConfigurationDeletePreset {
+  CommandResponse response = 1;
+}
+
+message InputConfigurationRequestAdd {
+  ControlDefinition definition = 1;
+  string guid = 2;
+  bool is_shift_button = 3;
+  bool listen_to_all = 100;
+}
+
+message InputConfigurationResponseAdd {
+  CommandResponse response = 1;
+  string error_guid = 3;
+  int32 error_key = 4;
+  repeated uint32 error_required_modifiers = 5;
+  InputConfiguration settings = 10;
+  SharedCommands shared_commands = 7;
+}
+
+message InputConfigurationRequestAdd_New {
+  ControlDefinition definition = 1;
+  InputSource input_source = 2;
+  bool is_shift_button = 3;
+  bool listen_to_all = 100;
+}
+
+message InputConfigurationResponseAdd_New {
+  CommandResponse response = 1;
+  string error_guid = 3;
+  int32 error_key = 4;
+  repeated uint32 error_required_modifiers = 5;
+  InputWrapper wrapper = 10;
+  repeated ControlDefinition already_bound_to = 11;
+  bool already_bound_to_shift = 12;
+}
+
+message InputConfigurationRequestEdit_New {
+  ControlDefinition definition = 1;
+  InputSource input_source = 2;
+  int32 trigger_time_ms = 10;
+  int32 repeat_time_ms = 11;
+  bool require_shift = 12;
+  InputDeviceAxisSettings axis_settings = 20;
+  bool is_forced_edit = 21;
+}
+
+message InputConfigurationResponseEdit_New {
+  CommandResponse response = 1;
+  string error_guid = 3;
+  int32 error_key = 4;
+  repeated uint32 error_required_modifiers = 5;
+  InputWrapper wrapper = 10;
+  repeated ControlDefinition already_bound_to = 11;
+  bool already_bound_to_shift = 12;
+}
+
+message InputConfigurationPressedEscape {
+  bool im_empty = 1;
+}
+
+message InputConfigurationRequestForceAdd {
+  ControlDefinition definition = 1;
+  string guid = 3;
+  int32 key = 4;
+  repeated uint32 required_modifiers = 5;
+}
+
+message InputConfigurationResponseForceAdd {
+  CommandResponse response = 1;
+  InputConfiguration settings = 10;
+  SharedCommands shared_commands = 5;
+}
+
+message InputConfigurationRequestEdit {
+  ControlDefinition definition = 1;
+  string guid = 2;
+  int32 trigger_time_ms = 10;
+  int32 repeat_time_ms = 11;
+  bool require_shift = 12;
+  InputDeviceAxisSettings axis_settings = 20;
+}
+
+message InputConfigurationResponseEdit {
+  CommandResponse response = 1;
+  string error_guid = 3;
+  int32 error_key = 4;
+  repeated uint32 error_required_modifiers = 5;
+  InputConfiguration settings = 10;
+  SharedCommands shared_commands = 7;
+}
+
+message InputConfigurationRequestRemove {
+  ControlDefinition definition = 1;
+  string guid = 2;
+  bool is_shift_button = 3;
+}
+
+message InputConfigurationResponseRemove {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+}
+
+message InputConfigurationRequestRemove_New {
+  ControlDefinition definition = 1;
+  InputSource input_source = 2;
+  bool is_shift_button = 3;
+}
+
+message InputConfigurationResponseRemove_New {
+  CommandResponse response = 1;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestUpdateKeyboardModifiers {
+  bool is_ctrl_enabled = 1;
+  bool is_shift_enabled = 2;
+  bool is_alt_enabled = 3;
+}
+
+message InputConfigurationResponseUpdateKeyboardModifiers {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestUpdateKeyboardSettings {
+  KeyboardSettings keyboard_settings = 1;
+}
+
+message InputConfigurationResponseUpdateKeyboardSettings {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestUpdateInputDeviceSettings {
+  InputDeviceSettings input_device_settings = 1;
+}
+
+message InputConfigurationResponseUpdateInputDeviceSettings {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestUpdateForceFeedbackEnhancements {
+  ForceFeedbackEnhancements force_feedback_enhancements = 1;
+}
+
+message InputConfigurationResponseUpdateForceFeedbackEnhancements {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestUpdateTrackIRConfiguration {
+  TrackIRConfiguration track_ir_configuration = 1;
+}
+
+message InputConfigurationResponseUpdateTrackIRConfiguration {
+  CommandResponse response = 1;
+  InputConfiguration settings = 2;
+  SharedCommands shared_commands = 5;
+  InputWrapper wrapper = 10;
+}
+
+message InputConfigurationRequestAxiiListenerMode {
+  UIAxiiListenerMode mode = 1;
+}
+
+message InputConfigurationResponseAxiiListenerMode {
+  bool im_empty = 1;
+}
+
+message InputConfigurationRequestTextboxMode {
+  bool is_textbox_mode = 1;
+  repeated InputAction optional_allowed_actions = 2;
+}
+
+message InputConfigurationResponseTextboxMode {
+  bool im_empty = 1;
+}
+
+message InputConfigurationRequestActionFilters {
+  repeated InputAction allowed_actions = 1;
+}
+
+message InputConfigurationResponseActionFilters {
+  bool im_empty = 1;
+}
+
+message InputConfigurationCommands {
+  InputConfigurationRequestListeningMode request_listening_mode = 1;
+  InputConfigurationResponseListeningMode response_listening_mode = 1000;
+  InputConfigurationRequestPage request_page = 2;
+  InputConfigurationResponsePage response_page = 1001;
+  InputConfigurationRequestApply request_apply = 3;
+  InputConfigurationResponseApply response_apply = 1002;
+  InputConfigurationRequestEraseDisconnectedControllers request_erase_disconnected_controllers = 4;
+  InputConfigurationResponseEraseDisconnectedControllers response_erase_disconnected_controllers = 1003;
+  InputConfigurationRequestEraseController request_erase_controller = 5;
+  InputConfigurationResponseEraseController response_erase_controller = 1004;
+  InputConfigurationRequestClearController request_clear_controller = 6;
+  InputConfigurationResponseClearController response_clear_controller = 1005;
+  InputConfigurationRequestClearKeyboard request_clear_keyboard = 7;
+  InputConfigurationResponseClearKeyboard response_clear_keyboard = 1006;
+  InputConfigurationRequestRefresh request_refresh = 8;
+  InputConfigurationResponseRefresh response_refresh = 1007;
+  InputConfigurationRequestReset request_reset = 9;
+  InputConfigurationResponseReset response_reset = 1008;
+  InputConfigurationRequestGroups request_groups = 10;
+  InputConfigurationResponseGroups response_groups = 1009;
+  SettingsRequestInputConfigurationPresetList request_preset_list = 11;
+  SettingsResponseInputConfigurationPresetList response_preset_list = 1010;
+  SettingsRequestInputConfigurationLoadPreset request_load_preset = 12;
+  SettingsResponseInputConfigurationLoadPreset response_load_preset = 1011;
+  SettingsRequestInputConfigurationSavePreset request_save_preset = 13;
+  SettingsResponseInputConfigurationSavePreset response_save_preset = 1012;
+  SettingsRequestInputConfigurationDeletePreset request_delete_preset = 14;
+  SettingsResponseInputConfigurationDeletePreset response_delete_preset = 1013;
+  InputConfigurationRequestAdd request_add = 15;
+  InputConfigurationResponseAdd response_add = 1014;
+  InputConfigurationRequestForceAdd request_force_add = 16;
+  InputConfigurationResponseForceAdd response_force_add = 1015;
+  InputConfigurationRequestEdit request_edit = 17;
+  InputConfigurationResponseEdit response_edit = 1016;
+  InputConfigurationRequestRemove request_remove = 18;
+  InputConfigurationResponseRemove response_remove = 1017;
+  InputConfigurationRequestUpdateKeyboardModifiers request_update_keyboard_modifiers = 19;
+  InputConfigurationResponseUpdateKeyboardModifiers response_update_keyboard_modifiers = 1018;
+  InputConfigurationRequestUpdateKeyboardSettings request_update_keyboard_settings = 20;
+  InputConfigurationResponseUpdateKeyboardSettings response_update_keyboard_settings = 1019;
+  InputConfigurationRequestUpdateInputDeviceSettings request_update_input_device_settings = 21;
+  InputConfigurationResponseUpdateInputDeviceSettings response_update_input_device_settings = 1020;
+  InputConfigurationRequestUpdateForceFeedbackEnhancements request_update_force_feedback_enhancements = 22;
+  InputConfigurationResponseUpdateForceFeedbackEnhancements response_update_force_feedback_enhancements = 1021;
+  InputConfigurationRequestUpdateTrackIRConfiguration request_update_track_i_r_configuration = 23;
+  InputConfigurationResponseUpdateTrackIRConfiguration response_update_track_i_r_configuration = 1022;
+  InputConfigurationRequestAxiiListenerMode request_axii_listener_mode = 24;
+  InputConfigurationResponseAxiiListenerMode response_axii_listener_mode = 1023;
+  InputConfigurationRequestActionFilters request_action_filters = 25;
+  InputConfigurationResponseActionFilters response_action_filters = 1024;
+  InputConfigurationRequestTextboxMode request_textbox_mode = 26;
+  InputConfigurationResponseTextboxMode response_textbox_mode = 1025;
+  InputConfigurationRequestCancel request_cancel = 27;
+  InputConfigurationResponseCancel response_cancel = 1026;
+  InputConfigurationRequestAdd_New request_add_new = 28;
+  InputConfigurationResponseAdd_New response_add_new = 1027;
+  InputConfigurationRequestEdit_New request_edit_new = 29;
+  InputConfigurationResponseEdit_New response_edit_new = 1028;
+  InputConfigurationRequestRemove_New request_remove_new = 30;
+  InputConfigurationResponseRemove_New response_remove_new = 1029;
+}

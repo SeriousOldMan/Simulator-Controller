@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "Scene.proto";
+import "Math.proto";
+
+message NetcodeTestlab {
+  enum Testcase {
+    ROLL_ON_NETCAR = 0;
+  }
+  message State {
+    message Game {
+    }
+    message GameCar {
+    }
+  }
+  message Specialization {
+  }
+  message UiData {
+    bool show_testlab_controls_window = 1;
+    bool show_testlab_results_window = 2;
+  }
+  message CreatePhysicsCommand {
+  }
+  message TestcaseData {
+    NetcodeTestlab.Testcase testcase = 1;
+    int32 car2_netcar_version = 2;
+    CarSpawnData car1_spawndata = 3;
+    TransformData car1_spawn_transform = 4;
+    CarSpawnData car2_spawndata = 5;
+    TransformData car2_spawn_transform = 6;
+    float push_force_per_kg = 7;
+    float relative_impact_velocity = 8;
+  }
+  message ResetTestcaseCommand {
+    NetcodeTestlab.TestcaseData testcase = 1;
+    float seconds_delay = 3;
+  }
+}

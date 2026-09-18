@@ -93,6 +93,8 @@ Information=informacje o sesji, informacje o stincie, informacje o prowadzeniu
 	[(CanYou) dawaj mi {wskazówki, porady} podczas jazdy, {Proszę mów, Mów} mi przed każdym {zakrętem}, (CanYou) coachuj mnie na torze]
 
 	[(CanYou) pokaż punkty hamowania, {Proszę powiedz, Powiedz} gdzie hamować, (CanWe) poćwiczyć hamowanie]
+	
+	[(CanYou) mi pomóc mi się skupić, (CanYou) zmotywować mnie w razie potrzeby, {Proszę, pomóż mi} utrzymać koncentrację]
 
 	[Teraz chcę się skupić, {Ok pozwól, Pozwól} mi spróbować, {Proszę przestań, Przestań} dawać wskazówki]
 

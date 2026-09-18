@@ -1,0 +1,239 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+
+enum CameraModeType {
+  CameraModeType_CameraNone = 0;
+  CameraModeType_CameraCockpit = 1;
+  CameraModeType_CameraExternal = 2;
+  CameraModeType_CameraFixed = 3;
+  CameraModeType_CameraDash = 4;
+  CameraModeType_CameraBonnet = 5;
+}
+
+enum CameraSetTag {
+  CameraSetTag_Mixed = 0;
+  CameraSetTag_Close = 1;
+  CameraSetTag_Far = 2;
+  CameraSetTag_Pit = 3;
+  CameraSetTag_VROnly = 4;
+}
+
+enum DrivableCameraType {
+  DrivableCameraType_Cockpit = 0;
+  DrivableCameraType_Dash = 1;
+  DrivableCameraType_Hood = 2;
+  DrivableCameraType_Bumper = 3;
+  DrivableCameraType_Chase = 4;
+  DrivableCameraType_FarChase = 5;
+}
+
+message MovementCameraSettings {
+  float rotation_degrees = 1;
+  float rotation_speed = 2;
+  Vector3Data g_forces_shake = 3;
+  bool camera_shake = 4;
+}
+
+message CameraSettings {
+  MovementCameraSettings drivableCamera = 1;
+  MovementCameraSettings cockpitCamera = 2;
+  bool enableShake = 3;
+  float gForceLag = 4;
+  float shakeRandomBlend = 5;
+  bool worldAligned = 6;
+  float look_around_speed = 10;
+  float chasecam_rotation_lag_speed = 11;
+  float horizon_lock = 12;
+  float general_movement = 13;
+  float onboard_movement = 19;
+  float dashcam_factor = 14;
+  float bonnet_factor = 18;
+  float look_with_steer_gain = 15;
+  float look_with_steer_gamma = 16;
+  float look_with_steer_smoothing = 17;
+  int32 version = 20;
+}
+
+message CameraBaseData {
+  enum CameraType {
+    CameraType_Perspective = 0;
+    CameraType_Orthographic = 1;
+  }
+  float fov = 2;
+  string graphicsSettingsOverride = 21;
+  CameraModeType mode_type = 13;
+  int32 movement_step = 9;
+  int32 rotation_step = 14;
+  float translation_X_multiplier = 15;
+  float translation_Y_multiplier = 16;
+  float translation_Z_multiplier = 17;
+  float rotation_pitch_multiplier = 18;
+  float rotation_yaw_multiplier = 19;
+  float rotation_roll_multiplier = 20;
+  reserved 6 to 6;
+  reserved 7 to 7;
+  reserved 8 to 8;
+  reserved 10 to 10;
+  reserved 11 to 11;
+  reserved 12 to 12;
+}
+
+message CamTVData {
+  message CamTVSegment {
+    Vector3Data pos = 1;
+    float width = 2;
+    float height = 3;
+    float angle = 4;
+  }
+  CamTVData.CamTVSegment startSegment = 1;
+  CamTVData.CamTVSegment endSegment = 2;
+  bool useSegments = 3;
+  bool linked = 4;
+  bool was_linked = 5;
+  string fov_curve = 6;
+  string spline_name = 7;
+  float speed = 8;
+  bool spring_mode = 9;
+  string settings = 10;
+}
+
+message SpringModeSettings {
+  float damping_ratio = 1;
+  float spline_ahead_mult = 2;
+  float half_life_center = 3;
+  float half_life_border = 4;
+  float half_life_exp = 5;
+  string damping_ratio_curve = 11;
+  string spline_ahead_mult_curve = 12;
+  string half_life_center_curve = 13;
+  string half_life_border_curve = 14;
+  float damping_ratio_random_offset_max = 21;
+  float spline_ahead_mult_random_offset_max = 22;
+  float half_life_random_offset_max = 23;
+}
+
+message TVCamSettings {
+  SpringModeSettings spring_mode_settings = 1;
+}
+
+message CamSeqData {
+  enum CamSeqTarget {
+    FocusedCar = 0;
+    FixedPoint = 1;
+    FixedDirection = 2;
+  }
+  string spline_name = 1;
+  bool spline_local = 5;
+  float speed = 2;
+  CamSeqData.CamSeqTarget target = 3;
+  Vector3Data target_point = 4;
+}
+
+message CameraData {
+  string cameraReferenceName = 2;
+  Vector3Data offset = 11;
+  CameraBaseData baseProperties = 14;
+  CameraAdditionalData addProperties = 12;
+  CamTVData tvProperties = 15;
+  CamSeqData sequenceProperties = 16;
+  repeated CameraSetTag tags = 13;
+  reserved 4 to 4;
+  reserved 5 to 5;
+}
+
+message CameraAdditionalData {
+  bool isFixed = 20;
+  bool mirrorRendering = 22;
+  float look_left_yaw = 30;
+  float look_right_yaw = 31;
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 7 to 7;
+  reserved 8 to 8;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 15 to 15;
+  reserved 16 to 16;
+  reserved 18 to 18;
+  reserved 19 to 19;
+  reserved 21 to 21;
+}
+
+message CarCameraInfo {
+  repeated Vector3Data positions = 1;
+  repeated Vector3Data rotations = 2;
+  repeated float fovs = 3;
+}
+
+message DrivableCameraUserSettings {
+  repeated float fovs = 1;
+  map<string, CarCameraInfo> mapCarCameraData = 2;
+}
+
+message OnboardCameraUserSettings {
+  map<string, CarCameraInfo> mapCarCameraData = 2;
+}
+
+message CarCameraUserSettings {
+  DrivableCameraUserSettings drivableSettings = 1;
+  OnboardCameraUserSettings onboardSettings = 2;
+  int32 last_used_drivable_index = 3;
+  int32 last_used_onboard_index = 4;
+}
+
+message CinematicCameraSettings {
+  enum DofType {
+    Fixed = 0;
+    Focused = 1;
+  }
+  float fov = 1;
+  Vector3Data lookatOffset = 9;
+  Vector3Data moveSpeed = 11;
+  Vector3Data rotationSpeed = 12;
+  float globalSpeed = 13;
+  float smoothness = 14;
+  CinematicCameraSettings.DofType dofType = 20;
+  float dofAperture = 21;
+  float dofForegroundBlur = 22;
+  float dofBackgroundBlur = 23;
+  float dofForegroundDistance = 24;
+  float dofBackgroundDistance = 25;
+  float dofFocusDistanceOverride = 26;
+  bool dofEnabled = 27;
+  float cineFovSpeed = 31;
+  float cineFovSmoothness = 32;
+  bool cineFovInvertAxis = 33;
+  bool shakeEnabled = 40;
+  Vector3Data shakeMoveAmplitude = 41;
+  Vector3Data shakeMoveFrequency = 42;
+  Vector3Data shakeRotateAmplitude = 43;
+  Vector3Data shakeRotateFrequency = 44;
+}
+
+message FreeCameraSettings {
+  int32 mode = 1;
+  float fov = 2;
+  float roll_deg = 5;
+  float sharpening_strength = 10;
+  float exposure_compensation = 11;
+  int32 veil_type = 12;
+  float dof_aperture = 21;
+  float dof_foreground_blur = 22;
+  float dof_background_blur = 23;
+  float dof_foreground_distance = 24;
+  float dof_background_distance = 25;
+  int32 dof_type = 26;
+  float dof_focus_distance_fixed = 27;
+  float dof_focus_distance_focused = 28;
+  float vignette_intensity = 31;
+  float vignette_radius = 32;
+  float chromatic_aberration = 33;
+  float fisheye_strength = 34;
+  float color_grading_white_balance_temperature = 41;
+  float color_grading_white_balance_tint = 42;
+  Vector4Data color_grading_master_saturation = 43;
+  Vector4Data color_grading_master_gamma = 44;
+  reserved 45 to 45;
+}

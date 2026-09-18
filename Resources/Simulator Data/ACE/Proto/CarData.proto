@@ -1,0 +1,1039 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "Options.proto";
+import "CarSetup.proto";
+
+enum SuspensionTypeEnum {
+  SuspensionType_DoubleWishbone = 0;
+  SuspensionType_Strut = 1;
+  SuspensionType_Axle = 2;
+  SuspensionType_Multilink = 3;
+  SuspensionType_MultilinkNew = 4;
+  SuspensionType_DoubleWishboneCoilover = 5;
+  SuspensionType_StrutMultilink = 6;
+}
+
+enum EBBMode {
+  ebbDisabled = 0;
+  ebbInternal = 1;
+  ebbDynamicControllerAbsolute = 2;
+  ebbDynamicControllerRelative = 3;
+}
+
+enum TractionType {
+  RWD = 0;
+  FWD = 1;
+  FourWD = 2;
+  AWD = 3;
+  AWDF = 4;
+}
+
+enum DifferentialType {
+  LSD = 0;
+  Spool = 1;
+  Torsen = 2;
+  EpicyclicTorsen = 3;
+  EpicyclicLSD = 4;
+  TorqueVectoring = 5;
+}
+
+enum KersAttachment {
+  To_Engine = 0;
+  To_Wheels = 1;
+}
+
+enum DRSWingConnectionMode {
+  UseEffect = 0;
+  UseAngle = 1;
+}
+
+message PhysicsDebugUiPage {
+  enum PhysicsDebugPageType {
+    Car = 0;
+    Tyres = 1;
+    Tyres_Wear = 2;
+    Tyres_Temps = 3;
+    Brakes = 4;
+    Suspensions = 5;
+    Drivetrain = 6;
+    Collider_Box = 7;
+    Aero = 8;
+    Engine_Damage = 9;
+    Dampers_Damage = 10;
+    Undertray_Damage = 11;
+    Track = 12;
+    FFB = 13;
+    Performance = 14;
+    Kers = 15;
+    BumpSteer = 16;
+    Scrubs = 17;
+    Traces = 18;
+    Tyre_Forces = 19;
+    Page_Count = 20;
+  }
+  bool is_open = 2;
+  PhysicsDebugUiPage.PhysicsDebugPageType type = 3;
+  reserved 1 to 1;
+}
+
+message PhysicsDebugUIData {
+  repeated PhysicsDebugUiPage pages = 1;
+}
+
+message DynamicControllerStageData {
+  enum Input {
+    UndefinedInput = 0;
+    Brake = 1;
+    Gas = 2;
+    LatG = 3;
+    LonG = 4;
+    Steer = 5;
+    Speed = 6;
+    Gear = 7;
+    SlipRatioFrontAVG = 25;
+    SlipRatioRearAVG = 26;
+    SlipRatioFrontMAX = 27;
+    SlipRatioRearMAX = 28;
+    SlipAngleFrontAVG = 10;
+    SlipAngleRearAVG = 11;
+    SlipAngleFrontMAX = 12;
+    SlipAngleRearMAX = 13;
+    OversteerFactor = 14;
+    RearSpeedRatio = 15;
+    SteerDEG = 16;
+    Const = 17;
+    RPMS = 18;
+    WheelSteerDEG = 19;
+    LoadSpreadLF = 20;
+    LoadSpreadRF = 21;
+    AvgTravelRear = 22;
+    SusTravelLR = 23;
+    SusTravelRR = 24;
+    SteerYawDeltaLeft = 29;
+    SteerYawDeltaRight = 30;
+    ErsChargeLevel = 31;
+    ErsCoastTorque = 32;
+  }
+  enum Mode {
+    UndefinedMode = 0;
+    Add = 1;
+    Mult = 2;
+  }
+  DynamicControllerStageData.Input inputVar = 1;
+  DynamicControllerStageData.Mode combinatorMode = 2;
+  string lut = 3;
+  float filterGain = 4;
+  float upLimit = 5;
+  float downLimit = 6;
+  float currentValue = 7;
+  float constValue = 8;
+}
+
+message DynamicControllerData {
+  string name = 1;
+  repeated DynamicControllerStageData stages = 2;
+}
+
+message WingControllerData {
+  enum Input {
+    UndefinedInput = 0;
+    Brake = 1;
+    Gas = 2;
+    LatG = 3;
+    LonG = 4;
+    Steer = 5;
+    Speed = 6;
+    SusTravelLR = 7;
+    SusTravelRR = 8;
+  }
+  enum Mode {
+    UndefinedMode = 0;
+    Add = 1;
+    Mult = 2;
+  }
+  WingControllerData.Mode combinator_mode = 1;
+  WingControllerData.Input input = 2;
+  float filter = 3;
+  float up_limit = 4;
+  float down_limit = 5;
+  string lut = 6;
+}
+
+message DownforceControllerData {
+  enum Input {
+    UndefinedInput = 0;
+    Brake = 1;
+    Gas = 2;
+    Yaw = 3;
+    LatG = 4;
+    LonG = 5;
+    Steer = 6;
+    Speed = 7;
+    SusTravelLR = 8;
+    SusTravelRR = 9;
+  }
+  enum Mode {
+    UndefinedMode = 0;
+    AddH = 1;
+    MultH = 2;
+    AddYawGain = 3;
+    MultYawGain = 4;
+    AddClGain = 5;
+    MultClGain = 6;
+  }
+  DownforceControllerData.Mode combinator_mode = 1;
+  DownforceControllerData.Input input = 2;
+  float filter = 3;
+  float up_limit = 4;
+  float down_limit = 5;
+  string lut = 6;
+}
+
+message Damper2WayData {
+  float bump = 1;
+  float rebound = 2;
+  reserved 3 to 3;
+  reserved 4 to 4;
+}
+
+message DamperController2WayData {
+  Damper2WayData fast = 1;
+  Damper2WayData slow = 2;
+  float fast_threshold_bump = 3;
+  float fast_threshold_rebound = 4;
+}
+
+message PolyFit3Data {
+  float a3 = 1;
+  float a2 = 2;
+  float a1 = 3;
+  float k = 4;
+}
+
+message PolyFit5Data {
+  float a5 = 1;
+  float a4 = 2;
+  float a3 = 3;
+  float a2 = 4;
+  float a1 = 5;
+  float k = 6;
+}
+
+message DamperLutData {
+  string bump_lut = 1;
+  string rebound_lut = 2;
+  float fast_bump = 3;
+  float fast_rebound = 4;
+}
+
+message DamperVariantProto {
+  oneof type {
+    PolyFit3Data poly3 = 1;
+    PolyFit5Data poly5 = 2;
+    DamperController2WayData piece_wise = 3;
+    DamperLutData damper_lut_data = 4;
+  }
+}
+
+message DamperControllerData {
+  DamperVariantProto base = 20;
+  DamperVariantProto heave = 21;
+  DamperVariantProto roll = 22;
+  DamperVariantProto pitch = 23;
+  DamperVariantProto max = 24;
+  DamperVariantProto min = 25;
+  reserved 1 to 17;
+}
+
+message DampersController {
+  float wheel_gain = 1;
+  float heave_gain = 2;
+  float pitch_gain = 3;
+  float roll_gain = 4;
+  DamperControllerData front = 5;
+  DamperControllerData rear = 6;
+}
+
+message DampersData {
+  Damper2WayData fast = 1;
+  Damper2WayData slow = 2;
+  float fastThresholdBump = 3;
+  float fastThresholdRebound = 4;
+  float cooling_surface = 6;
+  float nominal_force = 7;
+  float min_stress_fatigue = 8;
+  float max_stress_fatigue = 9;
+  float thermal_capacity = 10;
+  float heat_transfer_coef = 11;
+  string lut_list = 13;
+  float damper_lut_scale = 14;
+  reserved 5 to 5;
+  reserved 12 to 12;
+}
+
+message DamperCurvesList {
+  repeated string damper_lut = 1;
+}
+
+message ARBData {
+  float stiffness = 1;
+  DynamicControllerData controller = 2;
+}
+
+message BumpStopData {
+  float Range = 1;
+  float Reference = 2;
+  float Force = 3;
+  float Gamma = 4;
+  float length = 5;
+  float damping = 6;
+}
+
+message CoiloverData {
+  float springRate = 1;
+  float progressiveSpringRate = 2;
+  BumpStopData bumpStopUp = 3;
+  BumpStopData bumpStopDown = 4;
+  float collar_position = 5;
+  DampersData damper = 6;
+  float helperK = 7;
+  float helperRange = 8;
+  DynamicControllerData rod_controllers = 9;
+}
+
+message DoubleWishBoneData {
+  Vector3Data carTopFront = 1;
+  Vector3Data carTopRear = 2;
+  Vector3Data tyreTop = 5;
+  Vector3Data carBottomFront = 3;
+  Vector3Data carBottomRear = 4;
+  Vector3Data tyreBottom = 6;
+  Vector3Data carSteer = 7;
+  Vector3Data tyreSteer = 8;
+}
+
+message DoubleWishBoneCoiloverData {
+  Vector3Data carTopFront = 1;
+  Vector3Data carTopRear = 2;
+  Vector3Data tyreTop = 5;
+  Vector3Data carBottomFront = 3;
+  Vector3Data carBottomRear = 4;
+  Vector3Data tyreBottom = 6;
+  Vector3Data carSteer = 7;
+  Vector3Data tyreSteer = 8;
+  Vector3Data carCoilover = 9;
+  Vector3Data bottomCoilover = 10;
+}
+
+message TrailingArmData {
+  Vector3Data carHingeInt = 1;
+  Vector3Data carHingeExt = 2;
+  Vector3Data tyreTop = 3;
+  Vector3Data tyreBottom = 4;
+  Vector3Data carSteer = 5;
+  Vector3Data tyreSteer = 6;
+  bool steer_link_to_body = 7;
+}
+
+message StrutSuspensionData {
+  Vector3Data carStrut = 1;
+  Vector3Data tyreStrut = 2;
+  Vector3Data carBottomWBF = 3;
+  Vector3Data carBottomWBR = 4;
+  Vector3Data tyreBottomWB = 5;
+  Vector3Data carSteer = 6;
+  Vector3Data tyreSteer = 7;
+}
+
+message AxleSuspensionData {
+  float attachRelativePos = 1;
+  int32 linkCount = 2;
+  repeated Vector3Data carSide = 3;
+  repeated Vector3Data axleSide = 4;
+  float hubMass = 5;
+  float leafSpringLatK = 6;
+  float torquereaction = 7;
+}
+
+message MultiLinkSuspensionData {
+  repeated Vector3Data jointCar = 1;
+  repeated Vector3Data jointTyre = 2;
+}
+
+message SuspensionLink {
+  string name = 5;
+  Vector3Data ball_car = 1;
+  Vector3Data ball_Tyre = 2;
+  bool has_coilover_attached = 3;
+  bool is_toe = 6;
+}
+
+message SuspensionArm {
+  string name = 5;
+  Vector3Data ball_car_1 = 1;
+  Vector3Data ball_car_2 = 4;
+  Vector3Data ball_tyre = 2;
+  bool has_coilover_attached = 3;
+}
+
+message MultiLinkSuspensionNewData {
+  repeated SuspensionLink links = 1;
+  repeated SuspensionArm arms = 2;
+  Vector3Data car_coilover = 9;
+  Vector3Data bottom_coilover = 10;
+}
+
+message StrutMultiLinkSuspensionData {
+  Vector3Data carStrut = 1;
+  Vector3Data tyreStrut = 2;
+  Vector3Data carBottomWBF = 3;
+  Vector3Data carBottomWBR = 4;
+  Vector3Data tyreBottomWB = 5;
+  Vector3Data carThrustBall1 = 6;
+  Vector3Data carThrustBall2 = 7;
+  Vector3Data tyreThrustArm = 8;
+  Vector3Data carSteer = 9;
+  Vector3Data tyreSteer = 10;
+}
+
+message SuspensionDamageData {
+  float minVelocity = 1;
+  float gain = 2;
+  float maxDamage = 3;
+  bool debugLog = 4;
+}
+
+message BasicSuspensionData {
+  float hubMass = 3;
+  float toeOutLinear = 4;
+  float staticCamber = 5;
+  float rimOffset = 6;
+  reserved 1 to 1;
+  reserved 2 to 2;
+}
+
+message SuspensionGeometryData {
+  BasicSuspensionData basic_data = 1;
+  DoubleWishBoneData dW_data = 2;
+  StrutSuspensionData strut = 3;
+  StrutMultiLinkSuspensionData strut_ml = 9;
+  AxleSuspensionData axle = 4;
+  MultiLinkSuspensionData multi_link_data = 5;
+  TrailingArmData trailing_arm_data = 6;
+  MultiLinkSuspensionNewData multi_link_new_data = 7;
+  DoubleWishBoneCoiloverData dw_coil_data = 8;
+}
+
+message SuspensionsData {
+  float wheel_base = 2;
+  float longitudinal_cg_location = 3;
+  float base_y_front = 50;
+  float base_y_rear = 51;
+  float track_front = 52;
+  float track_rear = 53;
+  SuspensionDamageData damage = 4;
+  CoiloverData coilover_front = 8;
+  CoiloverData coilover_rear = 9;
+  string coilover_front_path = 20;
+  string coilover_rear_path = 21;
+  SuspensionGeometryData suspension_geometry_front = 40;
+  SuspensionGeometryData suspension_geometry_rear = 41;
+  string front_suspension_path = 22;
+  string rear_suspension_path = 23;
+  repeated CoiloverData heaveSprings = 17;
+  ARBData arbFront = 18;
+  ARBData arbRear = 19;
+  ARBData flexBarFront = 24;
+  ARBData flexBarRear = 25;
+  DampersController dampers_controller = 60;
+  bool has_dampers_cockpit_setting = 61;
+  reserved 1 to 1;
+  reserved 5 to 5;
+  reserved 6 to 6;
+  reserved 10 to 10;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 13 to 13;
+  reserved 14 to 14;
+  reserved 15 to 15;
+  reserved 16 to 16;
+  reserved 27 to 27;
+  reserved 26 to 26;
+}
+
+message EngineMapData {
+  enum ThrottleType {
+    gamma = 0;
+    cervone = 1;
+  }
+  EngineMapData.ThrottleType type = 9;
+  float powerMult = 1;
+  float consumptionMult = 2;
+  string throttleResponseCurve = 3;
+  float throttleGainKRPM = 4;
+  float throttleRefRPMMove = 8;
+  float throttle_lag_up = 6;
+  float throttle_lag_dn = 7;
+  float throttling_factor = 10;
+  reserved 5 to 5;
+}
+
+message StartECUAssistData {
+  float rpmRange = 1;
+  float gain = 2;
+  float speedRangeKHM = 3;
+  float rpm_limiter = 4;
+  int32 limiter_cycles = 5;
+  bool use_clutch = 7;
+  float slip_ratio_target = 6;
+  float clutch_gain = 8;
+  float gas_gain = 9;
+}
+
+message TurboData {
+  float max_boost = 1;
+  float lag_UP = 2;
+  float lag_DN = 3;
+  float rpm_Ref = 4;
+  float gamma_Rpm = 5;
+  float gamma_Gas = 6;
+  float wastegate = 7;
+  bool is_Adjustable = 8;
+  float nominal_Boost = 9;
+  float wear_Factor = 10;
+  float thermal_capacity = 11;
+  float heat_transfer_coef = 12;
+  float cooling_surface = 13;
+  float nominal_temp = 14;
+}
+
+message EngineDamageData {
+  float turboBoostDamageThreshold = 1;
+  float turboBoostDamageK = 2;
+  float rpmDamageThreshold = 3;
+  float rpmDamageK = 4;
+  float bovThreshold = 5;
+}
+
+message EngineData {
+  enum EngineType {
+    internal_combustion = 0;
+    electric_motor = 1;
+  }
+  EngineData.EngineType engine_type = 51;
+  float inertia = 1;
+  string powerCurve = 2;
+  string coastCurve = 3;
+  repeated EngineMapData maps = 4;
+  int32 minimum = 5;
+  int32 limiter = 6;
+  int32 limiterCycles = 7;
+  float overlapFreq = 8;
+  float overlapGain = 9;
+  float overlapIdealRPM = 10;
+  string throttleResponseCurve = 14;
+  float throttle_lag_up = 40;
+  float throttle_lag_dn = 41;
+  float nominal_rpm = 15;
+  float turboBoostDamageThreshold = 16;
+  float turboBoostDamageK = 17;
+  float throttle_rev_choking = 60;
+  float ignitionTimeS = 18;
+  float starterEngineTorque = 20;
+  StartECUAssistData startECUAssist = 19;
+  string gasCoastOffsetCurve = 21;
+  int32 coastSettingsDefaultIndex = 22;
+  int32 coastEntryRpm = 23;
+  repeated TurboData turbos = 24;
+  repeated DynamicControllerData turboControllers = 25;
+  repeated DynamicControllerData wasteGateControllers = 26;
+  float max_turbo_boost = 34;
+  float bovThreshold = 12;
+  repeated string turbos_to_load = 29;
+  EngineDamageData damage = 27;
+  PushToPassData p2p = 28;
+  float fatigue_log10_a = 30;
+  float min_stress = 31;
+  float max_stress = 32;
+  float nominal_torque = 33;
+  BatteryProtoData battery_data = 50;
+  reserved 11 to 11;
+  reserved 13 to 13;
+}
+
+message PushToPassData {
+  bool enabled = 1;
+  bool active = 2;
+  float overboost = 3;
+  float timeS = 4;
+  float coolDownS = 5;
+  int32 baseActivations = 6;
+  int32 basePositionCoeff = 7;
+  int32 maxActivations = 8;
+}
+
+message BrakeDiscData {
+  float coolTransfer = 1;
+  float torqueK = 2;
+  float coolSpeedFactor = 3;
+  float rainCoolFactor = 4;
+  float emissivity = 5;
+  float surface = 6;
+  float thermalCapacity = 8;
+  float coreThermalCapacity = 9;
+  float thermalConductivity = 10;
+  float conductionThickness = 11;
+  float diskConsumptionRate = 19;
+  float padConsumptionRate = 20;
+  float diskThickness = 18;
+  float padThickness = 17;
+  float perfDecreaseMM = 13;
+  float gammaCorrectionMM = 14;
+  float muReductionMM = 15;
+  float areaReductionMM = 16;
+  float tReferenceWear = 7;
+  string perfCurve = 12;
+}
+
+message BrakesData {
+  float totalTorque = 1;
+  float frontBias = 2;
+  float handBrakeTorque = 3;
+  bool hasCockpitBias = 4;
+  float biasStep = 5;
+  repeated BrakeDiscData frontBrakeCompounds = 6;
+  repeated BrakeDiscData rearBrakeCompounds = 7;
+  repeated string front_compound_path = 12;
+  repeated string rear_compound_path = 13;
+  DynamicControllerData controllerEbb = 8;
+  repeated DynamicControllerData controllersEbb = 16;
+  DynamicControllerData steerBrakeController = 9;
+  DynamicControllerData torqueControllerEbb = 14;
+  EBBMode ebbMode = 10;
+  float ebbFrontMultiplier = 11;
+  float ebbMinSpeed = 15;
+}
+
+message ERSCockpit {
+  bool deliveryProfile = 1;
+  bool mguHMode = 2;
+  bool recovery = 3;
+}
+
+message ERSFrontMotors {
+  string torqueLut = 1;
+  float dischargetime = 2;
+  float torqueVectoringBias = 3;
+}
+
+message ERSData {
+  string torqueLut = 2;
+  string coastLut = 3;
+  float batteryChargeKj = 4;
+  bool hasButtonOverride = 5;
+  float maxKjPerLap = 6;
+  float maxChargeKjPerLap = 18;
+  float heatChargePerc = 7;
+  float heatPowerKw = 8;
+  int32 defaultPowerControllerIndex = 9;
+  repeated DynamicControllerData powerControllersFront = 11;
+  repeated DynamicControllerData powerControllersRear = 12;
+  float brakeRearCorrection = 13;
+  bool hasCockpitControls = 14;
+  ERSCockpit cockpitControls = 15;
+  bool hasFrontMotors = 16;
+  ERSFrontMotors frontMotors = 17;
+  reserved 10 to 10;
+  reserved 1 to 1;
+}
+
+message GearData {
+  string name = 1;
+  float ratio = 2;
+}
+
+message DifferentialData {
+  DifferentialType type = 4;
+  float power = 1;
+  float coast = 2;
+  float preload = 3;
+  float front_share = 13;
+  float torque_bias_ratio_power = 11;
+  float torque_bias_ratio_coast = 12;
+  float thermal_capacity = 5;
+  float surface = 6;
+  float heat_transfer_coeff = 7;
+  float wear_factor = 8;
+  float friction_reduction_with_T = 9;
+  float friction_ref_T = 10;
+}
+
+message AWDDifferentialsData {
+  DifferentialData frontDiff = 1;
+  DifferentialData centerDiff = 3;
+  DifferentialData rearDiff = 2;
+}
+
+message DownshiftProtectionData {
+  bool isActive = 1;
+  bool isDebug = 2;
+  int32 overrev = 3;
+  bool lockN = 4;
+}
+
+message AutoBlipData {
+  string profile = 1;
+  bool isElectronic = 2;
+}
+
+message AWDVectoringClutch {
+  int32 position = 1;
+  float preload = 2;
+  DynamicControllerData controllers = 3;
+}
+
+message AutoClutchData {
+  string upshiftProfile = 1;
+  string downShiftProfile = 2;
+  bool forcedOn = 3;
+  float min_rpms = 4;
+  float max_rpms = 5;
+  bool useOnChanges = 6;
+}
+
+message AutoShifterData {
+  int32 up = 1;
+  int32 down_rpm_threshold = 5;
+  float slipThreshold = 3;
+  float gasCutoffTime = 4;
+  reserved 2 to 2;
+}
+
+message GearBoxData {
+  int32 gear_count = 1;
+  repeated GearData gears = 2;
+  float final_ratio = 3;
+  float gear_up_time = 4;
+  float gear_dn_time = 5;
+  float auto_cut_off_time = 6;
+  float gas_cut_off_level = 18;
+  bool has_dual_clutch = 19;
+  bool is_shifter_supported = 7;
+  DownshiftProtectionData downshift_protection = 8;
+  float damageRpmWindow = 20;
+  float valid_shift_rpm_window = 9;
+  float controls_window_gain = 10;
+  float gearbox_inertia = 11;
+  AutoBlipData autoblip = 12;
+  AutoShifterData autoshifter = 13;
+  float gears_fatigue_log10_a = 14;
+  float gears_fatigue_nominal_torque = 15;
+  float gears_fatigue_max_stress = 16;
+  float gears_fatigue_min_stress = 17;
+}
+
+message ClutchData {
+  float clutch_inertia = 1;
+  float clutch_max_torque = 2;
+  AutoClutchData autoclutch = 3;
+  string clutch_curve = 40;
+  reserved 4 to 4;
+}
+
+message DrivetrainData {
+  TractionType tractionType = 2;
+  DifferentialData differential_data = 39;
+  AWDDifferentialsData FourWD_differentials = 15;
+  float stiffness = 46;
+  float stiffness_mult = 104;
+  float damping_ratio = 47;
+  float max_torsion_deg = 102;
+  bool non_linear_model = 103;
+  bool max_between_lsd_and_elsd = 101;
+  bool has_cockpit_controls = 105;
+  DynamicControllerData front_lock_controllers = 8;
+  DynamicControllerData center_lock_controllers = 7;
+  DynamicControllerData rear_lock_controllers = 5;
+  DynamicControllerData left_lock_controllers = 50;
+  DynamicControllerData right_lock_controllers = 51;
+  DynamicControllerData frontShareControllers = 6;
+  repeated AWDVectoringClutch awd_clutches = 45;
+  reserved 3 to 3;
+  reserved 4 to 4;
+  reserved 9 to 9;
+  reserved 10 to 10;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 13 to 13;
+  reserved 14 to 14;
+  reserved 16 to 16;
+  reserved 17 to 17;
+  reserved 18 to 18;
+  reserved 19 to 19;
+  reserved 20 to 20;
+  reserved 21 to 21;
+  reserved 22 to 22;
+  reserved 23 to 23;
+  reserved 24 to 24;
+  reserved 25 to 25;
+  reserved 26 to 26;
+  reserved 27 to 27;
+  reserved 28 to 28;
+  reserved 29 to 29;
+  reserved 30 to 30;
+  reserved 31 to 31;
+  reserved 32 to 32;
+  reserved 33 to 33;
+  reserved 34 to 34;
+  reserved 35 to 35;
+  reserved 36 to 36;
+  reserved 37 to 37;
+  reserved 38 to 38;
+}
+
+message SteeringSystemData {
+  DynamicControllerData fourWSControllers = 1;
+}
+
+message EDLData {
+  bool active = 1;
+  float braketorquepower = 2;
+  float braketorquecoast = 3;
+  float deadzonecoast = 4;
+  float deadzonepower = 5;
+  float maxspinpower = 6;
+  float maxspincoast = 7;
+  float minspeed = 8;
+}
+
+message ABSSettingsData {
+  float minSlipRatio = 1;
+  float maxSlipRatio = 2;
+  float refSlipAngledeg = 3;
+  float cutLevel = 4;
+  float maxTorqueVariation = 5;
+}
+
+message ABSData {
+  repeated ABSSettingsData settings = 1;
+  float frequency = 2;
+  int32 channels = 3;
+  float minSpeedKmh = 4;
+}
+
+message TractionControlSettingsData {
+  float minSlipRatio = 1;
+  float maxSlipRatio = 2;
+  float refSlipAngleDeg = 3;
+  float engineCutLevel = 4;
+  float angularACCgain = 5;
+  float oversteerGain = 6;
+  float slipAngleActivationDeg = 7;
+}
+
+message TCData {
+  bool hasTC2 = 1;
+  float frequencyHz = 2;
+  float minSpeedKmh = 3;
+  float gearChangeTime = 4;
+  float minCutLevel = 5;
+  float maxCutLevel = 6;
+  repeated TractionControlSettingsData settings = 7;
+}
+
+message ESPSettingsData {
+  float gain = 1;
+  float steer_gain = 2;
+  float min_steer_gain = 12;
+  float steer_gain_max_speed = 13;
+  float oversteer_gain = 3;
+  float understeer_gain = 4;
+  float max_slip_ratio = 5;
+  float dead_zone = 6;
+  float filter_gain = 8;
+  float brake_perc = 10;
+  float brake_perc_activation = 11;
+}
+
+message ESPData {
+  float frequencyHz = 1;
+  float minSpeedKmh = 2;
+  repeated ESPSettingsData settings = 3;
+}
+
+message ElectronicsData {
+  TCData TC = 1;
+  ABSData ABS = 2;
+  EDLData EDL = 3;
+  ESPData ESP = 4;
+}
+
+message DRSWingConnectionData {
+  DRSWingConnectionMode mode = 1;
+  int32 connected_wing = 4;
+  float effect = 2;
+  float angle = 3;
+}
+
+message DRSData {
+  bool ignore_zones = 1;
+  float limit_g = 2;
+  repeated DRSWingConnectionData wing_connections = 3;
+}
+
+message GeneralCarData {
+  string screenName = 2;
+  float totalMass = 1;
+  Vector3Data tankPosition = 4;
+  float fuel = 5;
+  float maxFuel = 6;
+  float efficiency = 16;
+  float kgPerLiter = 8;
+  Vector3Data body_box_sizes = 9;
+  float pickupFrontHeight = 10;
+  float pickupRearHeight = 11;
+  bool checkRules = 12;
+  float minimumHeight = 13;
+  float torsionalStiffness = 14;
+  float torsionalDamping = 15;
+  TransformData bodyMeshOffset = 18;
+  reserved 3 to 3;
+  reserved 7 to 7;
+}
+
+message SteerControlsData {
+  float ffMult = 1;
+  float steer_lock = 2;
+  float steerRatio = 3;
+  float linearSteerRodRatio = 4;
+  float steerAssist = 5;
+  reserved 6 to 6;
+}
+
+message BoxColliderData {
+  Vector3Data center = 1;
+  Vector3Data size = 2;
+  float pitch_rotation_deg = 3;
+}
+
+message WingData {
+  bool vertical = 1;
+  string name = 2;
+  float chord = 3;
+  float span = 4;
+  Vector3Data position = 6;
+  string lutAOA_CL = 7;
+  string lutAOA_CD = 8;
+  string lutGH_CL_mult = 9;
+  string lutGH_CD_mult = 10;
+  float cd_gain = 11;
+  float cl_gain = 12;
+  float angle = 13;
+  float yaw_gain = 14;
+  float drag_per_cool_transfer = 20;
+  bool has_fan = 18;
+  float fan_speed = 19;
+  repeated float damage_CD = 15;
+  repeated float damage_CL = 16;
+  repeated WingControllerData wing_controllers = 17;
+}
+
+message DownForceData {
+  Vector3Data position = 1;
+  float cl_gain = 2;
+  float cd_gain = 3;
+  float yaw_gain = 4;
+  float drag_per_cool_transfer = 5;
+  repeated float damage_CL = 6;
+  repeated float damage_CD = 7;
+  repeated DownforceControllerData downforce_controllers = 9;
+  float lift_per_front_angle = 10;
+  float lift_per_rear_angle = 11;
+  float drag_per_front_angle = 12;
+  float drag_per_rear_angle = 13;
+  float default_front_Angle = 14;
+  float default_rear_Angle = 15;
+  reserved 8 to 8;
+}
+
+message AeroData {
+  float slip_gain_mult = 1;
+  float speed_factor_mult = 2;
+  repeated WingData wings = 3;
+  repeated WingData fins = 4;
+  repeated DownForceData downforces = 5;
+  string front_lift = 7;
+  string rear_lift = 8;
+  string drag = 9;
+  repeated string wings_path = 10;
+  reserved 6 to 6;
+}
+
+message TurboSettings {
+  float boost_lv = 10;
+}
+
+message PerformanceModeData {
+  string performance_mode_name = 11;
+  ElectronicsSettings electronics_settings = 1;
+  BrakeSettings brakes_settings = 2;
+  repeated DamperSettings damper_settings = 3;
+  DifferentialData differential_data = 12;
+  AWDDifferentialsData FourWD_differentials = 13;
+  DynamicControllerData front_lock_controllers = 6;
+  DynamicControllerData center_lock_controllers = 5;
+  DynamicControllerData rear_lock_controllers = 7;
+  repeated AWDVectoringClutch awd_clutches = 4;
+  repeated DynamicControllerData turbo_controllers = 9;
+  TurboSettings turbo_settings = 10;
+}
+
+message BatteryProtoData {
+  float capacity_Kwh = 1;
+  float discharge_Efficiency = 2;
+  float charge_Efficiency = 3;
+  float temp_Eff_Loss_Per_Deg = 4;
+  float convection_K = 5;
+  float convection_Forced_K = 6;
+  float thermal_Capacity = 7;
+  float max_Temp = 8;
+  float min_Temp = 9;
+}
+
+message CarData {
+  string screenName = 202;
+  GeneralCarData general = 1;
+  string general_path = 201;
+  SuspensionsData suspensions = 2;
+  DrivetrainData drivetrain = 3;
+  string drivetrain_path = 22;
+  GearBoxData gearbox = 23;
+  string gearbox_path = 24;
+  ClutchData clutch = 25;
+  string clutch_path = 26;
+  EngineData engine = 4;
+  string engine_path = 20;
+  BrakesData brakes = 5;
+  string brakes_path = 27;
+  SteeringSystemData steeringSystem = 6;
+  ElectronicsData electronics = 7;
+  string electronics_path = 77;
+  SteerControlsData controls = 8;
+  repeated BoxColliderData boxColliders = 9;
+  repeated string frontTyreCompounds = 10;
+  repeated string rearTyreCompounds = 11;
+  AeroData aero = 12;
+  DRSData drs = 14;
+  ERSData ers = 15;
+  string setupLimits = 16;
+  string colliderMesh = 21;
+  TransformData bodyMeshOffset = 18;
+  string stock_setup = 19;
+  string ai_setup = 190;
+  string wet_setup = 191;
+  repeated PerformanceModeData performance_modes = 30;
+  string ai_car_data = 29;
+  reserved 28 to 28;
+  reserved 13 to 13;
+}

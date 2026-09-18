@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+enum ClientServerPlatformType {
+  PLAYSTATION = 0;
+  STEAM = 1;
+  XBOX = 2;
+  VSERVER = 3;
+  DEV = 4;
+}
+
+message RegisterRequest {
+  int32 action_id = 1;
+  string identity_id = 2;
+  ClientServerPlatformType platform_type = 3;
+  int32 server_version = 4;
+  int32 procol_version = 5;
+}
+
+message RegisterResponse {
+  int32 action_id = 1;
+  bool is_registered = 2;
+  ClientServerPlatformType platform_type = 3;
+  string public_s3_base_url = 4;
+}
+
+message CloseRequest {
+  int32 action_id = 1;
+  string identity_id = 2;
+  ClientServerPlatformType platform_type = 3;
+  int32 server_version = 4;
+}
+
+message CloseResponse {
+  int32 action_id = 1;
+  bool is_disconnected = 2;
+  ClientServerPlatformType platform_type = 3;
+}

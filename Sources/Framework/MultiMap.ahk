@@ -222,6 +222,8 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 	loop
 		try {
 			if empty {
+				deleteFile(tempFile)
+				
 				if !FileExist(multiMapFile)
 					break
 				else if deleteFile(multiMapFile)

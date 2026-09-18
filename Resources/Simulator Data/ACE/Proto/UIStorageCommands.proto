@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+enum UIStorageCommandsResponse {
+  UIStorageCommandsResponse_OK = 0;
+  UIStorageCommandsResponse_CRITICAL_ERROR = 100;
+  UIStorageCommandsResponse_KEY_NOT_FOUND = 101;
+}
+
+message UIStorage {
+  map<string, string> storage = 1;
+}
+
+message UIStorageRequestStorage {
+  bool im_empty = 1;
+}
+
+message UIStorageResponseStorage {
+  UIStorage storage = 1;
+  UIStorageCommandsResponse response = 2;
+}
+
+message UIStorageRequestSetStorage {
+  UIStorage storage = 2;
+  reserved 1 to 1;
+}
+
+message UIStorageResponseSetStorage {
+  UIStorageCommandsResponse response = 1;
+}
+
+message UIStorageRequestLoadStorage {
+  bool im_empty = 1;
+}
+
+message UIStorageResponseLoadStorage {
+  UIStorage storage = 1;
+}
+
+message UIStorageRequestDeleteKey {
+  string key = 2;
+  reserved 1 to 1;
+}
+
+message UIStorageResponseDeleteKey {
+  UIStorageCommandsResponse response = 1;
+  UIStorage storage = 2;
+}
+
+message UIStorageCommands {
+  UIStorageRequestStorage request_storage = 1;
+  UIStorageResponseStorage response_storage = 1000;
+  UIStorageRequestSetStorage request_set_storage = 2;
+  UIStorageResponseSetStorage response_set_storage = 1001;
+  UIStorageRequestLoadStorage request_load_storage = 3;
+  UIStorageResponseLoadStorage response_load_storage = 1002;
+  UIStorageRequestDeleteKey request_delete_key = 4;
+  UIStorageResponseDeleteKey response_delete_key = 1003;
+}

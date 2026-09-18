@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "google/protobuf/descriptor.proto";
+
+enum InputChannel {
+  None = 0;
+  Client = 1;
+  Core = 2;
+  Both = 4;
+}
+
+enum StringSubtype {
+  StringSubtype_FilesystemPath = 0;
+  StringSubtype_ContentPath = 1;
+}
+
+enum VectorSubtype {
+  VectorSubtype_Color = 0;
+  VectorSubtype_ColorHdr = 1;
+}
+
+enum NumericWidgetType {
+  NumericWidgetType_Drag = 0;
+  NumericWidgetType_Slider = 1;
+}
+
+enum TemplateFieldType {
+  TemplateFieldType_source = 0;
+  TemplateFieldType_name = 1;
+  TemplateFieldType_data = 2;
+}
+
+enum TerrainDebugVisualization {
+  TerrainDebugVisualization_Disabled = 0;
+  TerrainDebugVisualization_Lods = 1;
+  TerrainDebugVisualization_Instances = 2;
+  TerrainDebugVisualization_Quads = 3;
+  TerrainDebugVisualization_PrimaryDebugMaterials = 4;
+  TerrainDebugVisualization_SecondaryDebugMaterials = 5;
+  TerrainDebugVisualization_Satview = 6;
+}

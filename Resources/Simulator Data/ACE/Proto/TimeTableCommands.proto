@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "ClientCommandsUtil.proto";
+import "PlatformCommands.proto";
+import "BackendMessages.proto";
+
+message TimeTableRequestSessions {
+  bool im_empty = 1;
+}
+
+message TimeTableResponseSessions {
+  ClientCommandsResponse response = 1;
+  repeated TimeTableSession sessions = 10;
+}
+
+message TimeTableRequestDrivers {
+  int32 event_id = 1;
+  int32 session_id = 2;
+}
+
+message TimeTableResponseDrivers {
+  ClientCommandsResponse response = 1;
+  int32 event_id = 2;
+  int32 session_id = 3;
+  repeated TimeTableDriver drivers = 10;
+}
+
+message TimeTableRequestRuntimeDrivers {
+  bool im_empty = 1;
+}
+
+message TimeTableResponseRuntimeDrivers {
+  ClientCommandsResponse response = 1;
+  repeated TimeTableDriver drivers = 10;
+}
+
+message TimeTableRequestLaps {
+  PGUID driver_id = 1;
+  int32 event_id = 2;
+  int32 session_id = 3;
+}
+
+message TimeTableResponseLaps {
+  ClientCommandsResponse response = 1;
+  TimeTableDriver driver = 10;
+  repeated TimeTableLap laps = 11;
+}
+
+message TimeTableRequestRuntimeLaps {
+  PGUID driver_id = 1;
+}
+
+message TimeTableResponseRuntimeLaps {
+  ClientCommandsResponse response = 1;
+  TimeTableDriver driver = 10;
+  repeated TimeTableLap laps = 11;
+}
+
+message TimeTableRequestEndSessionDriverStats {
+  bool im_empty = 1;
+  BackendRequestEndSessionType type = 2;
+}
+
+message TimeTableResponseEndSessionDriverStats {
+  ClientCommandsResponse response = 1;
+  BackendRequestEndSessionType type = 2;
+  EndSessionXpRankWallet total_stats = 9;
+  repeated EndSessionDriverStatsRow rows = 10;
+}
+
+message TimeTableRequestDebug {
+  int32 field_1 = 1;
+}
+
+message TimeTableResponseDebug {
+  int32 field_1 = 1;
+}
+
+message TimeTableCommands {
+  TimeTableRequestSessions request_sessions = 1;
+  TimeTableResponseSessions response_sessions = 1000;
+  TimeTableRequestDrivers request_drivers = 2;
+  TimeTableResponseDrivers response_drivers = 1001;
+  TimeTableRequestRuntimeDrivers request_runtime_drivers = 3;
+  TimeTableResponseRuntimeDrivers response_runtime_drivers = 1002;
+  TimeTableRequestLaps request_laps = 4;
+  TimeTableResponseLaps response_laps = 1003;
+  TimeTableRequestRuntimeLaps request_runtime_laps = 5;
+  TimeTableResponseRuntimeLaps response_runtime_laps = 1004;
+  TimeTableRequestEndSessionDriverStats request_end_session_driver_stats = 6;
+  TimeTableResponseEndSessionDriverStats response_end_session_driver_stats = 1005;
+  TimeTableRequestDebug request_debug = 7;
+  TimeTableResponseDebug response_debug = 1006;
+}

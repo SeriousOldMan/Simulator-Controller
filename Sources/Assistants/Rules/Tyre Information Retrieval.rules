@@ -23,7 +23,15 @@ currentTyreCompound(?compound, ?color) <= setupTyreCompound(?compound, ?color)
 currentTyreCompound(?position, ?compound, ?color) <= Get(Lap, !Lap, Tyre.Compound, ?position, ?compound),
 													 Get(Lap, !Lap, Tyre.Compound.Color, ?position, ?color), !
 currentTyreCompound(?position, ?compound, ?color) <= lastPitstopTyreCompound(?position, ?compound, ?color), !
-currentTyreCompound(?position, ?compound, ?color) <= setupTyreCompound(?position, ?compound, ?color)
+currentTyreCompound(?position, ?compound, ?color) <= setupTyreCompound(?position, ?compound, ?color), !
+
+currentTyreCompound(FrontLeft, ?compound, ?color) <= currentTyreCompound(Front, ?compound, ?color)
+currentTyreCompound(FrontRight, ?compound, ?color) <= currentTyreCompound(Front, ?compound, ?color)
+currentTyreCompound(RearLeft, ?compound, ?color) <= currentTyreCompound(Rear, ?compound, ?color)
+currentTyreCompound(RearRight, ?compound, ?color) <= currentTyreCompound(Rear, ?compound, ?color)
+
+currentTyreCompound(Front, ?compound, ?color) <= currentTyreCompound(?compound, ?color)
+currentTyreCompound(Rear, ?compound, ?color) <= currentTyreCompound(?compound, ?color)
 
 currentTyreSet(?tyreSet) <= Get(Lap, !Lap, Tyre.Set, ?tyreSet), !
 currentTyreSet(?tyreSet) <= lastPitstopTyreSet(?tyreSet), !

@@ -1,0 +1,21 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;   Modular Simulator Controller System - Assetto Corsa Competizione      ;;;
+;;;                                         BMW M4 GT3 Evo                  ;;;
+;;;                                         Setup Rules                     ;;;
+;;;                                                                         ;;;
+;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
+;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;-------------------------------------------------------------------------;;;
+;;;                            Initialization                               ;;;
+;;;-------------------------------------------------------------------------;;;
+
+[?Initialize] => (Prove: addSettings("Assetto Corsa EVO", "BMW M4 GT3 Evo",
+									 [Geometry.Caster.Left, Geometry.Caster.Right])),
+				 (Prove: removeSettings("Assetto Corsa EVO", "BMW M4 GT3 Evo",
+										[Electronics.Map, Aero.Wing.Front, Brake.Pressure,
+										 Damper.Compression.Fast.Front.Left, Damper.Compression.Fast.Front.Right,
+										 Damper.Compression.Fast.Rear.Left, Damper.Compression.Fast.Rear.Right,
+										 Damper.Rebound.Fast.Front.Left, Damper.Rebound.Fast.Front.Right,
+										 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right]))

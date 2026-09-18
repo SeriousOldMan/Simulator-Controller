@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+message CarControlRatingState {
+  float cc_rating = 1;
+  float push = 2;
+  float overdrive = 3;
+  float overturn = 4;
+  float loaded_side = 6;
+  float loaded_axis_slip = 7;
+  bool is_abs_active = 20;
+  bool is_action_time = 21;
+  bool is_full_brake = 22;
+}
+
+message CarRatingState {
+  CarControlRatingState CarControl = 1;
+}
+
+message RatingDebugUiData {
+  bool show_carcontrol_window_open = 1;
+}

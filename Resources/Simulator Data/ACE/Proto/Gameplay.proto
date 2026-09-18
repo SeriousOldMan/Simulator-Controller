@@ -1,0 +1,1049 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "Scene.proto";
+import "Math.proto";
+import "Options.proto";
+import "PenaltySystem.proto";
+import "google/protobuf/any.proto";
+import "Weather.proto";
+import "Customization.proto";
+import "CarBehaviour.proto";
+import "ClientCommandsUtil.proto";
+import "DateTime.proto";
+
+enum GameModeSelectionWeatherType {
+  GameModeSelectionWeatherType_CLEAR = 0;
+  GameModeSelectionWeatherType_SCATTERED_CLOUDS = 1;
+  GameModeSelectionWeatherType_BROKEN_CLOUDS = 2;
+  GameModeSelectionWeatherType_OVERCAST = 3;
+  GameModeSelectionWeatherType_DRIZZLE = 4;
+  GameModeSelectionWeatherType_RAIN = 5;
+  GameModeSelectionWeatherType_HEAVY_RAIN = 6;
+  GameModeSelectionWeatherType_CUSTOM = 7;
+  GameModeSelectionWeatherType_DAMP = 8;
+}
+
+enum PlatformRaceSessionType {
+  PlatformRaceSessionType_Error = 0;
+  PlatformRaceSessionType_Practice = 1;
+  PlatformRaceSessionType_Qualifying = 2;
+  PlatformRaceSessionType_Race = 3;
+}
+
+enum PlatformRaceLeaderboardSortType {
+  PlatformRaceLeaderboardSortType_Qualy = 0;
+  PlatformRaceLeaderboardSortType_Race = 1;
+  PlatformRaceLeaderboardSortType_HotStint = 2;
+}
+
+enum ScenePhysicsType {
+  ScenePhysicsType_Static = 0;
+  ScenePhysicsType_Realtime = 1;
+  ScenePhysicsType_Background = 2;
+}
+
+enum AssistPresetListType {
+  AssistPresetListType_BEGINNER = 0;
+  AssistPresetListType_ROOKIE = 1;
+  AssistPresetListType_EXPERT = 2;
+  AssistPresetListType_PRO = 3;
+  AssistPresetListType_CUSTOM = 4;
+}
+
+enum RacingSetting {
+  RacingSetting_OFF = 0;
+  RacingSetting_ON = 1;
+  RacingSetting_FREE = 2;
+}
+
+enum ResultSessionType {
+  Practice = 0;
+  Qualify = 1;
+  WarmUp = 2;
+  Race = 3;
+}
+
+enum BackendLeaderboardSessionType {
+  BackendLeaderboardSessionType_TimeAttack = 0;
+  BackendLeaderboardSessionType_InstantRace = 1;
+}
+
+enum FreeRoamActivity {
+  FreeRoamActivity_FREE_DRIVE = 0;
+  FreeRoamActivity_NAVIGATION = 1;
+  FreeRoamActivity_TIMEATTACK = 2;
+}
+
+message PlatformSessionPhaseDescriptor {
+  TranslatedTimestamp phase_end = 1;
+  bool is_set = 2;
+  bool is_infinite = 3;
+  int32 phase = 4;
+}
+
+message PlatformSessionStateInternalFoo {
+  int32 definition = 1;
+  int32 event_index = 2;
+  int32 session_index = 3;
+  repeated PlatformSessionPhaseDescriptor phase_end_times = 4;
+}
+
+message RaceCarCutState {
+  int32 tyres_out = 1;
+  bool is_in_last_corner = 2;
+}
+
+message RaceSimulationMessage {
+  enum SimulatedType {
+    None = 0;
+    TimelineCrossing = 1;
+    ActiveZone = 2;
+    SimulateLaps = 3;
+  }
+  bool debug_enabled = 1;
+  PGUID car_id = 2;
+  int32 crossed_timeline_index = 3;
+  bool is_last_timeline_crossed = 5;
+  int32 tyres_out = 6;
+  repeated ZoneData.Instance activated_zones = 7;
+  bool is_wrongway = 8;
+  int32 speed_kmh = 9;
+  float distance_on_grid = 11;
+  float angle_on_grid = 12;
+  float distance_on_start = 13;
+  float angle_on_start = 14;
+  repeated int32 split_base_time = 15;
+  int32 laps_to_simulate = 16;
+  RaceSimulationMessage.SimulatedType simulated_type = 100;
+}
+
+message NoneGameModeData {
+}
+
+message RaceTimingTimelineConfig {
+  int32 splits_required_for_lap = 1;
+  repeated int32 timeline_start_ids = 2;
+  repeated int32 timeline_end_ids = 3;
+  int32 a_to_b = 4;
+}
+
+message PlatformComMgrMessage {
+  string Text = 1;
+  Vector3Data color = 2;
+  double visible_until_ts = 3;
+  bool dev_or_tester_only = 4;
+  bool dev_only = 5;
+}
+
+message PlatformRaceSessionDefinition {
+  PlatformRaceSessionType type = 1;
+  int32 duration_laps = 2;
+  int32 duration_seconds = 3;
+}
+
+message PlatformRaceEventDefinition {
+  repeated PlatformRaceSessionDefinition sessions = 1;
+  string track_name = 2;
+  string display_name = 3;
+  int32 repetitions = 4;
+}
+
+message PlatformRaceSeasonDefinition {
+  repeated PlatformRaceEventDefinition events = 1;
+  string display_name = 2;
+  int32 repetitions = 3;
+}
+
+message RaceLapFlags {
+  bool has_cut = 1;
+  bool is_valid_for_best_lap = 2;
+  bool session_over = 3;
+  bool disqualified = 4;
+  bool is_out_lap = 5;
+  bool retired = 6;
+  bool has_contacts = 7;
+}
+
+message RaceTimingLap {
+  repeated int32 splits = 3;
+  int32 laptime_ms = 4;
+  int32 session_timestamp = 6;
+  int32 flags = 7;
+  int64 lap_snowflake_id = 8;
+  reserved 2 to 2;
+}
+
+message RaceTimingCut {
+  PGUID car_id = 1;
+  bool remove_current_lap = 2;
+  bool remove_next_lap = 3;
+}
+
+message SpawnPoint {
+  TransformData transform = 1;
+  PGUID car_id = 2;
+  bool is_virtual = 3;
+  string name = 4;
+}
+
+message PlatformRaceLeaderboardCarState {
+  int32 last_split_id = 1;
+  repeated int32 current_splits = 5;
+  RaceTimingLap last_lap = 6;
+  RaceTimingLap best_personal_lap = 7;
+  int32 last_finish_line_time = 8;
+  int32 current_flags = 9;
+  float last_split_timestamp = 12;
+  reserved 2 to 2;
+}
+
+message PlatformRaceLeaderboardLine {
+  PGUID car_id = 1;
+  int32 laps = 5;
+  int32 data = 6;
+  PlatformRaceLeaderboardCarState car_state = 7;
+  bool is_connected = 8;
+  int32 car_number = 9;
+  reserved 3 to 3;
+}
+
+message PlatformRaceBestData {
+  PGUID car_id = 1;
+  int32 index = 2;
+  double time_ms = 3;
+}
+
+message PlatformRaceBestState {
+  PlatformRaceBestData lap = 1;
+  repeated PlatformRaceBestData splits = 2;
+}
+
+message PlatformRaceLeaderboard {
+  PlatformRaceLeaderboardSortType type = 1;
+  repeated PlatformRaceLeaderboardLine lines = 2;
+  PlatformRaceBestState bestData = 3;
+  PlatformRacePenaltyCollection penalties = 4;
+}
+
+message PlatformRaceLeaderboard_LineUpdateEvent {
+  message Lap {
+    int32 laptime = 1;
+    repeated int32 splits = 2;
+    int32 lap_flags = 3;
+    int64 lap_snowflake_id = 4;
+  }
+  PlatformRaceLeaderboardLine updated_line = 1;
+  int32 position = 2;
+  bool was_finish_line = 3;
+  int32 completed_sector_index = 4;
+  int32 laptime_ms = 5;
+  bool was_personal_session_best = 6;
+  bool was_personal_backend_best = 7;
+  int32 session_start_time = 8;
+  int32 stint_start_time = 9;
+  repeated PlatformRaceLeaderboard_LineUpdateEvent.Lap hotstint_laps = 10;
+}
+
+message PlatformRacePenaltyCollection {
+  message List {
+    PGUID car_id = 3;
+    repeated SessionPenaltyData pending_penalties = 1;
+    repeated SessionPenaltyData cleared_penalties = 2;
+  }
+  repeated PlatformRacePenaltyCollection.List session_penalties = 1;
+}
+
+message ReplayConfiguration {
+  bool snapshot_enabled = 1;
+}
+
+message SceneConfigurationData {
+  message SceneOptions {
+    string hdri_texture_path = 1;
+    reserved 2 to 2;
+  }
+  TrackContentData track_content_data = 1;
+  string event_name = 5;
+  ScenePhysicsType physics_type = 2;
+  TransformData spawn = 3;
+  repeated string containers = 4;
+  bool force_scene_change = 6;
+  SceneConfigurationData.SceneOptions scene_options = 8;
+  ShowroomData.SceneCameraOptions scene_camera_option = 9;
+  TrackLayoutImage layout_image = 10;
+  string track_layout_name = 11;
+  reserved 7 to 7;
+}
+
+message GameModeConfigurationData {
+  reserved 1 to 1;
+  reserved 2 to 2;
+  reserved 3 to 3;
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 6 to 6;
+  reserved 8 to 8;
+  reserved 9 to 9;
+  reserved 50 to 50;
+}
+
+message WeatherServiceData {
+  google.protobuf.Any weather_service_parameters = 1;
+}
+
+message GameModeSpecializationData {
+  google.protobuf.Any specialization = 1;
+}
+
+message RaceTimingManagerEntry {
+  PGUID car_id = 1;
+  CarSpawnData car_data = 2;
+  repeated DriverDescriptorData drivers = 3;
+  repeated AiDriverData ai_drivers = 6;
+  bool is_connected = 4;
+  string car_model = 5;
+  string car_brand = 7;
+  float distance_traveled = 8;
+  float fuel_consumed = 9;
+  float energy_source_consumed = 11;
+  EnergySourceType energy_source_type = 12;
+  map<uint32, float> tyre_tread_consumed = 10;
+}
+
+message RaceTimingLapCollection {
+  PGUID car_id = 1;
+  repeated RaceTimingLap laps = 2;
+}
+
+message PlatformRaceGameCarSafetyCarLineMessage {
+  PGUID car_id = 1;
+  int32 line = 2;
+  double timestamp = 3;
+}
+
+message PlatformRaceGameCarTimelineMessage {
+  PGUID car_id = 1;
+  int32 split_id = 2;
+  int32 split_time_ms = 3;
+  string player_id = 5;
+  double physics_timestamp = 6;
+  bool on_pitlane = 7;
+  double session_timestamp = 8;
+  string car_key = 9;
+  bool is_armed = 13;
+  int32 flags = 16;
+}
+
+message PlatformRaceGameCarRollingStartMessage {
+  PGUID car_id = 1;
+  int32 zone_id = 2;
+  int32 zone_time_ms = 3;
+  string player_id = 5;
+  double physics_timestamp = 6;
+  double session_timestamp = 8;
+  string car_key = 9;
+  ZoneData.RollingStartZone rolling_start_zone = 10;
+}
+
+message RaceTimingCurrentSplitCollection {
+  PGUID car_id = 1;
+  repeated PlatformRaceGameCarTimelineMessage splits = 2;
+  bool is_out_lap = 3;
+}
+
+message RaceTimingSplitTrackingData {
+  PGUID car_id = 1;
+  int32 expected_split_id = 2;
+  int32 last_split_timestamp = 3;
+  int32 last_lap_timestamp = 4;
+  int32 last_split_id = 5;
+  bool armed_lap = 6;
+}
+
+message RaceTimingManagerState {
+  RaceTimingTimelineConfig timeline_config = 1;
+  repeated RaceTimingManagerEntry entrylist = 2;
+  repeated RaceTimingCurrentSplitCollection open_splits = 3;
+  repeated RaceTimingLapCollection laps = 10;
+  repeated RaceTimingSplitTrackingData split_tracking = 12;
+}
+
+message PlatformTimingCarState {
+  int32 current_delta_ms = 1;
+  int32 last_split_id = 2;
+  double last_split_timestamp = 3;
+  RaceLapFlags current_lap_flags = 4;
+  int32 next_expected_split_index = 5;
+  double last_lap_timestamp = 6;
+}
+
+message RacingSettingsAssistPreset {
+  AssistPresetListType type = 10;
+  RacingSetting automatic_gearbox = 1;
+  RacingSetting automatic_clutch = 2;
+  RacingSetting manual_ignition = 11;
+  RacingSetting automatic_clutch_on_start = 7;
+  RacingSetting automatic_pit_limiter = 12;
+  RacingSetting automatic_blip = 8;
+  RacingSetting automatic_lights = 3;
+  RacingSetting automatic_wipers = 4;
+  RacingSetting stability_control_mode = 9;
+  float stability_control = 5;
+  RacingSetting ideal_line = 6;
+  RacingSetting standing_start_assist = 13;
+}
+
+message AssistPresetSave {
+  RacingSettingsAssistPreset preset = 1;
+}
+
+message PlatformPenaltyScoredMessage {
+  SessionPenaltyData penalty = 1;
+  PGUID car_id = 2;
+  string debug_message = 3;
+}
+
+message PlatformPitstopStart {
+  PGUID car_id = 1;
+}
+
+message PlatformPitstopEnd {
+  PGUID car_id = 1;
+  int32 session_time_pitlane_crossed_ms = 2;
+  bool has_refuelled = 3;
+  bool has_changed_tyres = 4;
+}
+
+message PlatformClearingPit {
+  PGUID car_id = 1;
+  bool serve_stop_and_go_penalty = 2;
+}
+
+message PlatformPenaltyTeleportReset {
+  PGUID car_id = 1;
+}
+
+message DynamicTrackCondition {
+  float initial_grip = 1;
+  float rubber = 2;
+  float marbles = 3;
+}
+
+message SeasonDefinition {
+  message SpecialEvent {
+    bool is_driveable = 1;
+    uint32 license_requested = 2;
+    uint32 license_gained = 3;
+    PGUID special_event_id = 4;
+    int32 special_event_int_id = 11;
+    uint32 golden_time = 5;
+    uint32 silver_time = 6;
+    uint32 bronze_time = 7;
+    uint32 my_time = 8;
+    uint32 my_medal = 9;
+    uint32 my_attempts = 10;
+    bool is_practice_mode = 12;
+  }
+  message SessionDefinition {
+    message StartingSequence {
+      message SortingBest {
+        int32 best_lap = 10;
+      }
+      message SortingAverage {
+        int32 laps_to_use = 20;
+      }
+      message SortingInverted {
+        int32 max_drivers_inverted = 30;
+        bool include_out_drivers = 31;
+      }
+      repeated int32 session_index_ref = 2;
+      oneof sorting {
+        SeasonDefinition.SessionDefinition.StartingSequence.SortingBest best = 50;
+        SeasonDefinition.SessionDefinition.StartingSequence.SortingAverage average = 51;
+        SeasonDefinition.SessionDefinition.StartingSequence.SortingInverted inverted = 52;
+      }
+      reserved 1 to 1;
+    }
+    string name = 2;
+    string description = 5;
+    SceneConfigurationData scene = 21;
+    string scene_file = 23;
+    DataSourceType scene_source = 24;
+    google.protobuf.Any specialization = 25;
+    ReplayConfiguration replay_configuration = 29;
+    WeatherConfigurationData weather = 40;
+    GameModeSelectionWeatherType weather_type = 45;
+    string weather_file = 41;
+    DataSourceType weather_source = 42;
+    float weather_update_interval_seconds = 43;
+    InitialGrip initial_grip = 46;
+    DynamicTrackCondition dynamic_track_condition = 44;
+    repeated string car_model = 6;
+    SeasonDefinition.SessionDefinition.StartingSequence starting_sequence = 7;
+    int32 netcode_update_interval = 8;
+    bool save_as_default = 9;
+    bool pause_replay_enable = 10;
+    bool pause_go_to_pitlane_enable = 11;
+    bool pause_restart_enable = 12;
+    float crowd_density = 47;
+    reserved 1 to 1;
+    reserved 3 to 3;
+    reserved 4 to 4;
+    reserved 26 to 26;
+    reserved 27 to 27;
+    reserved 28 to 28;
+  }
+  message EventDefinition {
+    string name = 2;
+    map<int32, SeasonDefinition.SessionDefinition> session_map = 4;
+    reserved 1 to 1;
+    reserved 3 to 3;
+  }
+  message CompetitorMutableData {
+    string competitor_key = 1;
+    string name = 2;
+  }
+  message CarMutableData {
+    string competitor_key = 1;
+    string registration_key = 2;
+    repeated CarFinalStateData car_final_states = 3;
+  }
+  message DriverMutableData {
+    string driver_key = 1;
+    string first_name = 2;
+    string last_name = 4;
+    string nick_name = 5;
+    string nation = 8;
+    float overall_strength = 9;
+    AiDriverData ai = 3;
+    DriverFinalStateData driver_final_state = 7;
+  }
+  message EntryListMutableData {
+    repeated SeasonDefinition.CompetitorMutableData competitors = 4;
+    repeated SeasonDefinition.CarMutableData cars = 5;
+    repeated SeasonDefinition.DriverMutableData drivers = 6;
+  }
+  message TyreSetMutableData {
+    fixed64 tyreset_key = 1;
+  }
+  message SessionMutableData {
+    message Car {
+      string registration_key = 1;
+      repeated string usable_driver_keys = 2;
+      repeated fixed64 usable_tyreset_keys = 3;
+    }
+    repeated SeasonDefinition.SessionMutableData.Car cars = 1;
+    reserved 2 to 2;
+  }
+  message EventMutableData {
+    message Car {
+      string registration_key = 1;
+      int32 assigned_car_number = 2;
+      int32 pit_box_number = 3;
+      int32 spawn_group = 6;
+      int32 skin_id = 5;
+      repeated SeasonDefinition.TyreSetMutableData tyresets = 4;
+    }
+    repeated SeasonDefinition.EventMutableData.Car cars = 1;
+    map<int32, SeasonDefinition.SessionMutableData> session_mutable_data = 3;
+    reserved 2 to 2;
+    reserved 4 to 4;
+  }
+  message Lap {
+    string driver_key = 1;
+    int32 time = 2;
+    bool is_valid = 3;
+    repeated int32 split = 4;
+    int32 flags = 5;
+  }
+  message CarResult {
+    repeated SeasonDefinition.Lap laps = 2;
+  }
+  message SessionResult {
+    map<string, SeasonDefinition.CarResult> car_result = 3;
+    PlatformRaceLeaderboard platform_race_leaderboard = 6;
+    map<string, float> car_points_map = 11;
+    map<string, float> driver_points_map = 12;
+    reserved 1 to 1;
+    reserved 2 to 2;
+    reserved 10 to 10;
+  }
+  message EventResult {
+    map<int32, SeasonDefinition.SessionResult> session_results_map = 10;
+    reserved 1 to 1;
+    reserved 2 to 2;
+  }
+  message SeasonCache {
+    int32 current_session_id = 1;
+    int32 current_event_id = 3;
+  }
+  PGUID season_guid = 666;
+  SeasonDefinitionType season_type = 667;
+  GameModeType gamemode_type = 671;
+  SeasonDefinition.SpecialEvent special_event = 668;
+  bool no_leaderboard = 669;
+  bool cycle = 670;
+  string name = 2;
+  map<int32, SeasonDefinition.EventDefinition> event_map = 10;
+  SeasonDefinition.EntryListMutableData entrylist = 25;
+  string entrylist_file = 26;
+  DataSourceType entrylist_source = 27;
+  map<int32, SeasonDefinition.EventMutableData> event_mutable_data = 101;
+  map<int32, SeasonDefinition.EventResult> event_results_map = 11;
+  SeasonDefinition.SeasonCache season_cache = 12;
+  RacingSettingsAssistPreset assists_preset = 50;
+  CarFinalStateData wip_player_car = 10000;
+  reserved 1 to 1;
+  reserved 3 to 3;
+  reserved 9 to 9;
+  reserved 100 to 100;
+  reserved 1000 to 1000;
+}
+
+message CarRealtimePositionData {
+  PGUID car_id = 1;
+  int32 position = 2;
+  double n_pos = 3;
+  int32 lap_count = 4;
+  int32 split = 5;
+  double last_split_n_pos = 6;
+  string first_name = 7;
+  string last_name = 8;
+  int32 car_number = 9;
+  string car_name = 10;
+  string car_brand = 11;
+  int32 lap_flags = 12;
+}
+
+message RealtimeFilteredCache {
+  PGUID car_id = 1;
+  int32 time_ahead_current = 2;
+  int32 time_ahead_to = 3;
+}
+
+message RealtimeLeaderboard {
+  repeated CarRealtimePositionData cars = 1;
+}
+
+message RealtimeCarPositionOnSpline {
+  PGUID car_id = 1;
+  double n_pos = 2;
+  int32 position = 3;
+  CarLocation carLocation = 4;
+  int32 lap_count = 5;
+  int32 time_ahead = 6;
+  int32 last_lap = 7;
+  bool is_player = 8;
+  int32 lap_time = 9;
+  int32 best = 10;
+  int32 current_lap_flags = 19;
+  double speed = 12;
+  string first_name = 13;
+  string last_name = 14;
+  int32 car_number = 15;
+  string car_name = 16;
+  string car_brand = 17;
+  int32 game_car_vector_index = 18;
+}
+
+message RealtimePositions {
+  repeated RealtimeCarPositionOnSpline cars = 1;
+  repeated RealtimeFilteredCache filtered_time = 2;
+}
+
+message EntryListData_NewEntry {
+  EntryListData_Competitor competitor = 1;
+  EntryListData_Driver driver = 3;
+  EntryListData_Car car = 2;
+}
+
+message EntryListData_Competitor {
+  PGUID key = 1;
+  string name = 2;
+  bool is_static = 200;
+}
+
+message EntryListData_Car {
+  PGUID key = 1;
+  PGUID competitor_key = 2;
+  repeated CarFinalStateData car_final_states = 3;
+  uint32 assigned_car_number = 4;
+  bool is_static = 200;
+}
+
+message EntryListData_Driver {
+  PGUID key = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string short_name = 5;
+  uint32 nation = 6;
+  float overall_strength = 21;
+  AiDriverData ai_data = 20;
+  bool is_static = 200;
+  DriverFinalStateData driver_final_state = 7;
+  reserved 4 to 4;
+}
+
+message EntryListData_Crew {
+  PGUID car_key = 1;
+  repeated PGUID driver_keys = 2;
+  bool is_static = 200;
+}
+
+message EntryListData {
+  repeated EntryListData_Competitor competitors = 1;
+  repeated EntryListData_Car cars = 2;
+  repeated EntryListData_Driver drivers = 3;
+  repeated EntryListData_Crew crews = 4;
+}
+
+message ChampionshipResult_Session_Lap {
+  PGUID car_key = 1;
+  PGUID driver_key = 2;
+  int32 time = 3;
+  repeated int32 split = 5;
+  int32 flags = 6;
+}
+
+message ChampionshipResult_Session_Points {
+  PGUID key = 1;
+  float value = 2;
+}
+
+message CarStandings {
+  PGUID car_id = 1;
+  float total_km = 2;
+  float total_fuel_liters = 3;
+  float energy_source_consumed = 6;
+  EnergySourceType energy_source_type = 7;
+  int32 starting_position = 4;
+  map<uint32, float> tyre_tread_consumed = 5;
+}
+
+message ChampionshipResult_Collision {
+  enum ColliderType {
+    None = 0;
+    Car = 1;
+    Wall = 2;
+    Object = 3;
+  }
+  double local_timestamp = 1;
+  double server_timestamp = 2;
+  PGUID car_id = 3;
+  PGUID other_car_id = 4;
+  ChampionshipResult_Collision.ColliderType collider = 5;
+  bool has_damage = 6;
+  float relative_impact_kmh = 7;
+  Vector3Data world_pos = 8;
+  Vector3Data rel_pos = 9;
+  Vector3Data normal = 10;
+}
+
+message ChampionshipResult_CarEntry {
+  PGUID car_id = 1;
+  string model_displayname = 2;
+  string model_mechanical_preset = 3;
+  float performance_indicator = 4;
+  int32 race_number = 5;
+}
+
+message ChampionshipResult_Session {
+  string server_name = 15;
+  string server_id = 16;
+  string server_ip = 17;
+  string season_guid = 18;
+  string session_name = 19;
+  ResultSessionType session_type = 20;
+  string track_name = 21;
+  string track_layout_name = 22;
+  PGUID championship_id = 103;
+  int32 event_index = 100;
+  int32 session_index = 101;
+  bool is_static = 200;
+  bool is_completed = 201;
+  google.protobuf.Any specialization = 202;
+  repeated CarStandings car_standings = 1;
+  repeated PGUID driver_standings = 4;
+  repeated int32 time_standings = 2;
+  repeated DriverDescriptorData drivers = 3;
+  repeated ChampionshipResult_Session_Lap laps = 10;
+  repeated ChampionshipResult_Session_Points car_points = 50;
+  repeated ChampionshipResult_Session_Points driver_points = 51;
+  repeated ChampionshipResult_CarEntry cars = 23;
+  repeated ChampionshipResult_Collision collisions = 24;
+  PlatformRacePenaltyCollection penalty_collection = 25;
+}
+
+message ChampionshipResult {
+  PGUID championship_id = 1;
+  repeated ChampionshipResult_Session sessions = 200;
+}
+
+message BackendRequestSaveLeaderboard {
+  ChampionshipResult_Session session = 1;
+}
+
+message BackendResponseSaveLeaderboard {
+  ClientCommandsResponse response = 1;
+}
+
+message ChampionshipRegistrationData_Session_Car {
+  PGUID car_key = 1;
+  repeated PGUID usable_driver_keys = 2;
+  repeated fixed64 usable_tyreset_keys = 3;
+  bool is_static = 200;
+}
+
+message ChampionshipRegistrationData_Session {
+  int32 event_index = 100;
+  int32 session_index = 101;
+  repeated ChampionshipRegistrationData_Session_Car cars = 1;
+  bool is_static = 200;
+}
+
+message ChampionshipRegistrationData_Event_TyreSetData {
+  fixed64 tyreset_key = 1;
+}
+
+message ChampionshipRegistrationData_Event_Car {
+  PGUID car_key = 1;
+  uint32 car_number = 2;
+  uint32 pit_box_number = 3;
+  uint32 skin_index = 5;
+  repeated ChampionshipRegistrationData_Event_TyreSetData tyresets = 4;
+  bool is_static = 200;
+}
+
+message ChampionshipRegistrationData_Event {
+  int32 event_index = 100;
+  repeated ChampionshipRegistrationData_Event_Car cars = 1;
+  bool is_static = 200;
+}
+
+message ChampionshipRegistrationData {
+  repeated ChampionshipRegistrationData_Event events = 100;
+  repeated ChampionshipRegistrationData_Session sessions = 101;
+}
+
+message ChampionshipData_Session_StartingSequence_SortingBest {
+  int32 best_lap = 1;
+}
+
+message ChampionshipData_Session_StartingSequence_SortingAverage {
+  int32 laps_to_use = 2;
+}
+
+message ChampionshipData_Session_StartingSequence_SortingInverted {
+  int32 max_drivers_inverted = 1;
+  bool include_out_drivers = 2;
+}
+
+message ChampionshipData_Session_StartingSequence {
+  repeated int32 session_index_ref = 1;
+  oneof sorting {
+    ChampionshipData_Session_StartingSequence_SortingBest best = 50;
+    ChampionshipData_Session_StartingSequence_SortingAverage average = 51;
+    ChampionshipData_Session_StartingSequence_SortingInverted inverted = 52;
+  }
+}
+
+message ChampionshipData_Session {
+  string display_name = 1;
+  int32 open_slots = 2;
+  SceneConfigurationData scene = 3;
+  google.protobuf.Any specialization = 4;
+  ReplayConfiguration replay_configuration = 5;
+  WeatherConfigurationData weather = 6;
+  float weather_update_interval_seconds = 7;
+  DynamicTrackCondition dynamic_track_condition = 8;
+  ChampionshipData_Session_StartingSequence starting_sequence = 100;
+  int32 netcode_update_interval = 200;
+  bool pause_replay_enable = 210;
+  bool pause_go_to_pitlane_enable = 211;
+  bool pause_restart_enable = 212;
+}
+
+message ChampionshipData_Event {
+  string display_name = 1;
+  repeated ChampionshipData_Session sessions = 2;
+}
+
+message ChampionshipData {
+  PGUID championship_id = 1;
+  string display_name = 2;
+  EntryListData entrylist = 101;
+  repeated ChampionshipData_Event events = 3;
+  ChampionshipRegistrationData registration = 12;
+  ChampionshipResult result = 21;
+  CarFinalStateData wip_player_car = 10000;
+  reserved 100 to 100;
+  reserved 11 to 11;
+}
+
+message BackendLeaderboardShortcut {
+  PGUID driver_key = 2;
+  bool is_ai = 3;
+  float ratio = 4;
+  int32 total_session_time_ms = 5;
+  int32 best_lap_time_ms = 6;
+  int32 lap_count = 7;
+  int32 consecutive_clean_lap_count = 8;
+  int32 lap_with_no_contacts_count = 9;
+  bool is_session_completed = 10;
+  bool is_season_completed = 11;
+  bool is_special_event = 12;
+  int32 leaderboard_position = 20;
+}
+
+message BackendLeaderboardLine {
+  PGUID car_key = 1;
+  PGUID driver_key = 2;
+  RaceTimingLap flags = 3;
+  int32 laptime_ms = 4;
+  repeated int32 splits_ms = 5;
+  int32 timestamp = 6;
+}
+
+message UnlockCarTime {
+  message Item {
+    PGUID car_id = 1;
+    float time = 2;
+    bool lock_from_ui = 3;
+  }
+  repeated UnlockCarTime.Item items = 1;
+}
+
+message PlatformRequestLeaderboard {
+}
+
+message PlatformRequestEndSessionDriverStats {
+  ClientCommandsResponse response = 1;
+}
+
+message PlatformRequestLoadReplay {
+  string full_replay_name = 1;
+}
+
+message PlatformResponseLoadReplay {
+  ClientCommandsResponse response = 1;
+}
+
+message CarCollisionEventData {
+  double timestamp = 1;
+  PGUID my_car_pguid = 2;
+  PGUID optional_other_car_pguid = 3;
+  float relative_impact_velocity = 4;
+  Vector3Data worldPos = 5;
+  Vector3Data relPos = 6;
+  uint32 colliderGroup = 7;
+  bool damages = 8;
+  Vector3Data normal = 9;
+  float depth = 10;
+}
+
+message GameplayPoi {
+  fixed64 guid = 1;
+  PGUID pguid = 6;
+  ZoneData.Poi instance = 2;
+  float distance = 3;
+  Vector3Data position = 5;
+  uint32 screen_position_x = 7;
+  uint32 screen_position_y = 8;
+  uint32 screen_position_y0 = 9;
+  reserved 4 to 4;
+}
+
+message GameplayPoiList {
+  repeated GameplayPoi poi = 1;
+}
+
+message FreeRoamNavigation {
+  enum NavigationState {
+    Idle = 0;
+    OnRoute = 1;
+    Recalculating = 2;
+    Arrived = 3;
+  }
+  FreeRoamNavigation.NavigationState state = 1;
+  repeated Vector3Data remaining_points = 2;
+  int32 current_point_index = 3;
+  string destination_name = 4;
+  float distance = 5;
+  float air_distance = 6;
+}
+
+message FreeRoamBestPerformance {
+  message Performance {
+    string car_mech = 1;
+    float value = 2;
+    HumanReadableDateTimeData date_time = 3;
+    int32 attempts = 4;
+  }
+  fixed64 guid = 1;
+  repeated FreeRoamBestPerformance.Performance performances = 2;
+}
+
+message FreeRoamTimeAttack {
+  enum TimeAttackState {
+    Idle = 0;
+    ApproachingStart = 1;
+    Starting = 2;
+    Drive = 3;
+    End = 4;
+    Failed = 5;
+  }
+  message BestTime {
+    string car_mech = 1;
+    int32 time = 2;
+  }
+  message Penalty {
+    enum Type {
+      Offroad = 0;
+      Accident = 1;
+    }
+    FreeRoamTimeAttack.Penalty.Type type = 1;
+    float time = 2;
+  }
+  PGUID event_id = 1;
+  string event_name = 2;
+  FreeRoamTimeAttack.TimeAttackState state = 3;
+  int32 step = 4;
+  repeated FreeRoamTimeAttack.Penalty penalties = 5;
+  float reaction_time = 6;
+  float time = 7;
+  FreeRoamTimeAttack.BestTime best_time = 8;
+}
+
+message FreeRoamVisited {
+  repeated fixed64 guid = 1;
+}
+
+message FreeRoamRoad {
+  fixed64 guid = 1;
+  bool is_visited = 2;
+  repeated Vector2Data points = 3;
+  float length = 4;
+  float left_width = 5;
+  float right_width = 6;
+}
+
+message FreeRoamSave {
+  FreeRoamVisited poi_visited = 1;
+  FreeRoamVisited roads_visited = 2;
+  repeated FreeRoamBestPerformance speed_traps = 3;
+}
+
+message ServerWorldTime {
+  double time = 1;
+}
+
+message ServerGameModeTime {
+  double world_time_at_start = 1;
+}
+
+message ServerInitializeClient {
+  RaceTimingTimelineConfig timeline_config = 1;
+  repeated ZoneData timeline_zones = 2;
+  repeated ZoneData zones = 3;
+}

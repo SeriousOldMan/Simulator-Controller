@@ -472,6 +472,10 @@ getControllerState(configuration?, force := false) {
 
 					return newMultiMap()
 				}
+				finally {
+					if isSet(fileName)
+						deleteFile(fileName)
+				}
 			}
 			else if (!FileExist(kTempDirectory . "Simulator Controller.state") && pid && (StrSplit(A_ScriptName, ".")[1] != "Simulator Controller")) {
 				if (pid != ProcessExist())

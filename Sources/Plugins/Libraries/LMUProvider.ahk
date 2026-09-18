@@ -229,7 +229,7 @@ class LMUProvider extends Sector397Provider {
 	acquireStandingsData(telemetryData, finished := false) {
 		local teamSession := this.TeamData.TeamSession
 		local rf2APIType := (LMUProvider.kAPIType = "RF2")
-		local standingsData, forname, surname, nickname, id, teamID
+		local standingsData, forname, surname, nickname, id, teamID, car
 
 		if ((rf2APIType || teamSession) && LMUProvider.kRESTAPI)
 			this.iStandingsData := LMURESTProvider.StandingsData()
@@ -239,6 +239,15 @@ class LMUProvider extends Sector397Provider {
 		loop getMultiMapValue(standingsData, "Position Data", "Car.Count", 0) {
 			forname := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Forname")
 			surname := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Driver.Surname")
+
+			car := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car")
+
+			if (InStr(car, "Chevrolet Corvette Z06") == 1)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Chevrolet Corvette Z06 LMGT3.R")
+			else if (InStr(car, "Aston Martin Vantage AMR LMGT") == 1)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Aston Martin Vantage AMR LMGT3")
+			else if (InStr(car, "Lamborghini Huracan LMGT3") == 1)
+				setMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".Car", "Lamborghini Huracan LMGT3 Evo2")
 
 			id := getMultiMapValue(standingsData, "Position Data", "Car." . A_Index . ".ID")
 
@@ -315,7 +324,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData, paused, fuelAmount, tyreWear, brakeWear
+		local sessionData, paused, fuelAmount, tyreWear, brakeWear, active
 
 		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	  , kUserConfigDirectory, kConfigDirectory))
@@ -342,6 +351,9 @@ class LMUProvider extends Sector397Provider {
 
 		static nextUpdate := 0
 		static lastFuelAmount := 0
+
+		static wasActive := false
+		static waitForFinish := false
 
 		if !tyreTypes {
 			tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
@@ -458,6 +470,13 @@ class LMUProvider extends Sector397Provider {
 				track := (this.Track || this.TrackData.Track)
 			}
 
+			if (InStr(car, "Chevrolet Corvette Z06") == 1)
+				car := "Chevrolet Corvette Z06 LMGT3.R"
+			else if (InStr(car, "Aston Martin Vantage AMR LMGT") == 1)
+				car := "Aston Martin Vantage AMR LMGT3"
+			else if (InStr(car, "Lamborghini Huracan LMGT3") == 1)
+				car := "Lamborghini Huracan LMGT3 Evo2"
+
 			if logRequests {
 				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car,Track):" . (A_TickCount - splitTime) . " ms...")
 
@@ -547,8 +566,25 @@ class LMUProvider extends Sector397Provider {
 						throw "Unknown session state detected in LMUProvider.readSessionData..."
 				}
 
-				if (logRequests && !getMultiMapValue(data, "Session Data", "Active", false))
+				active := getMultiMapValue(data, "Session Data", "Active", false)
+
+				if (logRequests && !active)
 					logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionData.State . "](" . sessionData.State[true] . ")...")
+
+				if !active {
+					if (wasActive && (getMultiMapValue(data, "Stint Data", "InPit", false)
+								   || getMultiMapValue(data, "Stint Data", "InPitLane", false)))
+						waitForFinish := (A_TickCount + 5000)
+
+					if (waitForFinish && (A_TickCount < waitForFinish)) {
+						setMultiMapValue(data, "Session Data", "Paused", true)
+						setMultiMapValue(data, "Session Data", "Active", true)
+					}
+					else
+						waitForFinish := false
+				}
+
+				wasActive := active
 
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)

@@ -1,0 +1,492 @@
+syntax = "proto3";
+
+import "Customization.proto";
+import "PlatformCommands.proto";
+import "LogicScene.proto";
+import "Math.proto";
+
+enum CarCustomizationAvailability {
+  CarCustomizationAvailability_allowed = 0;
+  CarCustomizationAvailability_not_allowed_x_installed_part = 1;
+  CarCustomizationAvailability_not_allowed_x_forced_part = 2;
+  CarCustomizationAvailability_not_allowed_x_exclusive_part = 3;
+}
+
+enum CarCustomizationCommandsResponse {
+  CarCustomizationCommandsResponse_OK = 0;
+  CarCustomizationCommandsResponse_NO_AVAILABLE_CARS = 1;
+  CarCustomizationCommandsResponse_NO_MECHANICAL_PRESET = 2;
+  CarCustomizationCommandsResponse_NO_VISUAL_PRESET = 3;
+  CarCustomizationCommandsResponse_IS_READONLY = 99;
+  CarCustomizationCommandsResponse_CRITICAL_ERROR = 100;
+}
+
+message CarCustomizationRequestDebugCarFinalState {
+  string actor_path = 3;
+  string mechanical_path = 4;
+  string visual_path = 5;
+  bool generate_thumbnail = 6;
+}
+
+message CarCustomizationResponseDebugCarFinalState {
+  bool im_empty = 1;
+}
+
+message CarCustomizationRequestDebugCarList {
+  bool im_empty = 1;
+}
+
+message CarCustomizationResponseDebugCarList {
+  message Item {
+    string name = 1;
+    string path = 2;
+  }
+  message MechanicalList {
+    CarCustomizationResponseDebugCarList.Item actor = 2;
+    repeated CarCustomizationResponseDebugCarList.Item list = 3;
+  }
+  message VisualList {
+    string mechanical_path = 1;
+    repeated CarCustomizationResponseDebugCarList.Item list = 2;
+  }
+  repeated CarCustomizationResponseDebugCarList.MechanicalList mechanicals = 1;
+  repeated CarCustomizationResponseDebugCarList.VisualList visuals = 2;
+}
+
+message CarCustomizationMaterialList {
+  string key = 1;
+  repeated CarCustomizationMaterialItem multilayers = 10;
+  repeated CarCustomizationMaterialItem singlelayers = 11;
+  bool is_customizable = 2;
+}
+
+message CarCustomizationSelection {
+  string selected_mechanical_path = 1;
+  string selected_visual_path = 2;
+  string selected_compatible_rim_path = 3;
+  string selected_rim_design_path = 4;
+  string selected_compatible_part_path = 5;
+  string selected_part_design_path = 6;
+  TyreCompound selected_tyre_compound = 32;
+  NumberDecalIndexes selected_number_decal_indexes = 51;
+  bool are_number_decals_locked = 52;
+}
+
+message CarCustomizationMaterialItem {
+  int32 material_index = 1;
+  string description = 2;
+  string group = 7;
+  string display = 3;
+  bool is_locked = 4;
+  bool is_customizable = 5;
+  bool is_optional = 6;
+  bool is_hidden = 8;
+}
+
+message CarCustomizationMultilayerChannelRules {
+  bool is_channel_customizable = 100;
+  bool show_picker_option = 2;
+  bool allow_color_picker = 11;
+  bool allow_roughness_picker = 13;
+  bool allow_metalness_picker = 12;
+  bool allow_clear_coat_picker = 14;
+  bool allow_clear_coat_roughness_picker = 15;
+  bool allow_normal_intensity_picker = 16;
+  bool allow_emissive_color = 17;
+}
+
+message CarCustomizationSinglelayerChannelRules {
+  bool is_channel_customizable = 100;
+  bool show_picker_option = 2;
+  bool allow_color_picker = 11;
+  bool allow_opacity_picker = 12;
+  bool allow_emissive_color = 13;
+}
+
+message CarCustomizationMultilayerChannelState {
+  string oem_color_path = 1;
+  Vector3Data srgb_color = 100;
+  float normalized_roughness = 3;
+  float normalized_metalness = 4;
+  float normalized_clear_coat = 5;
+  float normalized_clear_coat_roughness = 6;
+  float normalized_normal_intensity = 7;
+  Vector3Data emissive_srgb_color = 101;
+  string channel_preset_path = 9;
+}
+
+message CarCustomizationSinglelayerChannelState {
+  string oem_color_path = 1;
+  Vector3Data srgb_color = 100;
+  float normalized_opacity = 3;
+  Vector3Data emissive_srgb_color = 101;
+}
+
+message CarCustomizationOemColorItem {
+  KeyDescriptionItem item = 1;
+  string color_code = 2;
+}
+
+message CarCustomizationVisualItem {
+  KeyDescriptionItem item = 1;
+  bool is_customizable = 2;
+}
+
+message CarCustomizationMechanicalItem {
+  KeyDescriptionItem item = 1;
+  bool is_oem = 2;
+  repeated CarCustomizationVisualItem visual_presets = 3;
+}
+
+message CarCustomizationDesignItem {
+  KeyDescriptionItem item = 1;
+  bool is_installed = 2;
+}
+
+message CarCustomizationPartItem {
+  KeyDescriptionItem item = 1;
+  string original_part_path = 11;
+  bool is_installed = 2;
+  bool is_forced = 3;
+  CarCustomizationAvailability availability = 12;
+  repeated string kits = 4;
+  repeated CarCustomizationDesignItem designs = 5;
+  CarPartType part_type = 6;
+  string attachment_bone = 7;
+  CompatiblePartData.AttachmentType attachment_type = 8;
+  repeated string not_allowed_part_paths = 9;
+  repeated string not_compatible_rim_paths = 10;
+}
+
+message CarCustomizationRimItem {
+  KeyDescriptionItem item = 1;
+  CarCustomizationAvailability availability = 12;
+  repeated CarCustomizationDesignItem designs = 2;
+}
+
+message CarCustomizationRequestGoToGarage {
+  bool im_empty = 1;
+}
+
+message CarCustomizationResponseToGarage {
+  CarCustomizationCommandsResponse response = 1;
+}
+
+message CarCustomizationRequestCurrentFinalCar {
+  bool im_empty = 1;
+}
+
+message CarCustomizationResponseCurrentFinalCar {
+  CarCustomizationCommandsResponse response = 1;
+  string car_final_state_name = 2;
+}
+
+message CarCustomizationRequestUpdateCurrentFinalCar {
+  string car_final_state_name = 1;
+}
+
+message CarCustomizationResponseUpdateCurrentFinalCar {
+  CarCustomizationCommandsResponse response = 1;
+}
+
+message CarCustomizationRequestAvailableCarList {
+  bool im_empty = 1;
+}
+
+message CarCustomizationResponseAvailableCarList {
+  CarCustomizationCommandsResponse response = 1;
+  repeated KeyDescriptionItem cars = 2;
+}
+
+message CarCustomizationRequestAvailableFinalCarList {
+  bool im_empty = 1;
+}
+
+message CarCustomizationResponseAvailableFinalCarList {
+  CarCustomizationCommandsResponse response = 1;
+  repeated string custom_car_list = 2;
+  repeated string original_car_list = 3;
+}
+
+message CarCustomizationRequestChannelPresetList {
+  bool im_empty = 1;
+}
+
+message CarCustomizationResponseChannelPresetList {
+  CarCustomizationCommandsResponse response = 1;
+  repeated KeyDescriptionItem channel_presets = 2;
+}
+
+message CarCustomizationRequestSelectBaseCar {
+  string key = 1;
+}
+
+message CarCustomizationResponseSelectBaseCar {
+  CarCustomizationCommandsResponse response = 1;
+  repeated CarCustomizationMechanicalItem mechanical_presets = 2;
+}
+
+message CarCustomizationRequestLoadFinalCar {
+  bool is_original = 2;
+}
+
+message CarCustomizationResponseLoadFinalCar {
+  string car_model_name = 102;
+  string car_model_display_name = 101;
+  int32 car_number = 103;
+  CarCustomizationCommandsResponse response = 1;
+  repeated CarCustomizationMechanicalItem mechanical_presets = 2;
+  repeated CarCustomizationRimItem oem_rims = 10;
+  repeated CarCustomizationRimItem aftermarket_rims = 12;
+  repeated CarCustomizationPartItem oem_parts = 20;
+  repeated CarCustomizationPartItem aftermarket_parts = 21;
+  CarCustomizationMaterialList bodywork_material_list = 4;
+  CarCustomizationMaterialList rim_material_list = 5;
+  repeated CarCustomizationMaterialList part_material_list = 6;
+  NumberDecalIndexes number_decal_indexes_sizes = 51;
+  CarCustomizationSelection selection = 100;
+  reserved 3 to 3;
+}
+
+message CarCustomizationRequestSaveFinalCar {
+  string key = 1;
+}
+
+message CarCustomizationResponseSaveFinalCar {
+  CarCustomizationCommandsResponse response = 1;
+}
+
+message CarCustomizationRequestListTyreCompounds {
+  string compatible_rim_path = 1;
+}
+
+message CarCustomizationResponseListTyreCompounds {
+  CarCustomizationCommandsResponse response = 1;
+  repeated string selectable_tyres_compound_names = 3;
+  repeated TyreCompound selectable_tyres_compounds = 2;
+}
+
+message CarCustomizationRequestMaterialList {
+  CarCustomizationCategory category = 2;
+  string part_path = 3;
+}
+
+message CarCustomizationResponseMaterialList {
+  CarCustomizationCommandsResponse response = 1;
+  CarCustomizationMaterialList material_list = 2;
+}
+
+message CarCustomizationRequestSelectMechanicalPreset {
+  string key = 1;
+}
+
+message CarCustomizationResponseSelectMechanicalPreset {
+  CarCustomizationCommandsResponse response = 1;
+  repeated CarCustomizationVisualItem visual_presets = 2;
+  repeated CarCustomizationRimItem oem_rims = 10;
+  repeated CarCustomizationRimItem aftermarket_rims = 12;
+  repeated CarCustomizationPartItem oem_parts = 20;
+  repeated CarCustomizationPartItem aftermarket_parts = 21;
+  CarCustomizationSelection selection = 100;
+}
+
+message CarCustomizationRequestSelectRim {
+  string key = 1;
+}
+
+message CarCustomizationResponseSelectRim {
+  CarCustomizationCommandsResponse response = 1;
+  repeated KeyDescriptionItem designs = 2;
+  CarCustomizationSelection selection = 100;
+}
+
+message CarCustomizationRequestSelectDesign {
+  string key = 1;
+  CarCustomizationCategory category = 2;
+  string part_path = 3;
+}
+
+message CarCustomizationResponseSelectDesign {
+  CarCustomizationCommandsResponse response = 1;
+  CarCustomizationMaterialList material_list = 2;
+  CarCustomizationSelection selection = 100;
+}
+
+message CarCustomizationRequestUpdateTyreCompound {
+  TyreCompound tyre_compound = 1;
+}
+
+message CarCustomizationResponseUpdateTyreCompound {
+  CarCustomizationCommandsResponse response = 1;
+}
+
+message CarCustomizationRequestSelectPart {
+  string key = 1;
+}
+
+message CarCustomizationResponseSelectPart {
+  CarCustomizationCommandsResponse response = 1;
+  repeated KeyDescriptionItem designs = 2;
+  CarCustomizationSelection selection = 100;
+}
+
+message CarCustomizationRequestSelectMultilayerMaterial {
+  int32 material_index = 1;
+  CarCustomizationCategory category = 2;
+  string part_path = 3;
+}
+
+message CarCustomizationResponseSelectMultilayerMaterial {
+  CarCustomizationCommandsResponse response = 1;
+  CarCustomizationMultilayerChannelRules primary_channel_rules = 10;
+  CarCustomizationMultilayerChannelState primary_channel_state = 11;
+  CarCustomizationMultilayerChannelRules secondary_channel_rules = 20;
+  CarCustomizationMultilayerChannelState secondary_channel_state = 21;
+  CarCustomizationMultilayerChannelRules tertiary_channel_rules = 30;
+  CarCustomizationMultilayerChannelState tertiary_channel_state = 31;
+  bool is_optional = 5;
+  bool is_enabled = 6;
+  bool is_locked = 7;
+  bool is_hidden = 12;
+  repeated CarCustomizationOemColorItem oem_colors = 8;
+  string slot = 9;
+}
+
+message CarCustomizationRequestUpdateMultilayerChannels {
+  int32 material_index = 1;
+  CarCustomizationCategory category = 3;
+  string part_path = 4;
+  CarCustomizationMultilayerChannelState primary_channel = 10;
+  CarCustomizationMultilayerChannelState secondary_channel = 20;
+  CarCustomizationMultilayerChannelState tertiary_channel = 30;
+}
+
+message CarCustomizationResponseUpdateMultilayerChannels {
+  CarCustomizationCommandsResponse response = 1;
+  CarCustomizationMultilayerChannelState primary_channel_state = 11;
+  CarCustomizationMultilayerChannelState secondary_channel_state = 21;
+  CarCustomizationMultilayerChannelState tertiary_channel_state = 31;
+}
+
+message CarCustomizationRequestSelectSinglelayerMaterial {
+  int32 material_index = 1;
+  CarCustomizationCategory category = 2;
+  string part_path = 3;
+}
+
+message CarCustomizationResponseSelectSinglelayerMaterial {
+  CarCustomizationCommandsResponse response = 1;
+  CarCustomizationSinglelayerChannelRules channel_rules = 30;
+  CarCustomizationSinglelayerChannelState channel_state = 31;
+  bool is_optional = 5;
+  bool is_enabled = 6;
+  bool is_locked = 7;
+  bool is_hidden = 10;
+  repeated CarCustomizationOemColorItem oem_colors = 8;
+}
+
+message CarCustomizationRequestUpdateSinglelayerChannels {
+  int32 material_index = 1;
+  CarCustomizationCategory category = 3;
+  string part_path = 4;
+  CarCustomizationSinglelayerChannelState channel = 10;
+}
+
+message CarCustomizationResponseUpdateSinglelayerChannels {
+  CarCustomizationCommandsResponse response = 1;
+  CarCustomizationSinglelayerChannelState channel_state = 31;
+}
+
+message CarCustomizationRequestToggleMaterial {
+  bool is_multilayer = 1;
+  int32 material_index = 2;
+  CarCustomizationCategory category = 3;
+  string part_path = 4;
+  bool value = 10;
+}
+
+message CarCustomizationResponseToggleMaterial {
+  CarCustomizationCommandsResponse response = 1;
+}
+
+message CarCustomizationRequestTogglePart {
+  string key = 1;
+}
+
+message CarCustomizationResponseTogglePart {
+  CarCustomizationCommandsResponse response = 1;
+  repeated CarCustomizationRimItem oem_rims = 10;
+  repeated CarCustomizationRimItem aftermarket_rims = 12;
+  repeated CarCustomizationPartItem oem_parts = 20;
+  repeated CarCustomizationPartItem aftermarket_parts = 21;
+  bool value = 2;
+}
+
+message CarCustomizationRequestUpdateCarNumber {
+  int32 new_car_number = 1;
+}
+
+message CarCustomizationResponseUpdateCarNumber {
+  CarCustomizationCommandsResponse response = 1;
+  int32 car_number = 2;
+}
+
+message CarCustomizationRequestUpdateNumberDecals {
+  NumberDecalIndexes number_decal_indexes = 1;
+}
+
+message CarCustomizationResponseUpdateNumberDecals {
+  CarCustomizationCommandsResponse response = 1;
+  NumberDecalIndexes number_decal_indexes = 2;
+}
+
+message CarCustomizationCommands {
+  CarCustomizationRequestGoToGarage request_go_to_garage = 1;
+  CarCustomizationResponseToGarage response_to_garage = 1000;
+  CarCustomizationRequestCurrentFinalCar request_current_final_car = 2;
+  CarCustomizationResponseCurrentFinalCar response_current_final_car = 1001;
+  CarCustomizationRequestUpdateCurrentFinalCar request_update_current_final_car = 3;
+  CarCustomizationResponseUpdateCurrentFinalCar response_update_current_final_car = 1002;
+  CarCustomizationRequestAvailableCarList request_available_car_list = 4;
+  CarCustomizationResponseAvailableCarList response_available_car_list = 1003;
+  CarCustomizationRequestAvailableFinalCarList request_available_final_car_list = 5;
+  CarCustomizationResponseAvailableFinalCarList response_available_final_car_list = 1004;
+  CarCustomizationRequestChannelPresetList request_channel_preset_list = 6;
+  CarCustomizationResponseChannelPresetList response_channel_preset_list = 1005;
+  CarCustomizationRequestSelectBaseCar request_select_base_car = 7;
+  CarCustomizationResponseSelectBaseCar response_select_base_car = 1006;
+  CarCustomizationRequestLoadFinalCar request_load_final_car = 8;
+  CarCustomizationResponseLoadFinalCar response_load_final_car = 1007;
+  CarCustomizationRequestSaveFinalCar request_save_final_car = 9;
+  CarCustomizationResponseSaveFinalCar response_save_final_car = 1008;
+  CarCustomizationRequestListTyreCompounds request_list_tyre_compounds = 10;
+  CarCustomizationResponseListTyreCompounds response_list_tyre_compounds = 1009;
+  CarCustomizationRequestMaterialList request_material_list = 11;
+  CarCustomizationResponseMaterialList response_material_list = 1010;
+  CarCustomizationRequestSelectMechanicalPreset request_select_mechanical_preset = 12;
+  CarCustomizationResponseSelectMechanicalPreset response_select_mechanical_preset = 1011;
+  CarCustomizationRequestSelectRim request_select_rim = 13;
+  CarCustomizationResponseSelectRim response_select_rim = 1012;
+  CarCustomizationRequestSelectDesign request_select_design = 14;
+  CarCustomizationResponseSelectDesign response_select_design = 1013;
+  CarCustomizationRequestUpdateTyreCompound request_update_tyre_compound = 15;
+  CarCustomizationResponseUpdateTyreCompound response_update_tyre_compound = 1014;
+  CarCustomizationRequestSelectPart request_select_part = 16;
+  CarCustomizationResponseSelectPart response_select_part = 1015;
+  CarCustomizationRequestSelectMultilayerMaterial request_select_multilayer_material = 17;
+  CarCustomizationResponseSelectMultilayerMaterial response_select_multilayer_material = 1016;
+  CarCustomizationRequestUpdateMultilayerChannels request_update_multilayer_channels = 18;
+  CarCustomizationResponseUpdateMultilayerChannels response_update_multilayer_channels = 1017;
+  CarCustomizationRequestSelectSinglelayerMaterial request_select_singlelayer_material = 19;
+  CarCustomizationResponseSelectSinglelayerMaterial response_select_singlelayer_material = 1018;
+  CarCustomizationRequestUpdateSinglelayerChannels request_update_singlelayer_channels = 20;
+  CarCustomizationResponseUpdateSinglelayerChannels response_update_singlelayer_channels = 1019;
+  CarCustomizationRequestToggleMaterial request_toggle_material = 21;
+  CarCustomizationResponseToggleMaterial response_toggle_material = 1020;
+  CarCustomizationRequestTogglePart request_toggle_part = 22;
+  CarCustomizationResponseTogglePart response_toggle_part = 1021;
+  CarCustomizationRequestUpdateCarNumber request_update_car_number = 23;
+  CarCustomizationResponseUpdateCarNumber response_update_car_number = 1022;
+  CarCustomizationRequestUpdateNumberDecals request_update_number_decals = 24;
+  CarCustomizationResponseUpdateNumberDecals response_update_number_decals = 1023;
+}

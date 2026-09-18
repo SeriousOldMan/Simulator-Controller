@@ -1230,12 +1230,7 @@ launchPad(command := false, arguments*) {
 
 				curControl.Value := ("*w59 *h59 " . curControl.Value)
 
-				try {
-					SoundPlay(getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+				playSound("SysSoundPlayer", getFileName("Mouse.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\"))
 			}
 			else if (pressedControl && !GetKeyState("LButton")) {
 				pressedControl.Value := ("*w60 *h60 " . pressedControl.Value)
@@ -1710,6 +1705,7 @@ availableFunctions(configuration, &hasTeamServer := false
 		functions.Push(Array("Driving Coach", "Handling Analysis"))
 		functions.Push(Array("Driving Coach", "On-track Coaching"))
 		functions.Push(Array("Driving Coach", "Brake Coaching"))
+		functions.Push(Array("Driving Coach", "Race Motivation"))
 	}
 
 	if hasRaceSpotter {
@@ -1816,6 +1812,7 @@ loadStartupProfiles(target, fileName := false) {
 
 		setMultiMapValue(settings, "Profiles", name . ".Mode", profile["Mode"])
 		setMultiMapValue(settings, "Profiles", name . ".Tools", profile["Tools"])
+		setMultiMapValue(settings, "Profiles", name . ".Units", profile["Units"])
 		setMultiMapValue(settings, "Profiles", name . ".Simulator", profile["Simulator"])
 
 		for ignore, assistant in kRaceAssistants
@@ -1846,6 +1843,7 @@ loadStartupProfiles(target, fileName := false) {
 
 		setMultiMapValue(settings, "Session", "Mode", selected["Mode"])
 		setMultiMapValue(settings, "Session", "Tools", selected["Tools"])
+		setMultiMapValue(settings, "Session", "Units", selected["Units"])
 		setMultiMapValue(settings, "Session", "Simulator", selected.Has("Simulator") ? selected["Simulator"] : false)
 
 		for ignore, assistant in kRaceAssistants
@@ -2174,10 +2172,14 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profile := CaseInsenseMap("Name", name
 									, "Mode", (hasTeamServer ? getMultiMapValue(settings, "Profiles", name . ".Mode", "Solo") : "Solo")
 									, "Tools", values2String(",", tools*)
+									, "Units", getMultiMapValue(settings, "Profiles", name . ".Units", false)
 									, "Simulator", getMultiMapValue(settings, "Profiles", name . ".Simulator", false))
 
 			if !profile["Mode"]
 				profile["Mode"] := "Solo"
+
+			if !profile["Units"]
+				profile["Units"] := translate("Standard")
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")
@@ -2239,6 +2241,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			setMultiMapValue(settings, "Profiles", name . ".Mode", profile["Mode"])
 			setMultiMapValue(settings, "Profiles", name . ".Tools", profile["Tools"])
+			setMultiMapValue(settings, "Profiles", name . ".Units", profile["Units"])
 			setMultiMapValue(settings, "Profiles", name . ".Simulator", profile["Simulator"])
 
 			for ignore, assistant in kRaceAssistants
@@ -2271,6 +2274,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			setMultiMapValue(settings, "Session", "Mode", profile["Mode"])
 			setMultiMapValue(settings, "Session", "Tools", profile["Tools"])
+			setMultiMapValue(settings, "Session", "Units", profile["Units"])
 			setMultiMapValue(settings, "Session", "Simulator", profile["Simulator"])
 
 			for ignore, assistant in kRaceAssistants
@@ -2330,6 +2334,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		profilesEditorGui["profileNameEdit"].Text := profile["Name"]
 		profilesEditorGui["profileModeDropDown"].Choose(Max(1, inList(hasTeamServer ? ["Solo", "Team"] : ["Solo"], profile["Mode"])))
 		profilesEditorGui["profilePitwallDropDown"].Choose(1 + inList(hasTeamServer ? ["Solo Center", "Team Center", "Team Center Lite"] : ["Solo Center"], profile["Tools"]))
+		profilesEditorGui["profileUnitsDropDown"].Choose(Max(1, inList(allUnits(), profile["Units"])))
 		profilesEditorGui["profileSimulatorDropDown"].Choose(1 + inList(string2Values("|", getMultiMapValue(kSimulatorConfiguration, "Configuration", "Simulators", "")), profile["Simulator"]))
 
 		profilesEditorGui["profileAutonomyDropDown"].Choose(inList(["Yes", "No", "Default"], profile["Assistant.Autonomy"]))
@@ -2385,6 +2390,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		else {
 			profile["Name"] := profilesEditorGui["profileNameEdit"].Text
 			profile["Mode"] :=  ["Solo", "Team"][profilesEditorGui["profileModeDropDown"].Value]
+			profile["Units"] := profilesEditorGui["profileUnitsDropDown"].Text
 			profile["Tools"] := ["", "Solo Center", "Team Center", "Team Center Lite"][profilesEditorGui["profilePitwallDropDown"].Value]
 
 			if (profilesEditorGui["profileSimulatorDropDown"].Text = translate("None"))
@@ -2494,7 +2500,20 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 					if ((function = "Brake Coaching") && profile.Has("Function.On-Track Coaching"))
 						profile["Function.On-Track Coaching"] := false
-					else if ((function = "On-Track Coaching") && profile.Has("Function.Brake Coaching"))
+
+					if ((function = "Brake Coaching") && profile.Has("Function.Race Motivation"))
+						profile["Function.Race Motivation"] := false
+
+					if ((function = "On-Track Coaching") && profile.Has("Function.Brake Coaching"))
+						profile["Function.Brake Coaching"] := false
+
+					if ((function = "On-Track Coaching") && profile.Has("Function.Race Motivation"))
+						profile["Function.Race Motivation"] := false
+
+					if ((function = "Race Motivation") && profile.Has("Function.On-Track Coaching"))
+						profile["Function.On-Track Coaching"] := false
+
+					if ((function = "Race Motivation") && profile.Has("Function.Brake Coaching"))
 						profile["Function.Brake Coaching"] := false
 				}
 			}
@@ -2966,6 +2985,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			profilesEditorGui["profileNameEdit"].Enabled := true
 			profilesEditorGui["profileModeDropDown"].Enabled := true
+			profilesEditorGui["profileUnitsDropDown"].Enabled := true
 			profilesEditorGui["profilePitwallDropDown"].Enabled := true
 			profilesEditorGui["profileSimulatorDropDown"].Enabled := true
 
@@ -3009,6 +3029,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			profilesEditorGui["profileNameEdit"].Text := ""
 			profilesEditorGui["profileModeDropDown"].Enabled := false
 			profilesEditorGui["profileModeDropDown"].Choose(0)
+			profilesEditorGui["profileUnitsDropDown"].Enabled := false
+			profilesEditorGui["profileUnitsDropDown"].Choose(0)
 			profilesEditorGui["profilePitwallDropDown"].Enabled := false
 			profilesEditorGui["profilePitwallDropDown"].Choose(0)
 			profilesEditorGui["profileSimulatorDropDown"].Enabled := false
@@ -3156,6 +3178,9 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+24 w120 h23 +0x200", translate("Mode"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileModeDropDown", collect(hasTeamServer ? ["Solo", "Team"] : ["Solo"], translate)).OnEvent("Change", editStartupProfiles.Bind("Update State"))
+
+		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Units"))
+		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofileUnitsDropDown", allUnits()).OnEvent("Change", editStartupProfiles.Bind("Update State"))
 
 		profilesEditorGui.Add("Text", "x" . x0 . " yp+23 w120 h23 +0x200", translate("Control Center"))
 		profilesEditorGui.Add("DropDownList", "x" . x1 . " yp+1 w" . w3 . " vprofilePitwallDropDown", collect(hasTeamServer ? ["None", "Solo Center", "Team Center", "Team Center Lite"] : ["None", "Solo Center"], translate))

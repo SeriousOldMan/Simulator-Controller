@@ -1,5 +1,182 @@
 # Latest stable release
 
+## 7.2.5.0
+
+#### Date: 09/18/26
+
+#### Fixes
+
+  - Fixed a bug for the Driving Coach, that prevented to store the correct lap time, when auto-saving a reference lap.
+  - Fixed a bug in the "Setup Workbench", that prevented to show up cars that have not been driven yet.
+  - Fixed the Setup Engineer in "Setup Workbench" sometimes not showing driver names and lap times in the list of available telemetry data.
+  - Fixed handling for over long car names in *Assetto Corsa EVO*. This relates to the cars:
+    - BMW M3 E30 Sport Evo (Evolution III)
+    - Lancia Delta HF integrale Evoluzione II
+    - Toyota Sprinter Trueno 1600GT-Apex (AE89)
+  - [Experts] Fixed a bug in the *RawHandler* used in car setup definition files and clarified the documentation.
+  
+#### Changes
+
+  - Updated car database and also the the tyre information for *RaceRoom Racing Experience* by @inthebagbud UK.
+  - Introduced extended car name handling for *Assetto Corsa EVO*, so the cars like "KTM X-Bow GT4", which is named without the hyphen internally by *Assetto Corsa EVO*, are named correctly.
+  - Added a new field to the Setup Editor of "Setup Workbench", which allows you to restrict the number of setting increments when applying recommendations to a setup file.
+  - [Internal] Migrated to AHK 2.1-alpha.31.
+  - New and updated car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - BMW M4 LMGT3 (update with differential preload setting)
+    - Assetto Corsa EVO
+	  - BMW M3 E30 Sport Evo (Evolution III)
+	  - Lotus Exige V6 Cup
+	  - Mazda MX-5 ND Cup
+	  - Audi R8 LMS GT4 Evo
+	  - Porsche 718 Cayman GT4 Clubsport
+	  - KTM X Bow GT4
+    - Assetto Corsa EVO (by @\|FuZzYyY\|)
+	  - Ford Escort RS Cosworth
+
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
+## 7.2.4.0
+
+#### Date: 09/11/26
+
+#### Fixes
+
+  - Implemented a workaround for a sporadic premature session end in *Le Mans Ultimate* that is caused by the game sometimes reporting to be in the main menu while the car is actually pitting at that moment.
+  - Fixed several wrong setting units in the car setup definitions added for *Assetto Corsa EVO* in the last release.
+  - Added tyre data information for several missing or wrongly spelled cars in *Assetto Corsa EVO*.
+  
+#### Changes
+
+  - It is now possible to define several sets of units, for example "Metric", "Imperial" or whatever you like. Switching between unit sets if possible using [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This allows you to switch to those units which are used by the simulator you are running.
+  - Implemented several optimizations in the strategy simulation when tyre sets are restricted and tyre wear is quite different between the available tyre compounds.
+  - Updated track names database for *Automobilista 2* by @inthebagbud UK.
+  - Updated track names database as well as car database for *RaceRoom Racing Experience* by @inthebagbud UK. All cars and tracks are now visible in the "Session Database", for example, if so chosen in the settings.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Ferrari SF25 (renamed, was formerly SF-25)
+	  - Porsche 992 GT3 R Rennsport (renamed, was formerly 911)
+	  - BMW M4 GT3 Evo (fixed rear spring rate settings)
+	  - Porsche 911 Turbo 3.6 (964)
+	  - Ferrari Daytona SP3
+	  - Ferrari F40 LM
+	  - Ferrari 288 GTO
+	  - Audi R8 LMS GT3 Evo II
+	  - Maserati GT2
+	  - Mercedes-AMG GT2
+	  - KTM X-Bow GT2
+	  - Porsche 911 GT2 RS Clubsport EVO
+
+## 7.2.3.0
+
+#### Date: 09/04/26
+
+#### Fixes
+
+  - Fixed a critical bug introduced two releases ago, that caused the issue analyzer of the "Setup Workbench" to report superfluous heavy oversteer handling problems for *Assetto Corsa EVO* and *Assetto Corsa Competizione*.
+  
+#### Changes
+
+  - Several important improvements for the "Setup Workbench":
+    - All known tracks are now shown in "Setup Workbench", not only the ones which already had been driven.
+	- All tracks are now available for the *All* cars selection, which allows you to use the telemetry system and also the Setup Engineer for a car that has no definition in the "Setup Workbench".
+    - All ever driven cars will now show up in the "Setup Workbench" for moddable simulators, not only the cars, which have a setup file definition.
+  - The "Setup Workbench" now supports reading, manipulation and writing of the setup files of *Assetto Corsa EVO*. For now, only a few cars are supported (see below). More cars will follow with future releases, but you can also [create your own car definitions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench) as described in the documentation for the "Setup Workbench".
+    - The current implementation is to be considered in *Alpha* state. There are still cases where it is also possible that a generated setup file is not accepted by *Assetto Corsa EVO*. This will be fixed with the next release.
+    - [Experts] The definition and behavior of *FloatHandler* in the [car definition files](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) of "Setup Workbench" has changed. This handler was never used so far and is now the main handler for all car definition files of *Assetto Corsa EVO*.
+	- [Experts] The *ClicksHandler* and *RawHandler* both support a second variant which is also used for *Assetto Corsa EVO*. With this variant a list of values can be defined to be used in the setup file for each click.
+	- [Experts] A new handler *ValuesHandler* has been added, which allows you to define a list of allowed values, which are used for both the internal, as well as the display values,
+  - [Important] Huge performance improvements for all standings and track gap computations. This will allow even lower data update frequencies.
+    - As a result, the default for the setting ["Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings) has changed from 4 to 3 seconds now. If this causes problems on your computer, change the value in the "Session Database".
+  - [Internal] Implemented a filter in the creation of the community database to suppress cars with the old naming scheme in *Le Mans Ultimate*. Tracks with UTF coding errors are suppressed as well.
+  - Tyre information has been added for the new cars of *Assetto Corsa EVO 0.9*.
+  - Thanks to @inthebagbud UK we have a fully updated list of cars and tyre data information for *RaceRoom Racing Experience*.
+  - [Internal] Migrated to AHK 2.1-alpha.31.
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Ferrari SF-25
+	  - BMW M4 GT3 Evo
+	  - Ferrari 296 GT3
+	  - Ford Mustang GT3
+	  - Porsche 911 GT3 R Rennsport
+	  - Porsche 911 GT3 Cup (992)
+
+## 7.2.2.0
+
+#### Date: 08/28/26
+
+#### Fixes
+
+  - Fixed a very complex bug, which prevented lap or wear based tyre change decision, if tyres could be changed individually for each wheel, but a single tyre compound must be used for all wheels. This is especially the case for *iRacing*.
+  - Fixed a redraw problem on the *Data* tab in "Solo Center".
+  - Fixed selection of pitstop repair requests using controller actions for *Le Mans Ultimate*.
+  - Fixed several car names for *Le Mans Ultimate*, which are reported with incomplete names by the game and therefore had missing information like tyre data:
+    - Chevrolet Corvette Z06 LMGT3.R (the car's name is reported without the trailing "R")
+    - Aston Martin Vantage AMR LMGT3 (the car's name is reported without the trailing "3")
+    - Lamborghini Huracan LMGT3 Evo2 (the car's name is reported without the trailing "2")
+  
+#### Changes
+
+  - The Driving Coach provides a new coaching mode, which is most helpful during a race. He will now praise you for a good lap, but will also blame you and call you back to focus, if you lose your pace. Additionally, he can give you advice where on the track you are losing time and what to change.
+    - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#motivation-on-the-track) has been added for the Driving Coach.
+	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
+	- The motivation mode can also be activated from the tray menu of the "Simulator Controller" process.
+	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
+	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
+  - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Piper) for more information.
+  - Sliders for Volume, Pitch and Speed will now be disabled in voice configuration, if the corresponding option is not supported by the chosen speech synthesis method.
+  - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
+  - A new article has been written for the *News* system.
+  - Added car meta data for the Ferrari 206 LMGT3 EVO, which was *forgotten* to be included and therefore had no tyre information.
+  - New car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - Ferrari 296 LMGT3 Evo (has been forgotten on release, sorry)
+    - Automobilista 2 (by @inthebagbud UK)
+	  - Formula V10 Gen2 (has been removed)
+      - Formula V10 Gen2 (B)
+      - Formula V10 Gen2 (M)
+      - Formula V10 Gen3 (B)
+      - Formula V10 Gen3 (M)
+      - Formula V8 Gen1 (B)
+      - Formula V8 Gen1 (M)
+      - Formula V8 Gen2
+      - Gillet Vertigo Streiff
+      - Lister Storm GTM
+      - Maserati GranSport Trofeo
+      - Milano GT55
+      - Panoz Esperante GTLM
+      - Renault R25
+      - Renault R26
+      - Renault R28
+      - Saleen S7-R GT1
+      - Spyker C8 Spyder GT2-R
+      - TVR Tuscan T400R GT2
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-722). A few fixes have been applied for cars in *Le Mans Ultimate* and your data may have been moved to an archive.
+
+## 7.2.1.0
+
+#### Date: 08/21/26
+
+#### Fixes
+
+  - Added missing translations for all languages.
+  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
+  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
+  - Fixed the location handling of the diary folder location in "Setup Workbench".
+  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
+  - "Simulator Setup" no longer crashes when the startup video file cannot play with sound.
+  
+#### Changes
+
+  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
+  - [Internal] Sounds that do not require an audio route will now also be played by SoX, if installed.
+  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
+
 ## 7.2.0.0
 
 #### Date: 08/14/26
@@ -23,27 +200,6 @@
   - The "Session Database" provides a new inspector which gives you detailed information about the tyre wear per lap for each wheel in specific weather conditions. Depending on your settings, the number of usable laps per tyre will be calculated automatically. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#tyres) for more information.
   - IBT files can now be opened directly from the telemetry select dialog.
   - Suspension information and the lap time is now included in telemetry data acquired by the Second Monitor provider.
-
-# Upcoming release
-
-## 7.2.1.0
-
-#### Date: 08/21/26 (planned)
-
-#### Fixes
-
-  - Added missing translations for all languages.
-  - Fixed several minor bugs in the telemetry handling especially in "Setup Workbench".
-  - Fixed cerating the analysis by the new Setup Engineer in the "Setup Workbench" for telemetry not loaded from the session database.
-  - Fixed the location handling of the diary folder location in "Setup Workbench".
-  - Automatic scrolling of the telemetries list of the Setup Engineer that prevented selection of laps lower in the list does not happen anymore.
-  
-#### Changes
-
-  - Several visual enhancements in "Simulator Setup" and "Simulator Configuration".
-  - [Developer] The plugin registration method has been extended, so that it is now possible to *overwrite* plugins with own, custom implementations.
-
-# Release history
 
 ## 7.1.5.0
 

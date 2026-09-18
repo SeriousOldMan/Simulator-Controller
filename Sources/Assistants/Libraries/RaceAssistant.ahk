@@ -188,7 +188,7 @@ class AssistantEvent extends AgentEvent {
 		triggerEvent() {
 			static reasoningStartSound := getFileName("Reasoning Begin.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
 
-			playSound("RASoundPlayer.exe", reasoningStartSound, getAudioSettings("Reasoning"))
+			playSound("RASoundPlayer", reasoningStartSound, getAudioSettings("Reasoning"))
 
 			return booster.trigger(this, this.createTrigger(this.Event, this.Phrase, arguments)
 								 , this.createGoal(this.Goal, arguments)
@@ -1749,7 +1749,7 @@ class RaceAssistant extends ConfigurationItem {
 			if this.ConversationBooster {
 				data := this.getKnowledge("Conversation")
 
-				playSound("RASoundPlayer.exe", conversationStartSound, getAudioSettings("Conversation"))
+				playSound("RASoundPlayer", conversationStartSound, getAudioSettings("Conversation"))
 
 				text := this.ConversationBooster.ask(text
 												   , Map("Variables", {assistant: this.AssistantType, name: this.VoiceManager.Name
@@ -1758,7 +1758,7 @@ class RaceAssistant extends ConfigurationItem {
 
 				if text {
 					if (text != true) {
-						playSound("RASoundPlayer.exe", conversationStopSound, getAudioSettings("Conversation"))
+						playSound("RASoundPlayer", conversationStopSound, getAudioSettings("Conversation"))
 
 						if this.VoiceManager.UseTalking
 							this.getSpeaker().speak(text, false, false, {Noise: false, Rephrase: false})
@@ -2815,7 +2815,7 @@ class RaceAssistant extends ConfigurationItem {
 		local driverForname, driverSurname, driverNickname, tyreSet, airTemperature, trackTemperature, sessionTimeRemaining, driverTimeRemaining
 		local weatherNow, weather10Min, weather30Min, lapTime, settingsLapTime, overallTime, values, result, baseLap, enoughData
 		local fuelRemaining, avgFuelConsumption, tyrePressures, tyreTemperatures, tyreWear, brakeTemperatures, brakeWear, key, noBaseLap
-		local mixedCompounds, tyreSet, index, tyre, axle
+		local mixedCompounds, tyreSet, index, tyre, axle, start
 
 		if (knowledgeBase && (knowledgeBase.getValue("Lap", 0) == lapNumber))
 			return false
@@ -3139,7 +3139,15 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("Update", true)
 
-		result := knowledgeBase.produce()
+		if isDebug() {
+			start := A_TickCount
+
+			result := knowledgeBase.produce()
+
+			logMessage(kLogWarn, "Add lap knowledge took " . (A_TickCount - start) . " ms...")
+		}
+		else
+			result := knowledgeBase.produce()
 
 		if (dump && this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledgeBase(this.KnowledgeBase)
@@ -3166,7 +3174,7 @@ class RaceAssistant extends ConfigurationItem {
 
 	updateLap(lapNumber, &data, dump := true, lapValid := kUndefined, lapPenalty := kUndefined) {
 		local knowledgeBase := this.KnowledgeBase
-		local result, newValue
+		local result, newValue, start
 
 		data := this.prepareData(lapNumber, data)
 
@@ -3206,7 +3214,15 @@ class RaceAssistant extends ConfigurationItem {
 
 		knowledgeBase.setFact("Update", true)
 
-		result := knowledgeBase.produce()
+		if isDebug() {
+			start := A_TickCount
+
+			result := knowledgeBase.produce()
+
+			logMessage(kLogWarn, "Update lap knowledge took " . (A_TickCount - start) . " ms...")
+		}
+		else
+			result := knowledgeBase.produce()
 
 		if (dump && this.Debug[kDebugKnowledgeBase])
 			this.dumpKnowledgeBase(knowledgeBase)
@@ -5240,6 +5256,230 @@ getTime(*) {
 	return A_Now
 }
 
+computeGrid(context, lapNumber) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local prefix := ("Standings.Lap." . lapNumber)
+	local sCarPrefix, cCarPrefix
+
+	knowledgeBase.setFact(prefix . ".Weather", knowledgeBase.getValue("Weather.Weather.Now", "Dry"))
+	knowledgeBase.setFact(prefix . ".Time", A_Now)
+	knowledgeBase.setFact(prefix . ".Car.Count", carCount)
+
+	loop carCount {
+		sCarPrefix := (prefix . ".Car." . A_Index)
+		cCarPrefix := ("Car." . A_Index)
+
+		knowledgeBase.setFact(sCarPrefix . ".Nr", knowledgeBase.getValue(cCarPrefix . ".Nr"))
+		knowledgeBase.setFact(sCarPrefix . ".ID", knowledgeBase.getValue(cCarPrefix . ".ID", A_Index))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Forname", knowledgeBase.getValue(cCarPrefix . ".Driver.Forname"))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Surname", knowledgeBase.getValue(cCarPrefix . ".Driver.Surname"))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Nickname", knowledgeBase.getValue(cCarPrefix . ".Driver.Nickname"))
+		knowledgeBase.setFact(sCarPrefix . ".Driver.Category", knowledgeBase.getValue(cCarPrefix . ".Driver.Category"
+																					, "Unknown"))
+	}
+
+	return true
+}
+
+computePositions(context, lapNumber) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local driverCar := knowledgeBase.getValue("Driver.Car", 0)
+	local driverRunning := knowledgeBase.getValue("Car." . driverCar . ".Lap.Running", 0)
+	local driverLaps := (knowledgeBase.getValue("Car." . driverCar . ".Laps"
+											  , knowledgeBase.getValue("Car." . driverCar . ".Lap", 0))
+					   + driverRunning)
+	local driverClass := knowledgeBase.getValue("Car." . driverCar . ".Class", "Unknown")
+	local driverLapTime := knowledgeBase.getValue("Car." . driverCar . ".Time")
+	local position, prefix, carLaps, carRunning
+	local standingsDistance, standingsDelta, trackDistance, trackDelta
+
+	updateStandingsClassAhead(class, car, distance, delta) {
+		if ((knowledgeBase.getValue("Car." . car . ".Class", "Unknown") = class) && (delta > 0))
+			if ((knowledgeBase.getValue("Position.Standings.Class.Ahead.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Standings.Class.Ahead.Delta") > delta)) {
+				knowledgeBase.setFact("Position.Standings.Class.Ahead.Car", car)
+				knowledgeBase.setFact("Position.Standings.Class.Ahead.Distance", distance)
+				knowledgeBase.setFact("Position.Standings.Class.Ahead.Delta", delta)
+			}
+	}
+
+	updateStandingsClassBehind(class, car, distance, delta) {
+		if ((knowledgeBase.getValue("Car." . car . ".Class", "Unknown") = class) && (delta < 0))
+			if ((knowledgeBase.getValue("Position.Standings.Class.Behind.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Standings.Class.Behind.Delta") < delta)) {
+				knowledgeBase.setFact("Position.Standings.Class.Behind.Car", car)
+				knowledgeBase.setFact("Position.Standings.Class.Behind.Distance", distance)
+				knowledgeBase.setFact("Position.Standings.Class.Behind.Delta", delta)
+			}
+	}
+
+	updateStandingsClassLeader(class, car, distance, delta) {
+		local leaderCar
+
+		if (knowledgeBase.getValue("Car." . car . ".Class", "Unknown") = class) {
+			leaderCar := knowledgeBase.getValue("Position.Standings.Class.Leader.Car", kUndefined)
+
+			if ((leaderCar == kUndefined)
+			 || (knowledgeBase.getValue("Car." . car . ".Position") < knowledgeBase.getValue("Car." . leaderCar . ".Position"))) {
+				knowledgeBase.setFact("Position.Standings.Class.Leader.Car", car)
+				knowledgeBase.setFact("Position.Standings.Class.Leader.Distance", distance)
+				knowledgeBase.setFact("Position.Standings.Class.Leader.Delta", delta)
+			}
+		}
+	}
+
+	updateStandingsOverallAhead(car, distance, delta) {
+		if (delta > 0)
+			if ((knowledgeBase.getValue("Position.Standings.Overall.Ahead.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Standings.Overall.Ahead.Delta") > delta)) {
+				knowledgeBase.setFact("Position.Standings.Overall.Ahead.Car", car)
+				knowledgeBase.setFact("Position.Standings.Overall.Ahead.Distance", distance)
+				knowledgeBase.setFact("Position.Standings.Overall.Ahead.Delta", delta)
+			}
+	}
+
+	updateStandingsOverallBehind(car, distance, delta) {
+		if (delta < 0)
+			if ((knowledgeBase.getValue("Position.Standings.Overall.Behind.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Standings.Overall.Behind.Delta") < delta)) {
+				knowledgeBase.setFact("Position.Standings.Overall.Behind.Car", car)
+				knowledgeBase.setFact("Position.Standings.Overall.Behind.Distance", distance)
+				knowledgeBase.setFact("Position.Standings.Overall.Behind.Delta", delta)
+			}
+	}
+
+	updateStandingsOverallLeader(car, distance, delta) {
+		if (knowledgeBase.getValue("Car." . car . ".Position", 0) == 1) {
+			knowledgeBase.setFact("Position.Standings.Overall.Leader.Car", car)
+			knowledgeBase.setFact("Position.Standings.Overall.Leader.Distance", distance)
+			knowledgeBase.setFact("Position.Standings.Overall.Leader.Delta", delta)
+		}
+	}
+
+	updateStandings(class, car, distance, delta) {
+		updateStandingsClassAhead(class, car, distance, delta)
+		updateStandingsClassBehind(class, car, distance, delta)
+		updateStandingsClassLeader(class, car, distance, delta)
+		updateStandingsOverallAhead(car, distance, delta)
+		updateStandingsOverallBehind(car, distance, delta)
+		updateStandingsOverallLeader(car, distance, delta)
+	}
+
+	updateTrackAhead(car, distance, delta) {
+		if (distance < 0)
+			if ((knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Track.Ahead.Distance") < distance)) {
+				knowledgeBase.setFact("Position.Track.Ahead.Car", car)
+				knowledgeBase.setFact("Position.Track.Ahead.Distance", distance)
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", delta)
+			}
+	}
+
+	updateTrackBehind(car, distance, delta) {
+		if (distance > 0)
+			if ((knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Track.Behind.Distance") > distance)) {
+				knowledgeBase.setFact("Position.Track.Behind.Car", car)
+				knowledgeBase.setFact("Position.Track.Behind.Distance", distance)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", delta)
+			}
+	}
+
+	updateTrack(car, distance, delta) {
+		updateTrackAhead(car, distance, delta)
+		updateTrackBehind(car, distance, delta)
+	}
+
+	loop carCount {
+		prefix := ("Standings.Lap." . lapNumber . ".Car." . A_Index)
+		position := knowledgeBase.getValue("Car." . A_Index . ".Position")
+
+		knowledgeBase.setFact(prefix . ".Position", position)
+		knowledgeBase.setFact(prefix . ".Time", knowledgeBase.getValue("Car." . A_Index . ".Time"))
+		knowledgeBase.setFact(prefix . ".Time.Sectors", knowledgeBase.getValue("Car." . A_Index . ".Time.Sectors"))
+
+		if (A_Index = driverCar) {
+			knowledgeBase.setFact("Standings.Lap." . lapNumber . ".Position", position)
+			knowledgeBase.setFact("Position", position)
+
+			knowledgeBase.setFact(prefix . ".Laps", driverLaps)
+			knowledgeBase.setFact(prefix . ".Delta", 0)
+
+			updateStandingsClassLeader(driverClass, driverCar, 0, 0)
+			updateStandingsOverallLeader(driverCar, 0, 0)
+		}
+		else {
+			carRunning := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0)
+			carLaps := (carRunning + knowledgeBase.getValue("Car." . A_Index . ".Laps"
+														  , knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)))
+
+			if (carLaps > 1) {
+				standingsDistance := (carLaps - driverLaps)
+				standingsDelta := (driverLapTime * standingsDistance)
+
+				knowledgeBase.setFact(prefix . ".Laps", carLaps)
+				knowledgeBase.setFact(prefix . ".Delta", standingsDelta)
+
+				trackDistance := (driverRunning - carRunning)
+				trackDelta := (-1 * (driverLapTime * trackDistance))
+
+				updateStandings(driverClass, A_Index, standingsDistance, standingsDelta)
+				updateTrack(A_Index, trackDistance, trackDelta)
+			}
+		}
+	}
+
+	return true
+}
+
+computeTrackAhead(context, driverRemaining) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local driverCar := knowledgeBase.getValue("Driver.Car", 0)
+	local lapTime := knowledgeBase.getValue("Car." . driverCar . ".Time", 0)
+	local running, distance
+
+	loop carCount
+		if (A_Index != driverCar) {
+			running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0)
+			distance := (driverRemaining + running)
+
+			if ((knowledgeBase.getValue("Position.Track.Ahead.Car", kUndefined) == kUndefined)
+			 || (knowledgeBase.getValue("Position.Track.Ahead.Distance") > (- distance))) {
+				knowledgeBase.setFact("Position.Track.Ahead.Car", A_Index)
+				knowledgeBase.setFact("Position.Track.Ahead.Distance", (- distance))
+				knowledgeBase.setFact("Position.Track.Ahead.Delta", lapTime * distance)
+			}
+		}
+
+	return true
+}
+
+computeTrackBehind(context, driverRunning) {
+	local knowledgeBase := context.KnowledgeBase
+	local carCount := knowledgeBase.getValue("Car.Count", 0)
+	local driverCar := knowledgeBase.getValue("Driver.Car", 0)
+	local lapTime := knowledgeBase.getValue("Car." . driverCar . ".Time", 0)
+	local running, distance
+
+	loop carCount
+		if (A_Index != driverCar) {
+			running := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running", 0)
+			distance := ((1 - running) + driverRunning)
+
+			if ((knowledgeBase.getValue("Position.Track.Behind.Car", kUndefined) == kUndefined)
+			 || (distance < knowledgeBase.getValue("Position.Track.Behind.Distance"))) {
+				knowledgeBase.setFact("Position.Track.Behind.Car", A_Index)
+				knowledgeBase.setFact("Position.Track.Behind.Distance", distance)
+				knowledgeBase.setFact("Position.Track.Behind.Delta", lapTime * (- distance))
+			}
+		}
+
+	return true
+}
+
 callAssistant(context, method, arguments*) {
 	local script := isInstance(context, RaceAssistant)
 	local assistant := (script ? context : context.KnowledgeBase.RaceAssistant)
@@ -5593,7 +5833,7 @@ createTools(assistant, type, target := false, categories := ["Custom", "Builtin"
 
 	runAction(enoughData, confirm) {
 		if chime
-			playSound("RASoundPlayer.exe", reasoningStopSound, getAudioSettings("Reasoning"))
+			playSound("RASoundPlayer", reasoningStopSound, getAudioSettings("Reasoning"))
 
 		if !assistant.KnowledgeBase
 			return assistant.hasEnoughData()

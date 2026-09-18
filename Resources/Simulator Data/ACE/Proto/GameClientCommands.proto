@@ -1,0 +1,252 @@
+syntax = "proto3";
+
+import "Customization.proto";
+import "BackendMessage.proto";
+import "LogicScene.proto";
+import "DriverManager.proto";
+
+enum GameEconomyClientCommandsResponse {
+  GameEconomyClientCommandsResponse_OK = 0;
+  GameEconomyClientCommandsResponse_NO_AVAILABLE_CARS = 1;
+  GameEconomyClientCommandsResponse_NO_MECHANICAL_PRESET = 2;
+  GameEconomyClientCommandsResponse_NO_VISUAL_PRESET = 3;
+  GameEconomyClientCommandsResponse_NO_MONEY = 4;
+  GameEconomyClientCommandsResponse_DIFFERENT_MONEY = 5;
+  GameEconomyClientCommandsResponse_NO_AVAILABLE_PARTS = 6;
+  GameEconomyClientCommandsResponse_CAR_NOT_AVAILABLE = 7;
+  GameEconomyClientCommandsResponse_NO_REQUIRED_LICENSE = 8;
+  GameEconomyClientCommandsResponse_BACKEND_DISCONNECTED = 97;
+  GameEconomyClientCommandsResponse_DATABASE_DISCONNECTED = 98;
+  GameEconomyClientCommandsResponse_IS_READONLY = 99;
+  GameEconomyClientCommandsResponse_CRITICAL_ERROR = 100;
+}
+
+message GameEconomyClientRequestAccount {
+  string steam_id = 7;
+  string psn_id = 8;
+  string xbox_id = 6;
+}
+
+message GameEconomyClientResponseAccount {
+  BackendResponse response = 1;
+  string account_id = 2;
+  PGUID account_pguid = 100;
+  DriverProfileData driver_data = 3;
+  DriverPersonalData current_driver_personal_data = 4;
+  DriverProgressionData current_driver_progression_data = 5;
+  bool is_new = 6;
+}
+
+message GameEconomyClientRequestUserProfileInit {
+  bool im_empty = 1;
+}
+
+message GameEconomyClientResponseUserProfileInit {
+  DriverProfileData driver_data = 1;
+  BackendResponse response = 2;
+}
+
+message GameEconomyClientRequestDriver {
+  PGUID driver_pguid = 100;
+  bool is_startup = 2;
+  reserved 1 to 1;
+}
+
+message GameEconomyClientResponseDriver {
+  BackendResponse response = 1;
+  PGUID driver_pguid = 100;
+  DriverProgressionData progression_data = 9;
+  DriverPersonalData personal_data = 10;
+  DriverGarageData garage_data = 11;
+  DriverLicenseData license_data = 12;
+  reserved 3 to 3;
+}
+
+message GameClientRequestDriverPersonalData {
+  PGUID driver_pguid = 100;
+  reserved 1 to 1;
+}
+
+message GameClientResponseDriverPersonalData {
+  BackendResponse response = 1;
+  PGUID driver_pguid = 100;
+  DriverPersonalData personal_data = 3;
+  reserved 2 to 2;
+}
+
+message GameClientRequestUpdateDriverPersonalData {
+  PGUID driver_pguid = 100;
+  DriverPersonalData personal_data = 1;
+  reserved 2 to 2;
+}
+
+message GameClientResponseUpdateDriverPersonalData {
+  BackendResponse response = 1;
+  PGUID driver_pguid = 100;
+  DriverPersonalData personal_data = 3;
+  bool is_new = 4;
+  reserved 2 to 2;
+}
+
+message GameEconomyClientRequestDriverProgressionData {
+  PGUID driver_pguid = 100;
+  reserved 1 to 1;
+}
+
+message GameEconomyClientResponseDriverProgressionData {
+  BackendResponse response = 1;
+  PGUID driver_pguid = 100;
+  DriverProgressionData progression_data = 3;
+  DriverLicenseData license_data = 4;
+  reserved 2 to 2;
+}
+
+message GameClientRequestOwnedCars {
+  PGUID driver_pguid = 100;
+  reserved 1 to 1;
+}
+
+message GameClientResponseOwnedCars {
+  GameEconomyClientCommandsResponse response = 1;
+  repeated PGUID car_pguid = 100;
+  PGUID selected_car_pguid = 101;
+  reserved 2 to 2;
+  reserved 3 to 3;
+}
+
+message GameClientRequestOwnedCar {
+  PGUID driver_pguid = 100;
+  PGUID car_pguid = 101;
+  reserved 1 to 1;
+  reserved 2 to 2;
+}
+
+message GameClientResponseOwnedCar {
+  GameEconomyClientCommandsResponse response = 1;
+  CarFinalStateWithConsumable final_state_with_consumable = 2;
+}
+
+message GameClientRequestUpdateOwnedCar {
+  PGUID driver_pguid = 100;
+  CarFinalStateData final_state = 3;
+  reserved 1 to 1;
+}
+
+message GameClientResponseUpdateOwnedCar {
+  GameEconomyClientCommandsResponse response = 1;
+  CarFinalStateData final_state = 2;
+}
+
+message GameClientRequestFinalStates {
+  PGUID driver_pguid = 100;
+  repeated string key = 2;
+  reserved 1 to 1;
+}
+
+message GameClientResponseFinalStates {
+  GameEconomyClientCommandsResponse response = 1;
+  repeated CarFinalStates states = 2;
+}
+
+message GameClientRequestBuyCar {
+  CarModel model = 1;
+}
+
+message GameClientResponseBuyCar {
+  GameEconomyClientCommandsResponse response = 1;
+  PGUID driver_pguid = 2;
+}
+
+message GameClientRequestRemoveCar {
+  PGUID car_pguid = 1;
+}
+
+message GameClientResponseRemoveCar {
+  GameEconomyClientCommandsResponse response = 1;
+}
+
+message GameClientRequestSelectCar {
+  PGUID driver_pguid = 100;
+  PGUID car_pguid = 101;
+  reserved 1 to 1;
+  reserved 2 to 2;
+}
+
+message GameClientResponseSelectCar {
+  GameEconomyClientCommandsResponse response = 1;
+  PGUID car_pguid = 101;
+  reserved 2 to 2;
+}
+
+message GameClientRequestUpdateFinalStates {
+}
+
+message GameClientResponseUpdateFinalStates {
+  GameEconomyClientCommandsResponse response = 1;
+}
+
+message GameClientRequestPlayerMode {
+  bool is_sandbox = 1;
+}
+
+message GameClientResponsePlayerMode {
+  bool new_is_sandbox = 1;
+  bool is_new_career = 2;
+}
+
+message GameClientRequestPersonalSettings {
+  bool im_empty = 1;
+}
+
+message GameClientResponsePersonalSettings {
+  PersonalSettings personal_settings = 1;
+}
+
+message GameClientRequestSetPersonalSettings {
+  PersonalSettings personal_settings = 1;
+}
+
+message GameClientResponseSetPersonalSettings {
+  PersonalSettings personal_settings = 1;
+}
+
+message GameClientCommands {
+  GameEconomyClientRequestAccount request_account = 2;
+  GameEconomyClientResponseAccount response_account = 1001;
+  GameEconomyClientRequestUserProfileInit request_user_profile_init = 3;
+  GameEconomyClientResponseUserProfileInit response_user_profile_init = 1002;
+  GameEconomyClientRequestDriver request_driver = 4;
+  GameEconomyClientResponseDriver response_driver = 1003;
+  GameClientRequestDriverPersonalData request_driver_personal_data = 5;
+  GameClientResponseDriverPersonalData response_driver_personal_data = 1004;
+  GameClientRequestUpdateDriverPersonalData request_update_driver_personal_data = 6;
+  GameClientResponseUpdateDriverPersonalData response_update_driver_personal_data = 1005;
+  GameEconomyClientRequestDriverProgressionData request_driver_progression_data = 7;
+  GameEconomyClientResponseDriverProgressionData response_driver_progression_data = 1006;
+  GameClientRequestOwnedCars request_owned_cars = 8;
+  GameClientResponseOwnedCars response_owned_cars = 1007;
+  GameClientRequestOwnedCar request_owned_car = 9;
+  GameClientResponseOwnedCar response_owned_car = 1008;
+  GameClientRequestUpdateOwnedCar request_update_owned_car = 10;
+  GameClientResponseUpdateOwnedCar response_update_owned_car = 1009;
+  GameClientRequestFinalStates request_final_states = 11;
+  GameClientResponseFinalStates response_final_states = 1010;
+  GameClientRequestBuyCar request_buy_car = 12;
+  GameClientResponseBuyCar response_buy_car = 1011;
+  GameClientRequestSelectCar request_select_car = 14;
+  GameClientResponseSelectCar response_select_car = 1013;
+  GameClientRequestUpdateFinalStates request_update_final_states = 19;
+  GameClientResponseUpdateFinalStates response_update_final_states = 1018;
+  GameClientRequestPlayerMode request_player_mode = 20;
+  GameClientResponsePlayerMode response_player_mode = 1019;
+  GameClientRequestPersonalSettings request_personal_settings = 21;
+  GameClientResponsePersonalSettings response_personal_settings = 1020;
+  GameClientRequestSetPersonalSettings request_set_personal_settings = 22;
+  GameClientResponseSetPersonalSettings response_set_personal_settings = 1021;
+  GameClientRequestRemoveCar request_remove_car = 23;
+  GameClientResponseRemoveCar response_remove_car = 1022;
+}
+
+message EventServerRequestJoin {
+  string join_clipboard_text = 1;
+}

@@ -362,13 +362,13 @@ After you have described your problems and reviewed the recommendations of "Setu
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Editor%201.JPG)
 
-On the right side, you will see the simulator specific content of the setup file, in this case a setup for *Assetto Corsa Competizione* in a JSON format. In the list on the right, all settings known to "Setup Workbench", which are valid for the currently selected simulator and car will be listed together with their values from the currently loaded setup file. You can select a setting in this list and change its value using the "Increase" or "Decrease" button. Much more interesting is the "Apply" button below. When you click this button, all recommendations of the "Setup Workbench" will be applied as balanced changes to the currently loaded setup. You can specify with the small slider to the right of the button the amount of the applied changes, thereby filtering small and possibly unneccessary changes. You will then see a list like this:
+On the right side, you will see the simulator specific content of the setup file, in this case a setup for *Assetto Corsa Competizione* in a JSON format. In the list on the right, all settings known to "Setup Workbench", which are valid for the currently selected simulator and car will be listed together with their values from the currently loaded setup file. You can select a setting in this list and change its value using the "Increase" or "Decrease" button. Much more interesting is the "Apply" button below. When you click this button, all recommendations of the "Setup Workbench" will be applied as balanced changes to the currently loaded setup. You can specify with the small slider to the right of the button the amount of the applied changes, thereby filtering small and possibly unneccessary changes. Additionally you can restrict the maximum increment applied to a setting of the setup at once with the edit field on the right of the slider. You will then see a list like this:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/Development/Docs/Images/Setup%20Editor%202.JPG)
 
 Using the checkboxes on the left side of each setting, you can control which modifications will be included in the modified setup and which are not. The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed, chosen and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione* and *Le Mans Ultimate*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
+Note: The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corsa EVO*, *Le Mans Ultimate* and *rFactor 2*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
 
 ## Comparing Car Setups
 
@@ -472,16 +472,16 @@ Here is an extract from the definition file for the "McLaren 720s GT3":
 	[General]
 	SteerLock=480
 	[Setup.Settings.Handler]
-	Brake.Balance=FloatHandler(47.0, 0.2, 1, 47.0, 68.0)
+	Brake.Balance=DecimalHandler(47.0, 0.2, 1, 47.0, 68.0)
 	Brake.Duct.Front=ClicksHandler(0, 6)
 	Brake.Duct.Rear=ClicksHandler(0, 6)
 	Aero.Height.Front=IntegerHandler(50, 1, 50, 80)
 	Aero.Height.Rear=IntegerHandler(64, 1, 64, 105)
 	Aero.Wing.Rear=IntegerHandler(1, 1, 1, 8)
-	Geometry.Toe.Front.Left=FloatHandler(-0.48, 0.01, 2, -0.48, 0.44)
-	Geometry.Toe.Front.Right=FloatHandler(-0.48, 0.01, 2, -0.48, 0.44)
-	Geometry.Toe.Rear.Left=FloatHandler(-0.1, 0.01, 2, -0.1, 0.4)
-	Geometry.Toe.Rear.Right=FloatHandler(-0.1, 0.01, 2, -0.1, 0.4)
+	Geometry.Toe.Front.Left=DecimalHandler(-0.48, 0.01, 2, -0.48, 0.44)
+	Geometry.Toe.Front.Right=DecimalHandler(-0.48, 0.01, 2, -0.48, 0.44)
+	Geometry.Toe.Rear.Left=DecimalHandler(-0.1, 0.01, 2, -0.1, 0.4)
+	Geometry.Toe.Rear.Right=DecimalHandler(-0.1, 0.01, 2, -0.1, 0.4)
 	...
 	[Setup.Settings.Units.DE]
 	Brake.Balance=% Vorne
@@ -506,37 +506,88 @@ In the "[General]" section, values for *SteerLock*, *SteerRatio*, *Wheelbase* an
 
 The most important part is the "[Setup.Settings.Handler]" section. Here you specify a special handler for each setting, which manages this specific setting. If you don't supply a handler for an active setting of the given car, a default *ClicksHandler* with an unrestricted range will be active. You can also supply *false* as a handler, which means that this setting will be unavailable. The following handlers are available:
 
-  - **RawHandler(increment, minValue, maxValue)**
+  - **ValuesHandler(value1, value2, ...)**
   
-    This handler implements a range of numbers. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+    The values, both internally and also for the display are defined as the list of supplied values and no conversion will be applied. If a conversion is necessary, see the next two handlers.
 
-  - **ClicksHandler(minValue, maxValue)**
+  - **RawHandler(increment, minValue, maxValue)** or **RawHandler(increment, value1, value2, ...)**
   
-    Available values for this setting range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0** in the underlying simulator specific setup file.
+    This handler comes in two flavors:
+	
+	- The first defines a range of numbers specified by a lower and an upper bound. The valid range of setting values goes from *minValue* to *maxValue* with each step defined be *increment*. The values will be used as such in the underlying simulator specific setup file.
+	
+	  *increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
+	
+	  Good to know: The special case, where *increment* is **1** and *minValue* is an integer, this handler will be identical in behavior to the second variant of *ClicksHandler*.
+	  
+	- The second variant maps a range of values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. For technical reasons, there must be more than two values in this list.
+
+      Please note, that in this variant the first argument *increment* is ignored.
+
+  - **ClicksHandler(minValue, maxValue)** or **ClicksHandler(minValue, value1, value2, ...)**
+  
+	This handler also comes also in two flavors:
+	
+	- The first defines a range of discrete integer values, which are mapped to a corresponding range of integer values in the underlying simulator specific setup file. Available values range from *minValue* to *maxValue* and are incremented by **1**. *minValue* and *maxValue* must be both integers, where *minValue* is mapped to **0**.
+	
+	  *minValue* defaults to **0** and *maxValue* default to a reasonably large value.
+	  
+	- The second variant maps a range of discrete integer values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. Of course, there must be more than one value in this list.
 
   - **IntegerHandler(baseValue, increment, minValue, maxValue)**
   
-    This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file. Each step will correspond to an increment by **1** in the underlying raw value.
+    This handler implements a more complex range of natural numbers. All supplied values must be integers. The valid range of setting values goes from minValue to maxValue with each step defined be *increment*. *baseValue* will be used as the anchor, which corresponds to **0** in the underlying simulator specific setup file. Each step will correspond to an increment by **1** in the internal raw value.
+	
+	*baseValue* defaults to **0**, *increment* to **1**, *minValue* and *maxValue* to reasonably large values.
 
-  - **DecimalHandler(baseValue, increment, precision, minValue, maxValue)**
+  - **DecimalHandler(baseValue, increment, places, minValue, maxValue)**
   
-    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *precision* defines, how many places after the decimal point are considered and displayed. *FloatHandler* can be used as well, as it is synonym to *DecimalHandler*.
+    Similar in behavior to the *IntegerHandler*, but uses floating point numbers. *places* defines, how many places after the decimal point are considered and displayed.
 	
 	Example:
 	
 		DecimalHandler(0, 0.1, 1, -3.5, 0.1)
 	
 	will create a continuous range of -35 to 1 in the simulator specific setup file, where -35 equals the display value -3.5 and 1 equals the display value 0.1.
+	
+	*baseValue* defaults to **0.0**, *increment* to **1.0**, *places* to **0**, *minValue* and *maxValue* to reasonably large values.
 
-  - **EnumerationHandler(baseValue, increment, value1, value2, ...)**
   
-    Using this handler, you can define a set of discrete values, which will then be mapped to a value in the underlying simulator specific setup file. *baseValue* will be used as the anchor, which corresponds to the first *value1* and *increment* specify the change of the underlying value for each step in supplied list of discrete values.
+  - **FloatHandler(increment, places, minValue, maxValue, base, multiplier, round)**
+    
+	This handler must be used, when the values in the setup file are stored as floating point numbers, which is the case for *Assetto Corsa EVO*, for example. *increment* defines the step between each display value and *places* defines, how many places after the decimal point are considered and displayed. *minValue* and *maxValue* specifies the lower and upper bound of the allowed display values.
+	
+	Example:
+	
+		FloatHandler(0.25, 2, -3.5, 1.0)
+	
+	will create a range from **-3.5** to **1.0** with an increment of **0.25**. The values are display with two digits after the decimal point, for example **-1.75**. Without additional arguments, the value is stored as is in the setup file. But sometimes, the range of internal values used in the setup file is different from that of the displayed values. In this case you can use the last two optional parameters:
+	
+	- *base* specifies the internal values which corresponds to the **minValue** of the display values.
+	- *multiplier* defines the increment of the internal value for each increment of the display value by **1**.
+	- *round*, if supplied, specify the number of places after the decimal point allowed for the internal values. If not supplied, no rounding will be applied.
+	
+	Example: You have a discrete range of integer display values from **1** to **10** (clicks on a damper, for example). They should map internally to **60000** to **70000**. *base* must be **60000** and *multiplier* will be **2000**, the required increment of the internal value for each step of the display value.
+	
+	Let's express the relationship as an equation:
+	
+		internal_value := base + (display_value - minValue) * multiplier (possibly rounded, see above)
+	
+	or
+	
+		display_value = (interval_value - base) / multiplier + minValue
+
+  - **EnumerationHandler(baseValue, step, value1, value2, ...)**
+  
+    Using this handler, you can define a set of discrete values, which will then be mapped to a value in the underlying simulator specific setup file. *baseValue* will be used as the anchor, which corresponds to the first *value1* and *step* specify the change of the internal value for each step in supplied list of discrete values.
 	
 	Example:
 	
 		Electronics.MGUK.Delivery=EnumerationHandler(0, 1, No Deploy, Build, Low, Balanced, High, Attack)
 	
 	defines six discrete values. *No Deploy* will be mapped to **0** and *Attack* will be mapped to **5**.
+	
+	*baseValue* defaults to **0** and *step* to **1**.
 
   - **ScriptHandler(scriptFileName, arg1, arg2, ...)**
   
@@ -722,9 +773,10 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 
 ## Notes
 
-  1. Only *Assetto Corsa*, *Assetto Corsa Competizione*, *Le Mans Ultimate* and *rFactor 2* are supported at the moment, when it comes to editing, comparing and saving setup files. For *rFactor 2* only a few cars are supported in the standard distribution of Simulator Controller, but you can define your own cars as described above. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
+  1. Only *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corrsa EVO*, *Le Mans Ultimate* and *rFactor 2* are supported at the moment, when it comes to editing, comparing and saving setup files. For *rFactor 2* only a few cars are supported in the standard distribution of Simulator Controller, but you can define your own cars as described above. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
   2. The implementations for *Assetto Corsa Competizione* provides a generic car model and detailed car specifications for all currently available cars. More cars will be added when additional DLCs become availabble.
   3. The implementation for *Assetto Corsa* currently provides a generic car model and many detailed car models at the moment. More detailed car models will be added over time. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
-  4. The implementation for *Le Mans Ultimate* currently provides a generic car model and detailed car models for all cars from the simulator including all current extensions. Working with *Le Mans Ultimate* setup is a bit different than for the other simulators, since setups are not stored car specific, but only track specific. So be sure to include the car model name in the name of the setup file to help identifying the correct setup later on.
-  5. As said, not many cars are available for *rFactor 2* but you may define your own car meta data. Once done and tested, I will be happy to add your car to the package as a community contribution. The comments for *Le Mans Ultimate* apply here as well.
-  6. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 
+  4. The same is true for *Assetto Corsa EVO*, espcially because the support for this simulator has just been added at the time of this writing.
+  5. The implementation for *Le Mans Ultimate* currently provides a generic car model and detailed car models for all cars from the simulator including all current extensions. Working with *Le Mans Ultimate* setup is a bit different than for the other simulators, since setups are not stored car specific, but only track specific. So be sure to include the car model name in the name of the setup file to help identifying the correct setup later on.
+  6. As said, not many cars are available for *rFactor 2* but you may define your own car meta data. Once done and tested, I will be happy to add your car to the package as a community contribution. The comments for *Le Mans Ultimate* apply here as well.
+  7. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 

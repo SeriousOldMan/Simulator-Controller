@@ -1,0 +1,1019 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "LogicScene.proto";
+import "Scene.proto";
+import "Options.proto";
+import "google/protobuf/descriptor.proto";
+import "google/protobuf/any.proto";
+
+enum CustomizationResult {
+  CustomizationResult_OK = 0;
+  CustomizationResult_MISSING_ASSET = 1;
+  CustomizationResult_DUPLICATED_ASSET_IN_LIST = 2;
+  CustomizationResult_EMPTY_ASSET_LIST = 3;
+  CustomizationResult_MATERIAL_STATE_NOT_FOUND_ON_DESIGN = 4;
+}
+
+enum ChannelCustomizationMode {
+  ChannelCustomization_None = 0;
+  ChannelCustomization_OemOnly = 1;
+  ChannelCustomization_OemAndPickers = 2;
+  ChannelCustomization_Inherit = 3;
+}
+
+enum ChannelCustomizationEnum {
+  ChannelCustomization_Primary = 0;
+  ChannelCustomization_Secondary = 1;
+  ChannelCustomization_Tertiary = 2;
+}
+
+enum PhysicsTyreCompound {
+  PhysicsTyreCompound_Eco = 0;
+  PhysicsTyreCompound_Road = 1;
+  PhysicsTyreCompound_SuperCar = 2;
+  PhysicsTyreCompound_HyperCar = 3;
+  PhysicsTyreCompound_Slick_Medium = 21;
+  PhysicsTyreCompound_Wet = 31;
+  PhysicsTyreCompound_Racing_Vintage = 102;
+  PhysicsTyreCompound_F1_Soft = 201;
+  PhysicsTyreCompound_F1_Medium = 202;
+  PhysicsTyreCompound_F1_Hard = 203;
+  PhysicsTyreCompound_F1_Wet = 204;
+  PhysicsTyreCompound_F1_Intermediate = 205;
+}
+
+enum ModdedTyreCompound {
+  ModdedTyreCompound_Mod_1 = 0;
+  ModdedTyreCompound_Mod_2 = 1;
+  ModdedTyreCompound_Mod_3 = 2;
+  ModdedTyreCompound_Mod_4 = 3;
+  ModdedTyreCompound_Mod_5 = 4;
+  ModdedTyreCompound_Mod_6 = 5;
+  ModdedTyreCompound_Mod_7 = 6;
+  ModdedTyreCompound_Mod_8 = 7;
+  ModdedTyreCompound_Mod_9 = 8;
+  ModdedTyreCompound_Mod_10 = 9;
+}
+
+enum TyreCompound {
+  TyreCompound_Racing_Michelin_Cup = 0;
+  TyreCompound_Racing_Michelin_Cup_Wet = 1;
+  TyreCompound_Racing_Michelin_WEC_Soft = 2;
+  TyreCompound_Racing_Michelin_WEC_Hard = 3;
+  TyreCompound_Racing_Michelin_WEC_Wet = 4;
+  TyreCompound_Racing_Michelin_Special = 5;
+  TyreCompound_Racing_Generic_Slick = 10;
+  TyreCompound_Racing_Generic_Wet = 11;
+  TyreCompound_Racing_Generic_Intermediate = 12;
+  TyreCompound_Racing_Pirelli_GTWC = 20;
+  TyreCompound_Racing_Pirelli_GTWC_Wet = 21;
+  TyreCompound_Racing_GoodYear_Cup = 23;
+  TyreCompound_Racing_GoodYear_Wet = 24;
+  TyreCompound_Racing_BFG_Cup = 25;
+  TyreCompound_Racing_BFG_Wet = 26;
+  TyreCompound_Racing_Falken_Cup = 27;
+  TyreCompound_Racing_Falken_Wet = 28;
+  TyreCompound_Racing_Hankook_Cup = 30;
+  TyreCompound_Racing_Hankook_Wet = 31;
+  TyreCompound_Racing_Dunlop_Cup = 32;
+  TyreCompound_Racing_Dunlop_Wet = 33;
+  TyreCompound_Racing_Pirelli_F1_SuperSoft = 40;
+  TyreCompound_Racing_Pirelli_F1_Soft = 41;
+  TyreCompound_Racing_Pirelli_F1_Medium = 42;
+  TyreCompound_Racing_Pirelli_F1_Hard = 43;
+  TyreCompound_Racing_Pirelli_F1_SuperHard = 44;
+  TyreCompound_Racing_Pirelli_F1_Intermediate = 50;
+  TyreCompound_Racing_Pirelli_F1_Wet = 51;
+  TyreCompound_Racing_Bridgestone_F1_Slick = 55;
+  TyreCompound_Racing_Bridgestone_F1_Intermediate = 56;
+  TyreCompound_Racing_Bridgestone_F1_Wet = 57;
+  TyreCompound_Racing_Bridgestone_F1_Soft = 58;
+  TyreCompound_Racing_Bridgestone_F1_Medium = 59;
+  TyreCompound_Racing_Bridgestone_F1_Hard = 62;
+  TyreCompound_Hypercar_Pirelli_Trofeo = 60;
+  TyreCompound_Supercar_Pirelli_Corsa = 61;
+  TyreCompound_Hypercar_Michelin_Cup_2R = 70;
+  TyreCompound_Supercar_Michelin_Cup_2 = 71;
+  TyreCompound_Hypercar_Bridgestone = 80;
+  TyreCompound_Supercar_Bridgestone = 81;
+  TyreCompound_Hypercar_GoodYear = 90;
+  TyreCompound_Supercar_GoodYear = 91;
+  TyreCompound_Hypercar_Toyo = 100;
+  TyreCompound_Supercar_Toyo = 101;
+  TyreCompound_Hypercar_Continental = 110;
+  TyreCompound_Supercar_Continental = 111;
+  TyreCompound_Hypercar_Yokohama = 120;
+  TyreCompound_Supercar_Yokohama = 121;
+  TyreCompound_Hypercar_Hankook = 130;
+  TyreCompound_Supercar_Hankook = 131;
+  TyreCompound_Hypercar_Avon = 140;
+  TyreCompound_Supercar_Avon = 141;
+  TyreCompound_Hypercar_Generic = 150;
+  TyreCompound_Supercar_Generic = 151;
+  TyreCompound_Road_Pirelli = 301;
+  TyreCompound_Road_Michelin = 302;
+  TyreCompound_Road_Bridgestone = 303;
+  TyreCompound_Road_GoodYear = 304;
+  TyreCompound_Road_Toyo = 305;
+  TyreCompound_Road_Continental = 306;
+  TyreCompound_Road_Hankook = 307;
+  TyreCompound_Road_Avon = 308;
+  TyreCompound_Road_Generic = 309;
+  TyreCompound_Eco_Pirelli = 401;
+  TyreCompound_Eco_Generic = 300;
+  TyreCompound_Eco_Michelin = 402;
+  TyreCompound_Eco_Bridgestone = 403;
+  TyreCompound_Eco_GoodYear = 404;
+  TyreCompound_Eco_Toyo = 405;
+  TyreCompound_Eco_Continental = 406;
+  TyreCompound_Eco_Hankook = 407;
+  TyreCompound_Eco_Avon = 408;
+  TyreCompound_Eco_Vintage_Avon = 409;
+  TyreCompound_Road_Vintage_1950s = 500;
+  TyreCompound_Racing_Vintage_1950s = 501;
+  TyreCompound_Road_Vintage_1960s = 600;
+  TyreCompound_Racing_Vintage_1960s = 601;
+  TyreCompound_Road_Vintage_1970s = 700;
+  TyreCompound_Racing_Vintage_1970s = 701;
+  TyreCompound_Road_Vintage_1980s = 800;
+  TyreCompound_Racing_Vintage_1980s = 801;
+  TyreCompound_Road_Vintage_1990s = 900;
+  TyreCompound_Racing_Vintage_1990s = 901;
+  TyreCompound_Racing_Vintage_Dunlop = 2000;
+  TyreCompound_Racing_Vintage_Firestone = 2010;
+  TyreCompound_Racing_Vintage_GoodYear = 2020;
+  TyreCompound_Road_Vintage_Pirelli = 2030;
+  TyreCompound_Road_Vintage_Michelin = 2031;
+  TyreCompound_Special_Pirelli = 2100;
+  TyreCompound_Special_Pirelli_2 = 2109;
+  TyreCompound_Special_Michelin = 2101;
+  TyreCompound_Special_Bridgestone = 2102;
+  TyreCompound_Special_GoodYear = 2103;
+  TyreCompound_Special_Toyo = 2104;
+  TyreCompound_Special_Continental = 2105;
+  TyreCompound_Special_Hankook = 2106;
+  TyreCompound_Special_Avon = 2107;
+  TyreCompound_Special_Generic = 2108;
+  TyreCompound_Racing_GoodYear_92_F1_Slick = 2120;
+  TyreCompound_Racing_GoodYear_92_F1_Intermediate = 2121;
+  TyreCompound_Racing_GoodYear_92_F1_Wet = 2122;
+  TyreCompound_Racing_GoodYear_96_F1_Slick = 2140;
+  TyreCompound_Racing_GoodYear_96_F1_Intermediate = 2141;
+  TyreCompound_Racing_GoodYear_96_F1_Wet = 2142;
+  TyreCompound_Mod_1 = 5001;
+  TyreCompound_Mod_2 = 5002;
+  TyreCompound_Mod_3 = 5003;
+  TyreCompound_Mod_4 = 5004;
+  TyreCompound_Mod_5 = 5005;
+  TyreCompound_Mod_6 = 5006;
+  TyreCompound_Mod_7 = 5007;
+  TyreCompound_Mod_8 = 5008;
+  TyreCompound_Mod_9 = 5009;
+  TyreCompound_Mod_10 = 5010;
+}
+
+enum CarCustomizationCategory {
+  CarCustomizationCategory_Bodywork = 0;
+  CarCustomizationCategory_Rims = 1;
+  CarCustomizationCategory_Compounds = 2;
+  CarCustomizationCategory_Parts = 3;
+}
+
+enum DriverMainStreetPartType {
+  DriverMainStreetPartType_Head = 0;
+  DriverMainStreetPartType_Torso = 1;
+  DriverMainStreetPartType_Legs = 2;
+  DriverMainStreetPartType_Feet = 3;
+  DriverMainStreetPartType_Helmet = 4;
+}
+
+enum DriverHeadAdditiveStreetPartType {
+  DriverHeadAdditiveStreetPartType_Hair = 0;
+  DriverHeadAdditiveStreetPartType_Jewelry = 1;
+  DriverHeadAdditiveStreetPartType_Glasses = 2;
+  DriverHeadAdditiveStreetPartType_Facial = 3;
+  DriverHeadAdditiveStreetPartType_Makeup = 4;
+}
+
+enum DriverHandsAdditiveStreetPartType {
+  DriverHandsAdditiveStreetPartType_Ring = 0;
+  DriverHandsAdditiveStreetPartType_Bracelet = 1;
+  DriverHandsAdditiveStreetPartType_Gloves = 2;
+}
+
+enum DriverTorsoAdditiveStreetPartType {
+  DriverTorsoAdditiveStreetPartType_Hands = 0;
+  DriverTorsoAdditiveStreetPartType_Necklace = 1;
+}
+
+enum DriverMainRacingPartType {
+  DriverMainRacingPartType_Head = 0;
+  DriverMainRacingPartType_Suit = 1;
+  DriverMainRacingPartType_Gloves = 2;
+  DriverMainRacingPartType_Shoes = 3;
+  DriverMainRacingPartType_Helmet = 4;
+}
+
+enum DriverAdditiveRacingPartType {
+  DriverAdditiveRacingPartType_Hans = 0;
+}
+
+enum DriverPartType {
+  DriverPartType_Street_Head = 0;
+  DriverPartType_Street_Torso = 1;
+  DriverPartType_Street_Legs = 2;
+  DriverPartType_Street_Feet = 4;
+  DriverPartType_Street_Hair = 5;
+  DriverPartType_Street_Jewelry = 6;
+  DriverPartType_Street_Glasses = 7;
+  DriverPartType_Street_Facial = 8;
+  DriverPartType_Street_Makeup = 9;
+  DriverPartType_Street_Ring = 10;
+  DriverPartType_Street_Bracelet = 11;
+  DriverPartType_Street_Gloves = 12;
+  DriverPartType_Street_Necklace = 13;
+  DriverPartType_Racing_Head = 100;
+  DriverPartType_Racing_Suit = 101;
+  DriverPartType_Racing_Gloves = 103;
+  DriverPartType_Racing_Shoes = 104;
+  DriverPartType_Racing_Helmet = 102;
+  DriverPartType_Racing_Hans = 105;
+}
+
+message MultilayerChannelCustomization {
+  ChannelCustomizationMode channel_customization_mode = 1;
+  bool allow_color_picker = 11;
+  bool allow_roughness_picker = 13;
+  bool allow_metalness_picker = 12;
+  bool allow_clear_coat_picker = 14;
+  bool allow_clear_coat_roughness_picker = 15;
+  bool allow_normal_intensity_picker = 16;
+  bool allow_emissive_color_picker = 17;
+  string inheritance_material_path = 20;
+  ChannelCustomizationEnum channel = 21;
+  bool inherit_color = 33;
+  bool inherit_roughness = 35;
+  bool inherit_metalness = 34;
+  bool inherit_clear_coat = 36;
+  bool inherit_clear_coat_roughness = 37;
+  bool inherit_normal_intensity = 38;
+  bool inherit_emissive_color = 39;
+}
+
+message SinglelayerChannelCustomization {
+  ChannelCustomizationMode channel_customization_mode = 1;
+  bool allow_color_picker = 11;
+  bool allow_opacity_picker = 12;
+  bool allow_emissive_color_picker = 13;
+  string inheritance_material_path = 20;
+  bool inherit_color = 32;
+  bool inherit_opacity = 33;
+  bool inherit_emissive_color = 34;
+}
+
+message CustomizableMaterial {
+  enum Key {
+    None = 0;
+    A = 1;
+    B = 2;
+    C = 3;
+    D = 4;
+    E = 5;
+    F = 6;
+    G = 7;
+    H = 8;
+    I = 9;
+    J = 10;
+  }
+  message Multilayer {
+    MultilayerChannelCustomization primary_channel = 1;
+    MultilayerChannelCustomization secondary_channel = 2;
+    MultilayerChannelCustomization tertiary_channel = 3;
+    repeated string oem_color_paths = 4;
+  }
+  message Singlelayer {
+    SinglelayerChannelCustomization channel = 1;
+    repeated string oem_color_paths = 2;
+  }
+  bool is_external = 202;
+  string slot = 1;
+  string description = 2;
+  string material_replacement_path = 3;
+  string display = 20;
+  string group = 200;
+  CustomizableMaterial.Key key = 13;
+  bool is_hidden = 201;
+  repeated CarLightingFunction car_lighting_functions = 21;
+  bool is_optional = 9;
+  bool is_light = 11;
+  Vector3Data light_color = 12;
+  oneof material {
+    CustomizableMaterial.Multilayer multilayer = 6;
+    CustomizableMaterial.Singlelayer singlelayer = 7;
+  }
+  reserved 4 to 4;
+  reserved 5 to 5;
+  reserved 10 to 10;
+}
+
+message DesignData {
+  string brand = 102;
+  string description = 2;
+  repeated CustomizableMaterial customizable_materials = 3;
+  reserved 4 to 4;
+}
+
+message PhysicsTyreCompoundGeneratorData {
+  PhysicsTyreCompound compound_type = 1;
+  string tyre_compound_generator_data = 2;
+}
+
+message TyreCompoundData {
+  TyreCompound tyre_compound = 1;
+  string tyre_textures_path = 2;
+  reserved 3 to 3;
+}
+
+message BrandData {
+  string brand = 1;
+  string nationality = 2;
+  int32 foundation_year = 3;
+  string logo_path = 4;
+  string icon_path = 5;
+}
+
+message TyreTexturesData {
+  string brand = 102;
+  string description = 2;
+  bool generic = 3;
+  string color_map_path = 5;
+  string normal_map_path = 6;
+  string ao_map_path = 7;
+  string clear_coat_normal_map_path = 8;
+  string color_map_blur_path = 9;
+  string normal_map_blur_path = 10;
+  string ao_map_blur_path = 11;
+  string clear_coat_normal_map_blur_path = 12;
+  reserved 4 to 4;
+}
+
+message TyreMeshData {
+  string description = 11;
+  float nominal_contact_width_mm = 2;
+  float nominal_sidewall_ratio = 3;
+  float nominal_diameter_in = 4;
+  float shadow_decal_scale_x_m = 5;
+  float shadow_decal_scale_z_m = 10;
+  float shadow_decal_position_y_m = 6;
+  string shadow_decal_texture_path = 8;
+  string mesh_path = 7;
+  reserved 9 to 9;
+  reserved 12 to 12;
+  reserved 13 to 13;
+}
+
+message RimMeshData {
+  string brand = 102;
+  string description = 11;
+  float nominal_diameter_in = 2;
+  float nominal_width_in = 3;
+  float nominal_offset_mm = 4;
+  string left_mesh_path = 5;
+  string right_mesh_path = 6;
+  string left_blur_mesh_path = 7;
+  string right_blur_mesh_path = 8;
+  repeated string compatible_tyre_meshes_paths = 9;
+  repeated string design_paths = 10;
+  repeated string physics_part_paths = 101;
+}
+
+message CarPartData {
+  message NoSpecialization {
+  }
+  message LightPart {
+    repeated CarActorData.PhysicalLight lights = 1;
+    CarActorData.LightsBatches lights_batches = 2;
+  }
+  message SuspensionPart {
+    TransformData actor_offset = 10;
+    TransformData transform_fl = 1;
+    TransformData transform_fr = 2;
+    TransformData transform_rl = 3;
+    TransformData transform_rr = 4;
+    int32 suspension_animation_fl = 21;
+    int32 suspension_animation_fr = 22;
+    int32 suspension_animation_rl = 23;
+    int32 suspension_animation_rr = 24;
+  }
+  message DigitalDashPart {
+    CarActorData.Display display = 1;
+    CarActorData.Leds leds = 2;
+  }
+  message AnalogDashPart {
+    string script_path = 3;
+    CarActorData.Leds leds = 2;
+  }
+  message LumirankPart {
+    enum InfoCycle {
+      LumirankPart_InfoCycle_Shortname = 0;
+      LumirankPart_InfoCycle_Position = 1;
+    }
+    message Rules {
+      message Color {
+        int32 category = 1;
+        Vector3Data color = 2;
+      }
+      Vector3Data default_color = 1;
+      float vip_blinking_on_s = 2;
+      float vip_blinking_off_s = 3;
+      float info_loop_s = 4;
+      repeated CarPartData.LumirankPart.InfoCycle info_cycle = 5;
+      repeated CarPartData.LumirankPart.Rules.Color category_colors = 6;
+    }
+    message Input {
+      string driver_shortname = 1;
+      int32 leaderboard_position = 2;
+      int32 category = 3;
+      bool is_vip = 4;
+    }
+    message Output {
+      string value = 1;
+      float intensity = 2;
+      Vector3Data color = 3;
+    }
+    int32 max_digits = 2;
+    float max_intensity = 3;
+    reserved 1 to 1;
+  }
+  message EnginePart {
+    string script_path = 1;
+  }
+  message TurboPart {
+    string script_path = 1;
+  }
+  message GearBoxPart {
+    enum ShifterBlendingType {
+      ShifterBlendingType_use_cardata = 0;
+      ShifterBlendingType_h_shifter = 1;
+      ShifterBlendingType_sequential_shifter = 2;
+      ShifterBlendingType_paddle_shifter = 3;
+    }
+    CarPartData.GearBoxPart.ShifterBlendingType shifter_blending_type = 1;
+  }
+  message ExhaustPart {
+    repeated CarParticleEmitterData car_particle_emitters = 1;
+  }
+  message CarLogicPartData {
+    string tuning_part_path = 1;
+    string damage_part_path = 3;
+    string movable_part_path = 5;
+    repeated AudioEventData car_audio_events = 4;
+    reserved 2 to 2;
+  }
+  string brand = 105;
+  string description = 2;
+  string note = 14;
+  CarPartType part_type = 3;
+  bool is_oem = 4;
+  string mesh_path = 5;
+  bool requires_multiply_second_ambient_occlusion = 17;
+  repeated string kits = 8;
+  repeated string design_paths = 7;
+  repeated string not_allowed_part_paths = 31;
+  repeated string not_compatible_rim_paths = 41;
+  string shadow_decal_texture_path = 50;
+  bool is_shadow_decal_replacement = 51;
+  float shadow_decal_intensity = 52;
+  float shadow_decal_ao_intensity = 553;
+  bool is_gforce_influenced = 200;
+  bool is_temperature_influenced = 201;
+  repeated CarPartData.CarLogicPartData logic_parts = 102;
+  oneof specialization {
+    CarPartData.NoSpecialization no_specialization = 53;
+    CarPartData.DigitalDashPart digital_dash = 54;
+    CarPartData.AnalogDashPart analog_dash = 55;
+    CarPartData.LumirankPart lumirank = 56;
+    CarPartData.LightPart light = 70;
+    CarPartData.SuspensionPart suspension = 80;
+    CarPartData.EnginePart engine = 81;
+    CarPartData.TurboPart turbo = 82;
+    CarPartData.GearBoxPart gearbox = 83;
+    CarPartData.ExhaustPart exhaust = 84;
+  }
+  reserved 6 to 6;
+  reserved 30 to 30;
+  reserved 40 to 40;
+  reserved 100 to 100;
+  reserved 101 to 101;
+}
+
+message CarKitData {
+  string brand = 105;
+  string description = 1;
+  repeated string car_part_paths = 10;
+}
+
+message MaterialFinish {
+  string key = 1;
+  string description = 2;
+  float roughness = 4;
+  float metalness = 3;
+  float clear_coat = 5;
+  float clear_coat_roughness = 6;
+  float normal_intensity = 7;
+  reserved 8 to 8;
+  reserved 9 to 9;
+  reserved 10 to 10;
+  reserved 11 to 11;
+}
+
+message OemMultilayerColorData {
+  string description = 2;
+  Vector3Data color = 3;
+  float roughness = 5;
+  float metalness = 4;
+  float clear_coat = 6;
+  float clear_coat_roughness = 7;
+  float normal_intensity = 8;
+  Vector3Data emissive_color = 10;
+  bool ignore_material = 9;
+}
+
+message OemSinglelayerColorData {
+  string description = 2;
+  Vector3Data color = 3;
+  float opacity = 4;
+  Vector3Data emissive_color = 5;
+  bool ignore_material = 9;
+  reserved 6 to 6;
+}
+
+message GraphicsCompoundData {
+  TyreCompound tyre_compound = 1;
+  string override_tyre_textures_path = 2;
+}
+
+message FinalCompoundData {
+  TyreCompound tyre_compound = 1;
+  string front_tyre_data_path = 2;
+  string rear_tyre_data_paths = 3;
+}
+
+message CompatibleTyresData {
+  repeated GraphicsCompoundData graphic_compounds = 3;
+  repeated FinalCompoundData physic_compounds = 2;
+  reserved 1 to 1;
+}
+
+message CompatibleRimData {
+  string front_rim_mesh_path = 1;
+  float front_offset_m = 2;
+  repeated string front_tyre_mesh_paths = 3;
+  string rear_rim_mesh_path = 4;
+  float rear_offset_m = 5;
+  repeated string rear_tyre_mesh_paths = 6;
+  string compatible_tyre_compounds = 7;
+  CarActorData.ShowroomPreviewData showroom_data = 10;
+}
+
+message CompatiblePartData {
+  enum AttachmentType {
+    AttachmentType_Replacement = 0;
+    AttachmentType_Additive = 1;
+  }
+  message CarAnimation {
+    CarAnimationType car_animation_type = 1;
+    GenericRendererAnimation animation = 2;
+  }
+  message OptionalCarAnimation {
+    GenericRendererOptionalAnimation animation = 3;
+    reserved 1 to 1;
+    reserved 2 to 2;
+  }
+  message DriverAnimation {
+    DriverAnimationType driver_animation_type = 1;
+    GenericRendererAnimation animation = 2;
+    reserved 3 to 3;
+  }
+  message OptionalDriverAnimation {
+    GenericRendererOptionalAnimation animation = 3;
+    reserved 1 to 1;
+    reserved 2 to 2;
+  }
+  string car_part_path = 1;
+  CompatiblePartData.AttachmentType attachment_type = 2;
+  string attachment_bone = 3;
+  TransformData attachment_relative_transform = 5;
+  CarActorData.ShowroomPreviewData showroom_data = 6;
+  repeated CompatiblePartData.CarAnimation car_animation_override = 10;
+  repeated CompatiblePartData.OptionalCarAnimation optional_car_animation_override = 11;
+  repeated CompatiblePartData.DriverAnimation driver_animation_override = 12;
+  repeated CompatiblePartData.OptionalDriverAnimation optional_driver_animation_override = 13;
+  reserved 4 to 4;
+  reserved 14 to 14;
+  reserved 15 to 15;
+}
+
+message CarDesignData {
+  string design_path = 1;
+  repeated string compatible_rim_paths = 2;
+}
+
+message MultilayerChannelCustomizationState {
+  string oem_color_path = 10;
+  Vector3Data color = 1;
+  float roughness = 3;
+  float metalness = 2;
+  float clear_coat = 4;
+  float clear_coat_roughness = 5;
+  float normal_intensity = 6;
+  Vector3Data emissive_color = 20;
+  string channel_preset_path = 31;
+  reserved 30 to 30;
+}
+
+message MultilayerMaterialCustomizationState {
+  string material_replacement_path = 1;
+  MultilayerChannelCustomizationState primary_channel_state = 2;
+  MultilayerChannelCustomizationState secondary_channel_state = 3;
+  MultilayerChannelCustomizationState tertiary_channel_state = 4;
+  bool is_optional_enabled = 5;
+  bool is_locked = 6;
+}
+
+message SinglelayerChannelCustomizationState {
+  string oem_color_path = 10;
+  Vector3Data color = 1;
+  float opacity = 2;
+  Vector3Data emissive_color = 20;
+}
+
+message SinglelayerMaterialCustomizationState {
+  string material_replacement_path = 1;
+  SinglelayerChannelCustomizationState channel_state = 2;
+  bool is_optional_enabled = 3;
+  bool is_locked = 4;
+}
+
+message CarPartCustomizationState {
+  string part = 1;
+  string part_design = 2;
+}
+
+message MechanicalCarPresetData {
+  string brand = 1;
+  string description = 2;
+  string note = 3;
+  string display_text_path = 13;
+  bool is_oem = 4;
+  string compatible_rim = 5;
+  bool has_exclusive_rim = 6;
+  TyreCompound tyre_compound = 7;
+  bool requires_multiply_second_ambient_occlusion = 17;
+  repeated int32 ignored_performance_modes = 15;
+  repeated string visual_preset_paths = 8;
+  repeated string compatible_part_paths = 9;
+  repeated string not_compatible_part_paths = 11;
+  repeated string forced_compatible_part_paths = 10;
+  repeated string not_compatible_rim_paths = 16;
+  DriverModelType driver_model_type = 18;
+  CarSpecsData car_specs = 19;
+  reserved 12 to 12;
+  reserved 14 to 14;
+}
+
+message NumberDecalIndexes {
+  int32 front_a = 1;
+  int32 front_b = 2;
+  int32 door_l = 3;
+  int32 door_r = 4;
+  int32 roof = 5;
+  int32 rear_a = 6;
+  int32 rear_b = 7;
+}
+
+message VisualCarPresetData {
+  string brand = 1;
+  string description = 2;
+  string note = 3;
+  bool is_ingame_customizable = 4;
+  bool is_externally_customizable = 19;
+  string car_design_path = 5;
+  repeated string rim_design_paths = 6;
+  repeated string tyre_texture_path = 17;
+  repeated MultilayerMaterialCustomizationState multilayer_material_states = 8;
+  repeated SinglelayerMaterialCustomizationState singlelayer_material_states = 9;
+  repeated CarPartCustomizationState part_states = 10;
+  bool is_player_only = 11;
+  string driver_final_state = 12;
+  int32 car_number = 13;
+  int32 number_padding = 14;
+  NumberDecalIndexes number_decal_indexes = 15;
+  bool are_number_decals_locked = 18;
+  reserved 7 to 7;
+  reserved 20 to 20;
+}
+
+message CarCustomizationData {
+  message Global {
+    CarFinalStateData final_state = 100;
+    map<string, MaterialFinish> channel_presets = 1;
+    repeated string channel_presets_list = 7;
+    OemMultilayerColorData default_multilayer_channel = 2;
+    OemSinglelayerColorData default_singlelayer_channel = 3;
+    map<string, MechanicalCarPresetData> mechanicals = 4;
+    repeated string sorted_mechanical_presets = 5;
+    map<int32, string> tyres_textures = 9;
+    CarActorData.Customization car_actor_data = 6;
+    string car_actor_path = 8;
+    CarActorData.NumberDecalPositions number_decal_positions = 52;
+  }
+  message Set {
+    message Multilayer {
+      string group = 10;
+      int32 selected_channel = 1;
+      MultilayerMaterialCustomizationState state = 2;
+      MultilayerChannelCustomizationState oem_primary_channel_state = 20;
+      MultilayerChannelCustomizationState oem_secondary_channel_state = 30;
+      MultilayerChannelCustomizationState oem_tertiary_channel_state = 40;
+      MultilayerChannelCustomizationState picker_primary_channel_state = 21;
+      MultilayerChannelCustomizationState picker_secondary_channel_state = 31;
+      MultilayerChannelCustomizationState picker_tertiary_channel_state = 41;
+      CustomizableMaterial original = 3;
+      bool is_enabled = 4;
+    }
+    message Singlelayer {
+      string group = 10;
+      SinglelayerMaterialCustomizationState state = 1;
+      SinglelayerChannelCustomizationState oem_channel_state = 20;
+      SinglelayerChannelCustomizationState picker_channel_state = 21;
+      CustomizableMaterial original = 3;
+      bool is_enabled = 4;
+    }
+    int32 selected_multilayer_material_state = 1;
+    repeated CarCustomizationData.Set.Multilayer multilayer_materials = 3;
+    int32 selected_singlelayer_material_state = 21;
+    repeated CarCustomizationData.Set.Singlelayer singlelayer_materials = 10;
+  }
+  message Part {
+    string selected_design = 1;
+    CarCustomizationData.Set customization_set = 3;
+    bool is_installed = 4;
+    bool is_forced = 5;
+    bool is_not_allowed = 6;
+  }
+  CarCustomizationData.Global global = 500;
+  map<string, OemMultilayerColorData> multilayer_colors = 1000;
+  map<string, OemSinglelayerColorData> singlelayer_colors = 1001;
+  map<string, CarPartData> car_parts = 1002;
+  map<string, CarDesignData> car_designs = 1003;
+  map<string, DesignData> designs = 1004;
+  map<string, CompatiblePartData> compatible_parts = 1005;
+  map<string, VisualCarPresetData> visuals = 1006;
+  map<string, CompatibleRimData> compatible_rims = 1007;
+  map<string, RimMeshData> rims = 1008;
+  map<string, CarKitData> kits = 1009;
+  map<string, CompatibleTyresData> compatible_tyres = 1011;
+  map<string, TyreMeshData> tyres = 1012;
+  repeated string oem_compatible_rims = 2000;
+  repeated string aftermarket_compatible_rims = 2001;
+  repeated string oem_compatible_parts = 2002;
+  repeated string aftermarket_compatible_parts = 2003;
+  repeated string sorted_oem_rims = 2005;
+  repeated string sorted_oem_parts = 2006;
+  repeated string sorted_aftermarket_rims = 2008;
+  repeated string sorted_aftermarket_parts = 2009;
+  CarCustomizationCategory selected_category = 26;
+  string selected_mechanical_path = 1;
+  string selected_visual_path = 4;
+  CarCustomizationData.Set car_design_customization_set = 7;
+  string selected_compatible_rim_path = 40;
+  string selected_rim_design_path = 10;
+  CarCustomizationData.Set rim_customization_set = 12;
+  repeated TyreCompound tyre_compounds = 31;
+  repeated string override_tyre_compound_paths = 34;
+  TyreCompound selected_tyre_compound = 32;
+  string selected_override_tyre_compound_path = 35;
+  string selected_compatible_part_path = 20;
+  map<string, CarCustomizationData.Part> part_sets = 25;
+  int32 car_number = 33;
+  NumberDecalIndexes selected_number_decal_indexes = 37;
+  PGUID livery_linker = 38;
+  reserved 30 to 30;
+}
+
+message CarFinalStates {
+  string guid = 100;
+  PGUID pguid = 101;
+  CarPartType type = 102;
+  string path = 1;
+  string design = 2;
+  map<string, MultilayerMaterialCustomizationState> multilayer_states = 3;
+  map<string, SinglelayerMaterialCustomizationState> singlelayer_states = 4;
+}
+
+message CarFinalStateData {
+  string car_data = 1;
+  string actor_data = 2;
+  CarFinalStates body = 10;
+  CarFinalStates rims = 20;
+  repeated CarFinalStates parts = 30;
+  map<string, string> custom_textures = 50;
+  float performance_index = 70;
+  int32 ballast = 71;
+  float restrictor = 72;
+  int32 default_car_number = 74;
+  NumberDecalIndexes number_decal_indexes = 51;
+  PGUID livery_linker = 52;
+  reserved 40 to 40;
+  reserved 60 to 60;
+  reserved 73 to 73;
+}
+
+message ExternalLiveryData {
+  message ExternalSlot {
+    message Base {
+      string base_color_replacement_texture_path = 1;
+      string roughness_replacement_texture_path = 2;
+      string metalness_replacement_texture_path = 3;
+      string clearcoat_replacement_texture_path = 4;
+      string clearcoat_roughness_replacement_texture_path = 5;
+      string emissive_replacement_texture_path = 6;
+      Vector3Data emissive_color = 7;
+      float emissive_intensity = 8;
+    }
+    message ColorChannel {
+      Vector3Data base_color = 2;
+      float roughness = 3;
+      float metalness = 4;
+      float clearcoat = 5;
+      float clearcoat_roughness = 6;
+      float normal_scale = 7;
+      float clearcoat_normal_scale = 8;
+      reserved 9 to 9;
+    }
+    string batch_name = 1;
+    ExternalLiveryData.ExternalSlot.Base base = 2;
+    ExternalLiveryData.ExternalSlot.ColorChannel red = 3;
+    ExternalLiveryData.ExternalSlot.ColorChannel green = 4;
+    ExternalLiveryData.ExternalSlot.ColorChannel blue = 5;
+    string splat_map_replacement_texture_path = 8;
+  }
+  PGUID livery_linker = 3;
+  string car_guid = 1;
+  repeated ExternalLiveryData.ExternalSlot materials = 2;
+}
+
+message FinalStateExport {
+  repeated CarFinalStateData finals_states = 1;
+}
+
+message Consumable_Body {
+  PGUID pguid = 100;
+  int32 front_damage = 1;
+  int32 rear_damage = 2;
+  int32 left_side_damage = 3;
+  int32 right_side_damage = 4;
+  int32 floor_damage = 5;
+  float wear = 10;
+  float dirt = 11;
+  uint32 hundred_meters = 20;
+  uint32 time_s = 30;
+  float fuel = 40;
+}
+
+message Consumable_Generic {
+  PGUID pguid = 100;
+  CarPartType type = 101;
+  float wear_friction = 1;
+  float wear_fatigue = 2;
+  float wear_creep = 3;
+  uint32 hundred_meters = 10;
+  uint32 time_s = 11;
+}
+
+message Consumable_Tyreset {
+  message Status {
+    float tread_mm = 1;
+    float flat_spot = 2;
+    float blister = 3;
+    float grain = 4;
+    float dirt = 5;
+  }
+  PGUID pguid = 100;
+  repeated Consumable_Tyreset.Status status = 1;
+  uint32 hundred_meters = 2;
+  uint32 time_s = 3;
+}
+
+message CarConsumableStatus {
+  Consumable_Body body = 1;
+  repeated Consumable_Generic generics = 2;
+  Consumable_Tyreset tyreset = 3;
+}
+
+message UpdateConsumable {
+  google.protobuf.Any msg = 1;
+}
+
+message DriverPartData {
+  enum AttachmentType {
+    AttachmentType_Replacement = 0;
+    AttachmentType_Additive = 1;
+  }
+  string brand = 100;
+  string description = 1;
+  string note = 2;
+  DriverPartType part_type = 3;
+  bool is_dress = 4;
+  string mesh_path = 5;
+  repeated string kits = 6;
+  repeated string design_paths = 7;
+  repeated string not_allowed_part_paths = 8;
+  DriverPartData.AttachmentType attachment_type = 9;
+  string attachment_bone = 10;
+}
+
+message DriverKitData {
+  string brand = 1;
+  string description = 12;
+  repeated string driver_part_paths = 3;
+}
+
+message DriverPresetData {
+  string description = 2;
+  string note = 3;
+  bool is_dress = 4;
+  repeated string visual_preset_paths = 8;
+  repeated string driver_part_paths = 9;
+}
+
+message DriverPartCustomizationState {
+  string part = 1;
+  string part_design = 2;
+}
+
+message VisualDriverPresetData {
+  string brand = 1;
+  string description = 2;
+  string note = 3;
+  bool is_ingame_customizable = 4;
+  bool is_externally_customizable = 19;
+  repeated MultilayerMaterialCustomizationState multilayer_material_states = 8;
+  repeated SinglelayerMaterialCustomizationState singlelayer_material_states = 9;
+  repeated DriverPartCustomizationState part_states = 10;
+}
+
+message DriverFinalStates {
+  uint32 type = 100;
+  string path = 1;
+  string design = 2;
+  map<string, MultilayerMaterialCustomizationState> multilayer_states = 3;
+  map<string, SinglelayerMaterialCustomizationState> singlelayer_states = 4;
+}
+
+message DriverFinalStateData {
+  oneof driver {
+    DriverFinalState_StreetData street = 100;
+    DriverFinalState_RacingData racing = 200;
+  }
+  reserved 50 to 50;
+  reserved 10 to 10;
+  reserved 11 to 11;
+  reserved 12 to 12;
+  reserved 13 to 13;
+  reserved 15 to 15;
+  reserved 20 to 20;
+  reserved 21 to 21;
+  reserved 25 to 25;
+}
+
+message DriverFinalState_StreetData {
+  repeated DriverFinalStates main_street_parts = 10;
+  repeated DriverFinalStates head_additive_street_parts = 11;
+  repeated DriverFinalStates hands_additive_street_parts = 12;
+  repeated DriverFinalStates torso_additive_street_parts = 13;
+  map<string, string> steet_custom_textures = 15;
+}
+
+message DriverFinalState_RacingData {
+  repeated DriverFinalStates main_racing_parts = 20;
+  repeated DriverFinalStates additive_racing_parts = 21;
+  map<string, string> racing_custom_textures = 25;
+}
+
+message DriverFinalStateEditorPartData {
+  message Material {
+    string slot = 1;
+    string material = 2;
+    bool is_singlelayer = 3;
+  }
+  string mesh = 1;
+  repeated DriverFinalStateEditorPartData.Material materials = 2;
+}
+
+message DriverFinalStateEditorData {
+  int32 driver_type = 1;
+  map<int32, DriverFinalStateEditorPartData> parts = 2;
+}

@@ -46,6 +46,8 @@ global gTargetLanguageCode := "en"
 
 global gLocalizationCallbacks := []
 
+global gTargetUnits := translate("Standard")
+
 global gMassUnit := "Kilogram"
 global gTemperatureUnit := "Celcius"
 global gPressureUnit := "PSI"
@@ -376,23 +378,54 @@ internalTimeValue(timeFormat, time, arguments*) {
 	}
 }
 
-initializeLocalization() {
-	global gMassUnit, gTemperatureUnit, gPressureUnit, gVolumeUnit, gLengthUnit, gSpeedUnit, gNumberFormat, gTimeFormat
+initializeLocalization(from := "File") {
+	global gTargetUnits, gMassUnit, gTemperatureUnit, gPressureUnit
+	global gVolumeUnit, gLengthUnit, gSpeedUnit, gNumberFormat, gTimeFormat
 
-	local configuration := readMultiMap(kSimulatorConfigurationFile)
+	local configuration, index, targetUnits
 
-	gMassUnit := getMultiMapValue(configuration, "Localization", "MassUnit", "Kilogram")
-	gTemperatureUnit := getMultiMapValue(configuration, "Localization", "TemperatureUnit", "Celsius")
-	gPressureUnit := getMultiMapValue(configuration, "Localization", "PressureUnit", "PSI")
-	gVolumeUnit := getMultiMapValue(configuration, "Localization", "VolumeUnit", "Liter")
-	gLengthUnit := getMultiMapValue(configuration, "Localization", "LengthUnit", "Meter")
-	gSpeedUnit := getMultiMapValue(configuration, "Localization", "SpeedUnit", "km/h")
+	static startup := true
 
-	gNumberFormat := getMultiMapValue(configuration, "Localization", "NumberFormat", "#.##")
-	gTimeFormat := getMultiMapValue(configuration, "Localization", "TimeFormat", "H:M:S.##")
+	loadUnits(units) {
+		gTargetUnits := (units.Has("Units") ? units["Units"] : translate("Standard"))
 
-	if (gVolumeUnit = "Gallon")
-		gVolumeUnit := "Gallon (GB)"
+		gMassUnit := (units.Has("MassUnit") ? units["MassUnit"] : "Kilogram")
+		gTemperatureUnit := (units.Has("TemperatureUnit") ? units["TemperatureUnit"] : "Celsius")
+		gPressureUnit := (units.Has("PressureUnit") ? units["PressureUnit"] : "PSI")
+		gVolumeUnit := (units.Has("VolumeUnit") ? units["VolumeUnit"] : "Liter")
+		gLengthUnit := (units.Has("LengthUnit") ? units["LengthUnit"] : "Meter")
+		gSpeedUnit := (units.Has("SpeedUnit") ? units["SpeedUnit"] : "km/h")
+
+		gNumberFormat := (units.Has("NumberFormat") ? units["NumberFormat"] : "#.##")
+		gTimeFormat := (units.Has("TimeFormat") ? units["TimeFormat"] : "H:M:S.##")
+
+		if (gVolumeUnit = "Gallon")
+			gVolumeUnit := "Gallon (GB)"
+	}
+
+	if (from = "Memory")
+		configuration := kSimulatorConfiguration
+	else if (from = "File")
+		configuration := readMultiMap(kSimulatorConfigurationFile)
+
+	loadUnits(getMultiMapValues(configuration, "Localization"))
+
+	if startup {
+		index := inList(A_Args, "-Startup")
+
+		if index {
+			targetUnits := getMultiMapValue(readMultiMap(A_Args[index + 1]), "Session", "Units", kUndefined)
+
+			if (targetUnits != kUndefined) {
+				configuration := getMultiMapValues(readMultiMap(kUserConfigDirectory . "Units.ini"), targetUnits, false)
+
+				if configuration
+					loadUnits(configuration)
+			}
+		}
+
+		startup := false
+	}
 }
 
 
@@ -896,9 +929,42 @@ withFormat(type, format, function, arguments*) {
 	}
 }
 
+chooseUnits(units, temporary := false) {
+	local configuration := readMultiMap(kUserConfigDirectory . "Units.ini")
+	local unitsSet
+
+	unitsSet := getMultiMapValues(readMultiMap(kUserConfigDirectory . "Units.ini"), units, false)
+
+	if unitsSet {
+		if !temporary {
+			configuration := readMultiMap(kSimulatorConfigurationFile)
+
+			setMultiMapValues(configuration, "Localization", unitsSet)
+			setMultiMapValue(configuration, "Localization", "Units", units)
+
+			writeMultiMap(kSimulatorConfigurationFile, configuration)
+		}
+
+		setMultiMapValues(kSimulatorConfiguration, "Localization", unitsSet)
+		setMultiMapValue(kSimulatorConfiguration, "Localization", "Units", units)
+	}
+
+	initializeLocalization("Memory")
+}
+
+allUnits() {
+	local units := getKeys(readMultiMap(kUserConfigDirectory . "Units.ini"))
+
+	return ((units.Length > 0) ? units : [translate("Standard")])
+}
+
+currentUnits() {
+	return gTargetUnits
+}
+
 
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Initialization Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-initializeLocalization()
+initializeLocalization("File")

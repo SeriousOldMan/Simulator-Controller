@@ -1,0 +1,208 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "LogicScene.proto";
+import "PenaltySystem.proto";
+import "Scene.proto";
+import "Gameplay.proto";
+
+message InstantRace {
+  enum SessionPhase {
+    Waiting_For_Players = 0;
+    Start_Spawn_On_Position = 1;
+    Start_Countdown_No_Lights = 2;
+    Start_Countdown_Lights_On = 3;
+    Start_Countdown_Lights_Off = 4;
+    RollingStart_Start_Formation = 11;
+    RollingStart_Change_Line = 12;
+    RollingStart_Start_Green_Flag = 13;
+    RollingStart_End_Green_Flag = 14;
+    Session = 50;
+    Overtime_Waiting_For_Leader = 60;
+    Overtime_Waiting_For_Others = 70;
+    Waiting_For_Ai = 71;
+    Waiting_For_PitBox = 72;
+    Ended = 80;
+    Request_Quit = 90;
+  }
+  message SessionPhasePair {
+    InstantRace.SessionPhase phase = 1;
+    TranslatedTimestamp end_timestamp = 2;
+    bool is_set = 4;
+  }
+  message SessionPhaseData {
+    repeated InstantRace.SessionPhasePair session_phase_pairs = 1;
+    InstantRace.SessionPhase current_phase = 2;
+    double current_gamemode_time = 3;
+    double start_gamemode_time = 4;
+  }
+  message State {
+    message Game {
+      message ReadyToStartMap {
+        message Item {
+          PGUID car_id = 1;
+          bool value = 2;
+        }
+        repeated InstantRace.State.Game.ReadyToStartMap.Item items = 1;
+      }
+      message CrossedSafetCarLine {
+        message Item {
+          PGUID car_id = 1;
+          bool value = 2;
+        }
+        repeated InstantRace.State.Game.CrossedSafetCarLine.Item items = 1;
+      }
+      message ReadyToNextMap {
+        message Item {
+          PGUID car_id = 1;
+          bool value = 2;
+        }
+        repeated InstantRace.State.Game.ReadyToNextMap.Item items = 1;
+      }
+      message TrackStatus {
+        enum PitSemaphore {
+          Off = 0;
+          Green = 1;
+          Red = 2;
+          Yellow = 3;
+        }
+        InstantRace.State.Game.TrackStatus.PitSemaphore pitexit_semaphore = 1;
+      }
+      message MandatoryPistops {
+        message Item {
+          PGUID car_id = 1;
+          repeated bool done = 2;
+        }
+        repeated InstantRace.State.Game.MandatoryPistops.Item items = 1;
+      }
+      PlatformRaceLeaderboard leaderboard = 1;
+      InstantRace.SessionPhaseData session_data = 2;
+      InstantRace.State.Game.ReadyToStartMap ready_to_start_map = 3;
+      PlatformRacePenaltyCollection penalty_collection = 4;
+      UnlockCarTime unlock_car_time = 5;
+      double start_game_mode_time = 7;
+      int32 elimination_remain = 8;
+      RealtimeLeaderboard realtime_leaderboard = 9;
+      RealtimePositions realtime_positions = 10;
+      InstantRace.State.Game.CrossedSafetCarLine crossed_safety_car_map = 11;
+      InstantRace.State.Game.TrackStatus track_status = 12;
+      InstantRace.State.Game.ReadyToNextMap ready_to_next_map = 13;
+      InstantRace.State.Game.MandatoryPistops mandatory_pistops = 15;
+      string name = 1000;
+      float finish_line_npos = 14;
+    }
+    message GameCar {
+      message Investigations {
+        repeated InvestigationType types = 1;
+      }
+      InstantRace.State.GameCar.Investigations investigations = 1;
+      float last_split_timestamp = 2;
+      float time_to_recover = 3;
+    }
+  }
+  message Specialization {
+    enum EndReplayType {
+      None = 0;
+      Standard = 1;
+      Highlights = 2;
+      Delayed = 3;
+    }
+    message Base {
+      enum StartMode {
+        Grid = 0;
+        RollingStartSingleLine = 1;
+        RollingStartDoubleLine = 2;
+        RollingStartSingleLineDoubleLine = 3;
+        RollingStartDoubleLineSingleLine = 4;
+      }
+      uint32 countdown_time_ms = 27;
+      uint32 countdown_random_min_time_ms = 28;
+      uint32 countdown_random_max_time_ms = 29;
+      uint32 session_duration_ms = 4;
+      uint32 session_laps = 5;
+      uint32 session_minimum_car_count = 7;
+      uint32 maximum_waiting_for_players_duration_ms = 8;
+      uint32 minimum_waiting_for_players_duration_ms = 9;
+      uint32 maximum_session_waiting_for_leader_duration_ms = 15;
+      uint32 maximum_session_overtime_duration_ms = 10;
+      uint32 maximum_go_to_box_duration_ms = 14;
+      uint32 maximum_session_overtime_before_next_session = 20;
+      InstantRace.Specialization.Base.StartMode start_mode = 40;
+      uint32 starting_position = 41;
+      bool waiting_for_players = 42;
+      bool intro_music = 16;
+      bool end_music = 17;
+      InstantRace.Specialization.EndReplayType end_replay_type = 18;
+      reserved 11 to 11;
+      reserved 12 to 12;
+      reserved 13 to 13;
+    }
+    message MandatoryPitstop {
+      message Range {
+        int32 start_ms = 1;
+        int32 end_ms = 2;
+      }
+      repeated InstantRace.Specialization.MandatoryPitstop.Range ranges = 1;
+      bool requires_tyre_change = 2;
+      bool requires_refuelling = 3;
+    }
+    message EliminationRule {
+      enum EliminationType {
+        None = 0;
+        By_Laps_Leader = 1;
+        By_Laps_Last = 2;
+        By_Time = 3;
+      }
+      InstantRace.Specialization.EliminationRule.EliminationType elimination_type = 1;
+      uint32 elimination_begin = 2;
+      uint32 elimination_frequency = 3;
+    }
+    message LapTimingAtSessionStart {
+    }
+    message Rule {
+      oneof type {
+        InstantRace.Specialization.EliminationRule elimination_rule = 54;
+        InstantRace.Specialization.LapTimingAtSessionStart lap_timing_at_session_start = 55;
+        InstantRace.Specialization.MandatoryPitstop mandatory_pitstop = 56;
+      }
+      reserved 51 to 51;
+      reserved 52 to 52;
+    }
+    InstantRace.Specialization.Base base = 200;
+    string base_file = 201;
+    DataSourceType base_source = 202;
+    PenaltyTransformations penalty_transformations = 21;
+    string penalty_transformations_file = 23;
+    DataSourceType penalty_transformations_source = 25;
+    PenaltyInvestigations penalty_investigations = 22;
+    string penalty_investigations_file = 24;
+    DataSourceType penalty_investigations_source = 26;
+    repeated InstantRace.Specialization.Rule rules = 100;
+    repeated string allowed_car_table_keys = 30;
+    repeated string allowed_car_keys = 31;
+    reserved 27 to 27;
+    reserved 28 to 28;
+    reserved 29 to 29;
+    reserved 4 to 4;
+    reserved 5 to 5;
+    reserved 7 to 7;
+    reserved 8 to 8;
+    reserved 9 to 9;
+    reserved 10 to 10;
+    reserved 1 to 1;
+    reserved 2 to 2;
+    reserved 20 to 20;
+  }
+}
+
+message InstantRaceUiData {
+  bool hide_lap_panel = 1;
+  bool hide_gamemode_panel = 2;
+  bool hide_result_panel = 3;
+  bool hide_realtime_panel = 4;
+  bool hide_session_panel = 5;
+  bool hide_starting_lights_panel = 6;
+  bool hide_ready_panel = 7;
+  bool hide_control_panel = 8;
+  bool hide_leaderboard_panel = 10;
+}

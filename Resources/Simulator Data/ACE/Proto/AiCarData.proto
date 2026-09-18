@@ -1,0 +1,188 @@
+syntax = "proto3";
+
+import "Math.proto";
+import "google/protobuf/timestamp.proto";
+
+enum AutoEvalDriver_State {
+  AutoEvalDriver_State_Undefined = 0;
+  AutoEvalDriver_State_Waiting_For_Stance = 1;
+  AutoEvalDriver_State_Waiting_For_Launch = 2;
+  AutoEvalDriver_State_Test_Running = 3;
+  AutoEvalDriver_State_Waiting_For_Save = 4;
+  AutoEvalDriver_State_Finished = 5;
+  AutoEvalDriver_State_TestResetRequest = 6;
+  AutoEvalDriver_State_NextCarRequest = 7;
+  AutoEvalDriver_State_Success = 10;
+  AutoEvalDriver_State_Error_Could_Not_Load = 100;
+  AutoEvalDriver_State_Error_Could_Not_Launch = 101;
+  AutoEvalDriver_State_Error_Could_Not_Drive = 102;
+  AutoEvalDriver_State_Error_Could_Not_Save = 103;
+}
+
+message AiGears {
+  int32 upshift_rpm = 1;
+  int32 downshift_rpm = 2;
+  float slipThreshold = 3;
+  float gasCutOffTime = 4;
+  int32 redline_rpm = 5;
+  bool is_forced_automatic = 6;
+  bool use_evo_autoshifter = 7;
+}
+
+message AiPedals {
+  float gas_gain = 1;
+  float brake_hint = 2;
+  float trail_hint = 3;
+}
+
+message AiLookAhead {
+  float base = 1;
+  float speed_gain = 2;
+  float gas_brake_lookaahead = 3;
+  float steer_min_lookahead = 4;
+}
+
+message AiSteer {
+  float steer_gain = 1;
+  float underSteer_hint = 2;
+  float countersteer_damping = 3;
+  float predictive_steering = 4;
+  float pid_steer_gain = 5;
+  float steer_speed = 6;
+  float steer_min_lookahead = 7;
+  float lateral_offset_converge_speed_max = 8;
+}
+
+message AiAccelerationData {
+  float acceleration_g_ = 1;
+  float tyre_slip_max = 2;
+}
+
+message AiAccelerationLookupDatapoint {
+  float time_ms = 1;
+  float velocity_ms = 2;
+  float acceleration_g = 3;
+  int32 gear = 4;
+  int32 rpm = 5;
+  float drivetrain_hp = 6;
+  float drag = 7;
+  float rolling_resistance = 8;
+  float energy_source_per_second = 9;
+}
+
+message AiPhysicsHints {
+  float aero_hint = 1;
+  float tyres_hint = 3;
+  AiAccelerationData lateral_G_lowspeed_plateau_start = 4;
+  AiAccelerationData lateral_G_lowspeed_plateau_end = 5;
+  AiAccelerationData lateral_G_highspeed_plateau_start = 6;
+  AiAccelerationData lateral_G_highspeed_plateau_end = 7;
+  float topspeed_kmh = 8;
+  float topspeed_drivetrain_hp = 9;
+  float acceleration_G_forward = 10;
+  float acceleration_G_braking = 11;
+  repeated AiAccelerationLookupDatapoint acceleration_lookup_table = 12;
+}
+
+message AiEvoTrackControlpointBasedAdjustment {
+  int32 controlpoint_type = 1;
+  float value = 2;
+}
+
+message AiEvoAdjustments {
+  float pid_steer_gain_adjustment = 1;
+  float lookahead_multiplier_adjustment = 2;
+}
+
+message AiCarData {
+  enum EvaluationSequence {
+    Undefined = 0;
+    Reset_Car = 1;
+    GetStartingPosition = 2;
+    Shifting_Points_Start_Launch = 10;
+    Shifting_Points_Start_Settle = 11;
+    Shifting_Points_Determine_Redline = 12;
+    Shifting_Points_Determine_Redline_Settle = 13;
+    Shifting_Points_Determine_Upshifts = 14;
+    Shifting_Points_Determine_Topspeed = 15;
+    Shifting_Points_Determine_Downshifts = 16;
+    Lateral_G_Lowspeed_To_Target_Speed = 20;
+    Lateral_G_Lowspeed_Measurement = 21;
+    Lateral_G_Highspeed_To_Target_Speed = 22;
+    Lateral_G_Highspeed_Measurement = 23;
+    Lateral_G_Cooldown = 24;
+    Acceleration_Test_To_Target_Low_Speed = 30;
+    Acceleration_Acceleration_Test = 31;
+    Acceleration_Braking_Test = 32;
+    End_SaveAiCarData = 100;
+    Exit_Sequence = 101;
+    Exited = 102;
+  }
+  message SequenceResult {
+    AiCarData.EvaluationSequence sequence_type = 1;
+    int32 started_ms = 2;
+    int32 finished_ms = 3;
+    bool was_skipped = 4;
+    string error_message = 5;
+    string data_label = 6;
+  }
+  message TestResult {
+    string physicsGuid = 1;
+    string car_model_path = 2;
+    AiCarData current_ai_car_data = 3;
+    string error_message = 4;
+    repeated AiCarData.SequenceResult sequences = 5;
+  }
+  AiGears gears = 1;
+  AiPedals pedals = 2;
+  AiLookAhead lookahead = 3;
+  AiSteer steer = 4;
+  AiPhysicsHints physics_hints = 5;
+  float ultra_grip = 6;
+  float wing_variation = 9;
+  float hog_sc = 12;
+  int32 version = 10;
+  AiEvoAdjustments evo_adjustments = 14;
+  CurveDataEx acc_forward_curve = 15;
+  CurveDataEx acc_braking_curve = 16;
+  CurveDataEx acc_lateral_curve = 17;
+  google.protobuf.Timestamp updated_on = 18;
+}
+
+message VehicleAnalysisPacejkaData {
+  string car_model_path = 1;
+  string date = 2;
+  string tyre_compound_front = 5;
+  string tyre_compound_rear = 6;
+  float lat_g_peak = 7;
+  float peak_at_slipangle = 8;
+  float peak_at_ndSlip = 9;
+  float peak_at_steering_angle = 10;
+  int32 kmh_from = 11;
+  int32 kmh_to = 12;
+  string curve = 13;
+  float steering_angle_from = 14;
+  float steering_angle_to = 15;
+}
+
+message AutoEvalDriver {
+  message StateUpdate {
+    string physicsGuid = 1;
+    string car_model_path = 2;
+    AutoEvalDriver_State state = 3;
+    AiCarData currentAiCarData = 4;
+    AiCarData previousAiCarData = 5;
+  }
+  message SequenceUpdate {
+    string physicsGuid = 1;
+    string car_model_path = 2;
+    AiCarData.SequenceResult sequence_result = 3;
+    AiCarData current_ai_car_data = 4;
+  }
+  message SequenceListUpdate {
+    string physicsGuid = 1;
+    string car_model_path = 2;
+    repeated AiCarData.SequenceResult sequences = 3;
+    AiCarData current_ai_car_data = 4;
+  }
+}

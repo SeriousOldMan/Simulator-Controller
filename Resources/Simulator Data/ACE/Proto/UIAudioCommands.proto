@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+
+enum UIAudioCommandsResponse {
+  UIAudioCommandsResponse_OK = 0;
+  UIAudioCommandResponse_CRITICAL_ERROR = 100;
+}
+
+message UIAudioRequestAudioEvent {
+  AudioGuiEventType type = 1;
+}
+
+message UIAudioResponseEvent {
+  UIAudioCommandsResponse response = 1;
+}
+
+message UIAudioCommands {
+  UIAudioRequestAudioEvent request_audio_event = 1;
+  UIAudioResponseEvent response_event = 1000;
+}

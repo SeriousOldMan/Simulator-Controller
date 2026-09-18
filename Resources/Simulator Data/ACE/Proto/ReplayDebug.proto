@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+
+message MatrixFrameData {
+  float time = 1;
+}
+
+message ReplayCarStatData {
+  PGUID id = 1;
+  int32 numMatrixFrames = 2;
+  int32 numBaseFrames = 4;
+  float timeSpan = 5;
+  float timeStart = 6;
+  float timeEnd = 7;
+}
+
+message ReplayCarStatDataDetails {
+  repeated MatrixFrameData matrixFrame = 3;
+}
+
+message ReplayStatsData {
+  repeated ReplayCarStatData carData = 1;
+  float currentTime = 2;
+  float timeSpan = 3;
+  float timeStart = 4;
+}

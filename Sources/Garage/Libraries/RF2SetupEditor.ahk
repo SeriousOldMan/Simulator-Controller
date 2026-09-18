@@ -194,7 +194,6 @@ class RF2SetupEditor extends FileSetupEditor {
 
 	chooseSetup(load := true) {
 		local rF2Application := Application("rFactor 2", kSimulatorConfiguration)
-		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local directory := ""
 		local fileName, theSetup
@@ -207,7 +206,7 @@ class RF2SetupEditor extends FileSetupEditor {
 
 		if (track && (track != true))
 			loop Files, directory . "\*.*", "D"
-				if (InStr(track, A_LoopFileName) == 1) {
+				if ((InStr(track, A_LoopFileName) == 1) || (InStr(A_LoopFileName, track) == 1)) {
 					directory .= ("\" . A_LoopFileName)
 
 					break
@@ -281,7 +280,6 @@ class RF2SetupEditor extends FileSetupEditor {
 class RF2SetupComparator extends FileSetupComparator {
 	chooseSetup(type, load := true) {
 		local rF2Application := Application("rFactor 2", kSimulatorConfiguration)
-		local car := SessionDatabase.getCarCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedCar[false])
 		local track := SessionDatabase.getTrackCode(this.Workbench.SelectedSimulator[false], this.Workbench.SelectedTrack[false])
 		local directory := ""
 		local fileName, theSetup, ignore
@@ -294,7 +292,7 @@ class RF2SetupComparator extends FileSetupComparator {
 
 		if (track && (track != true))
 			loop Files, directory . "\*.*", "D"
-				if (InStr(track, A_LoopFileName) == 1) {
+				if ((InStr(track, A_LoopFileName) == 1) || (InStr(A_LoopFileName, track) == 1)) {
 					directory .= ("\" . A_LoopFileName)
 
 					break

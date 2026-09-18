@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "LogicScene.proto";
+
+enum ThumbView {
+  Current = 0;
+  Side = 1;
+  Top = 2;
+  ThreeQuarter = 3;
+  CustomView = 4;
+}
+
+message ThumbViewCustom {
+  float radius = 1;
+  float theta = 2;
+  float phi = 3;
+  float fov = 4;
+  float offset_y = 5;
+  float offset_z = 6;
+}
+
+message ThumbnailSettings {
+  int32 width = 1;
+  int32 height = 2;
+  ThumbView view = 3;
+  bool transparent_background = 4;
+  ThumbViewCustom custom_view_params = 5;
+  DateTimeLocation date_time_location = 11;
+  string graphics_settings_override = 12;
+  string background_mesh = 14;
+  float car_rotation = 16;
+}

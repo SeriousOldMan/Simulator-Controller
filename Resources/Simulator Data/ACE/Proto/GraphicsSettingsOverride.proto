@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+import "Renderer.proto";
+import "PostProcessing.proto";
+import "Math.proto";
+
+message GraphicsSettingsOverride {
+  message SunLocation {
+    float sunAzimuthDegree = 1;
+    float sunElevationDegree = 2;
+  }
+  bool overrideAntialiasing = 1;
+  VideoSettings.Antialiasing antialising = 2;
+  bool overrideSharpening = 11;
+  VideoSettings.Sharpen sharpening = 12;
+  bool overrideClouds = 13;
+  VideoSettings.Clouds clouds = 14;
+  bool overrideCarReflectionQuality = 15;
+  VideoSettings.CarReflection carReflectionQuality = 16;
+  bool overrideLevelOfDetail = 17;
+  VideoSettings.LevelOfDetail levelOfDetail = 18;
+  bool overrideShadow = 19;
+  VideoSettings.Shadow shadow = 20;
+  bool overrideMotionBlur = 21;
+  VideoSettings.MotionBlur motionBlur = 22;
+  bool overrideExposure = 3;
+  PostProcessingSettings.Exposure exposure = 4;
+  bool overrideColorGrading = 5;
+  PostProcessingSettings.ColorGrading colorGrading = 6;
+  bool overrideVeilSettings = 29;
+  VeilSettings veilSettings = 30;
+  bool overrideEyeParameters = 7;
+  PostProcessingSettings.EyeParametrization eyeParameters = 8;
+  bool overrideDepthOfField = 9;
+  PostProcessingSettings.DepthOfField depthOfField = 10;
+  bool overrideLensEffect = 28;
+  PostProcessingSettings.LensEffect lensEffect = 27;
+  bool skipDynamicPostProcessingCurve = 26;
+  bool overrideSunLocation = 23;
+  GraphicsSettingsOverride.SunLocation sunLocation = 24;
+  bool useInteralShadowSettings = 25;
+  bool doNotSkipHeroCar = 43;
+  bool disableCloudShadows = 40;
+  bool disableVolumetrics = 41;
+  bool disableUnshadowingFactor = 42;
+  bool keepIndirectIndirectLighting = 44;
+  bool interiorShowroomAdjustments = 142;
+  bool addExposureCompensationDelta = 50;
+  float exposureCompensationDelta = 51;
+  bool addWhiteBalanceTemperatureDelta = 52;
+  float whiteBalanceTemperatureDelta = 53;
+  bool addWhiteBalanceTintDelta = 54;
+  float whiteBalanceTintDelta = 55;
+  bool addMasterGammaDelta = 56;
+  Vector4Data masterGammaDelta = 57;
+  bool addMasterSaturationDelta = 58;
+  Vector4Data masterSaturationDelta = 59;
+}

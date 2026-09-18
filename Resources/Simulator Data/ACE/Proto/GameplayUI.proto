@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "Options.proto";
+
+enum UINotificationType {
+  UINotificationType_LevelUp = 0;
+  UINotificationType_BestLap = 1;
+  UINotificationType_Xp_Reward = 2;
+  UINotificationType_Credits_Reward = 3;
+  UINotificationType_Debug = 4;
+  UINotificationType_SessionPenalty = 5;
+  UINotificationType_ConnectionStatus = 6;
+  UINotificationType_TyreWear = 7;
+  UINotificationType_Rental_Done = 8;
+  UINotificationType_Gameplay_Info = 9;
+  UINotificationType_CarSettings = 10;
+  UINotificationType_Car = 11;
+  UINotificationType_Session = 12;
+  UINotificationType_Weather = 13;
+  UINotificationType_Multiplayer = 14;
+  UINotificationType_Clear = 15;
+  UINotificationType_RaceControl = 16;
+  UINotificationType_Backend = 17;
+  UINotificationType_Backend3rdPartyServerJoin = 18;
+}
+
+enum UINotificationValueType {
+  UINotificationValueType_Integer = 0;
+  UINotificationValueType_String = 1;
+  UINotificationValueType_StringKey = 2;
+  UINotificationValueType_Time = 3;
+  UINotificationValueType_Delta = 4;
+  UINotificationValueType_Float = 5;
+  UINotificationValueType_Bool = 6;
+}
+
+enum UINotificationPriorityType {
+  UINotificationPriorityType_Null = 0;
+  UINotificationPriorityType_Low = 1;
+  UINotificationPriorityType_Normal = 2;
+  UINotificationPriorityType_High = 3;
+  UINotificationPriorityType_Maximum = 4;
+}
+
+enum UIChatMessageType {
+  UINormal = 0;
+  UIDeveloper = 1;
+  UICertifiedVIP = 2;
+  UIServerAdmin = 3;
+  UIServerMessage = 4;
+  UIWhisper = 5;
+  UIPlayer = 6;
+}
+
+message SimulationUiData {
+  bool show_investigation_panel = 1;
+  bool show_simulation_panel = 2;
+}
+
+message TimelineUiData {
+  bool show_timeline_menu = 1;
+  bool enable_debug = 2;
+}
+
+message UINotificationTuple {
+  UINotificationValueType type = 1;
+  repeated string values = 2;
+}
+
+message UINotification {
+  PGUID car_pguid = 6;
+  UINotificationPriorityType priority = 5;
+  UINotificationType type = 1;
+  repeated UINotificationTuple tuples = 2;
+  uint32 time_to_hide = 3;
+  repeated UINotificationType notifications_to_clear = 4;
+}
+
+message CarPresenterUI {
+  bool show = 1;
+  bool recreate_all_particle_emitters = 2;
+}
+
+message UIChatMessage {
+  UIChatMessageType message_type = 1;
+  uint64 timestamp = 2;
+  string sender_name = 3;
+  string msg_text = 4;
+}

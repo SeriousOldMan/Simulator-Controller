@@ -1334,7 +1334,7 @@ int main(int argc, char* argv[])
 		if (handlingAnalyzer) {
 			dataFile = argv[2];
 
-			if (handlingAnalyzer) {
+			if (handlingCalibrator) {
 				lowspeedThreshold = atoi(argv[3]);
 				steerLock = atoi(argv[4]);
 				steerRatio = atoi(argv[5]);

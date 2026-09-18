@@ -1622,9 +1622,6 @@ class SoloCenter extends ConfigurationItem {
 				centerGui["practiceCenterTabView"].Redraw()
 
 				if (centerGui["practiceCenterTabView"].Value = 4) {
-					center.FuelDataListView.Redraw()
-					center.TyreDataListView.Redraw()
-
 					center.FuelDataListView.ModifyCol()
 
 					loop center.FuelDataListView.GetCount("Col")
@@ -1635,10 +1632,13 @@ class SoloCenter extends ConfigurationItem {
 					loop center.TyreDataListView.GetCount("Col")
 						center.TyreDataListView.ModifyCol(A_Index, "AutoHdr")
 
-					WinRedraw(centerGui)
+					Task.startTask(() {
+						center.ChartViewer.Resized()
+						center.DetailsViewer.Resized()
 
-					center.ChartViewer.Resized()
-					center.DetailsViewer.Resized()
+						center.FuelDataListView.Redraw()
+						center.TyreDataListView.Redraw()
+					})
 				}
 
 				this.analyzeTelemetry()
@@ -1742,7 +1742,7 @@ class SoloCenter extends ConfigurationItem {
 		centerGui.Add("DropDownList", "x215 yp+24 w171 vdataY6DropDown").OnEvent("Change", chooseAxis)
 
 		centerGui.Add("Text", "x400 ys w70 h23 +0x200", translate("Plot"))
-		centerGui.Add("DropDownList", "x474 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
+		centerGui.Add("DropDownList", "x474 yp w80 Choose1 vchartTypeDropDown", collect(["Scatter", "Bar ", "Bubble", "Line"], translate)).OnEvent("Change", chooseChartType)
 
 		centerGui.Add("Button", "x1327 yp w23 h23 X:Move vreportSettingsButton").OnEvent("Click", reportSettings)
 		setButtonIcon(centerGui["reportSettingsButton"], kIconsDirectory . "General Settings.ico", 1)

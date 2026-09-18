@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "Math.proto";
+import "Gameplay.proto";
+import "Scene.proto";
+import "LogicScene.proto";
+import "GameModeSelectionClientCommands.proto";
+
+message GasStationParameters {
+  float pricePerLitre = 1;
+  float carWashPrice = 2;
+}
+
+message FreeRoamUserProfile {
+  TransformData garage_spawn_position = 1;
+  repeated string last_selected_car_models = 2;
+}
+
+message FreeRoam {
+  enum SessionPhase {
+    Idle = 0;
+    Waiting_Car_To_Start = 1;
+    Waiting_Car_Stopped = 2;
+    Start_Countdown_No_Lights = 10;
+    Start_Countdown_Lights_On = 11;
+    Start_Countdown_Lights_Off = 12;
+    Session = 50;
+    Overtime_Waiting_For_Leader = 60;
+    Overtime_Waiting_For_Others = 70;
+    Waiting_For_Ai = 71;
+    Waiting_For_PitBox = 72;
+    Ended = 80;
+    Request_Quit = 90;
+  }
+  message Specialization {
+    bool proto_options = 666;
+  }
+  message SessionPhasePair {
+    FreeRoam.SessionPhase phase = 1;
+    TranslatedTimestamp end_timestamp = 2;
+    bool is_set = 3;
+  }
+  message SessionPhaseData {
+    repeated FreeRoam.SessionPhasePair session_phase_pairs = 1;
+    FreeRoam.SessionPhase current_phase = 2;
+    double current_gamemode_time = 4;
+    double start_gamemode_time = 5;
+  }
+  message State {
+    message Game {
+      message EventList {
+        string path = 1;
+        SeasonDefinition configuration = 2;
+      }
+      FreeRoam.SessionPhaseData session_data = 1;
+      repeated FreeRoam.State.Game.EventList event_configuration_list = 10;
+      FreeRoamActivity activity = 20;
+      FreeRoamNavigation navigation = 21;
+      FreeRoamTimeAttack time_attack = 22;
+      string name = 1000;
+    }
+    message GameCar {
+      int32 someNumber = 1;
+      float partial_distance = 2;
+      float odo_distance = 3;
+    }
+  }
+  message ZonePayload {
+    SeasonDefinition event_configuration = 1;
+  }
+  message Command {
+    message AddRoad {
+      repeated SceneActorData roads = 1;
+    }
+    message AddTimeAttackElements {
+      repeated FreeRoamTimeAttackActor elements = 1;
+    }
+  }
+}
+
+message FreeRoamUiData {
+  bool show_testing_freeroam_mode = 1;
+  bool show_minimap = 2;
+  bool traffic_enabled = 3;
+  bool show_poi = 4;
+  bool hide_session_panel = 5;
+}

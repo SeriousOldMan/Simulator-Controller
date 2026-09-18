@@ -589,13 +589,13 @@ startupSimulatorConfiguration() {
 		done := false
 		saved := false
 
-		__SCStartTask.stop()
-
-		__SCStartTask := false
-
 		editor.show()
 
 		startupApplication()
+
+		__SCStartTask.stop()
+
+		__SCStartTask := false
 
 		try {
 			loop {

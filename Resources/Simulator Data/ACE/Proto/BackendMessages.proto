@@ -1,0 +1,376 @@
+syntax = "proto3";
+
+import "GameplayUI.proto";
+import "LogicScene.proto";
+import "GameClientCommands.proto";
+import "GameModeSelectionClientCommands.proto";
+import "ClientCommandsUtil.proto";
+import "Customization.proto";
+import "DriverManager.proto";
+import "Gameplay.proto";
+import "google/protobuf/timestamp.proto";
+import "Math.proto";
+import "CarSetup.proto";
+import "CarSetupLimits.proto";
+import "Leaderboards.proto";
+
+enum EndSessionDriverStatsRowType {
+  EndSessionDriverStatsRow_XP = 0;
+  EndSessionDriverStatsRow_Credits = 1;
+  EndSessionDriverStatsRow_Distance = 2;
+  EndSessionDriverStatsRow_Consumed_Fuel = 3;
+  EndSessionDriverStatsRow_License_Medal = 4;
+  EndSessionDriverStatsRow_Consumed_Tyre = 5;
+  EndSessionDriverStatsRow_Consumed_Energy = 6;
+  EndSessionDriverStatsRow_Final_Position = 7;
+}
+
+enum BackendRequestEndSessionType {
+  BackendRequestEndSessionType_Default = 0;
+  BackendRequestEndSessionType_Grouped = 1;
+}
+
+message BackendNotification {
+  PGUID driver_guid = 1;
+  repeated UINotification notification = 2;
+  string reward_key = 3;
+}
+
+message BackendNotifications {
+  repeated BackendNotification notifications = 1;
+}
+
+message BackendRetrieveUserRequest {
+  string steam_id = 1;
+}
+
+message BackendRetrieveUserResponse {
+  DriverProgressionData driver_progression_data = 1;
+  DriverGarageData driver_garage_data = 2;
+  DriverPersonalData driver_personal_data = 3;
+  DriverLicenseData driver_license_data = 4;
+  ClientCommandsResponse response = 5;
+}
+
+message BackendCar {
+  string car_guid = 1;
+  string car_path = 2;
+  string car_design = 3;
+  int32 purchase_offer_percent = 23;
+  int32 price = 5;
+  int32 rental_offer_percent = 33;
+  int32 rental_price = 30;
+  bool is_enabled = 40;
+  LicenseType required_license = 41;
+  float performance_indicator = 42;
+}
+
+message BackendRequestManufacturers {
+  CarSelectionOwnerShipState state = 1;
+  PGUID driver_pguid = 100;
+  reserved 2 to 2;
+}
+
+message BackendResponseManufacturers {
+  ClientCommandsResponse response = 1;
+  CarSelectionOwnerShipState state = 2;
+  repeated CarManufacturer manufacturers = 10;
+}
+
+message BackendRequestCars {
+  CarSelectionOwnerShipState state = 1;
+  PGUID driver_pguid = 100;
+  reserved 2 to 2;
+}
+
+message BackendResponseCars {
+  ClientCommandsResponse response = 1;
+  CarSelectionOwnerShipState state = 2;
+  repeated BackendCar cars = 10;
+}
+
+message BackendRequestBuyCar {
+  PGUID driver_pguid = 100;
+  CarFinalStateData final_state = 2;
+  Consumable_Body consumable_body = 200;
+  Consumable_Generic consumable_rim = 201;
+  repeated Consumable_Generic consumable_oem_parts = 203;
+  repeated Consumable_Generic consumable_parts = 204;
+  reserved 1 to 1;
+}
+
+message BackendRequestUpdateCar {
+  PGUID driver_pguid = 100;
+  CarFinalStateWithConsumable full_final_state = 2;
+  reserved 1 to 1;
+}
+
+message BackendResponseUpdateCar {
+  GameEconomyClientCommandsResponse response = 1;
+  CarFinalStateWithConsumable full_final_state = 2;
+}
+
+message BackendGameModeSpecialEvent {
+  enum SetupRestrictions {
+    SetupRestrictions_None = 0;
+    SetupRestrictions_Limited = 1;
+    SetupRestrictions_Locked = 2;
+  }
+  string event_guid = 1;
+  GameModeType type = 2;
+  GameModeSelectionSession session_details = 3;
+  CarFinalStateData car_final_state = 4;
+  TrackItem track_item = 5;
+  GameModeSelectionWeatherType weather_preset = 6;
+  InitialGrip initial_grip = 7;
+  string img_path = 8;
+  SpecialEventStatus status = 12;
+  uint32 player_position = 29;
+  uint32 player_count = 30;
+  uint32 golden_time = 20;
+  uint32 silver_time = 21;
+  uint32 bronze_time = 22;
+  uint32 event_index = 23;
+  uint32 global_best_time = 24;
+  uint32 driver_best_time = 25;
+  uint32 driver_attempts = 28;
+  int32 max_attempts = 32;
+  float crowd = 31;
+  int64 event_id = 33;
+  string online_image_path = 34;
+  google.protobuf.Timestamp event_start_time_utc = 35;
+  google.protobuf.Timestamp event_end_time_utc = 36;
+  BackendGameModeSpecialEvent.SetupRestrictions setup_restrictions = 37;
+  CarSetupDataLimits custom_car_setup_limits = 38;
+  bool are_setups_shared = 39;
+  int32 sort_group = 40;
+  int32 sort_id = 41;
+  reserved 26 to 26;
+  reserved 27 to 27;
+}
+
+message BackendGameModeSpecialEventCategory {
+  string name = 1;
+  LicenseType license_type = 2;
+  LicenseType license_requested = 3;
+  repeated BackendGameModeSpecialEvent special_events = 10;
+}
+
+message BackendResultRow {
+  int32 position = 1;
+  string driver = 2;
+  int32 time = 3;
+  int32 total_laps = 4;
+}
+
+message BackendRequestSpecialEvents {
+  ClientCommandsMode mode = 2;
+  int32 version = 3;
+  PGUID driver_pguid = 10;
+}
+
+message BackendResponseSpecialEvents {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  repeated BackendGameModeSpecialEventCategory categories = 10;
+}
+
+message BackendRequestSpecialEventResults {
+  ClientCommandsMode mode = 1;
+  PGUID driver_pguid = 2;
+  string event_guid = 3;
+  int32 num_results = 4;
+}
+
+message BackendResponseSpecialEventResults {
+  ClientCommandsResponse response = 1;
+  ClientCommandsMode mode = 2;
+  repeated BackendResultRow rows = 3;
+  BackendResultRow driver_row = 4;
+}
+
+message BackendErrorMessage {
+  GameEconomyClientCommandsResponse error = 1;
+}
+
+message EndSessionDriverStatsRow {
+  string key = 1;
+  uint32 reward = 2;
+  EndSessionDriverStatsRowType reward_type = 3;
+  uint32 multiplier = 4;
+}
+
+message EndSessionDriverStats {
+  repeated EndSessionDriverStatsRow rows = 1;
+  EndSessionXpRankWallet total_stats = 2;
+  uint32 time_to_hide = 3;
+}
+
+message EndSessionXpRankWallet {
+  uint32 total_xp = 1;
+  uint32 wallet = 2;
+  uint32 rank = 3;
+  bool is_new_rank = 4;
+  uint32 earned_xp = 5;
+  uint32 earned_credits = 6;
+  uint32 total_costs = 7;
+}
+
+message BackendRequestEndSessionDriverStats {
+  PGUID driver_pguid = 1;
+  BackendRequestEndSessionType type = 2;
+}
+
+message BackendResponseEndSessionDriverStats {
+  ClientCommandsResponse response = 1;
+  BackendRequestEndSessionType type = 2;
+  EndSessionDriverStats stats = 10;
+}
+
+message BackendEvents {
+  enum SessionType {
+    None = 0;
+    SoloP = 1;
+    SoloR = 2;
+    MP_P = 3;
+    MP_Q = 4;
+    MP_R = 5;
+    AI_P = 6;
+    AI_Q = 7;
+    AI_R = 8;
+    Event_Hotlap = 9;
+    Event_Hotstint = 10;
+    Openworld = 11;
+    Openworld_MP = 12;
+    Other = 13;
+    Error = 14;
+  }
+  message EventRegistrationRequest {
+    string player_id = 1;
+    int32 player_id_type = 2;
+    Leaderboards.EventParams event_params = 3;
+    BackendEvents.SessionType session_type = 4;
+    int32 topN = 5;
+    int32 showAroundMeN = 6;
+    int32 listN = 7;
+    int32 skipN = 8;
+    bool registerForNotifications = 9;
+  }
+  message EventUnRegistrationRequest {
+    string player_id = 1;
+    Leaderboards.EventParams event_params = 2;
+  }
+  message EventRegistrationResponse {
+    Leaderboards.EventParams event_params = 1;
+    int32 personal_best = 2;
+    bool send_laps = 3;
+    bool send_setups = 4;
+    bool send_microsectors = 5;
+    bool send_validation_data = 6;
+  }
+  message LapValidationData {
+    message ControlpointData {
+      float lateral_offset = 1;
+      int32 laptime = 2;
+      float speed_ms = 3;
+      float speed_diff_reference = 4;
+      Vector3Data smoother_acc_g = 5;
+      float ndSlipFront = 6;
+      float ndSlipRear = 7;
+      float track_limit_gap = 8;
+    }
+    Vector3Data max_acc_g_1s = 1;
+    Vector3Data max_acc_g_100ms = 2;
+    int32 topspeed_ms = 3;
+    float distance_driven = 4;
+    int32 mech_preset_hash = 5;
+    int32 setup_hash = 6;
+    int32 setup_limits_hash = 7;
+    int32 car_data_hash = 8;
+    repeated BackendEvents.LapValidationData.ControlpointData controlpoints = 10;
+  }
+  message MicrosectorEntry {
+    float splinepos = 1;
+    int32 time_ms = 2;
+    float velocity = 4;
+  }
+  message MicrosectorLapData {
+    repeated BackendEvents.MicrosectorEntry microsectors = 1;
+    int32 official_laptime = 2;
+    double start_timestamp = 3;
+    float track_length = 4;
+    string driver_name = 5;
+    string driver_player_id = 6;
+  }
+  message LeaderboardRequest {
+    PGUID eventPguid = 1;
+    int32 event_id = 2;
+    ComboIdentifier combo = 3;
+    string player_id = 4;
+    int32 showTopN = 5;
+    int32 totalLines = 6;
+    bool sendEntireLeaderboard = 7;
+  }
+  message LapCompletedEvent {
+    string player_id = 1;
+    int32 player_id_type = 2;
+    Leaderboards.EventParams event_params = 3;
+    BackendEvents.SessionType session_type = 4;
+    int32 session_laps = 5;
+    int32 session_total_time = 6;
+    int32 stint_laps = 7;
+    int32 stint_total_time = 8;
+    float lap_time = 9;
+    int32 lap_flags = 10;
+    bool lap_valid = 11;
+    google.protobuf.Timestamp lap_started = 12;
+    google.protobuf.Timestamp lap_completed = 13;
+    repeated int32 splits = 14;
+    int32 ambientTemp = 15;
+    int32 trackTemp = 16;
+    int32 wetness = 17;
+    float track_grip = 23;
+    int32 physics_version = 18;
+    int32 car_version = 19;
+    BackendEvents.LapValidationData validation_data = 20;
+    string player_firstname = 21;
+    string player_lastname = 22;
+    repeated Leaderboards.HotstintLap hotstint_laps = 24;
+    repeated Leaderboards.HotstintTimePenalty hotstint_time_penalties = 25;
+    int32 session_start_time = 26;
+    int32 session_start_physics_time = 27;
+    BackendEvents.MicrosectorLapData microsector_data = 30;
+    CarSetupData car_setup_data = 31;
+    CarSetupDataLimits car_setup_data_limits = 32;
+    BackendEvents.MicrosectorLapData microsector_debug_data = 33;
+    int64 lap_snowflake_id = 99;
+    int32 protocol_version = 100;
+  }
+  message FetchS3DataRequest {
+    int64 snowflake_id = 1;
+    int32 reference_no = 2;
+    string filename_hint = 3;
+    string driver_name = 4;
+    string driver_player_id = 5;
+    bool fetch_setup = 10;
+    bool fetch_microsectors = 11;
+    bool fetch_ghost = 12;
+    bool fetch_hotstint = 13;
+    bool fetch_microsectors_background = 14;
+    bool reset_microsectors = 21;
+  }
+  message FetchS3DataResponse {
+    BackendEvents.FetchS3DataRequest request = 1;
+    string s3_key = 2;
+    string reference_playerid = 3;
+    string reference_playername = 4;
+    CarSetupData shared_setup = 10;
+    BackendEvents.MicrosectorLapData microsector_data = 11;
+    BackendEvents.MicrosectorLapData microsector_data_background = 12;
+  }
+  message ClearLeaderboardEntry {
+    Leaderboards.EventParams event_params = 1;
+    string admin_secret = 2;
+    string player_id_to_kill = 3;
+  }
+}

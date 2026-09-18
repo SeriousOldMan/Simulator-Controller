@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package google.protobuf;
+
+option java_package = "com.google.protobuf";
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}

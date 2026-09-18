@@ -1,0 +1,260 @@
+syntax = "proto3";
+
+import "LogicScene.proto";
+import "PlatformCommands.proto";
+import "GameplayUI.proto";
+
+enum GameModeCommandsResponse {
+  GameModeCommandsResponse_OK = 0;
+  CommandsResponse_CRITICAL_ERROR = 100;
+}
+
+enum GameModeRequestCarType {
+  GameModeRequestCarNextnSpline = 0;
+  GameModeRequestCarNextNearest = 1;
+  GameModeRequestCarNextRealtime = 2;
+}
+
+enum GameModePauseResponse {
+  GameModePauseOK = 0;
+  GameModePauseNotAllowed = 100;
+}
+
+message GameModeRequestQuitGame {
+  bool im_empty = 1;
+}
+
+message GameModeResponseQuitGame {
+  bool im_empty = 1;
+}
+
+message GameModeRequestRestart {
+  bool im_empty = 1;
+}
+
+message GameModeResponseRestart {
+  bool im_empty = 1;
+}
+
+message GameModeRequestNext {
+  bool im_empty = 1;
+}
+
+message GameModeResponseNext {
+  bool im_empty = 1;
+}
+
+message GameModeRequestNextSession {
+  bool im_empty = 1;
+}
+
+message GameModeResponseNextSession {
+  bool im_empty = 1;
+}
+
+message GameModeRequestExit {
+  bool im_empty = 1;
+}
+
+message GameModeResponseExit {
+  bool im_empty = 1;
+}
+
+message GameModeRequestStart {
+  bool im_empty = 1;
+}
+
+message GameModeResponseStart {
+  bool im_empty = 1;
+}
+
+message GameModeRequestRestartSession {
+  bool im_empty = 1;
+}
+
+message GameModeResponseRestartSession {
+  bool im_empty = 1;
+}
+
+message GameModeRequestRestartSeason {
+  bool im_empty = 1;
+}
+
+message GameModeResponseRestartSeason {
+  bool im_empty = 1;
+}
+
+message GameModeRequestSingleplayer {
+  bool im_empty = 1;
+}
+
+message GameModeResponseSingleplayer {
+  bool im_empty = 1;
+}
+
+message GameModeRequestOpenWorld {
+  bool im_empty = 1;
+}
+
+message GameModeResponseOpenWorld {
+  bool im_empty = 1;
+}
+
+message GameModeRequestMultiplayer {
+  bool im_empty = 1;
+}
+
+message GameModeResponseMultiplayer {
+  bool im_empty = 1;
+}
+
+message GameModeRequestBackToPit {
+  bool im_empty = 1;
+}
+
+message GameModeResponseBackToPit {
+  bool im_empty = 1;
+}
+
+message GameModeRequestResume {
+  bool im_empty = 1;
+}
+
+message GameModeResponseResume {
+  bool im_empty = 1;
+}
+
+message GameModeRequestPause {
+  bool im_empty = 1;
+}
+
+message GameModeResponsePause {
+  GameModePauseResponse response = 1;
+}
+
+message GameModeRequestTerminateSession {
+  bool im_empty = 1;
+}
+
+message GameModeResponseTerminateSession {
+  bool im_empty = 1;
+}
+
+message GameModeRequestNextCar {
+  GameModeRequestCarType request_type = 1;
+}
+
+message GameModeResponseNextCar {
+  bool im_empty = 1;
+}
+
+message GameModeRequestPreviousCar {
+  GameModeRequestCarType request_type = 1;
+}
+
+message GameModeResponsePreviousCar {
+  bool im_empty = 1;
+}
+
+message GameModeRequestPlayerCar {
+  GameModeRequestCarType request_type = 1;
+}
+
+message GameModeResponsePlayerCar {
+  bool im_empty = 1;
+}
+
+message GameModeRequestReadyForNext {
+  bool is_empty = 1;
+}
+
+message GameModeResponseReadyForNext {
+  bool im_empty = 1;
+}
+
+message GameModeRequestSpecificCar {
+  PGUID request_pguid = 1;
+  int32 car_number = 2;
+}
+
+message GameModeResponseSpecificCar {
+  GameModeCommandsResponse response = 1;
+}
+
+message GameModeRequestSpecificCameraMode {
+  GameModeCameraMode mode = 1;
+  int32 submode = 2;
+}
+
+message GameModeResponseSpecificCameraMode {
+  GameModeCameraMode mode = 1;
+  int32 submode = 2;
+  GameModeCommandsResponse response = 3;
+}
+
+message GameModeRequestSendChatMessage {
+  string message = 1;
+  UIChatMessageType type = 2;
+}
+
+message GameModeResponseSendChatMessage {
+  bool is_empty = 1;
+}
+
+message GameModeRequestSpecialEventSetDeltaTarget {
+  int64 snowflake_id = 1;
+  string driver_name = 4;
+}
+
+message GameModeResponseSpecialEventSetDeltaTarget {
+  bool is_empty = 1;
+}
+
+message GameModeCommands {
+  GameModeRequestQuitGame request_quit_game = 1;
+  GameModeResponseQuitGame response_quit_game = 1000;
+  GameModeRequestRestart request_restart = 2;
+  GameModeResponseRestart response_restart = 1001;
+  GameModeRequestNext request_next = 3;
+  GameModeResponseNext response_next = 1002;
+  GameModeRequestNextSession request_next_session = 4;
+  GameModeResponseNextSession response_next_session = 1003;
+  GameModeRequestExit request_exit = 5;
+  GameModeResponseExit response_exit = 1004;
+  GameModeRequestStart request_start = 6;
+  GameModeResponseStart response_start = 1005;
+  GameModeRequestRestartSession request_restart_session = 7;
+  GameModeResponseRestartSession response_restart_session = 1006;
+  GameModeRequestRestartSeason request_restart_season = 8;
+  GameModeResponseRestartSeason response_restart_season = 1007;
+  GameModeRequestSingleplayer request_singleplayer = 9;
+  GameModeResponseSingleplayer response_singleplayer = 1008;
+  GameModeRequestOpenWorld request_open_world = 10;
+  GameModeResponseOpenWorld response_open_world = 1009;
+  GameModeRequestMultiplayer request_multiplayer = 11;
+  GameModeResponseMultiplayer response_multiplayer = 1010;
+  GameModeRequestBackToPit request_back_to_pit = 12;
+  GameModeResponseBackToPit response_back_to_pit = 1011;
+  GameModeRequestResume request_resume = 13;
+  GameModeResponseResume response_resume = 1012;
+  GameModeRequestPause request_pause = 14;
+  GameModeResponsePause response_pause = 1013;
+  GameModeRequestTerminateSession request_terminate_session = 15;
+  GameModeResponseTerminateSession response_terminate_session = 1014;
+  GameModeRequestNextCar request_next_car = 16;
+  GameModeResponseNextCar response_next_car = 1015;
+  GameModeRequestPreviousCar request_previous_car = 17;
+  GameModeResponsePreviousCar response_previous_car = 1016;
+  GameModeRequestPlayerCar request_player_car = 18;
+  GameModeResponsePlayerCar response_player_car = 1017;
+  GameModeRequestReadyForNext request_ready_for_next = 19;
+  GameModeResponseReadyForNext response_ready_for_next = 1018;
+  GameModeRequestSpecificCar request_specific_car = 20;
+  GameModeResponseSpecificCar response_specific_car = 1019;
+  GameModeRequestSpecificCameraMode request_specific_camera = 21;
+  GameModeResponseSpecificCameraMode response_specific_camera = 1020;
+  GameModeRequestSendChatMessage request_send_chat_message = 22;
+  GameModeResponseSendChatMessage response_send_chat_message = 1021;
+  GameModeRequestSpecialEventSetDeltaTarget request_special_events_set_delta_target = 23;
+  GameModeResponseSpecialEventSetDeltaTarget response_special_events_set_delta_target = 1022;
+}

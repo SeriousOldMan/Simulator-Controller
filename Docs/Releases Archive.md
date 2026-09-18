@@ -313,7 +313,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - A bug has been fixed for *iRacing* when cars are towed to the pit or are otherwise absent. This bug caused the Monte Carlo strategy simulation to crash.
   - Fixed handling of language specific instructions for the Driving Coach and the Assistant boosters, when a machine translated language is used.
-  - Fixed a misbehaviour of a Race Asistant, when no language specification had been provided to the plugin. This cannot happen, when the configuration was created by "Simulator Setup", but it could happen in synthetic testing scenarios.
+  - Fixed a misbehavior of a Race Asistant, when no language specification had been provided to the plugin. This cannot happen, when the configuration was created by "Simulator Setup", but it could happen in synthetic testing scenarios.
   - Fixed a rare bug introduced with one of the recent releases, which caused the "Telemetry" and the "Analyzer" item to be unavailable in the "Issues" selector menu of "Setup Workbench".
   - Fixed a bug in "Simulator Setup" which prevented pre-listening a voice in a translated language.
   - [Experts] Fixed a bug in the "Simualators" script module, which accessed a non-existent global function.

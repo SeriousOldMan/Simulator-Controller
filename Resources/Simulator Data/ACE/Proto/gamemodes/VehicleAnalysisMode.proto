@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+import "AiCarData.proto";
+import "LogicScene.proto";
+
+message VehicleAnalysis {
+  enum CarContentEntryTestcaseState {
+    Undefinded = 0;
+    No_Test = 1;
+    Waiting_For_Test = 2;
+    Running_Test = 3;
+    Test_Finished = 4;
+    Test_Failed = 5;
+  }
+  message LiveState {
+    PGUID current_car_guid = 1;
+    AiCarData original_car_data = 2;
+    AiCarData current_ai_car_data = 3;
+    VehicleAnalysis.CarContentEntryTestcaseState current_test_state = 4;
+    AutoEvalDriver_State current_aicontroller_state = 5;
+  }
+  message CarContentEntry {
+    string car_data_path = 1;
+    string ai_car_data_path = 2;
+    string car_model = 3;
+    string car_screen_name = 4;
+    bool has_ai_car_data = 5;
+    bool is_ai_car_data_linked = 6;
+    bool is_ai_drivable = 7;
+    bool is_release = 8;
+    bool is_ai_car_data_complete = 9;
+    string error_msg = 10;
+    string file_path = 11;
+    VehicleAnalysis.LiveState live_state = 12;
+    AiCarData.TestResult test_result = 13;
+    Content_TestStage content_stage = 14;
+  }
+  message State {
+    message Game {
+      repeated VehicleAnalysis.CarContentEntry cars = 1;
+      int32 car_content_list_version = 2;
+      bool filter_only_is_ai_drivable = 3;
+      bool filter_only_release = 4;
+      bool filter_only_missing_cars = 5;
+    }
+    message GameCar {
+      bool is_retired = 1;
+      AutoEvalDriver_State current_aicontroller_state = 2;
+    }
+  }
+  message Specialization {
+    int32 parallel_cars_to_spawn = 1;
+    VehicleAnalysis.State.Game game_state = 2;
+  }
+  message GameStateChangedEvent {
+    VehicleAnalysis.State.Game game_state = 1;
+  }
+}
+
+message VehicleAnalysisUiData {
+  bool show_carlist_window = 1;
+  bool show_focused_car_window = 2;
+  bool show_car_current_state_window = 3;
+  bool show_car_sequence_overview_window = 4;
+}
+
+message VehicleAnalysisDevUI {
+  message FilterChangeEvent {
+    bool filter_only_is_ai_drivable = 1;
+    bool filter_only_release = 2;
+    bool filter_only_missing_cars = 3;
+  }
+  message CustomLaunchTestRequest {
+    string car_model_name = 1;
+    AutoEvalDriver_State currentTestFinishState = 2;
+  }
+}

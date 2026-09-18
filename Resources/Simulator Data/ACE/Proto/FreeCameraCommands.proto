@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+import "GameplaySettings.proto";
+import "CameraProperties.proto";
+
+enum FreeCameraCommandsResponse {
+  FreeCameraCommandsResponse_OK = 0;
+  FreeCameraCommandResponse_CRITICAL_ERROR = 100;
+}
+
+message FreeCameraRequestOptions {
+  bool is_auto_request = 1;
+}
+
+message FreeCameraResponseOptions {
+  FreeCameraCommandsResponse response = 1;
+  FreeCameraSettings free_camera_settings = 2;
+}
+
+message FreeCameraRequestSetOptions {
+  FreeCameraSettings free_camera_settings = 1;
+}
+
+message FreeCameraResponseSetOptions {
+  FreeCameraCommandsResponse response = 1;
+}
+
+message FreeCameraCommands {
+  FreeCameraRequestOptions request_options = 1;
+  FreeCameraResponseOptions response_options = 1000;
+  FreeCameraRequestSetOptions request_set_options = 2;
+  FreeCameraResponseSetOptions response_set_options = 1001;
+}

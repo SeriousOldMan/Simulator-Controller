@@ -1,0 +1,271 @@
+syntax = "proto3";
+
+import "Options.proto";
+import "LogicScene.proto";
+
+enum AudioVolumeType {
+  MainVolume = 0;
+  EngineExtVolume = 1;
+  EngineIntVolume = 2;
+  TyresVolume = 3;
+  WindVolume = 4;
+  PartsVolume = 5;
+  DamageVolume = 6;
+  CommsVolume = 7;
+  OpponentVolume = 8;
+  VideoVolume = 9;
+  EnvironmentVolume = 10;
+  UIVolume = 11;
+  MusicVolume = 12;
+  BodyworkVolume = 13;
+  HornVolume = 14;
+}
+
+enum UIAudioTypes {
+  Confirm = 0;
+  Cancel = 1;
+  TestButton = 2;
+}
+
+message AudioCarData {
+  string debug_name = 1;
+  repeated AudioEventData audioEvents = 2;
+}
+
+message AudioEngineData {
+  bool liveUpdate = 1;
+  int32 max_channel = 2;
+  int32 update_interval = 3;
+  int32 vol0virtual = 4;
+  bool wheelEnabled = 5;
+  bool bodywordEnabled = 6;
+  bool windEnabled = 7;
+  bool engineIntEnabled = 8;
+  bool engineExtEnabled = 9;
+  float raycastVolumeFactor = 10;
+}
+
+message IndicatorsEnum {
+  enum Type {
+    INDICATORS = 0;
+  }
+}
+
+message HornEnum {
+  enum Type {
+    HORN_SOUND = 0;
+  }
+}
+
+message TransmissionEnum {
+  enum Type {
+    THROTTLE_POSITION = 0;
+    CURRENT_GEAR_RATIO = 1;
+    TORQUE = 2;
+    DRIVETRAIN_SPEED = 3;
+    RPMS = 4;
+    GEAR = 5;
+    GEAR_UP = 6;
+    GEAR_DN = 7;
+  }
+}
+
+message GearboxEnum {
+  enum Type {
+    THROTTLE_POSITION = 0;
+    GEAR = 1;
+    GEAR_UP = 2;
+    GEAR_DN = 3;
+    GEARBOX_COMPRESSOR = 4;
+    GEAR_DAMAGE = 5;
+  }
+}
+
+message EngineEnum {
+  enum Type {
+    RPMS = 0;
+    THROTTLE_POSITION = 1;
+    LIMITER = 2;
+    TRACTION_CONTROL = 3;
+    SPEED = 4;
+    STARTER = 5;
+    IGNITION = 6;
+    BOOST = 7;
+    BOV = 8;
+    BRAKE_POSITION = 9;
+    GEAR = 10;
+    GEAR_UP = 11;
+    GEAR_DN = 12;
+    GEARBOX_COMPRESSOR = 13;
+    CURRENT_GEAR_RATIO = 14;
+    TORQUE = 15;
+    BACKFIRE_TYPE = 16;
+    DRIVETRAIN_SPEED = 17;
+    LAUNCH_CONTROL = 18;
+    STEP = 19;
+  }
+}
+
+message TrafficEngineEnum {
+  enum Type {
+    RPMS = 0;
+    THROTTLE_POSITION = 1;
+    SPEED = 2;
+    TRAFFIC_DRAFT = 3;
+  }
+}
+
+message BrakesEnum {
+  enum Type {
+    BRAKE_POSITION = 0;
+    WHEEL_ANGULAR_SPEED = 1;
+    SPEED = 2;
+    BRAKE_WEAR = 3;
+    DISC_TEMP = 4;
+    ABS = 5;
+  }
+}
+
+message TurboEnum {
+  enum Type {
+    BOOST = 0;
+    BOV = 1;
+    THROTTLE_POSITION = 2;
+    STEP = 3;
+    RPMS = 4;
+  }
+}
+
+message BackfireEnum {
+  enum Type {
+    BACKFIRE_TYPE = 0;
+    RPMS = 1;
+    THROTTLE_POSITION = 2;
+    LIMITER = 3;
+    BOOST = 4;
+    LAUNCH_CONTROL = 5;
+  }
+}
+
+message WheelHubEnum {
+  enum Type {
+    WHEEL_HUB_STATE = 0;
+    AUDIO_TRANSITION = 1;
+  }
+}
+
+message WheelEnum {
+  enum Type {
+    BRAKE_POSITION = 0;
+    WHEEL_DIRT = 1;
+    WHEEL_ANGULAR_SPEED = 2;
+    INFLATION = 3;
+    SURFACE_TYPE = 4;
+    SUSP_DAMAGE_LEVEL = 5;
+    ND_SLIP = 6;
+    TYRE_LOAD = 7;
+    SPEED = 8;
+    SLIP_RATIO = 9;
+    SURFACE_STATUS = 10;
+    RAIN_LEVEL = 11;
+    PUDDLE_LEVEL = 12;
+    BOTTOMING = 13;
+    MARBLES_LEVEL = 14;
+    IS_ON_MARBLES = 15;
+  }
+}
+
+message WindEnum {
+  enum Type {
+    AIR_PRESSURE = 0;
+    SPEED = 1;
+    OPPONENT_DIRT = 2;
+    WIPER_SPEED = 3;
+    WIPER_POSITION = 4;
+  }
+}
+
+message BodyworkEnum {
+  enum Type {
+    SPEED = 0;
+    SUSP_TRAVEL_SPEED = 1;
+    BODYWORK_DAMAGE = 2;
+  }
+}
+
+message HitAudioEnum {
+  enum Type {
+    CAR_TO_CAR = 0;
+    CAR_TO_TRACK = 1;
+    CAR_TO_OBJ = 2;
+    SCRAPING = 3;
+    SPEED = 4;
+  }
+}
+
+message GlobalParametersEnum {
+  enum Type {
+    TIME_OF_DAY = 0;
+    SPEED_GLOBAL = 1;
+    CAMERA_GLOBAL = 2;
+    RAIN_INTENSITY = 3;
+    WIND_INTENSITY = 4;
+    SCALE_GLOBAL = 5;
+    CAR_DISTANCE = 6;
+    SNAP_REVERB_LEVEL = 7;
+    SNAP_UNDERPASS_LEVEL = 8;
+  }
+}
+
+message AudioSettingsData {
+  int32 version = 100;
+  AudioDeviceData device = 1;
+  VolumesData volumes = 2;
+}
+
+message AudioUiData {
+  bool show_stats = 1;
+  bool show_settings = 2;
+  bool show_debug_draw = 3;
+  bool show_audio_debug = 4;
+  bool show_audio_test_turbo = 5;
+  bool occlusion_state = 6;
+}
+
+message AudioDeviceData {
+  int32 DeviceId = 1;
+  string DeviceName = 2;
+}
+
+message VolumesData {
+  float main = 1;
+  float engine_ext = 2;
+  float engine_int = 3;
+  float tyres = 4;
+  float wind = 5;
+  float parts = 6;
+  float environment = 9;
+  float gui = 10;
+  float music = 11;
+  float opponent = 12;
+  float bodywork = 13;
+  float damages = 14;
+  bool opponent_horn = 15;
+}
+
+message AudioApplyVolumes {
+  VolumesData volumes = 1;
+}
+
+message AudioChangeVolume {
+  AudioVolumeType volumeType = 1;
+  float value = 2;
+}
+
+message AudioChangeDevice {
+  AudioDeviceData device = 1;
+}
+
+message PlayUIAudio {
+  UIAudioTypes audioType = 1;
+}

@@ -1843,7 +1843,7 @@ int main(int argc, char* argv[])
 			trackLength = atof(argv[2]);
 			telemetryDirectory = argv[3];
 
-			if (argc > 5)
+			if ((argc > 5) && (strcmp(argv[5], "-") != 0))
 				loadTrackSpline(argv[5]);
 		}
 		else if (!mapTrack) {

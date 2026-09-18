@@ -12,6 +12,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <future>
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -445,14 +446,18 @@ class TrackSplinePoint {
 public:
 	string key;
 	float distance;
+	float posX;
+	float posY;
 
 	TrackSplinePoint() :
 		key(""),
 		distance(0) {}
 
-	TrackSplinePoint(string k, float d) :
+	TrackSplinePoint(string k, float d, float x, float y) :
 		key(k),
-		distance(d) {}
+		distance(d),
+		posX(x),
+		posY(x) {}
 };
 
 typedef std::unordered_map<std::string, TrackSplinePoint> TrackSpline;
@@ -684,6 +689,37 @@ inline bool hasValidCarCoordinates(long* milliSeconds) {
 		return true;
 }
 
+void loadTrackSpline(char* fileName) {
+	std::ifstream infile(fileName);
+	float distance, x, y;
+
+	trackSpline1.clear();
+	trackSpline1.reserve(2000);
+	
+	while (infile >> distance >> x >> y) {
+		string key = std::to_string((long)round(x / 5)) + "|" + std::to_string((long)round(y / 5));
+
+		trackSpline1[key] = TrackSplinePoint(key, distance, x, y);
+
+		activeTrackSplineLength = buildTrackSplineRunning;
+	}
+
+	trackSplineReady = true;
+	activeTrackSpline = &trackSpline1;
+}
+
+void saveTrackSpline(string fileName, TrackSpline* trackSpline) {
+	std::ofstream outfile;
+
+	outfile.open(fileName.c_str(), std::ios::out | std::ios::trunc);
+
+	for (TrackSpline::iterator it = trackSpline->begin(); it != trackSpline->end(); it++)
+		if (it->first[0] != '#')
+			outfile << it->second.distance << it->second.posX << it->second.posY;
+
+	outfile.close();
+}
+
 void updateTrackSpline() {
 	try {
 		if (trackSplineBuilding) {
@@ -770,7 +806,7 @@ void updateTrackSpline() {
 					if (!buildTrackSpline->contains(key)) {
 						buildTrackSplineRunning += distance;
 
-						TrackSplinePoint point = TrackSplinePoint(key, buildTrackSplineRunning);
+						TrackSplinePoint point = TrackSplinePoint(key, buildTrackSplineRunning, newPosX, newPosY);
 						int index = (int)(buildTrackSpline->size() / 2);
 
 						(*buildTrackSpline)[key] = point;
@@ -1621,7 +1657,6 @@ void checkCoordinates() {
 
 string telemetryDirectory = "";
 ofstream telemetryFile;
-string trackSplineFile = "";
 int startTelemetryLap = -1;
 int telemetryLap = -1;
 float lastRunning = -1;
@@ -1744,12 +1779,13 @@ void collectCarTelemetry() {
 				// retry next round...
 			}
 	}
-	else if (strcmp(trackSplineFile, "") != 0) {
-		
-		trackSplineFile = "";
-	}
-	else if (trackSplineBuilding)
+	else if (trackSplineBuilding) {
 		updateTrackSpline();
+
+		if (trackSplineReady)
+			async(saveTrackSpline, telemetryDirectory + "\\Track.spline", activeTrackSpline);
+
+	}
 	else
 		startTrackSplineBuilder(carID, true);
 }
@@ -1808,7 +1844,7 @@ int main(int argc, char* argv[])
 			telemetryDirectory = argv[3];
 
 			if (argc > 5)
-				trackSplineFile = argv[5];
+				loadTrackSpline(argv[5]);
 		}
 		else if (!mapTrack) {
 			trackLength = (argc > 1) ? atof(argv[1]) : 0;

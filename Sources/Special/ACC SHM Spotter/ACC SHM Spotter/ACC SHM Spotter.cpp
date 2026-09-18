@@ -1621,6 +1621,7 @@ void checkCoordinates() {
 
 string telemetryDirectory = "";
 ofstream telemetryFile;
+string trackSplineFile = "";
 int startTelemetryLap = -1;
 int telemetryLap = -1;
 float lastRunning = -1;
@@ -1743,6 +1744,10 @@ void collectCarTelemetry() {
 				// retry next round...
 			}
 	}
+	else if (strcmp(trackSplineFile, "") != 0) {
+		
+		trackSplineFile = "";
+	}
 	else if (trackSplineBuilding)
 		updateTrackSpline();
 	else
@@ -1801,6 +1806,9 @@ int main(int argc, char* argv[])
 		else if (carTelemetry) {
 			trackLength = atof(argv[2]);
 			telemetryDirectory = argv[3];
+
+			if (argc > 5)
+				trackSplineFile = argv[5];
 		}
 		else if (!mapTrack) {
 			trackLength = (argc > 1) ? atof(argv[1]) : 0;

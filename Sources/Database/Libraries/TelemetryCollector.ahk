@@ -151,8 +151,7 @@ class TelemetryCollector {
 			lap := Integer(lap)
 
 			inputFileName := temporaryFileName("Telemetry", "json")
-			importFileName := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory)
-							 . "\Lap " . lap . ".telemetry")
+			importFileName := (this.TelemetryCollector.TelemetryDirectory . "Lap " . lap . ".telemetry")
 
 			deleteFile(inputFileName)
 			deleteFile(importFileName)
@@ -196,7 +195,7 @@ class TelemetryCollector {
 		}
 
 		loadSection(startTime) {
-			local directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
+			local directory := this.TelemetryCollector.TelemetryDirectory
 			local inputFileName := temporaryFileName("Telemetry", "json")
 			local importFileName := temporaryFileName("Import", "telemetry")
 			local text, pid
@@ -295,9 +294,9 @@ class TelemetryCollector {
 
 	class InternalTelemetryFuture extends TelemetryCollector.TelemetryFuture {
 		__New(collector) {
-			super.__New(collector)
+			local directory := collector.TelemetryDirectory
 
-			local directory := (normalizeDirectoryPath(collector.TelemetryDirectory) . "\")
+			super.__New(collector)
 
 			if FileExist(directory . "Telemetry.cmd")
 				throw "Partial telemetry collection still running in TelemetryCollector.InternalTelemetryFuture.__New..."
@@ -312,7 +311,7 @@ class TelemetryCollector {
 			local directory, inFileName, outFileName
 
 			if !this.Collected {
-				directory := (normalizeDirectoryPath(this.TelemetryCollector.TelemetryDirectory) . "\")
+				directory := this.TelemetryCollector.TelemetryDirectory
 				inFileName := (directory . "Telemetry.section")
 				outFileName := temporaryFileName("Telemetry", "section")
 
@@ -419,7 +418,7 @@ class TelemetryCollector {
 				this.iProviderURL := provider[2]
 		}
 
-		this.iTelemetryDirectory := telemetryDirectory
+		this.iTelemetryDirectory := (normalizeDirectoryPath(telemetryDirectory) . "\")
 
 		this.initialize(simulator, track, trackLength)
 	}
@@ -432,7 +431,7 @@ class TelemetryCollector {
 
 	startup(restart := false) {
 		local sessionDB := SessionDatabase()
-		local code, exePath, protocol, arguments, pid, trackData
+		local code, exePath, protocol, arguments, pid, trackData, trackSpline
 
 		if (this.Provider = "Internal") {
 			if (this.iTelemetryCollectorPID && restart)
@@ -442,7 +441,7 @@ class TelemetryCollector {
 				this.iTelemetryCollectorPID := false
 
 			if !this.iTelemetryCollectorPID {
-				code := sessionDB.getSimulatorCode(this.iSimulator)
+				code := sessionDB.getSimulatorCode(this.Simulator)
 
 				protocol := "SHM"
 				exePath := "..."
@@ -463,13 +462,17 @@ class TelemetryCollector {
 						if !FileExist(exePath)
 							throw "File not found..."
 
-						DirCreate(this.TelemetryDirectory)
+						DirCreate(normalizeDirectoryPath(this.TelemetryDirectory))
+
+						deleteFile(this.TelemetryDirectory . "Track.spline")
 
 						trackData := sessionDB.getTrackData(code, this.Track)
+						trackSpline := sessionDB.getTrackSpline(code, this.Track)
 
-						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.iTrackLength
+						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.TrackLength
 						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
 						  . (trackData ? (" `"" . trackData . "`"") : "")
+						  . (trackSpline ? (" `"" . trackSpline . "`"") : "")
 						  , kBinariesDirectory, "Hide", &pid)
 					}
 				}
@@ -530,6 +533,10 @@ class TelemetryCollector {
 			return false
 
 		if ((this.Provider = "Internal") && pid) {
+			if FileExist(this.TelemetryDirectory . "Track.spline")
+				SessionDatabase().updateTrackSpline(this.Simulator, this.Track
+												  , this.TelemetryDirectory . "Track.spline")
+
 			ProcessClose(pid)
 
 			if (force && ProcessExist(pid)) {

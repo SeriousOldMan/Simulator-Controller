@@ -692,6 +692,7 @@ inline bool hasValidCarCoordinates(long* milliSeconds) {
 void loadTrackSpline(char* fileName) {
 	std::ifstream infile(fileName);
 	float distance, x, y;
+	float maxDistance = 0.0f;
 
 	trackSpline1.clear();
 	trackSpline1.reserve(2000);
@@ -701,11 +702,12 @@ void loadTrackSpline(char* fileName) {
 
 		trackSpline1[key] = TrackSplinePoint(key, distance, x, y);
 
-		activeTrackSplineLength = buildTrackSplineRunning;
+		maxDistance = max(distance, maxDistance);
 	}
 
 	trackSplineReady = true;
 	activeTrackSpline = &trackSpline1;
+	activeTrackSplineLength = maxDistance;
 }
 
 void saveTrackSpline(string fileName, TrackSpline* trackSpline) {

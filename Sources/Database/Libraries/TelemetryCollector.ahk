@@ -471,8 +471,8 @@ class TelemetryCollector {
 
 						Run("`"" . exePath . "`" " . arguments . " -Telemetry " . this.TrackLength
 						  . " `"" . normalizeDirectoryPath(this.TelemetryDirectory) . "`""
-						  . (trackData ? (" `"" . trackData . "`"") : "")
-						  . (trackSpline ? (" `"" . trackSpline . "`"") : "")
+						  . (trackData ? (" `"" . trackData . "`"") : " -")
+						  . (trackSpline ? (" `"" . trackSpline . "`"") : " -")
 						  , kBinariesDirectory, "Hide", &pid)
 					}
 				}

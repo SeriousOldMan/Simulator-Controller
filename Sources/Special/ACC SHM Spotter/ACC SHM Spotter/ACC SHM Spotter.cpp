@@ -457,7 +457,7 @@ public:
 		key(k),
 		distance(d),
 		posX(x),
-		posY(x) {}
+		posY(y) {}
 };
 
 typedef std::unordered_map<std::string, TrackSplinePoint> TrackSpline;
@@ -717,10 +717,12 @@ void saveTrackSpline(string fileName, TrackSpline* trackSpline) {
 
 	for (TrackSpline::iterator it = trackSpline->begin(); it != trackSpline->end(); it++)
 		if (it->first[0] != '#')
-			outfile << it->second.distance << it->second.posX << it->second.posY;
+			outfile << it->second.distance << " " << it->second.posX << " " << it->second.posY << endl;
 
 	outfile.close();
 }
+
+string telemetryDirectory = "";
 
 void updateTrackSpline() {
 	try {
@@ -800,6 +802,9 @@ void updateTrackSpline() {
 
 						trackSplineReady = (last > 100 && ((float)zeroCount / (float)last) < 0.1);
 						trackSplineBuilding = false;
+
+						if (trackSplineReady && (strcmp(telemetryDirectory.c_str(), "") != 0))
+							async(saveTrackSpline, telemetryDirectory + "\\Track.spline", activeTrackSpline);
 					}
 				}
 				else {
@@ -1657,7 +1662,6 @@ void checkCoordinates() {
 	}
 }
 
-string telemetryDirectory = "";
 ofstream telemetryFile;
 int startTelemetryLap = -1;
 int telemetryLap = -1;
@@ -1781,13 +1785,8 @@ void collectCarTelemetry() {
 				// retry next round...
 			}
 	}
-	else if (trackSplineBuilding) {
+	else if (trackSplineBuilding)
 		updateTrackSpline();
-
-		if (trackSplineReady)
-			async(saveTrackSpline, telemetryDirectory + "\\Track.spline", activeTrackSpline);
-
-	}
 	else
 		startTrackSplineBuilder(carID, true);
 }

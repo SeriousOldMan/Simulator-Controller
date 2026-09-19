@@ -1180,10 +1180,10 @@ class LMURESTProvider {
 						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : " , ")
 						  . (data.Has("MultiStintState") ? data["MultiStintState"] : ""))
 				else
-					if (data.Has("status") && (data["status"] = "unavailable"))
-						return "Inactive"
-					else if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
+					if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
 						return "Not Driving"
+					else if (data.Has("status") && (data["status"] = "unavailable"))
+						return "Inactive"
 					else if data.Has("MultiStintState") {
 						switch data["MultiStintState"], false {
 							case "Disabled":

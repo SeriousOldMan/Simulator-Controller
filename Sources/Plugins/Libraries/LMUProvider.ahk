@@ -324,7 +324,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData, paused, fuelAmount, tyreWear, brakeWear, active
+		local sessionData, sessionState, paused, fuelAmount, tyreWear, brakeWear, active
 
 		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	  , kUserConfigDirectory, kConfigDirectory))
@@ -543,21 +543,30 @@ class LMUProvider extends Sector397Provider {
 			}
 
 			if !standings {
+				sessionState := sessionData.State
+
 				if logRequests
 					if !getMultiMapValue(data, "Session Data", "Active", false)
-						logMessage(kLogWarn, "SHM LMU Session State: Shutdown [" . sessionData.State . "](" . sessionData.State[true] . ")...")
+						logMessage(kLogWarn, "SHM LMU Session State: Shutdown [" . sessionState . "](" . sessionData.State[true] . ")...")
 					else if getMultiMapValue(data, "Session Data", "Paused", false)
-						logMessage(kLogInfo, "SHM LMU Session State: Paused [" . sessionData.State . "](" . sessionData.State[true] . ")...")
+						logMessage(kLogInfo, "SHM LMU Session State: Paused [" . sessionState . "](" . sessionData.State[true] . ")...")
 					else
-						logMessage(kLogInfo, "SHM LMU Session State: Running [" . sessionData.State . "](" . sessionData.State[true] . ")...")
+						logMessage(kLogInfo, "SHM LMU Session State: Running [" . sessionState . "](" . sessionData.State[true] . ")...")
 
-				switch sessionData.State, false {
+				switch sessionState, false {
 					case "Driving":
 						setMultiMapValue(data, "Session Data", "Active", true)
 						setMultiMapValue(data, "Session Data", "Paused", false)
 					case "Not Driving", "Paused":
 						setMultiMapValue(data, "Session Data", "Active", true)
 						setMultiMapValue(data, "Session Data", "Paused", true)
+
+						if (sessionState = "Not Driving") {
+							setMultiMapValue(data, "Stint Data", "Driving", false)
+							setMultiMapValue(data, "Stint Data", "DriverForname", "-")
+							setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
+							setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
+						}
 					case "Disabled":
 						setMultiMapValue(data, "Session Data", "Paused", false)
 					case "Inactive":
@@ -569,7 +578,7 @@ class LMUProvider extends Sector397Provider {
 				active := getMultiMapValue(data, "Session Data", "Active", false)
 
 				if (logRequests && !active)
-					logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionData.State . "](" . sessionData.State[true] . ")...")
+					logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionState . "](" . sessionData.State[true] . ")...")
 
 				if !active {
 					if (wasActive && (getMultiMapValue(data, "Stint Data", "InPit", false)

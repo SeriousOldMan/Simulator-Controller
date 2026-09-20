@@ -36,7 +36,22 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.6.0
+
+#### Date: 09/25/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug in the new standings and gap calculation which showed up sporadically for *iRacing*.
+  - A rare bug that prevented the state and Assistant knowledge handover to the next driver in team races with *Le Mans Ultimate* has been fixed.
+  
+#### Changes
+
+  - Several optimizations for the telemetry system:
+    - The special track spline which is created for *Asetto Corsa Competizione* is now cached and stored together with the track map. This will save one lap for all later telemetry collections.
+
+      Important: If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
+    - The startup sequence of the telemetry system in "Solo Center" has been optimized, so that for all simulators an additional lap is saved. Telemetry data will now come in for the second lap in most cases, which typically is the first lap with full pace anyway.
 
 # Release history
 

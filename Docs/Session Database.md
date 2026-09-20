@@ -232,7 +232,9 @@ For unknown (and maybe historical) reasons *Assetto Corsa Competizione* supplies
 
 To get high precision samples with a resolution of at least 20 Hz, the telemetry collector implements a special method. This method first learns the layout of the track in the same manner as [track mapping for *iRacing*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#special-notes-about-track-mapping-in-iracing) is implemented, before telemetry data can be correlated to the track position. Therefore be sure to drive clean during the first laps.
 
-A drawback of this method is, that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
+This special track spline is cached together with track map and used for all later telemetry collection, thereby saving one lap. If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
+
+Good to know: a drawback of using the created track spline is that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
 
 #### Strategies
 

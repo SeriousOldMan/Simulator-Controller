@@ -1209,6 +1209,17 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	TelemetryCollecting {
+		Get {
+			if isInstance(this.TelemetryCollector, TelemetryCollector)
+				return this.TelemetryCollector.Collecting
+			else if isInstance(this.TelemetryViewer, TelemetryViewer)
+				return this.TelemetryViewer.TelemetryCollector.Collecting
+			else
+				return false
+		}
+	}
+
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local sessionsDirectory
@@ -8159,7 +8170,7 @@ class SoloCenter extends ConfigurationItem {
 				this.TelemetryViewer.shutdownCollector()
 	}
 
-	startSession(data, wait := false) {
+	startSession(data, wait := false, collect := true) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
 			local save, msgResult, track, trackLength
@@ -8216,19 +8227,24 @@ class SoloCenter extends ConfigurationItem {
 
 				this.analyzeTelemetry()
 
-				if isInstance(this.TelemetryCollector, TelemetryCollector) {
-					this.TelemetryCollector.shutdown()
+				if (collect || !this.TelemetryCollecting) {
+					if isInstance(this.TelemetryCollector, TelemetryCollector) {
+						this.TelemetryCollector.shutdown()
 
-					if this.TelemetryViewer
-						this.TelemetryViewer.updateCollecting()
+						if this.TelemetryViewer
+							this.TelemetryViewer.updateCollecting()
 
-					this.iTelemetryCollector := false
+						this.iTelemetryCollector := false
+					}
+
+					if this.AutoTelemetry
+						this.iTelemetryCollector := true
+
+					if isDebug()
+						logMessage(kLogWarn, "Starting telemetry collection for " . track . " (" . trackLength . ")")
+
+					this.startupTelemetrySystem(track, trackLength)
 				}
-
-				if this.AutoTelemetry
-					this.iTelemetryCollector := true
-
-				this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()
 			}
@@ -8252,9 +8268,10 @@ class SoloCenter extends ConfigurationItem {
 
 			try {
 				if (!this.LastLap && !update)
-					this.startSession(data, true)
+					this.startSession(data, true, false)
 
-				this.startupTelemetrySystem(track, trackLength)
+				if !this.TelemetryCollecting
+					this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()
 

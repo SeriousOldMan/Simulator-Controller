@@ -2955,17 +2955,19 @@ class SoloCenter extends ConfigurationItem {
 		return (this.iWorking > 0)
 	}
 
-	initializeSession(session := "Practice", full := true, active := true) {
+	initializeSession(session := "Practice", full := true) {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || this.SessionActive) {
-			if isInstance(this.TelemetryCollector, TelemetryCollector)
-				this.TelemetryCollector.shutdown()
+			if full {
+				if isInstance(this.TelemetryCollector, TelemetryCollector)
+					this.TelemetryCollector.shutdown()
 
-			if this.TelemetryViewer {
-				this.TelemetryViewer.shutdownCollector()
+				if this.TelemetryViewer {
+					this.TelemetryViewer.shutdownCollector()
 
-				this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry")
+					this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry")
+				}
 			}
 
 			directory := this.SessionDirectory
@@ -2985,7 +2987,7 @@ class SoloCenter extends ConfigurationItem {
 			this.iSessionMode := false
 			this.iSessionLoaded := false
 
-			this.initializeSession(session, full, active)
+			this.initializeSession(session, full)
 
 			return
 		}
@@ -3095,7 +3097,11 @@ class SoloCenter extends ConfigurationItem {
 
 			if track
 				this.loadTrack(track)
+
+			return true
 		}
+		else
+			return false
 	}
 
 	initializeReports() {
@@ -5560,7 +5566,7 @@ class SoloCenter extends ConfigurationItem {
 							this.iSessionLoading := true
 
 							try {
-								this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
+								this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"))
 
 								this.iSessionMode := "Loaded"
 								this.iSessionLoaded := folder
@@ -8162,7 +8168,7 @@ class SoloCenter extends ConfigurationItem {
 	startSession(data, wait := false) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
-			local save, msgResult, track, trackLength
+			local restart, save, msgResult, simulator, car, track, trackLength
 
 			if fileName
 				data := readMultiMap(fileName)
@@ -8206,29 +8212,32 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				}
 
+				simulator := SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown"))
+				car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 				trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
 
 				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"), false)
 
-				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
-									   , getMultiMapValue(data, "Session Data", "Car"), track)
+				restart := this.initializeSimulator(simulator, car, track)
 
 				this.analyzeTelemetry()
 
-				if isInstance(this.TelemetryCollector, TelemetryCollector) {
-					this.TelemetryCollector.shutdown()
+				if (restart || !this.TelemetryCollecting) {
+					if isInstance(this.TelemetryCollector, TelemetryCollector) {
+						this.TelemetryCollector.shutdown()
 
-					if this.TelemetryViewer
-						this.TelemetryViewer.updateCollecting()
+						if this.TelemetryViewer
+							this.TelemetryViewer.updateCollecting()
 
-					this.iTelemetryCollector := false
+						this.iTelemetryCollector := false
+					}
+
+					if this.AutoTelemetry
+						this.iTelemetryCollector := true
+
+					this.startupTelemetrySystem(track, trackLength)
 				}
-
-				if this.AutoTelemetry
-					this.iTelemetryCollector := true
-
-				this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()
 			}

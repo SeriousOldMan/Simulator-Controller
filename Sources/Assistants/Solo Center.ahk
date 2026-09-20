@@ -1209,6 +1209,17 @@ class SoloCenter extends ConfigurationItem {
 		}
 	}
 
+	TelemetryCollecting {
+		Get {
+			if isInstance(this.TelemetryCollector, TelemetryCollector)
+				return this.TelemetryCollector.Collecting
+			else if isInstance(this.TelemetryViewer, TelemetryViewer)
+				return this.TelemetryViewer.TelemetryCollector.Collecting
+			else
+				return false
+		}
+	}
+
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
 		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local sessionsDirectory
@@ -8224,6 +8235,9 @@ class SoloCenter extends ConfigurationItem {
 				this.analyzeTelemetry()
 
 				if (restart || !this.TelemetryCollecting) {
+					if isDebug()
+						logMessage(kLogWarn, "Starting telemetry collection for " . track . " (" . trackLength . ")")
+
 					if isInstance(this.TelemetryCollector, TelemetryCollector) {
 						this.TelemetryCollector.shutdown()
 
@@ -8262,8 +8276,8 @@ class SoloCenter extends ConfigurationItem {
 			try {
 				if (!this.LastLap && !update)
 					this.startSession(data, true)
-
-				this.startupTelemetrySystem(track, trackLength)
+				else if !this.TelemetryCollecting
+					this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()
 

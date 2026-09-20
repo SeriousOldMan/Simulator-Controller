@@ -1688,7 +1688,7 @@ int main(int argc, char* argv[])
 
 			telemetryDirectory = argv[3];
 
-			if (argc > 3) {
+			if ((argc > 4) && (strcmp(argv[4], "-") != 0)) {
 				loadTrackCoordinates(argv[4]);
 
 				hasTrackCoordinates = true;

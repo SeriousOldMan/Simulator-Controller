@@ -961,6 +961,22 @@ class SessionDatabase extends ConfigurationItem {
 			return false
 	}
 
+	updateTrackSpline(simulator, track, fileName) {
+		local prefix := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track))
+		local extension
+
+		FileCopy(fileName, prefix . ".spline", 1)
+	}
+
+	getTrackSpline(simulator, track) {
+		local fileName := (kDatabaseDirectory . "User\Tracks\" . this.getSimulatorCode(simulator) . "\" . this.getTrackCode(simulator, track) . ".spline")
+
+		if FileExist(fileName)
+			return fileName
+		else
+			return false
+	}
+
 	hasTrackAutomation(simulator, car, track, name := false) {
 		local ignore, trackAutomation
 

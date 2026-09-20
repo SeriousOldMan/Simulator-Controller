@@ -5415,19 +5415,21 @@ computePositions(context, lapNumber) {
 			carLaps := (carRunning + knowledgeBase.getValue("Car." . A_Index . ".Laps"
 														  , knowledgeBase.getValue("Car." . A_Index . ".Lap", 0)))
 
-			if (carLaps > 1) {
-				standingsDistance := (carLaps - driverLaps)
-				standingsDelta := (driverLapTime * standingsDistance)
+			if (carLaps > 1)
+				try {
+					standingsDistance := (carLaps - driverLaps)
+					standingsDelta := (isNumber(driverLapTime) ? (driverLapTime * standingsDistance)
+															   : knowledgeBase.RaceAssistant.BestLapTime)
 
-				knowledgeBase.setFact(prefix . ".Laps", carLaps)
-				knowledgeBase.setFact(prefix . ".Delta", standingsDelta)
+					knowledgeBase.setFact(prefix . ".Laps", carLaps)
+					knowledgeBase.setFact(prefix . ".Delta", standingsDelta)
 
-				trackDistance := (driverRunning - carRunning)
-				trackDelta := (-1 * (driverLapTime * trackDistance))
+					trackDistance := (driverRunning - carRunning)
+					trackDelta := (-1 * (driverLapTime * trackDistance))
 
-				updateStandings(driverClass, A_Index, standingsDistance, standingsDelta)
-				updateTrack(A_Index, trackDistance, trackDelta)
-			}
+					updateStandings(driverClass, A_Index, standingsDistance, standingsDelta)
+					updateTrack(A_Index, trackDistance, trackDelta)
+				}
 		}
 	}
 

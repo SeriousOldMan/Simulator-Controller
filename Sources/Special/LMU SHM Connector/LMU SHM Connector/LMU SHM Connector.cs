@@ -403,14 +403,11 @@ namespace SHMConnector {
 
 				strWriter.Write("InPitLane="); strWriter.WriteLine(playerScoring.mInPits != 0 ? "true" : "false");
 
-                if (playerScoring.mInPits != 0) {
-					double speed = VehicleSpeed(ref playerScoring);
-
-					if (speed < 5 || playerScoring.mPitState == (byte)Stopped)
+                if (playerScoring.mInPits != 0)
+					if (VehicleSpeed(ref playerScoring) < 5 || playerScoring.mPitState == (byte)Stopped)
 						strWriter.WriteLine("InPit=true");
 					else
 						strWriter.WriteLine("InPit=false");
-				}
 			}
 
 			strWriter.WriteLine("[Car Data]");

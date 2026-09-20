@@ -433,6 +433,9 @@ class TelemetryCollector {
 		local sessionDB := SessionDatabase()
 		local code, exePath, protocol, arguments, pid, trackData, trackSpline
 
+		if isDebug()
+			logMessage(kLogWarn, "Startup telemetry collector...")
+
 		if (this.Provider = "Internal") {
 			if (this.iTelemetryCollectorPID && restart)
 				this.shutdown(true)
@@ -528,6 +531,9 @@ class TelemetryCollector {
 	shutdown(force := false, arguments*) {
 		local pid := this.iTelemetryCollectorPID
 		local tries
+
+		if isDebug()
+			logMessage(kLogWarn, "Shutdown telemetry collector...")
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
 			return false

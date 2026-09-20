@@ -1455,7 +1455,10 @@ class TelemetryViewer {
 	}
 
 	startupCollector(simulatorOrCollector, track?, trackLength?) {
-		if this.Collect
+		if this.Collect {
+			if isDebug()
+				logMessage(kLogWarn, "Startup collector in TelemetryViewer...")
+
 			if isInstance(simulatorOrCollector, TelemetryCollector) {
 				this.iTelemetryCollector := simulatorOrCollector
 				this.iOwnedTelemetryCollector := false
@@ -1480,11 +1483,15 @@ class TelemetryViewer {
 				else
 					this.TelemetryCollector.startup()
 			}
+		}
 
 		this.updateCollecting(this.TelemetryCollector)
 	}
 
 	shutdownCollector() {
+		if isDebug()
+			logMessage(kLogWarn, "Shutdown collector in TelemetryViewer...")
+
 		if this.TelemetryCollector {
 			if this.iOwnedTelemetryCollector
 				this.TelemetryCollector.shutdown()

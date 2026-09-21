@@ -18,6 +18,7 @@
 										 Aero.Wing.Front, Aero.Wing.Rear,
 										 Spring.Rate.Front.Left,Spring.Rate.Front.Right,
 										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
+										 Geometry.Toe.Front.Left, Geometry.Toe.Front.Right,
 										 Geometry.Toe.Rear.Left, Geometry.Toe.Rear.Right,
 										 Geometry.Camber.Front.Left, Geometry.Camber.Front.Right,
 										 Geometry.Camber.Rear.Left, Geometry.Camber.Rear.Right,

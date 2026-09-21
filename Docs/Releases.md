@@ -53,6 +53,10 @@
       Important: If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
     - The startup sequence of the telemetry system in "Solo Center" has been optimized, so that for all simulators an additional lap is saved. Telemetry data will now come in for the second lap in most cases, which typically is the first lap with full pace anyway.
   - [Experts] It is now possible to use the asterisk \* as a part of a setting descriptor in a cars rule file for the "Setup Workbench". Example: Bumpstop.\*.\*.\*
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO (by @\|FuZzYyY\|)
+	  - Mini John Cooper S
+	  - Datsun 240Z
   
 # Release history
 

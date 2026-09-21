@@ -1213,7 +1213,8 @@ class SoloCenter extends ConfigurationItem {
 		Get {
 			if isInstance(this.TelemetryCollector, TelemetryCollector)
 				return this.TelemetryCollector.Collecting
-			else if isInstance(this.TelemetryViewer, TelemetryViewer)
+			else if (isInstance(this.TelemetryViewer, TelemetryViewer)
+				  && isInstance(this.TelemetryViewer.TelemetryCollector, TelemetryCollector))
 				return this.TelemetryViewer.TelemetryCollector.Collecting
 			else
 				return false

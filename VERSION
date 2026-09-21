@@ -2,7 +2,7 @@
 Version=7.2.6.0-dev
 Target=7.2.6.0-release
 Date=09/20/26
-Download=
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/8o4UDzPl?inline=true
 Changes=Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]

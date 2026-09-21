@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.2.6.0-dev]() (Early build for 7.2.6. Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC.)
+[7.2.6.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/8o4UDzPl?inline=true) (Early build for 7.2.6. Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7260) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-726) of this version and all the versions you might have skipped, before installing and using this version.
 

@@ -1284,6 +1284,67 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 	}
 
+	matchSettings(descriptor) {
+		local simulator := this.SelectedSimulator["*"]
+		local car := this.SelectedCar["*"]
+		local pattern, group, definition, ignore, groupOption, option, setting, settings
+
+		if InStr(descriptor, "*") {
+			pattern := string2Values(".", descriptor)
+			settings := []
+
+			for group, definition in this.getSettings(simulator, car)
+				for ignore, groupOption in string2Values(";", definition)
+					if InStr(groupOption, ":") {
+						groupOption := string2Values(":", groupOption)
+
+						for ignore, option in string2Values(",", groupOption[2]) {
+							setting := string2Values(".", factPath(group, groupOption[1], option))
+
+							if (pattern.Length = setting.Length) {
+								valid := true
+
+								loop pattern.Length
+									if ((pattern[A_Index] != setting[A_Index]) && pattern[A_Index] != "*") {
+										valid := false
+
+										break
+									}
+
+								if valid
+									settings.Push(values2String(".", setting*))
+							}
+						}
+					}
+					else {
+						setting := string2Values(".", factPath(group, groupOption))
+
+						if (pattern.Length = setting.Length) {
+							valid := true
+
+							loop pattern.Length
+								if ((pattern[A_Index] != setting[A_Index]) && pattern[A_Index] != "*") {
+									valid := false
+
+									break
+								}
+
+							if valid
+								settings.Push(values2String(".", setting*))
+						}
+					}
+
+			if (settings.Length = 0)
+				return "[]"
+			else if (settings.Length = 1)
+				return settings[1]
+			else
+				return ("[" . values2String(", ", settings*) . "]")
+		}
+		else
+			return descriptor
+	}
+
 	createKnowledgeBase(productions, reductions, facts := false, includes := false) {
 		local engine := RuleEngine(productions, reductions, facts, includes)
 

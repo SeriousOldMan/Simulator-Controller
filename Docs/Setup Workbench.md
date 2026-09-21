@@ -461,6 +461,8 @@ Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very
 				 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
 				 Differential.Preload, AntiRollBar.Rear]))
 
+Good to know: It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
+
 Beside the rules, which influence the way, the "Setup Workbench" analyses your handling problems, a so called definition file describe the car settings, their units and value ranges in more detail for the Setup Editor. These files are located in the *Resources\Garage\Definitions\Cars* folder in the program directory or in the *Simulator Controller\Garage\Definitions\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 
 	[Simulator].[Car].ini
@@ -656,6 +658,8 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 		
 		[?Speed.Corner.Fast.Correction != 0] =>
 			(Prove: changeSetting(Aero.Diffusor.Height, -1, ?Speed.Corner.Fast.Correction))
+
+Good to know: It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
 
 Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have an extensive understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
 

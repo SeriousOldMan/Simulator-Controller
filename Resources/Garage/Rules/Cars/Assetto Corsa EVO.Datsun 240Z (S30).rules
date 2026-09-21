@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa EVO               ;;;
-;;;                                         Datsun 240Z		 	            ;;;
+;;;                                         Datsun 240Z (S30)               ;;;
 ;;;                                         Setup Rules                     ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                    ;;;
@@ -11,7 +11,7 @@
 ;;;                            Initialization                               ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "Datsun 240Z",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "Datsun 240Z (S30)",
 										[Electronics.Map, Electronics.TC, Electronics.ABS,
 										 Brake.Balance, Brake.Pressure, AntiRollBar.Front, AntiRollBar.Rear,
 										 Aero.Height.Front, Aero.Height.Rear,

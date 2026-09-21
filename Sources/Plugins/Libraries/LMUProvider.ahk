@@ -329,6 +329,7 @@ class LMUProvider extends Sector397Provider {
 		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	  , kUserConfigDirectory, kConfigDirectory))
 											 , "Debug", "LogSimulator", false)
+		static waitForDriverSwap := false
 
 		static keys := Map("All", "", "Front Left", "FrontLeft", "Front Right", "FrontRight"
 									, "Rear Left", "RearLeft", "Rear Right", "RearRight")
@@ -594,6 +595,31 @@ class LMUProvider extends Sector397Provider {
 				}
 
 				wasActive := active
+
+				if true {
+					if (false && getMultiMapValue(data, "Stint Data", "InPit", false)) {
+						setMultiMapValue(data, "Session Data", "Active", true)
+						setMultiMapValue(data, "Session Data", "Paused", true)
+
+						setMultiMapValue(data, "Stint Data", "Driving", false)
+						setMultiMapValue(data, "Stint Data", "DriverForname", "-")
+						setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
+						setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
+					}
+					else if (!waitForDriverSwap && getMultiMapValue(data, "Stint Data", "InPit", false))
+						waitForDriverSwap := true
+					else if waitForDriverSwap {
+						waitForDriverSwap := false
+
+						setMultiMapValue(data, "Session Data", "Active", true)
+						setMultiMapValue(data, "Session Data", "Paused", true)
+
+						setMultiMapValue(data, "Stint Data", "Driving", false)
+						setMultiMapValue(data, "Stint Data", "DriverForname", "-")
+						setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
+						setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
+					}
+				}
 
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)

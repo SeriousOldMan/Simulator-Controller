@@ -461,7 +461,14 @@ Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very
 				 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
 				 Differential.Preload, AntiRollBar.Rear]))
 
-Good to know: It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
+Good to know: It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*. So the above declaration can be made much shorter:
+
+	[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 992 GT3 Cup",
+				[Electronics.TC, Aero.Splitter.Front,
+				 Spring.*.*.*, Bumpstop.*.*.*, Damper.*.*.*.*,
+				 Differential.Preload, AntiRollBar.Rear]))
+
+But make sure, that you do not match unwanted settings by accident, of course.
 
 Beside the rules, which influence the way, the "Setup Workbench" analyses your handling problems, a so called definition file describe the car settings, their units and value ranges in more detail for the Setup Editor. These files are located in the *Resources\Garage\Definitions\Cars* folder in the program directory or in the *Simulator Controller\Garage\Definitions\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 

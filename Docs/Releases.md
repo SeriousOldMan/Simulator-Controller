@@ -62,6 +62,11 @@
 	  - BMW M2 CS Racing
 	  - Mini John Cooper S
 	  - Datsun 240Z
+	  - Abarth 695 Biposto
+      - Alpine A110 S
+	  - Alpine A290 Beta
+	  - Dallara EXP
+	  - Hyundai i30 N Hatchback
   
 # Release history
 

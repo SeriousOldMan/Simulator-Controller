@@ -48,6 +48,7 @@
   
 #### Changes
 
+  - Added meta data for the tracks of the new *Le Mans Ultimate* DLC.
   - Several optimizations for the telemetry system:
     - The special track spline which is created for *Asetto Corsa Competizione* is now cached and stored together with the track map. This will save one lap for all later telemetry collections.
 
@@ -58,6 +59,7 @@
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO (partly by @\|FuZzYyY\|)
 	  - Lamborghini Huracan ST EVO2
+	  - BMW M2 CS Racing
 	  - Mini John Cooper S
 	  - Datsun 240Z
   

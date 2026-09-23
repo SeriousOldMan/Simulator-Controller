@@ -54,6 +54,7 @@
       Important: If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
     - The startup sequence of the telemetry system in "Solo Center" has been optimized, so that for all simulators an additional lap is saved. Telemetry data will now come in for the second lap in most cases, which typically is the first lap with full pace anyway.
   - [Experts] It is now possible to use the asterisk \* as a wildcard for a part of a setting descriptor in a cars rule file for the "Setup Workbench". Example: Bumpstop.\*.\*.\*. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for an example.
+  - Added a new article for the tipps and tricks system.
   - New car models for "Setup Workbench":
     - Assetto Corsa EVO (partly by @\|FuZzYyY\|)
 	  - Lamborghini Huracan ST EVO2

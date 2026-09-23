@@ -13,7 +13,8 @@
 
 [?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "Alpine A290 Beta",
 										[Electronics.Map, Electronics.TC, Electronics.ABS,
-										 Brake.Balance, Brake.Pressure, AntiRollBar.Front, AntiRollBar.Rear,
+										 Brake.Balance, Brake.Pressure,
+										 AntiRollBar.Front, AntiRollBar.Rear,
 										 Aero.Height.Front, Aero.Height.Rear,
 										 Aero.Wing.Front, Aero.Wing.Rear,
 										 Geometry.Toe.Front.Left, Geometry.Toe.Front.Right,

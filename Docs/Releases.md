@@ -44,6 +44,7 @@
 
   - Fixed a bug in the new standings and gap calculation which showed up sporadically for *iRacing*.
   - A rare bug that prevented the state and Assistant knowledge handover to the next driver in team races with *Le Mans Ultimate* has been fixed.
+  - Fixed another rare bug which prevented saving of instructions for Assistant boosters.
   
 #### Changes
 

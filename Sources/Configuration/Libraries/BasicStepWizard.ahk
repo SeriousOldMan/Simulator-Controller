@@ -1122,7 +1122,7 @@ class BasicStepWizard extends StepWizard {
 
 		if (getMultiMapValue(voiceConfiguration, "Voice Control", "Language", kUndefined) = kUndefined)
 			setMultiMapValue(voiceConfiguration, "Voice Control", "Language", getLanguage())
-		
+
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalk", this.Control["basicPushToTalkEdit"].Text)
 		setMultiMapValue(voiceConfiguration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["basicPushToTalkModeDropDown"].Value])
 
@@ -1256,6 +1256,7 @@ class BasicStepWizard extends StepWizard {
 		local wizard := this.SetupWizard
 		local window := this.Window
 		local configuration, setup, availableBooster, speakerBooster, listenerBooster, conversationBooster, agentBooster
+		local newConfiguration, assistants, section, values, key, value, removedKeys, candidate
 
 		window.Block()
 
@@ -1302,9 +1303,28 @@ class BasicStepWizard extends StepWizard {
 			availableBooster := ((assistant = "Driving Coach") ? ["Speaker", "Listener", "Agent"]
 															   : ["Speaker", "Listener", "Conversation", "Agent"])
 
-			configuration := AssistantBoosterEditor(assistant, configuration, availableBooster).editBooster(window)
+			newConfiguration := AssistantBoosterEditor(assistant, configuration.Clone(), availableBooster).editBooster(window)
 
-			if configuration {
+			if newConfiguration {
+				assistants := remove(kRaceAssistants.Clone(), assistant)
+
+				for section, values in newConfiguration {
+					removedKeys := []
+
+					for key, value in values
+						for ignore, candidate in assistants
+							if (InStr(key, candidate) == 1) {
+								removedKeys.Push(key)
+
+								break
+							}
+
+					for ignore, key in removedKeys
+						removeMultiMapValue(newConfiguration, section, key)
+				}
+
+				addMultiMapValues(configuration, newConfiguration)
+
 				writeMultiMap(kUserHomeDirectory . "Setup\Assistant Booster Configuration.ini", configuration)
 
 				speakerBooster := Map("Service", getMultiMapValue(configuration, "Conversation Booster", assistant . ".Service")

@@ -1,15 +1,15 @@
 [Development]
-Version=7.2.6.0-beta
+Version=7.2.6.0-release
 Target=7.2.6.0-release
-Date=09/23/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ATo-HC-R?inline=true
+Date=09/25/26
+Download=https://cutt.ly/1yvGGygW;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/y5qjYWHT?inline=true;https://www.dropbox.com/scl/fi/zim4u6ip3tij7zqhfs0j5/Simulator-Controller-7.2.6.0-release.zip?rlkey=lyhbdt5g2zr8i31fmwcd2dins&st=c02uk79s&dl=1;http://%master%/Releases/Simulator Controller 7.2.6.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.2.6.0-release.zip
 Changes=Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
-Version=7.2.5.0-release
-Date=09/18/26
-Download=https://cutt.ly/OyxB3OL0;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/QVKnYoA5?inline=true;https://www.dropbox.com/scl/fi/08dmgbv8d74ntjat2i6qo/Simulator-Controller-7.2.5.0-release.zip?rlkey=m5kgfqhw0nepicu5np5ko15cf&st=qn2xkpk3&dl=1;http://%master%/Releases/Simulator Controller 7.2.5.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.2.5.0-release.zip
-Changes=New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer, Max increment setting for setup changes
+Version=7.2.6.0-release
+Date=09/25/26
+Download=http://%master%/Releases/Simulator Controller 7.2.6.0-release.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.2.6.0-release.zip
+Changes=Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Components]
 Media.6.9.0.Path=Resources
@@ -22,7 +22,7 @@ Utilities.7.2.3.Path=.
 Utilities.7.2.3.Content=Utilities
 Utilities.7.2.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Rrjbhixm/Components/Utilities%207.2.3.zip;https://www.dropbox.com/scl/fi/8ezjlimilu942hbvhppuq/Utilities-7.2.3.zip?rlkey=9m9inc7rpoddt8jxpxweceuzf&st=jzhnxe7c&dl=1;http://%master%/Components/Utilities 7.2.3.zip
 [Current]
-Type=Development
+Type=Release
 [Version]
-Development=7.2.6.0-beta
-Release=7.2.5.0-release
+Development=7.2.6.0-release
+Release=7.2.6.0-release

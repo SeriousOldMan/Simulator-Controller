@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.5.0-release](https://cutt.ly/OyxB3OL0) (Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer, Max increment setting for setup changes.)
+[7.2.6.0-release](https://cutt.ly/1yvGGygW) (Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7250) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-725) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7260) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-726) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.2.4.0-release](https://cutt.ly/CylXW1AW) (Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New car models for "Setup Workbench".)
+[7.2.5.0-release](https://cutt.ly/OyxB3OL0) (Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer, Max increment setting for setup changes.)
 
-[7.2.3.0-release](https://cutt.ly/Fyj4wrqO) (Changes: Support for ACE setup files, Filter for unknown LMU cars in database synchronization, Filter for unknown LMU tracks in database synchronization, Migrated to AHK 2.1-Alpha.31, Added ACE cars for Setup Workbench", Added tyre data for new ACE cars, Performance improvement for standings computations, New car models for "Setup Workbench", Updated R3E car data, Fixed issue analyzer for ACC and ACE, Extended handler in the "Setup Workbench".)
+[7.2.4.0-release](https://cutt.ly/CylXW1AW) (Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New car models for "Setup Workbench".)
 
 #### Current development build
 
-[7.2.6.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ATo-HC-R?inline=true) (Test build for 7.2.6. Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7260) and - sometimes even, Fixed startup crash in "Strategy Workbench" more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-726) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

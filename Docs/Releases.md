@@ -1,5 +1,43 @@
 # Latest stable release
 
+## 7.2.6.0
+
+#### Date: 09/25/26
+
+#### Fixes
+
+  - Fixed a bug in the new standings and gap calculation which showed up sporadically for *iRacing*.
+  - A rare bug that prevented the state and Assistant knowledge handover to the next driver in team races with *Le Mans Ultimate* has been fixed.
+  - Fixed another rare bug which prevented saving of instructions for Assistant boosters.
+  
+#### Changes
+
+  - Added meta data for the tracks of the new *Le Mans Ultimate* DLC.
+  - Several optimizations for the telemetry system:
+    - The special track spline which is created for *Asetto Corsa Competizione* is now cached and stored together with the track map. This will save one lap for all later telemetry collections.
+
+      Important: If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
+    - The startup sequence of the telemetry system in "Solo Center" has been optimized, so that for all simulators an additional lap is saved. Telemetry data will now come in for the second lap in most cases, which typically is the first lap with full pace anyway.
+  - [Experts] It is now possible to use the asterisk \* as a wildcard for a part of a setting descriptor in a cars rule file for the "Setup Workbench". Example: Bumpstop.\*.\*.\*. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for an example.
+  - Added a new article for the tipps and tricks system.
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO (most of them by @\|FuZzYyY\|)
+	  - Lamborghini Huracan ST EVO2
+	  - BMW M2 CS Racing
+	  - Mini John Cooper S
+	  - Datsun 240Z
+	  - Abarth 695 Biposto
+      - Alpine A110 S
+	  - Alpine A290 Beta
+	  - Dallara EXP
+	  - Hyundai i30 N Hatchback
+
+# Upcoming release
+
+Not yet planned...
+  
+# Release history
+
 ## 7.2.5.0
 
 #### Date: 09/18/26
@@ -33,42 +71,6 @@
 	  - KTM X Bow GT4
     - Assetto Corsa EVO (by @\|FuZzYyY\|)
 	  - Ford Escort RS Cosworth
-
-# Upcoming release
-
-## 7.2.6.0
-
-#### Date: 09/25/26 (planned)
-
-#### Fixes
-
-  - Fixed a bug in the new standings and gap calculation which showed up sporadically for *iRacing*.
-  - A rare bug that prevented the state and Assistant knowledge handover to the next driver in team races with *Le Mans Ultimate* has been fixed.
-  - Fixed another rare bug which prevented saving of instructions for Assistant boosters.
-  
-#### Changes
-
-  - Added meta data for the tracks of the new *Le Mans Ultimate* DLC.
-  - Several optimizations for the telemetry system:
-    - The special track spline which is created for *Asetto Corsa Competizione* is now cached and stored together with the track map. This will save one lap for all later telemetry collections.
-
-      Important: If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
-    - The startup sequence of the telemetry system in "Solo Center" has been optimized, so that for all simulators an additional lap is saved. Telemetry data will now come in for the second lap in most cases, which typically is the first lap with full pace anyway.
-  - [Experts] It is now possible to use the asterisk \* as a wildcard for a part of a setting descriptor in a cars rule file for the "Setup Workbench". Example: Bumpstop.\*.\*.\*. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for an example.
-  - Added a new article for the tipps and tricks system.
-  - New car models for "Setup Workbench":
-    - Assetto Corsa EVO (most of them by @\|FuZzYyY\|)
-	  - Lamborghini Huracan ST EVO2
-	  - BMW M2 CS Racing
-	  - Mini John Cooper S
-	  - Datsun 240Z
-	  - Abarth 695 Biposto
-      - Alpine A110 S
-	  - Alpine A290 Beta
-	  - Dallara EXP
-	  - Hyundai i30 N Hatchback
-  
-# Release history
 
 ## 7.2.4.0
 

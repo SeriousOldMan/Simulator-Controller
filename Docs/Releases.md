@@ -57,7 +57,7 @@
   - [Experts] It is now possible to use the asterisk \* as a wildcard for a part of a setting descriptor in a cars rule file for the "Setup Workbench". Example: Bumpstop.\*.\*.\*. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for an example.
   - Added a new article for the tipps and tricks system.
   - New car models for "Setup Workbench":
-    - Assetto Corsa EVO (partly by @\|FuZzYyY\|)
+    - Assetto Corsa EVO (most of them by @\|FuZzYyY\|)
 	  - Lamborghini Huracan ST EVO2
 	  - BMW M2 CS Racing
 	  - Mini John Cooper S

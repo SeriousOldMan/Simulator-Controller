@@ -4269,6 +4269,15 @@ class RaceEngineer extends RaceAssistant {
 				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
 					fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 
+					if !isNumber(fuel) {
+						logMessage(kLogWarn, "refuelAmount: " . refuelAmount)
+						logMessage(kLogWarn, "correctedFuel: " . correctedFuel)
+						logMessage(kLogWarn, "Pitstop.Planned.Fuel: " . fuel)
+						logMessage(kLogWarn, "Fuel.Amount.Target: " . knowledgeBase.getValue("Fuel.Amount.Target"))
+
+						fuel := 0
+					}
+
 					if (fuel == 0)
 						speaker.speakPhrase(forceRefuel ? "NoRefuel" : "NoRefuelLap")
 					else

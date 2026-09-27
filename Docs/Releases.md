@@ -34,7 +34,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.6.0
+
+#### Date: 10/02/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - [Internal] Improved internal memory management of the Driving Coach.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
+	  - Porsche 911 GT3 RS (992)
   
 # Release history
 

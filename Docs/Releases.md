@@ -49,6 +49,7 @@
     - Assetto Corsa EVO
 	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
 	  - Porsche 911 GT3 RS (992)
+	  - Caterham Academy
   
 # Release history
 

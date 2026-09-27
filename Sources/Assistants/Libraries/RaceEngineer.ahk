@@ -4268,14 +4268,21 @@ class RaceEngineer extends RaceAssistant {
 				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
 					fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
 
-					if !isNumber(fuel) {
-						logMessage(kLogWarn, "refuelAmount: " . refuelAmount)
-						logMessage(kLogWarn, "correctedFuel: " . correctedFuel)
-						logMessage(kLogWarn, "Pitstop.Planned.Fuel: " . fuel)
-						logMessage(kLogWarn, "Fuel.Amount.Target: " . knowledgeBase.getValue("Fuel.Amount.Target"))
+					if isDebug() {
+						logMessage(kLogWarn, "Calculated refuel amount: " . fuel)
+						logMessage(kLogWarn, "Converted refuel amount: " . convertUnit("Volume", fuel))
 
-						fuel := 0
+						if !isNumber(fuel) {
+							logMessage(kLogWarn, "Requested Fuel Amount: " . refuelAmount)
+							logMessage(kLogWarn, "Fuel Correction: " . (correctedFuel ? "True" : "False"))
+							logMessage(kLogWarn, "Pitstop.Planned.Fuel: " . fuel)
+							logMessage(kLogWarn, "Fuel.Amount.Target: " . knowledgeBase.getValue("Fuel.Amount.Target"))
+
+							fuel := 0
+						}
 					}
+					else if !isNumber(fuel)
+						fuel := 0
 
 					if (fuel == 0)
 						speaker.speakPhrase(forceRefuel ? "NoRefuel" : "NoRefuelLap")
@@ -4384,7 +4391,7 @@ class RaceEngineer extends RaceAssistant {
 						else
 							for ignore, suffix in ["FL", "FR", "RL", "RR"]
 								if (debug || (increment%suffix% != 0.0))
-									speaker.speakPhrase("Tyre" . suffix
+									speaker.speakPhrase("Tyre" . suffix9
 													  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
 													   , unit: fragments[getUnit("Pressure")]
 													   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]

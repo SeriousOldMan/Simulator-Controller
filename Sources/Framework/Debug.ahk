@@ -284,7 +284,7 @@ logError(exception, unexpected := false, report := true) {
 				 , true, unexpected)
 
 		if exception.HasProp("Extra")
-			logMessage(critical ? kLogCritical : kLogDebug, "`What:`n`n" . exception.Extra
+			logMessage(critical ? kLogCritical : kLogDebug, "`What: " . exception.Extra
 					 , false, unexpected, false)
 
 		if exception.HasProp("Stack")

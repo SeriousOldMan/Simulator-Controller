@@ -665,7 +665,7 @@ class LMUProvider extends Sector397Provider {
 									fuelAmount := carData.FuelAmount
 								}
 
-								if fuelAmount
+								if isNumber(fuelAmount)
 									setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
 							}
 						}

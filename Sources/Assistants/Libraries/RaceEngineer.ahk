@@ -4081,7 +4081,7 @@ class RaceEngineer extends RaceAssistant {
 
 		correctedFuel := false
 
-		if (refuelAmount != kUndefined) {
+		if (refuelAmount != kUndefined)
 			if (InStr(refuelAmount, "!") = 1) {
 				knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", SubStr(refuelAmount, 2) + 0)
 
@@ -4100,7 +4100,6 @@ class RaceEngineer extends RaceAssistant {
 				else
 					knowledgeBase.addFact("Pitstop.Plan.Fuel.Amount", refuelAmount)
 			}
-		}
 
 		correctedTyres := false
 
@@ -4268,6 +4267,9 @@ class RaceEngineer extends RaceAssistant {
 
 				if ((options == true) || (options.HasProp("Fuel") && options.Fuel)) {
 					fuel := knowledgeBase.getValue("Pitstop.Planned.Fuel", 0)
+
+					if !isNumber(fuel)
+						fuel := 0
 
 					if (fuel == 0)
 						speaker.speakPhrase(forceRefuel ? "NoRefuel" : "NoRefuelLap")

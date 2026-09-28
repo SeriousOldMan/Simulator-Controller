@@ -108,8 +108,34 @@ class JSON {
 
 					if isInteger(val)
 						val += 0
-					else if isFloat(val)
-						val += 0
+					else if isFloat(val) {
+						decPos := InStr(val, ".")
+						charCount := 0
+						lastChar := kUndefined
+
+						loop (StrLen(val) - decPos) {
+							char := SubStr(val, decPos + A_Index, 1)
+
+							if (lastChar == kUndefined)
+								lastChar := char
+
+							if (char = lastChar)
+								charCount += 1
+							else {
+								lastChar := char
+								charCount := 1
+
+								continue
+							}
+
+							if (charCount > 2) {
+								val := Round(val, A_Index - 3)
+
+								break
+							}
+						}
+
+					}
 					else if (val == "true" || val == "false")
 						val := (val == "true")
 					else if (val == "null")
@@ -126,7 +152,7 @@ class JSON {
 				next := obj == tree ? "" : is_array ? ",]" : ",}"
 			}
 		}
-
+msgbox JSON.print(tree[1], "  ")
 		return tree[1]
 	}
 

@@ -2828,11 +2828,14 @@ class FloatHandler extends NumberHandler {
 		this.iIncrement := increment
 		this.iPrecision := precision
 
-		if (base == kUndefined)
+		if (base == kUndefined) {
 			if (minValue != kUndefined)
 				base := minValue
 			else
 				base := 0
+
+			places := precision
+		}
 
 		this.iBase := base
 		this.iMultiplier := multiplier

@@ -777,7 +777,10 @@ class LMURESTProvider {
 						else
 							capacity := StrReplace(capacity, "l", "")
 
-						return ((carSetup["VM_VIRTUAL_ENERGY"]["value"] / 100) * capacity * carSetup["VM_FUEL_LEVEL"]["stringValue"])
+						if isNumber(capacity)
+							return ((carSetup["VM_VIRTUAL_ENERGY"]["value"] / 100) * capacity * carSetup["VM_FUEL_LEVEL"]["stringValue"])
+						else
+							throw "Invalid fuel capacity value..."
 					}
 				}
 				catch Any {
@@ -816,7 +819,7 @@ class LMURESTProvider {
 						if isNumber(capacity)
 							return capacity
 						else
-							throw "Invalid fuel value..."
+							throw "Invalid fuel  capacity value..."
 					}
 				}
 				catch Any {

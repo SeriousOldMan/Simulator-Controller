@@ -3,7 +3,7 @@ Version=7.2.7.0-dev
 Target=7.2.7.0-release
 Date=09/25/26
 Download=
-Changes=Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench"
+Changes=Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.6.0-release

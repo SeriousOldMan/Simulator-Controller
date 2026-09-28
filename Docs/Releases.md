@@ -34,13 +34,14 @@
 
 # Upcoming release
 
-## 7.2.6.0
+## 7.2.7.0
 
 #### Date: 10/02/26 (planned)
 
 #### Fixes
 
-  - None this time...
+  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug only showed, when using *Le Mans Ultimate* with certain translations like Chinese.
+  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected correctly by the game.
   
 #### Changes
 

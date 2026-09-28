@@ -272,6 +272,26 @@ class ACESetupEditor extends FileSetupEditor {
 			return false
 	}
 
+	loadSetup(&setup := false, log := true) {
+		local ignore, setting, handler
+
+		if !setup
+			setup := this.Setup
+		else
+			this.Setup := setup
+
+		for ignore, setting in this.Workbench.Settings
+			if (setup.valueAvailable(setting, true) && setup.valueAvailable(setting, false))
+				try {
+					handler := this.createSettingHandler(setting)
+
+					if handler
+						setup.setValue(setting, handler.convertToRawValue(handler.convertToDisplayValue(setup.getValue(setting))))
+				}
+
+		return super.loadSetup(&setup, log)
+	}
+
 	saveSetup() {
 		local fileName := this.Setup.FileName
 		local directory, title, fileName, text, jsonFile, name

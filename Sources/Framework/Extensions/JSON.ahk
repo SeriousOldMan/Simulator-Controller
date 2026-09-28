@@ -128,8 +128,8 @@ class JSON {
 								continue
 							}
 
-							if (charCount > 2) {
-								val := Round(val, A_Index - 3)
+							if (charCount > 4) {
+								val := Round(val, A_Index - 5)
 
 								break
 							}
@@ -152,7 +152,7 @@ class JSON {
 				next := obj == tree ? "" : is_array ? ",]" : ",}"
 			}
 		}
-msgbox JSON.print(tree[1], "  ")
+
 		return tree[1]
 	}
 

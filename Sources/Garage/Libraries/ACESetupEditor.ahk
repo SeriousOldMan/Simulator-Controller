@@ -273,7 +273,7 @@ class ACESetupEditor extends FileSetupEditor {
 	}
 
 	loadSetup(&setup := false, log := true) {
-		local ignore, setting, handler
+		local ignore, setting, handler, display
 
 		if !setup
 			setup := this.Setup
@@ -288,6 +288,13 @@ class ACESetupEditor extends FileSetupEditor {
 					if handler
 						setup.setValue(setting, handler.convertToRawValue(handler.convertToDisplayValue(setup.getValue(setting))))
 				}
+
+		display := JSON.parse(setup.Setup[true])
+
+		for ignore, setting in this.Workbench.Settings
+			setup.setValue(setting, setup.getValue(setting, false), display)
+
+		setup.Setup[false] := JSON.print(display, "  ")
 
 		return super.loadSetup(&setup, log)
 	}

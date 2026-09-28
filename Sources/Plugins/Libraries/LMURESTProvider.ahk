@@ -807,11 +807,17 @@ class LMURESTProvider {
 
 					if (capacity = "n/a")
 						throw "No VE..."
-					else
+					else {
 						if InStr(capacity, "gal")
-							return (StrReplace(capacity, "gal", "") * 3.785411)
+							capacity := (StrReplace(capacity, "gal", "") * 3.785411)
 						else
-							return StrReplace(capacity, "l", "")
+							capacity := StrReplace(capacity, "l", "")
+
+						if isNumber(capacity)
+							return capacity
+						else
+							throw "Invalid fuel value..."
+					}
 				}
 				catch Any {
 					try {
@@ -922,7 +928,7 @@ class LMURESTProvider {
 		}
 
 		getFuelAmount() {
-			return false ; (this.Data ? this.Data["fuelCapacity"] : false)
+			return (this.Data ? this.Data["fuelCapacity"] : false)
 		}
 
 		getBrakeBrakePadWear(wheel) {

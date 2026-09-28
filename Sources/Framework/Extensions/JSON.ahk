@@ -135,6 +135,7 @@ class JSON {
 							}
 						}
 
+						; val += 0
 					}
 					else if (val == "true" || val == "false")
 						val := (val == "true")

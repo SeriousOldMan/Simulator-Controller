@@ -257,7 +257,7 @@ class ACESetupEditor extends FileSetupEditor {
 		fileName := withBlockedWindows(FileSelect, 1, directory
 									 , substituteVariables(translate("Load %simulator% Setup File...")
 														 , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])})
-									 , "Setup (*.carSetup)")
+									 , "Setup (*.carsetup)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
@@ -315,12 +315,12 @@ class ACESetupEditor extends FileSetupEditor {
 		fileName := withBlockedWindows(FileSelect, "S17", directory
 									 , substituteVariables(translate("Save %simulator% Setup File...")
 														 , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])})
-									 , "Setup (*.carSetup)")
+									 , "Setup (*.carsetup)")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
-			if !InStr(fileName, ".carSetup")
-				fileName := (fileName . ".carSetup")
+			if !InStr(fileName, ".carsetup")
+				fileName := (fileName . ".carsetup")
 
 			deleteFile(fileName)
 
@@ -388,7 +388,7 @@ class ACESetupComparator extends FileSetupComparator {
 									 , (translate("Load ") . translate((type = "A") ? "first" : "second")
 									  . substituteVariables(translate(" %simulator% Setup File...")
 														  , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])}))
-									 , "Setup (*.carSetup)")
+									 , "Setup (*.carsetup)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {

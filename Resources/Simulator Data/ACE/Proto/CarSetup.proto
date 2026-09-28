@@ -7,11 +7,21 @@ message DamperSettings {
   float fast_bump = 2;
   float slow_rebound = 3;
   float fast_rebound = 4;
+  float internal_one = 5;
+  float internal_two = 6;
+  float internal_three = 7;
+  float internal_four = 8;
+  float internal_five = 9;
 }
 
 message BumpStopSettings {
   float range = 1;
   float rate = 2;
+  float internal_one = 3;
+  float internal_two = 4;
+  float internal_three = 5;
+  float internal_four = 6;
+  float internal_five = 7;
 }
 
 message SuspensionSettings {
@@ -20,18 +30,33 @@ message SuspensionSettings {
   BumpStopSettings bump_stop_down = 3;
   float helper_rate = 4;
   float helper_range = 5;
+  float internal_one = 6;
+  float internal_two = 7;
+  float internal_three = 8;
+  float internal_four = 9;
+  float internal_five = 10;
 }
 
 message BrakeSettings {
   float front_bias = 1;
   float torque_multiplier = 2;
   repeated float brake_ducts = 3;
+  float internal_one = 4;
+  float internal_two = 5;
+  float internal_three = 6;
+  float internal_four = 7;
+  float internal_five = 8;
 }
 
 message DifferentialSettings {
   float power = 1;
   float coast = 2;
   float preload = 3;
+  float internal_one = 4;
+  float internal_two = 5;
+  float internal_three = 6;
+  float internal_four = 7;
+  float internal_five = 8;
 }
 
 message ElectronicsSettings {
@@ -46,6 +71,11 @@ message ElectronicsSettings {
   float ers_deployment_map = 8;
   float ers_recharge_lv = 9;
   float ers_heat_charging = 10;
+  float internal_one = 11;
+  float internal_two = 12;
+  float internal_three = 13;
+  float internal_four = 14;
+  float internal_five = 15;
 }
 
 message AeroSettings {
@@ -54,6 +84,11 @@ message AeroSettings {
   float rear_target_height = 3;
   float front_wing_angle = 4;
   float rear_wing_angle = 5;
+  float internal_one = 6;
+  float internal_two = 7;
+  float internal_three = 8;
+  float internal_four = 9;
+  float internal_five = 10;
 }
 
 message MechanicalBalance {
@@ -61,6 +96,11 @@ message MechanicalBalance {
   float steer_ratio = 2;
   BrakeSettings brakes = 3;
   DifferentialSettings differential = 4;
+  float internal_one = 5;
+  float internal_two = 6;
+  float internal_three = 7;
+  float internal_four = 8;
+  float internal_five = 9;
 }
 
 message TyreAlignment {
@@ -71,10 +111,20 @@ message TyreAlignment {
   float static_camber = 5;
   float toe_out_linear = 6;
   float compound = 7;
+  float internal_one = 8;
+  float internal_two = 9;
+  float internal_three = 10;
+  float internal_four = 11;
+  float internal_five = 12;
 }
 
 message FuelStrategy {
   float fuel = 1;
+  float internal_one = 2;
+  float internal_two = 3;
+  float internal_three = 4;
+  float internal_four = 5;
+  float internal_five = 6;
 }
 
 message CarSetupData {

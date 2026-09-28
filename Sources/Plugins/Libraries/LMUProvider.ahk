@@ -656,14 +656,13 @@ class LMUProvider extends Sector397Provider {
 							fuelAmount := (energyData.hasVirtualEnergy() ? energyData.MaxFuelAmount : false)
 
 							if !fuelAmount {
-								fuelAmount := LMURestProvider.SetupData().FuelAmount
+								if !carData
+									carData := LMURestProvider.CarData()
 
-								if !fuelAmount {
-									if !carData
-										carData := LMURestProvider.CarData()
+								fuelAmount := carData.FuelAmount
 
-									fuelAmount := carData.FuelAmount
-								}
+								if !fuelAmount
+									fuelAmount := LMURestProvider.SetupData().FuelAmount
 
 								if isNumber(fuelAmount)
 									setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
@@ -671,6 +670,12 @@ class LMUProvider extends Sector397Provider {
 						}
 						else
 							fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+
+						if !isNumber(fuelAmount) {
+							fuelAmount := 0
+
+							setMultiMapValue(data, "Session Data", "FuelAmount", 0)
+						}
 
 						if (fuelAmount && this.iFuelRatio)
 							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))

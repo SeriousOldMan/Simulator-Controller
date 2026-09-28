@@ -128,13 +128,14 @@ class JSON {
 								continue
 							}
 
-							if (charCount > 4) {
+							if ((charCount > 4) && (A_Index >= (StrLen(val) - decPos - 1))) {
 								val := Round(val, A_Index - 5)
 
 								break
 							}
 						}
 
+						; val += 0
 					}
 					else if (val == "true" || val == "false")
 						val := (val == "true")

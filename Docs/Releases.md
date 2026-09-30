@@ -49,8 +49,10 @@
   - New and updated car models for "Setup Workbench":
     - Assetto Corsa EVO
 	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
+	  - Ferrari SF-25 (removed the TC and ABS settings)
 	  - Porsche 911 GT3 RS (992)
 	  - Caterham Academy
+	  - Ferrari F2004
   
 # Release history
 

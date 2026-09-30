@@ -15,7 +15,7 @@
 									 [Electronics.MGUK.Delivery, Electronics.MGUK.Recovery, Electronics.MGUH.Mode,
 									  Differential.Coast, Differential.Power])),
 				 (Prove: removeSettings("Assetto Corsa EVO", "Ferrari SF-25",
-										[Brake.Pressure,
+										[Electronics.TC, Electronics.ABS, Brake.Pressure,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
 										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,

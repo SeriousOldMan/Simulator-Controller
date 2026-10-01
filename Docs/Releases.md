@@ -6,8 +6,8 @@
 
 #### Fixes
 
-  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug only showed, when using *Le Mans Ultimate* with certain translations like Chinese.
-  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected correctly by the game.
+  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug showed only when using *Le Mans Ultimate* with certain translations like Chinese.
+  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected properly by the game.
   
 #### Changes
 

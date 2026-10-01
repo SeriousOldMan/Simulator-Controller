@@ -18,15 +18,15 @@ Thank you very much for your support!
 
 Installation is very easy. For first time users I recommand using the automated installer below. But there are different download and installation options available. Please see the complete documentation on [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), where you also will find a quick start guide for new users, for more information.
 
+If you don't want to use the automated installer (or you can't cause of your Antivirus protection), you can manually install one of the versions below. There are separate download links for the current stable version, for the current development build and two previous stable versions. Download one of these builds and unzip it anywhere on your hard disks. You then need to run the "Install.exe" application found in the root directory. This will guide you through the remaining installation process. For release information, even for a preview on upcoming features in the next stable build, don't miss the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
+
 #### Antivirus Warnings
 
 The programming language used for building Simulator Controller uses some really nasty tricks to control Windows applications, tricks also used by malware. Therefore, depending on your concrete Antivirus program, you may get some warnings regarding the Simulator Controller applications. I can assure you, that there's nothing about it. But you can read about these issues in the forums of [AutoHotkey](https://www.autohotkey.com/) itself. If your Antivirus programm allows exception rules, please define rules for the Simulator Controller directories (install directory and also the one in the users *Documents* folder), otherwise you need to have a beer and search for another Simulator Controller tool. Sorry...
 
-If you don't want to use the automated installer (or you can't cause of your Antivirus protection), you can manually install one of the versions below. There are separate download links for the current development build and at least the two latest stable releases. Download one of these builds and unzip it anywhere on your hard disks. Beginnging with Release 3.5.2, you then need to run the "Simulator Tools" application in the *Binaries* folder. This will guide you through the remaining installation process. For release information, even for a preview on upcoming features in the next stable build, don't miss the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
-
 #### Automated Installer
 
-Simply download and run [Simulator Controller.exe](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Simulator+Controller.exe) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply download and run [Simulator Controller.exe](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Simulator+Controller.exe) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the latest one, no problem. As mentioned aboce, this is possible by downloading and installing one of the installation packages below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 Here is a short video which shows how to configure Simulator Controller for the first time with a few clicks:
 
@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.7.0-release](https://cutt.ly/1ynmeucb) (Changes: Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files, Support for offline installation.)
+[7.2.7.0-release](https://cutt.ly/KynPKGlI) (Changes: Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files, Support for offline installation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7270) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-727) of this version and all the versions you might have skipped, before installing and using this version.
 

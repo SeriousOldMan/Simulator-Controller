@@ -362,7 +362,7 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 
 If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
 
-Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask my why...
+Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask me why...
 
 #### Non-standard voice configurations
 

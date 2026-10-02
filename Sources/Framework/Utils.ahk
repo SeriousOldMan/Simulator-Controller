@@ -12,7 +12,7 @@
 global sendCommand := sendKeyboardCommand
 global installKeyboardHook := InstallKeybdHook
 global setSendDelay := SetKeyDelay
-global setHotKey := Hotkey
+global setHotKey := setControllerHotkey
 global detectProcess := detectRunningProcess
 global activateWindow := WinActivate
 global closeWindow := WinClose
@@ -38,6 +38,7 @@ global listWindows := (arguments*) => WinGetList(arguments*)
 
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Joystick.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -88,17 +89,7 @@ class TriggerDetectorTask extends Task {
 	}
 
 	run() {
-		local joysticks := []
-		local joyName
-
-		loop 16 { ; Query each joystick number to find out which ones exist.
-			joyName := (GetKeyState(A_Index . "JoyName") ? "D" : "")
-
-			if (joyName != "")
-				joysticks.Push(A_Index)
-		}
-
-		this.iJoysticks := joysticks
+		this.iJoysticks := getControllerNumbers()
 
 		return TriggerDetectorContinuation(Task.CurrentTask)
 	}
@@ -147,24 +138,25 @@ class TriggerDetectorContinuation extends Continuation {
 
 					; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
 
-					joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
-					joy_name := GetKeyState(joystickNumber . "JoyName")
-					joy_info := GetKeyState(joystickNumber . "JoyInfo")
+					joy_buttons := getJoystickState(joystickNumber . "JoyButtons")
+					joy_name := getJoystickState(joystickNumber . "JoyName")
+					joy_info := getJoystickState(joystickNumber . "JoyInfo")
 
 					buttons_down := ""
 					buttons := []
 
 					loop joy_buttons {
-						if GetKeyState(joystickNumber . "joy" . A_Index) {
+						if getJoystickState(joystickNumber . "joy" . A_Index) {
 							buttons_down := (buttons_down . A_Space . A_Index)
 
 							found := A_Index
 						}
 					}
 
-					axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
+					axis_info := (joystickNumber > 16) ? "" : ("X" . (getJoystickState(joystickNumber . "JoyX") ? "D" : "U"))
 
-					axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
+					if (joystickNumber <= 16)
+						axis_info := (axis_info . A_Space . A_Space . "Y" .  (getJoystickState(joystickNumber . "JoyY") ? "D" : "U"))
 
 					if InStr(joy_info, "Z")
 						axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))

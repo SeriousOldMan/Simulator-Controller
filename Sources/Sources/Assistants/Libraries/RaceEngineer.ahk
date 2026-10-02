@@ -4391,7 +4391,7 @@ class RaceEngineer extends RaceAssistant {
 						else
 							for ignore, suffix in ["FL", "FR", "RL", "RR"]
 								if (debug || (increment%suffix% != 0.0))
-									speaker.speakPhrase("Tyre" . suffix
+									speaker.speakPhrase("Tyre" . suffix9
 													  , {value: speaker.number2Speech(convertUnit("Pressure", Round(Abs(increment%suffix%), 1)))
 													   , unit: fragments[getUnit("Pressure")]
 													   , delta: fragments[(increment%suffix% > 0) ? "Increased" : "Decreased"]

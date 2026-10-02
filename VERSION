@@ -1,3 +1,5 @@
+[Current]
+Type=Development
 [Development]
 Version=7.2.8.0-dev
 Target=7.2.8.0-release
@@ -21,8 +23,3 @@ Configuration.7.2.2.Download=https://fileshare.impresion3d.pro/filebrowser/api/p
 Utilities.7.2.3.Path=.
 Utilities.7.2.3.Content=Utilities
 Utilities.7.2.3.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Rrjbhixm/Components/Utilities%207.2.3.zip;https://www.dropbox.com/scl/fi/8ezjlimilu942hbvhppuq/Utilities-7.2.3.zip?rlkey=9m9inc7rpoddt8jxpxweceuzf&st=jzhnxe7c&dl=1;http://%master%/Components/Utilities 7.2.3.zip
-[Current]
-Type=Development
-[Version]
-Development=7.2.8.0-dev
-Release=7.2.7.0-release

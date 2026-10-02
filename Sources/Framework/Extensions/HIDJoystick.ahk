@@ -47,7 +47,10 @@ class HIDJoystick {
 	static kRIDIDeviceInfo := 0x2000000B
 	static kRIDInput := 0x10000003
 	static kRIDEVInputSink := 0x00000100
+	static kRIDEVDeviceNotify := 0x00002000
 	static kWMInput := 0x00FF
+	static kWMInputDeviceChange := 0x00FE
+	static kGIDCRemoval := 2
 	static kHIDPStatusSuccess := 0x00110000
 	static kHIDPInput := 0
 	static kButtonUsagePage := 0x09
@@ -180,17 +183,32 @@ class HIDJoystick {
 
 			NumPut("UShort", 0x01, devices, offset)
 			NumPut("UShort", usage, devices, offset + 2)
-			NumPut("UInt", HIDJoystick.kRIDEVInputSink, devices, offset + 4)
+			NumPut("UInt", HIDJoystick.kRIDEVInputSink | HIDJoystick.kRIDEVDeviceNotify, devices, offset + 4)
 			NumPut("Ptr", A_ScriptHwnd, devices, offset + 8)
 		}
 
 		if DllCall("RegisterRawInputDevices", "Ptr", devices, "UInt", 3, "UInt", size, "Int") {
 			OnMessage(HIDJoystick.kWMInput, ObjBindMethod(HIDJoystick, "handleInput"))
+			OnMessage(HIDJoystick.kWMInputDeviceChange, ObjBindMethod(HIDJoystick, "handleDeviceChange"))
 
 			HIDJoystick.sListening := true
 		}
 
 		return HIDJoystick.sListening
+	}
+
+	static handleDeviceChange(wParam, lParam, message, hwnd) {
+		local device
+
+		if (wParam = HIDJoystick.kGIDCRemoval) {
+			if HIDJoystick.sByHandle.Has(lParam) {
+				device := HIDJoystick.sByHandle[lParam]
+
+				device.State := Map()
+			}
+		}
+
+		HIDJoystick.refresh()
 	}
 
 	static refresh() {

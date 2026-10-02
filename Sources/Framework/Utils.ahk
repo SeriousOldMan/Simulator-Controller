@@ -575,7 +575,7 @@ exitProcesses(title, message, silent := false, force := false, excludes := [], u
 			}
 
 		for ignore, app in backgroundApps
-			if ProcessExist(app ".exe") {
+			if ProcessExist(app . ".exe") {
 				hasBGProcesses := true
 
 				break
@@ -608,7 +608,7 @@ exitProcesses(title, message, silent := false, force := false, excludes := [], u
 
 		if hasBGProcesses
 			if (urgent = "Kill")
-				doApplications(computeTargets(foregroundApps), ProcessClose)
+				doApplications(computeTargets(backgroundApps), ProcessClose)
 			else
 				broadcastMessage(computeTargets(backgroundApps), "exitProcess", urgent)
 

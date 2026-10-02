@@ -396,7 +396,7 @@ checkInstallation() {
 			return false
 		}
 
-		if updatedNeeded(packageComponents) {
+		if updateNeeded(packageComponents) {
 			for component, version in packageComponents {
 				componentNr := A_Index
 
@@ -637,6 +637,7 @@ checkInstallation() {
 
 				deleteDirectory(A_MyDocuments . "\Simulator Controller")
 				deleteDirectory(kUserHomeDirectory)
+				deleteDirectory(userLocation)
 			}
 			else
 				deleteFile(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
@@ -4128,6 +4129,8 @@ startupSimulatorTools() {
 	setDebug(false)
 	setLogLevel(kLogWarn)
 
+	startupApplication()
+
 	checkInstallation()
 
 	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
@@ -4149,8 +4152,6 @@ startupSimulatorTools() {
 			if !editTargets()
 				ExitApp(0)
 	}
-
-	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)

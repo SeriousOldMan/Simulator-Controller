@@ -56,7 +56,7 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 ### Video Tutorials
 
-Beside the quite extensive documentation (more than 500 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
+Beside the quite extensive documentation (more than 900 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
 
 1. [Quick start guide](https://youtu.be/B1oKlzKIAbs) - This video shows you how to create your first running configuration with a few clicks.
 

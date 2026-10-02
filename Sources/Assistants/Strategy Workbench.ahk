@@ -380,18 +380,24 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		Set {
-			local viewer := this.Control["stratViewer"]
-			local scrollTop := false
-			local scrollLeft := false
+			local chartViewer := this.Control["chartViewer"]
+			local strategyViewer := this.Control["stratViewer"]
+			local chartScrollTop := false
+			local chartScrollLeft := false
+			local strategyScrollTop := false
+			local strategyScrollLeft := false
 			local settings
 
-			try {
-				scrollTop := viewer.document.documentElement.scrollTop
-				scrollLeft := viewer.document.documentElement.scrollLeft
-			}
-			catch Any as exception {
-				logError(exception)
-			}
+			if this.SelectedStrategy
+				try {
+					chartScrollTop := chartViewer.document.body.scrollTop
+					chartScrollLeft := chartViewer.document.body.scrollLeft
+					strategyScrollTop := strategyViewer.document.body.scrollTop
+					strategyScrollLeft := strategyViewer.document.body.scrollLeft
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			this.iStrategyAxis := value
 
@@ -399,14 +405,25 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.updateStrategyMenu()
 
-			if (scrollTop || scrollLeft)
-				try {
-					viewer.document.documentElement.scrollTop := scrollTop
-					viewer.document.documentElement.scrollLeft := scrollLeft
-				}
-				catch Any as exception {
-					logError(exception)
-				}
+			if this.SelectedStrategy {
+				if (chartScrollTop || chartScrollLeft)
+					try {
+						chartViewer.document.body.scrollTop := chartScrollTop
+						chartViewer.document.body.scrollLeft := chartScrollLeft
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+
+				if (strategyScrollTop || strategyScrollLeft)
+					try {
+						strategyViewer.document.body.scrollTop := strategyScrollTop
+						strategyViewer.document.body.scrollLeft := strategyScrollLeft
+					}
+					catch Any as exception {
+						logError(exception)
+					}
+			}
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 

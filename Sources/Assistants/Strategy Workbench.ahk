@@ -2146,8 +2146,9 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	updateStrategyMenu() {
-		local strategyMenu := collect(["Strategy", "---------------------------------------------", "Format: "]
-									, translate)
+		local strategyMenu := collect(["Strategy", "---------------------------------------------"], translate)
+
+		strategyMenu.Push(translate("X-Axis") . translate(":"))
 
 		if (this.StrategyAxis = "Dynamic")
 			strategyMenu.Push(translate("[x]") . A_Space . translate("Dynamic"))

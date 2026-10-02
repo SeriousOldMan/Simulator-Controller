@@ -23,7 +23,17 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.2.8.0
+
+#### Date: 10/09/26 (planned)
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - It is now possible to choose between a time-based and a lap-based x-axis for a strategy consumables chart.
   
 # Release history
 

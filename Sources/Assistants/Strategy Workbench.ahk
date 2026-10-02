@@ -117,6 +117,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iChartViewer := false
 	iStrategyViewer := false
+	iStrategyAxis := "Dynamic"
 
 	iSimulation := false
 	iLapsDatabase := false
@@ -370,6 +371,50 @@ class StrategyWorkbench extends ConfigurationItem {
 	StrategyViewer {
 		Get {
 			return this.iStrategyViewer
+		}
+	}
+
+	StrategyAxis {
+		Get {
+			return this.iStrategyAxis
+		}
+
+		Set {
+			local viewer := this.Control["stratViewer"]
+			local scrollTop := false
+			local scrollLeft := false
+			local settings
+
+			try {
+				scrollTop := viewer.document.documentElement.scrollTop
+				scrollLeft := viewer.document.documentElement.scrollLeft
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+
+			this.iStrategyAxis := value
+
+			this.showStrategyInfo(this.SelectedStrategy, true)
+
+			this.updateStrategyMenu()
+
+			if (scrollTop || scrollLeft)
+				try {
+					viewer.document.documentElement.scrollTop := scrollTop
+					viewer.document.documentElement.scrollLeft := scrollLeft
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
+			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+
+			setMultiMapValue(settings, "Strategy Workbench", "Strategy Axis", value)
+
+			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+
+			return value
 		}
 	}
 
@@ -1165,6 +1210,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		this.iAutoInitialize := getMultiMapValue(settings, "Strategy Workbench", "Auto Initialize", true)
+		this.iStrategyAxis := getMultiMapValue(settings, "Strategy Workbench", "Strategy Axis", "Dynamic")
 
 		this.iSelectedDataType := getMultiMapValue(settings, "Strategy Workbench", "Data Type", "Electronics")
 
@@ -1233,7 +1279,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x435 yp w180 Choose1 +0x200 VsimulationMenuDropDown", collect(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], translate)).OnEvent("Change", simulationMenu)
 
-		workbenchGui.Add("DropDownList", "x620 yp w180 Choose1 +0x200 VstrategyMenuDropDown", collect(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], translate)).OnEvent("Change", strategyMenu)
+		workbenchGui.Add("DropDownList", "x620 yp w180 Choose1 +0x200 VstrategyMenuDropDown").OnEvent("Change", strategyMenu)
+
+		this.updateStrategyMenu()
 
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
@@ -2097,6 +2145,34 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["settingsMenuDropDown"].Choose(1)
 	}
 
+	updateStrategyMenu() {
+		local strategyMenu := collect(["Strategy", "---------------------------------------------"], translate)
+
+		strategyMenu.Push(translate("X-Axis") . translate(":"))
+
+		if (this.StrategyAxis = "Dynamic")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Dynamic"))
+		else
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Dynamic"))
+
+		if (this.StrategyAxis = "Time")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Time"))
+		else
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Time"))
+
+		if (this.StrategyAxis = "Lap")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Lap"))
+		else
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Lap"))
+
+		strategyMenu := concatenate(strategyMenu, collect(["---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], translate))
+
+		this.Control["strategyMenuDropDown"].Delete()
+		this.Control["strategyMenuDropDown"].Add(strategyMenu)
+
+		this.Control["strategyMenuDropDown"].Choose(1)
+	}
+
 	createStrategyInfo(strategy) {
 		return this.StrategyViewer.createStrategyInfo(strategy)
 	}
@@ -2109,18 +2185,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		return this.StrategyViewer.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries)
 	}
 
-	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID) {
-		return this.StrategyViewer.createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis := this.StrategyAxis) {
+		return this.StrategyViewer.createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis)
 	}
 
-	showStrategyInfo(strategy, plot := true) {
-		this.StrategyViewer.showStrategyInfo(strategy)
+	showStrategyInfo(strategy, plot := true, strategyAxis := this.StrategyAxis) {
+		this.StrategyViewer.showStrategyInfo(strategy, strategyAxis)
 
 		if (strategy && plot)
-			this.showStrategyPlot(strategy)
+			this.showStrategyPlot(strategy, strategyAxis)
 	}
 
-	showStrategyPlot(strategy) {
+	showStrategyPlot(strategy, strategyAxis := this.StrategyAxis) {
 		local html, drawChartFunction, chartID, width, before, after
 		local timeSeries, lapSeries, fuelSeries, tyreSeries
 
@@ -2164,7 +2240,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			width := (this.ChartViewer.getWidth() - 4)
 
-			html := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+			html := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis)
 
 			tableCSS := this.StrategyViewer.getTableCSS()
 
@@ -3393,7 +3469,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			dirName := ""
 
 		switch line {
-			case 3:
+			case 4:
+				this.StrategyAxis := "Dynamic"
+			case 5:
+				this.StrategyAxis := "Time"
+			case 6:
+				this.StrategyAxis := "Lap"
+			case 8:
 				fileName := kUserConfigDirectory . "Race.strategy"
 
 				if FileExist(fileName) {
@@ -3408,7 +3490,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else
 					withBlockedWindows(MsgDlg, translate("There is no active Race Strategy."), translate("Information"), 262192)
-			case 4: ; "Load Strategy..."
+			case 9: ; "Load Strategy..."
 				if GetKeyState("Ctrl") {
 					this.Window.Opt("+OwnDialogs")
 
@@ -3494,7 +3576,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				}
-			case 5: ; "Save Strategy..."
+			case 10: ; "Save Strategy..."
 				if this.SelectedStrategy {
 					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
 					fileName := StrReplace(fileName, "n/a", "n.a.")
@@ -3533,7 +3615,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-			case 7: ; "Compare Strategies..."
+			case 12: ; "Compare Strategies..."
 				this.Window.Opt("+OwnDialogs")
 
 				translator := translateMsgDlgButtons.Bind(["Compare", "Cancel"])
@@ -3551,7 +3633,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					if (strategies.Length > 1)
 						this.compareStrategies(strategies*)
 				}
-			case 9: ; "Export Strategy..."
+			case 14: ; "Export Strategy..."
 				if this.SelectedStrategy {
 					configuration := newMultiMap()
 
@@ -3561,7 +3643,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-			case 10: ; "Clear Strategy..."
+			case 15: ; "Clear Strategy..."
 				deleteFile(kUserConfigDirectory . "Race.strategy")
 		}
 	}

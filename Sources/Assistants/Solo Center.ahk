@@ -1213,7 +1213,8 @@ class SoloCenter extends ConfigurationItem {
 		Get {
 			if isInstance(this.TelemetryCollector, TelemetryCollector)
 				return this.TelemetryCollector.Collecting
-			else if isInstance(this.TelemetryViewer, TelemetryViewer)
+			else if (isInstance(this.TelemetryViewer, TelemetryViewer)
+				  && isInstance(this.TelemetryViewer.TelemetryCollector, TelemetryCollector))
 				return this.TelemetryViewer.TelemetryCollector.Collecting
 			else
 				return false
@@ -2966,17 +2967,19 @@ class SoloCenter extends ConfigurationItem {
 		return (this.iWorking > 0)
 	}
 
-	initializeSession(session := "Practice", full := true, active := true) {
+	initializeSession(session := "Practice", full := true) {
 		local directory, reportDirectory
 
 		if (!this.SessionMode || this.SessionActive) {
-			if isInstance(this.TelemetryCollector, TelemetryCollector)
-				this.TelemetryCollector.shutdown()
+			if full {
+				if isInstance(this.TelemetryCollector, TelemetryCollector)
+					this.TelemetryCollector.shutdown()
 
-			if this.TelemetryViewer {
-				this.TelemetryViewer.shutdownCollector()
+				if this.TelemetryViewer {
+					this.TelemetryViewer.shutdownCollector()
 
-				this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry")
+					this.TelemetryViewer.restart(this.SessionDirectory . "Telemetry")
+				}
 			}
 
 			directory := this.SessionDirectory
@@ -2996,7 +2999,7 @@ class SoloCenter extends ConfigurationItem {
 			this.iSessionMode := false
 			this.iSessionLoaded := false
 
-			this.initializeSession(session, full, active)
+			this.initializeSession(session, full)
 
 			return
 		}
@@ -3106,7 +3109,11 @@ class SoloCenter extends ConfigurationItem {
 
 			if track
 				this.loadTrack(track)
+
+			return true
 		}
+		else
+			return false
 	}
 
 	initializeReports() {
@@ -5571,7 +5578,7 @@ class SoloCenter extends ConfigurationItem {
 							this.iSessionLoading := true
 
 							try {
-								this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"), true, false)
+								this.initializeSession(getMultiMapValue(info, "Session", "Session", "Practice"))
 
 								this.iSessionMode := "Loaded"
 								this.iSessionLoaded := folder
@@ -8170,10 +8177,10 @@ class SoloCenter extends ConfigurationItem {
 				this.TelemetryViewer.shutdownCollector()
 	}
 
-	startSession(data, wait := false, collect := true) {
+	startSession(data, wait := false) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
-			local save, msgResult, track, trackLength
+			local restart, save, msgResult, simulator, car, track, trackLength
 
 			if fileName
 				data := readMultiMap(fileName)
@@ -8217,17 +8224,21 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				}
 
+				simulator := SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown"))
+				car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 				trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
 
 				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"), false)
 
-				this.initializeSimulator(SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator"))
-									   , getMultiMapValue(data, "Session Data", "Car"), track)
+				restart := this.initializeSimulator(simulator, car, track)
 
 				this.analyzeTelemetry()
 
-				if (collect || !this.TelemetryCollecting) {
+				if (restart || !this.TelemetryCollecting) {
+					if isDebug()
+						logMessage(kLogWarn, "Starting telemetry collection for " . track . " (" . trackLength . ")")
+
 					if isInstance(this.TelemetryCollector, TelemetryCollector) {
 						this.TelemetryCollector.shutdown()
 
@@ -8239,9 +8250,6 @@ class SoloCenter extends ConfigurationItem {
 
 					if this.AutoTelemetry
 						this.iTelemetryCollector := true
-
-					if isDebug()
-						logMessage(kLogWarn, "Starting telemetry collection for " . track . " (" . trackLength . ")")
 
 					this.startupTelemetrySystem(track, trackLength)
 				}
@@ -8268,9 +8276,8 @@ class SoloCenter extends ConfigurationItem {
 
 			try {
 				if (!this.LastLap && !update)
-					this.startSession(data, true, false)
-
-				if !this.TelemetryCollecting
+					this.startSession(data, true)
+				else if !this.TelemetryCollecting
 					this.startupTelemetrySystem(track, trackLength)
 
 				this.updateSessionMenu()

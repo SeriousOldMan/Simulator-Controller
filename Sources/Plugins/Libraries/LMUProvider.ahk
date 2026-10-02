@@ -354,6 +354,7 @@ class LMUProvider extends Sector397Provider {
 
 		static wasActive := false
 		static waitForFinish := false
+		static waitForDriverSwap := false
 
 		if !tyreTypes {
 			tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
@@ -595,6 +596,31 @@ class LMUProvider extends Sector397Provider {
 
 				wasActive := active
 
+				/*
+				if (false && getMultiMapValue(data, "Stint Data", "InPit", false)) {
+					setMultiMapValue(data, "Session Data", "Active", true)
+					setMultiMapValue(data, "Session Data", "Paused", true)
+
+					setMultiMapValue(data, "Stint Data", "Driving", false)
+					setMultiMapValue(data, "Stint Data", "DriverForname", "-")
+					setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
+					setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
+				}
+				else if (!waitForDriverSwap && getMultiMapValue(data, "Stint Data", "InPit", false))
+					waitForDriverSwap := true
+				else if waitForDriverSwap {
+					waitForDriverSwap := false
+
+					setMultiMapValue(data, "Session Data", "Active", true)
+					setMultiMapValue(data, "Session Data", "Paused", true)
+
+					setMultiMapValue(data, "Stint Data", "Driving", false)
+					setMultiMapValue(data, "Stint Data", "DriverForname", "-")
+					setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
+					setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
+				}
+				*/
+
 				if car
 					setMultiMapValue(data, "Session Data", "Car", car)
 				else
@@ -630,7 +656,8 @@ class LMUProvider extends Sector397Provider {
 							fuelAmount := (energyData.hasVirtualEnergy() ? energyData.MaxFuelAmount : false)
 
 							if !fuelAmount {
-								fuelAmount := LMURestProvider.SetupData().FuelAmount
+								if (getMultiMapValue(data, "Session Data", "CarClass", "Unknown") = "GTE")
+									fuelAmount := LMURestProvider.SetupData().FuelAmount
 
 								if !fuelAmount {
 									if !carData
@@ -639,12 +666,18 @@ class LMUProvider extends Sector397Provider {
 									fuelAmount := carData.FuelAmount
 								}
 
-								if fuelAmount
+								if isNumber(fuelAmount)
 									setMultiMapValue(data, "Session Data", "FuelAmount", fuelAmount)
 							}
 						}
 						else
 							fuelAmount := getMultiMapValue(data, "Session Data", "FuelAmount", false)
+
+						if !isNumber(fuelAmount) {
+							fuelAmount := 0
+
+							setMultiMapValue(data, "Session Data", "FuelAmount", 0)
+						}
 
 						if (fuelAmount && this.iFuelRatio)
 							setMultiMapValue(data, "Session Data", "FuelAmount", Round(this.iFuelRatio * 100, 1))

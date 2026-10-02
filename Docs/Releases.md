@@ -1,5 +1,64 @@
 # Latest stable release
 
+## 7.2.7.0
+
+#### Date: 10/02/26
+
+#### Fixes
+
+  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug occurred only when *Le Mans Ultimate* was configured for certain languages ​​that do not use the Latin alphabet, such as Chinese.
+  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected properly by the game.
+  
+#### Changes
+
+  - Support has been added for full offline installation, which may sometimes be required for our fellows which live behind a great firewall and are not able to use a VPN.
+  - [Internal] Improved internal memory management of the Driving Coach.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
+	  - Ferrari SF-25 (removed the TC and ABS settings)
+	  - Porsche 911 GT3 RS (992)
+	  - Caterham Academy
+	  - Ferrari F2004
+
+# Upcoming release
+
+Not yet planned...
+  
+# Release history
+
+## 7.2.6.0
+
+#### Date: 09/25/26
+
+#### Fixes
+
+  - Fixed a bug in the new standings and gap calculation which showed up sporadically for *iRacing*.
+  - A rare bug that prevented the state and Assistant knowledge handover to the next driver in team races with *Le Mans Ultimate* has been fixed.
+  - Fixed another rare bug which prevented saving of instructions for Assistant boosters.
+  
+#### Changes
+
+  - Added meta data for the tracks of the new *Le Mans Ultimate* DLC.
+  - Several optimizations for the telemetry system:
+    - The special track spline which is created for *Asetto Corsa Competizione* is now cached and stored together with the track map. This will save one lap for all later telemetry collections.
+
+      Important: If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
+    - The startup sequence of the telemetry system in "Solo Center" has been optimized, so that for all simulators an additional lap is saved. Telemetry data will now come in for the second lap in most cases, which typically is the first lap with full pace anyway.
+  - [Experts] It is now possible to use the asterisk \* as a wildcard for a part of a setting descriptor in a cars rule file for the "Setup Workbench". Example: Bumpstop.\*.\*.\*. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#introducing-new-car-specifications) for an example.
+  - Added a new article for the tipps and tricks system.
+  - New car models for "Setup Workbench":
+    - Assetto Corsa EVO (most of them by @\|FuZzYyY\|)
+	  - Lamborghini Huracan ST EVO2
+	  - BMW M2 CS Racing
+	  - Mini John Cooper S
+	  - Datsun 240Z
+	  - Abarth 695 Biposto
+      - Alpine A110 S
+	  - Alpine A290 Beta
+	  - Dallara EXP
+	  - Hyundai i30 N Hatchback
+	  
 ## 7.2.5.0
 
 #### Date: 09/18/26
@@ -33,12 +92,6 @@
 	  - KTM X Bow GT4
     - Assetto Corsa EVO (by @\|FuZzYyY\|)
 	  - Ford Escort RS Cosworth
-
-# Upcoming release
-
-Not yet planned...
-
-# Release history
 
 ## 7.2.4.0
 

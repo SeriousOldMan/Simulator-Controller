@@ -223,7 +223,7 @@ writeMultiMap(multiMapFile, multiMap, symbolic := true) {
 		try {
 			if empty {
 				deleteFile(tempFile)
-				
+
 				if !FileExist(multiMapFile)
 					break
 				else if deleteFile(multiMapFile)

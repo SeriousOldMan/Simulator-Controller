@@ -283,6 +283,9 @@ logError(exception, unexpected := false, report := true) {
 				 . exception.File . translate(" at line ") . exception.Line . translate(": ") . message
 				 , true, unexpected)
 
+		if exception.HasProp("Extra")
+			logMessage(critical ? kLogCritical : kLogDebug, "`What: " . exception.Extra
+					 , false, unexpected, false)
 
 		if exception.HasProp("Stack")
 			logMessage(critical ? kLogCritical : kLogDebug, "`Stack:`n`n" . exception.Stack

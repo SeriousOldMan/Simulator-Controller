@@ -117,17 +117,33 @@ addSettings(?simulator, ?car, *) <= allSettings(?settings), addSettings(?simulat
 		
 addSettings(?, ?, [])
 addSettings(?simulator, ?car, [?setting | ?settings]) <=
-		addSetting(?simulator, ?car, ?setting), addSettings(?simulator, ?car, ?settings)
+		addSettings(?simulator, ?car, ?setting), addSettings(?simulator, ?car, ?settings)
+addSettings(?simulator, ?car, ?setting) <=
+		:%SetupWorkbench.Instance.matchSettings%=(?setting, ?temp), parse(?temp, ?settings),
+		includeSettings(?simulator, ?car, ?settings)
 
-addSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, true)
+includeSettings(?, ?, [])
+includeSettings(?simulator, ?car, [?setting | ?settings]) <=
+		includeSetting(?simulator, ?car, ?setting), includeSettings(?simulator, ?car, ?settings)
+includeSettings(?simulator, ?car, ?setting) <= includeSetting(?simulator, ?car, ?setting)
+
+includeSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, true)
 
 removeSettings(?simulator, ?car, *) <= allSettings(?settings), removeSettings(?simulator, ?car, ?settings)
 
 removeSettings(?, ?, [])
 removeSettings(?simulator, ?car, [?setting | ?settings]) <=
-		removeSetting(?simulator, ?car, ?setting), removeSettings(?simulator, ?car, ?settings)
+		removeSettings(?simulator, ?car, ?setting), removeSettings(?simulator, ?car, ?settings)
+removeSettings(?simulator, ?car, ?setting) <=
+		:%SetupWorkbench.Instance.matchSettings%=(?setting, ?temp), parse(?temp, ?settings),
+		excludeSettings(?simulator, ?car, ?settings)
 
-removeSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, false)
+excludeSettings(?, ?, [])
+excludeSettings(?simulator, ?car, [?setting | ?settings]) <=
+		excludeSetting(?simulator, ?car, ?setting), excludeSettings(?simulator, ?car, ?settings)
+excludeSettings(?simulator, ?car, ?setting) <= excludeSetting(?simulator, ?car, ?setting)
+
+excludeSetting(?simulator, ?car, ?setting) <= Set(?simulator, ?car, Setting, ?setting, Available, false)
 
 settingAvailable(?setting) <= settingAvailable(!Workbench.Simulator, !Workbench.Car, ?setting)
 

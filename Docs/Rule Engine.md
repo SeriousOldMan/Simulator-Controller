@@ -584,7 +584,7 @@ The rule engine has some builtin predicates which can be used when formulating r
   
 	Syntax: call(%function%, arg1, ..., argN) or :%function%(arg1, ..., argN)
 	
-	By the way, call(function, arg1, ..., argN) can actually be expressed with call=(%function%, arg1, ..., argN, ?) and is therefore provided for convinience.
+	By the way, call(function, arg1, ..., argN) can actually be expressed with call=(function, arg1, ..., argN, ?) and is therefore provided for convinience.
   
   - call=
   

@@ -257,7 +257,7 @@ class ACESetupEditor extends FileSetupEditor {
 		fileName := withBlockedWindows(FileSelect, 1, directory
 									 , substituteVariables(translate("Load %simulator% Setup File...")
 														 , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])})
-									 , "Setup (*.carSetup)")
+									 , "Setup (*.carsetup)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {
@@ -270,6 +270,33 @@ class ACESetupEditor extends FileSetupEditor {
 		}
 		else
 			return false
+	}
+
+	loadSetup(&setup := false, log := true) {
+		local ignore, setting, handler, display
+
+		if !setup
+			setup := this.Setup
+		else
+			this.Setup := setup
+
+		for ignore, setting in this.Workbench.Settings
+			if (setup.valueAvailable(setting, true) && setup.valueAvailable(setting, false))
+				try {
+					handler := this.createSettingHandler(setting)
+
+					if handler
+						setup.setValue(setting, handler.convertToRawValue(handler.convertToDisplayValue(setup.getValue(setting))))
+				}
+
+		display := JSON.parse(setup.Setup[true])
+
+		for ignore, setting in this.Workbench.Settings
+			setup.setValue(setting, setup.getValue(setting, false), display)
+
+		setup.Setup[false] := JSON.print(display, "  ")
+
+		return super.loadSetup(&setup, log)
 	}
 
 	saveSetup() {
@@ -288,12 +315,12 @@ class ACESetupEditor extends FileSetupEditor {
 		fileName := withBlockedWindows(FileSelect, "S17", directory
 									 , substituteVariables(translate("Save %simulator% Setup File...")
 														 , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])})
-									 , "Setup (*.carSetup)")
+									 , "Setup (*.carsetup)")
 		OnMessage(0x44, translateSaveCancelButtons, 0)
 
 		if (fileName != "") {
-			if !InStr(fileName, ".carSetup")
-				fileName := (fileName . ".carSetup")
+			if !InStr(fileName, ".carsetup")
+				fileName := (fileName . ".carsetup")
 
 			deleteFile(fileName)
 
@@ -361,7 +388,7 @@ class ACESetupComparator extends FileSetupComparator {
 									 , (translate("Load ") . translate((type = "A") ? "first" : "second")
 									  . substituteVariables(translate(" %simulator% Setup File...")
 														  , {simulator: SessionDatabase.getSimulatorCode(this.Workbench.SelectedSimulator[false])}))
-									 , "Setup (*.carSetup)")
+									 , "Setup (*.carsetup)")
 		OnMessage(0x44, translateLoadCancelButtons, 0)
 
 		if fileName {

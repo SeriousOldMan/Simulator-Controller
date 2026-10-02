@@ -1,5 +1,32 @@
 # Latest stable release
 
+## 7.2.7.0
+
+#### Date: 10/02/26
+
+#### Fixes
+
+  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug occurred only when *Le Mans Ultimate* was configured for certain languages ​​that do not use the Latin alphabet, such as Chinese.
+  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected properly by the game.
+  
+#### Changes
+
+  - Support has been added for full offline installation, which may sometimes be required for our fellows which live behind a great firewall and are not able to use a VPN.
+  - [Internal] Improved internal memory management of the Driving Coach.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
+	  - Ferrari SF-25 (removed the TC and ABS settings)
+	  - Porsche 911 GT3 RS (992)
+	  - Caterham Academy
+	  - Ferrari F2004
+
+# Upcoming release
+
+Not yet planned...
+  
+# Release history
+
 ## 7.2.6.0
 
 #### Date: 09/25/26
@@ -31,31 +58,7 @@
 	  - Alpine A290 Beta
 	  - Dallara EXP
 	  - Hyundai i30 N Hatchback
-
-# Upcoming release
-
-## 7.2.7.0
-
-#### Date: 10/02/26 (planned)
-
-#### Fixes
-
-  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug only showed, when using *Le Mans Ultimate* with certain translations like Chinese.
-  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected correctly by the game.
-  
-#### Changes
-
-  - [Internal] Improved internal memory management of the Driving Coach.
-  - New and updated car models for "Setup Workbench":
-    - Assetto Corsa EVO
-	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
-	  - Ferrari SF-25 (removed the TC and ABS settings)
-	  - Porsche 911 GT3 RS (992)
-	  - Caterham Academy
-	  - Ferrari F2004
-  
-# Release history
-
+	  
 ## 7.2.5.0
 
 #### Date: 09/18/26

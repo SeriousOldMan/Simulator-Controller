@@ -170,7 +170,7 @@ The set of units you choose here will be active for all applications and Assista
 
 If you choose one of a the simulators that have been registered for Simulator Controller, this simulator will be started automatically after all other startup tasks have finished.
 
-And you can choose furthermore, which Assistants will be available and whether they will talk and listen to you.
+And you can choose furthermore which Assistants will be available and whether they will talk and listen to you.
 
 | Setting  | Description |
 | -------- | ----------- |
@@ -183,6 +183,8 @@ And you can choose furthermore, which Assistants will be available and whether t
 Note: Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active *Push-To-Talk* button, this configuration is not necessary.
 
 Additionally, you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) by the Assistants, if required. "Default" is available here as well.
+
+For a more detailed description of the different settings, see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#non-standard-voice-configurations).
 
 If the Team Server is part of your configuration and if you have chosen "Team" as the *Mode* of the startup profile, you can configure all [team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server) related stuff on the second tab.
 
@@ -360,7 +362,7 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 
 If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
 
-Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask my why...
+Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask me why...
 
 #### Non-standard voice configurations
 
@@ -368,11 +370,11 @@ Normally you will use a standard configuration for voice control, which means, t
 
   1. Muted Assistant(s)
   
-     "Simulator Setup" provide a preset for each Assistant, which will let the corresponding start in the so called muted mode. In this mode, the Assistant will not talk unless a very critical situation occurs, or if you actively address the Assistant with a command. For example, the Engineer will not inform you about damages and will not call you to the pit, when the time loss is to high. You can always unmute the Assistant later on, using the corresponding [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements).
+     Startup profiles allow you to start an Assistant in the so called muted mode. In this mode, the Assistant will not talk unless a very critical situation occurs, or if you actively address the Assistant with a command. For example, the Engineer will not inform you about damages and will not call you to the pit, when the time loss is to high. You can always unmute the Assistant later on, using the corresponding [voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#enabling-and-disabling-specific-warnings-and-announcements).
 
   2. Silent Assistant(s)
   
-     For this purpose, "Simulator Setup" also provides a corresponding preset. Using this will completely disable voice output and input for the given Assistant. Commands issued by a Button Box or Stream Deck will still work and especially the remote control of the "Team Center" will work as well.
+     Choosing an Assitant to be *silent* in a startup profile will completely disable voice output and input for this Assistant. Commands issued by a Button Box or Stream Deck will still work and especially the remote control of the "Team Center" will work as well.
 
   3. No voice control for one or more Assistant(s)
   

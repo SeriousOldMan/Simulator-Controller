@@ -18,15 +18,15 @@ Thank you very much for your support!
 
 Installation is very easy. For first time users I recommand using the automated installer below. But there are different download and installation options available. Please see the complete documentation on [Installation & Configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration), where you also will find a quick start guide for new users, for more information.
 
+If you don't want to use the automated installer (or you can't cause of your Antivirus protection), you can manually install one of the versions below. There are separate download links for the current stable version, for the current development build and two previous stable versions. Download one of these builds and unzip it anywhere on your hard disks. You then need to run the "Install.exe" application found in the root directory. This will guide you through the remaining installation process. For release information, even for a preview on upcoming features in the next stable build, don't miss the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
+
 #### Antivirus Warnings
 
 The programming language used for building Simulator Controller uses some really nasty tricks to control Windows applications, tricks also used by malware. Therefore, depending on your concrete Antivirus program, you may get some warnings regarding the Simulator Controller applications. I can assure you, that there's nothing about it. But you can read about these issues in the forums of [AutoHotkey](https://www.autohotkey.com/) itself. If your Antivirus programm allows exception rules, please define rules for the Simulator Controller directories (install directory and also the one in the users *Documents* folder), otherwise you need to have a beer and search for another Simulator Controller tool. Sorry...
 
-If you don't want to use the automated installer (or you can't cause of your Antivirus protection), you can manually install one of the versions below. There are separate download links for the current development build and at least the two latest stable releases. Download one of these builds and unzip it anywhere on your hard disks. Beginnging with Release 3.5.2, you then need to run the "Simulator Tools" application in the *Binaries* folder. This will guide you through the remaining installation process. For release information, even for a preview on upcoming features in the next stable build, don't miss the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes).
-
 #### Automated Installer
 
-Simply download and run [Simulator Controller.exe](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Simulator+Controller.exe) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the current one, no problem. This is possible by downloading and installing one of the versions below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
+Simply download and run [Simulator Controller.exe](https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Simulator+Controller.exe) (you may have to deactivate your Antivirus or Browser download protection). This small application will connect to the version repository and will download and install the latest version automatically for you. If you want to install a version other than the latest one, no problem. As mentioned aboce, this is possible by downloading and installing one of the installation packages below manually, but consult the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation) beforehand.
 
 Here is a short video which shows how to configure Simulator Controller for the first time with a few clicks:
 
@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.6.0-release](https://cutt.ly/1yvGGygW) (Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster.)
+[7.2.7.0-release](https://cutt.ly/KynPKGlI) (Changes: Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files, Support for offline installation.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7260) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-726) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7270) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-727) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.2.5.0-release](https://cutt.ly/OyxB3OL0) (Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer, Max increment setting for setup changes.)
+[7.2.6.0-release](https://cutt.ly/1yvGGygW) (Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster.)
 
-[7.2.4.0-release](https://cutt.ly/CylXW1AW) (Changes: Support for multiple unit sets, Fixed premature end of LMU sessions, Fixed strategy for restricted tyres and retricted laps, Fixed spring rate for ACE BMW M4, Fixed several other ACE cars, New car models for "Setup Workbench".)
+[7.2.5.0-release](https://cutt.ly/OyxB3OL0) (Changes: New car models for "Setup Workbench", Fixed Driving Coach reference lap saving, Update R3E car database, Fixed wrong car names for ACE, Show more undriven cars in "Setup Workbench", Fixed overlong car names for ACE, Fixed RawHandler in "Setup Workbench", Fixed telemetry list update for Setup Engineer, Max increment setting for setup changes.)
 
 #### Current development build
 
-[7.2.7.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/5UHCBlg3?inline=true) (Test build for 7.2.7. Changes: Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7270) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-727) of this version and all the versions you might have skipped, before installing and using this version.
+None this time...
 
 ### Documentation
 
@@ -58,7 +56,7 @@ The markdown files, the so to say source code of this documentation Wiki, can be
 
 ### Video Tutorials
 
-Beside the quite extensive documentation (more than 500 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
+Beside the quite extensive documentation (more than 900 pages - I know, nobody reads documentation these days), we also have a list of video tutorials, which are recordings of live coaching session in our Discord community.
 
 1. [Quick start guide](https://youtu.be/B1oKlzKIAbs) - This video shows you how to create your first running configuration with a few clicks.
 

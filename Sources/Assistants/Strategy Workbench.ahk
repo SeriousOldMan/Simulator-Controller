@@ -381,16 +381,32 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		Set {
 			local viewer := this.Control["stratViewer"]
-			local scrollPos := getScrollPosition(viewer)
+			local scrollTop := false
+			local scrollLeft := false
 			local settings
 
-			this.iStrategyAxis := value
+			try {
+				scrollTop := viewer.document.documentElement.scrollTop
+				scrollLeft := viewer.document.documentElement.scrollLeft
+			}
+			catch Any as exception {
+				logError(exception)
+			}
 
-			setScrollPosition(viewer, scrollPos)
+			this.iStrategyAxis := value
 
 			this.showStrategyInfo(this.SelectedStrategy, true)
 
 			this.updateStrategyMenu()
+
+			if (scrollTop || scrollLeft)
+				try {
+					viewer.document.documentElement.scrollTop := scrollTop
+					viewer.document.documentElement.scrollLeft := scrollLeft
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 

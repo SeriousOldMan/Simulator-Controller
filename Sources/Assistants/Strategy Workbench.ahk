@@ -408,7 +408,6 @@ class StrategyWorkbench extends ConfigurationItem {
 				catch Any as exception {
 					logError(exception)
 				}
-			}
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 

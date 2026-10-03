@@ -228,7 +228,7 @@ class StrategyViewer {
 		return html
 	}
 
-	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis := "Dynamic") {
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis := "Auto") {
 		local durationSession := (strategy.SessionType = "Duration")
 		local ignore, time, xAxis, sessionColumn
 
@@ -236,7 +236,7 @@ class StrategyViewer {
 
 		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
 
-		if (strategyAxis = "Dynamic") {
+		if (strategyAxis = "Auto") {
 			if durationSession
 				sessionColumn := "Lap"
 			else
@@ -274,7 +274,7 @@ class StrategyViewer {
 		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width - 120) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	createInfoContent(strategy, margin := 0, strategyAxis := "Dynamic") {
+	createInfoContent(strategy, margin := 0, strategyAxis := "Auto") {
 		local html := ""
 		local timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID, width, chartArea
 		local before, after, tableCSS, margins
@@ -355,7 +355,7 @@ class StrategyViewer {
 		return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 	}
 
-	showStrategyInfo(strategy, strategyAxis := "Dynamic") {
+	showStrategyInfo(strategy, strategyAxis := "Auto") {
 		local html := this.createInfoContent(strategy, , strategyAxis)
 
 		if this.StrategyViewer {

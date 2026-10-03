@@ -117,7 +117,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iChartViewer := false
 	iStrategyViewer := false
-	iStrategyAxis := "Dynamic"
+	iStrategyAxis := "Auto"
 
 	iSimulation := false
 	iLapsDatabase := false
@@ -1227,7 +1227,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
 		this.iAutoInitialize := getMultiMapValue(settings, "Strategy Workbench", "Auto Initialize", true)
-		this.iStrategyAxis := getMultiMapValue(settings, "Strategy Workbench", "Strategy Axis", "Dynamic")
+		this.iStrategyAxis := getMultiMapValue(settings, "Strategy Workbench", "Strategy Axis", "Auto")
 
 		this.iSelectedDataType := getMultiMapValue(settings, "Strategy Workbench", "Data Type", "Electronics")
 
@@ -2167,10 +2167,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		strategyMenu.Push(translate("X-Axis") . translate(":"))
 
-		if (this.StrategyAxis = "Dynamic")
-			strategyMenu.Push(translate("[x]") . A_Space . translate("Dynamic"))
+		if (this.StrategyAxis = "Auto")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Auto"))
 		else
-			strategyMenu.Push(translate("[  ]") . A_Space . translate("Dynamic"))
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Auto"))
 
 		if (this.StrategyAxis = "Time")
 			strategyMenu.Push(translate("[x]") . A_Space . translate("Time"))
@@ -3487,7 +3487,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		switch line {
 			case 4:
-				this.StrategyAxis := "Dynamic"
+				this.StrategyAxis := "Auto"
 			case 5:
 				this.StrategyAxis := "Time"
 			case 6:

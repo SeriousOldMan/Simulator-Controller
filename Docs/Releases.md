@@ -35,7 +35,9 @@
 #### Changes
 
   - It is now possible to choose between a time-based and a lap-based x-axis for a strategy consumables chart.
-  
+  - [Internal] Migrated to AHK 2.1-alpha.33.
+  - [Developer] Introduced a new application settings management module, which prevents the sporadic loss of setting changes.
+    
 # Release history
 
 ## 7.2.6.0

@@ -5,7 +5,7 @@ Version=7.2.8.0-dev
 Target=7.2.8.0-release
 Date=10/02/26
 Download=
-Changes=Switchable X-Axis in Strategy Viewer
+Changes=Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.7.0-release

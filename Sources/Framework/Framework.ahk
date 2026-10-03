@@ -15,4 +15,5 @@
 #Include "Collections.ahk"
 #Include "MultiMap.ahk"
 #Include "Localization.ahk"
+#Include "Settings.ahk"
 #Include "Audio.ahk"

@@ -451,10 +451,10 @@ Attention: Depending on the given data constellation, the command "Cleanup..." c
 
 ### Strategy
 
-The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
+The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Also, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track. Lastly, you can choose the type of the horizontal axis of the consumables chart in the strategy report by selecting the format in the "Strategy" menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%204.JPG)
 
-Good to know: The document shown on the right side can be printed using the right mouse button context menu. Additionally, you can select the type of the horizontal axis of the consumables chart in the strategy report by selecting the format in the "Strategy" menu.
+Good to know: The document shown on the right side can be printed using the right mouse button context menu.
 
 Note: Exported strategies will be saved in the file "Race.strategy", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. There can only be one currently active strategey. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) for information, how Cato uses such a predefined strategy during a race.

@@ -380,18 +380,13 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		Set {
-			local chartViewer := this.Control["chartViewer"]
 			local strategyViewer := this.Control["stratViewer"]
-			local chartScrollTop := false
-			local chartScrollLeft := false
 			local strategyScrollTop := false
 			local strategyScrollLeft := false
 			local settings
 
 			if this.SelectedStrategy
 				try {
-					chartScrollTop := chartViewer.document.body.scrollTop
-					chartScrollLeft := chartViewer.document.body.scrollLeft
 					strategyScrollTop := strategyViewer.document.body.scrollTop
 					strategyScrollLeft := strategyViewer.document.body.scrollLeft
 				}
@@ -401,28 +396,18 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iStrategyAxis := value
 
-			this.showStrategyInfo(this.SelectedStrategy, true)
+			this.showStrategyInfo(this.SelectedStrategy, false, value)
 
 			this.updateStrategyMenu()
 
-			if this.SelectedStrategy {
-				if (chartScrollTop || chartScrollLeft)
-					try {
-						chartViewer.document.body.scrollTop := chartScrollTop
-						chartViewer.document.body.scrollLeft := chartScrollLeft
-					}
-					catch Any as exception {
-						logError(exception)
-					}
-
-				if (strategyScrollTop || strategyScrollLeft)
-					try {
-						strategyViewer.document.body.scrollTop := strategyScrollTop
-						strategyViewer.document.body.scrollLeft := strategyScrollLeft
-					}
-					catch Any as exception {
-						logError(exception)
-					}
+			if (this.SelectedStrategy && (strategyScrollTop || strategyScrollLeft))
+				try {
+					strategyViewer.document.body.scrollTop := strategyScrollTop
+					strategyViewer.document.body.scrollLeft := strategyScrollLeft
+				}
+				catch Any as exception {
+					logError(exception)
+				}
 			}
 
 			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")

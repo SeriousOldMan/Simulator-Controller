@@ -37,36 +37,40 @@ global gSettingsFlushing := false
 ;;;                    Public Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-getSetting(topic := StrSplit(A_ScriptName, ".")[1], setting, default := false) {
+getSetting(topic, setting, default := false) {
 	local value
 
 	static unsetSetting := {}
 
-	if !getMultiMapValue(gRemovedSettings, topic, setting, false) {
-		requireSettings()
+	if getMultiMapValue(gRemovedSettings, topic, setting, false)
+		return default
 
-		if gSettingsFlushing {
-			value := getMultiMapValue(gPendingChangedSettings, topic, setting, unsetSetting)
+	if (gSettingsFlushing && getMultiMapValue(gPendingRemovedSettings, topic, setting, false))
+		return default
 
-			if (value != unsetSetting)
-				return value
-		}
+	requireSettings()
 
-		value := getMultiMapValue(gChangedSettings, topic, setting, unsetSetting)
-
-		if (value != unsetSetting)
-			return value
-
-		value := getMultiMapValue(gSettings, topic, setting, unsetSetting)
+	if gSettingsFlushing {
+		value := getMultiMapValue(gPendingChangedSettings, topic, setting, unsetSetting)
 
 		if (value != unsetSetting)
 			return value
 	}
 
+	value := getMultiMapValue(gChangedSettings, topic, setting, unsetSetting)
+
+	if (value != unsetSetting)
+		return value
+
+	value := getMultiMapValue(gSettings, topic, setting, unsetSetting)
+
+	if (value != unsetSetting)
+		return value
+
 	return default
 }
 
-setSetting(topic := StrSplit(A_ScriptName, ".")[1], setting, value, flush := false) {
+setSetting(topic, setting, value, flush := false) {
 	if gSettingsFlushing {
 		setMultiMapValue(gPendingChangedSettings, topic, setting, value)
 		removeMultiMapValue(gPendingRemovedSettings, topic, setting)
@@ -169,11 +173,6 @@ flushSettings() {
 				gSettingsFlushing := true
 
 				requireSettings(file)
-
-				if isDebug()
-					for topic, settings in gChangedSettings
-						for setting, ignore in settings
-							logMessage(kLogWarn, topic . "." . setting . " = " . ignore)
 
 				addMultiMapValues(gSettings, gChangedSettings)
 

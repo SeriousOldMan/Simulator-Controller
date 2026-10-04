@@ -26,8 +26,11 @@
 
 global gSettings := newMultiMap()
 global gChangedSettings := newMultiMap()
+global gPendingChangedSettings := newMultiMap()
 global gRemovedSettings := newMultiMap()
+global gPendingRemovedSettings := newMultiMap()
 global gSettingsUpdate := false
+global gSettingsFlushing := false
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -41,6 +44,13 @@ getSetting(topic := StrSplit(A_ScriptName, ".")[1], setting, default := false) {
 
 	if !getMultiMapValue(gRemovedSettings, topic, setting, false) {
 		requireSettings()
+
+		if gSettingsFlushing {
+			value := getMultiMapValue(gPendingChangedSettings, topic, setting, unsetSetting)
+
+			if (value != unsetSetting)
+				return value
+		}
 
 		value := getMultiMapValue(gChangedSettings, topic, setting, unsetSetting)
 
@@ -57,15 +67,28 @@ getSetting(topic := StrSplit(A_ScriptName, ".")[1], setting, default := false) {
 }
 
 setSetting(topic := StrSplit(A_ScriptName, ".")[1], setting, value, flush := false) {
-	setMultiMapValue(gChangedSettings, topic, setting, value)
-	removeMultiMapValue(gRemovedSettings, topic, setting)
+	if gSettingsFlushing {
+		setMultiMapValue(gPendingChangedSettings, topic, setting, value)
+		removeMultiMapValue(gPendingRemovedSettings, topic, setting)
+	}
+	else {
+		setMultiMapValue(gChangedSettings, topic, setting, value)
+		removeMultiMapValue(gRemovedSettings, topic, setting)
+	}
 
 	if flush
 		flushSettings()
 }
 
 removeSetting(topic := StrSplit(A_ScriptName, ".")[1], setting, flush := false) {
-	setMultiMapValue(gRemovedSettings, topic, setting, true)
+	if gSettingsFlushing {
+		setMultiMapValue(gPendingRemovedSettings, topic, setting, true)
+		removeMultiMapValue(gPendingChangedSettings, topic, setting)
+	}
+	else {
+		setMultiMapValue(gRemovedSettings, topic, setting, true)
+		removeMultiMapValue(gChangedSettings, topic, setting)
+	}
 
 	if flush
 		flushSettings()
@@ -81,12 +104,19 @@ lockSettings() {
 
 	loop
 		try {
-			return FileOpen(kUserConfigDirectory . "Application Settings.ini", "rw-rw", "UTF-16")
+			file := FileOpen(kUserConfigDirectory . "Application Settings.ini", "rw-rw", "UTF-16")
+
+			file.Pos := 0
+
+			return file
 		}
 		catch Any as exception {
 			logError(exception)
 
-			Sleep(100)
+			if gSettingsFlushing
+				return false
+			else
+				Sleep(100)
 		}
 }
 
@@ -103,12 +133,13 @@ requireSettings(file := false) {
 		if !file {
 			file := lockSettings()
 
-			try {
-				requireSettings(file)
-			}
-			finally {
-				unlockSettings(file)
-			}
+			if file
+				try {
+					requireSettings(file)
+				}
+				finally {
+					unlockSettings(file)
+				}
 		}
 		else {
 			fileTime := FileGetTime(kUserConfigDirectory . "Application Settings.ini", "M")
@@ -125,30 +156,44 @@ requireSettings(file := false) {
 }
 
 flushSettings() {
-	global gChangedSettings, gRemovedSettings
+	global gChangedSettings, gPendingChangedSettings, gRemovedSettings, gPendingRemovedSettings
+	global gSettingsFlushing
 
-	local file, topic, settings, ignore, setting
+	local oldFlushingSettings, file, topic, settings, ignore, setting
 
-	if (gChangedSettings.Count > 0) {
+	if ((gChangedSettings.Count > 0) && !(oldFlushingSettings := gSettingsFlushing)) {
 		file := lockSettings()
 
-		try {
-			requireSettings(file)
+		if file
+			try {
+				gSettingsFlushing := true
 
-			addMultiMapValues(gSettings, gChangedSettings)
+				requireSettings(file)
 
-			for topic, settings in gRemovedSettings
-				for setting, ignore in settings
-					removeMultiMapValue(gSettings, topic, setting)
+				if isDebug()
+					for topic, settings in gChangedSettings
+						for setting, ignore in settings
+							logMessage(kLogWarn, topic . "." . setting . " = " . ignore)
 
-			file.Write(printMultiMap(gSettings))
+				addMultiMapValues(gSettings, gChangedSettings)
 
-			gChangedSettings := newMultiMap()
-			gRemovedSettings := newMultiMap()
-		}
-		finally {
-			unlockSettings(file)
-		}
+				for topic, settings in gRemovedSettings
+					for setting, ignore in settings
+						removeMultiMapValue(gSettings, topic, setting)
+
+				file.Length := 0
+				file.Write(printMultiMap(gSettings))
+
+				gChangedSettings := gPendingChangedSettings
+				gRemovedSettings := gPendingRemovedSettings
+				gPendingChangedSettings := newMultiMap()
+				gPendingRemovedSettings := newMultiMap()
+			}
+			finally {
+				unlockSettings(file)
+
+				gSettingsFlushing := oldFlushingSettings
+			}
 	}
 
 	return false

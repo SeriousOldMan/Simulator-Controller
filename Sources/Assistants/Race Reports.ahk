@@ -687,7 +687,7 @@ class RaceReports extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local simulator, ignore, report, fileName, raceData, date, time, settings
+		local simulator, ignore, report, fileName, raceData, date, time
 
 		if (force || (track != this.SelectedTrack)) {
 			simulator := this.SelectedSimulator
@@ -735,13 +735,9 @@ class RaceReports extends ConfigurationItem {
 				this.RacesListView.ModifyCol(3, "AutoHdr")
 				this.RacesListView.ModifyCol(4, "AutoHdr")
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Race Reports", "Simulator", this.SelectedSimulator)
-				setMultiMapValue(settings, "Race Reports", "Car", this.SelectedCar)
-				setMultiMapValue(settings, "Race Reports", "Track", this.SelectedTrack)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("Race Reports", "Simulator", this.SelectedSimulator)
+				setSetting("Race Reports", "Car", this.SelectedCar)
+				setSetting("Race Reports", "Track", this.SelectedTrack)
 			}
 		}
 	}
@@ -930,10 +926,9 @@ class RaceReports extends ConfigurationItem {
 
 startupRaceReports() {
 	local icon := kIconsDirectory . "Chart.ico"
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Race Reports", "Simulator", false)
-	local car := getMultiMapValue(settings, "Race Reports", "Car", false)
-	local track := getMultiMapValue(settings, "Race Reports", "Track", false)
+	local simulator := getSetting("Race Reports", "Simulator", false)
+	local car := getSetting("Race Reports", "Car", false)
+	local track := getSetting("Race Reports", "Track", false)
 	local reportsDirectory := normalizeDirectoryPath(getMultiMapValue(kSimulatorConfiguration, "Race Strategist Reports", "Database", false))
 	local index := 1
 	local reports, simulators, cars, tracks, msgResult

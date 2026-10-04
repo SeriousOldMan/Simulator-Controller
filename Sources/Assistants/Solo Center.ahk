@@ -1222,7 +1222,6 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	__New(configuration, raceSettings, simulator := false, car := false, track := false) {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local sessionsDirectory
 
 		this.iSimulator := simulator
@@ -1240,14 +1239,14 @@ class SoloCenter extends ConfigurationItem {
 		if (!this.iSessionDirectory || (this.iSessionDirectory = "") || !FileExist(this.iSessionDirectory))
 			this.iSessionDirectory := (kTempDirectory . "Sessions\Solo\")
 
-		this.AutoClear := getMultiMapValue(settings, "Solo Center", "AutoClear", false)
-		this.AutoExport := getMultiMapValue(settings, "Solo Center", "AutoExport", false)
-		this.AutoSave := getMultiMapValue(settings, "Solo Center", "AutoSave", false)
-		this.AutoTelemetry := getMultiMapValue(settings, "Solo Center", "AutoTelemetry", false)
+		this.AutoClear := getSetting("Solo Center", "AutoClear", false)
+		this.AutoExport := getSetting("Solo Center", "AutoExport", false)
+		this.AutoSave := getSetting("Solo Center", "AutoSave", false)
+		this.AutoTelemetry := getSetting("Solo Center", "AutoTelemetry", false)
 
-		this.iUseSessionData := getMultiMapValue(settings, "Solo Center", "UseSessionData", true)
-		this.iUseLapsDatabase := getMultiMapValue(settings, "Solo Center", "UseLapsDatabase", getMultiMapValue(settings, "Solo Center", "UseTelemetryDatabase", false))
-		this.iDataWeather := getMultiMapValue(settings, "Solo Center", "Weather", "Dry")
+		this.iUseSessionData := getSetting("Solo Center", "UseSessionData", true)
+		this.iUseLapsDatabase := getSetting("Solo Center", "UseLapsDatabase", getSetting("Solo Center", "UseTelemetryDatabase", false))
+		this.iDataWeather := getSetting("Solo Center", "Weather", "Dry")
 
 		super.__New(configuration)
 
@@ -2073,7 +2072,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false, reload := true) {
-		local cars, settings, msgResult
+		local cars, msgResult
 
 		if (force || (simulator != this.Simulator)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2097,11 +2096,7 @@ class SoloCenter extends ConfigurationItem {
 
 			this.iSimulator := simulator
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Solo Center", "Simulator", simulator)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Solo Center", "Simulator", simulator)
 
 			if simulator
 				cars := this.getAvailableCars(simulator)
@@ -2124,7 +2119,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false, reload := true) {
-		local tracks, settings
+		local tracks
 
 		if (force || (car != this.Car)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2154,11 +2149,7 @@ class SoloCenter extends ConfigurationItem {
 			else {
 				this.iCar := car
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Solo Center", "Car", car)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("Solo Center", "Car", car)
 
 				tracks := this.getAvailableTracks(this.Simulator, car)
 
@@ -2178,7 +2169,7 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false, reload := true) {
-		local simulator, car, settings
+		local simulator, car
 
 		if (force || (track != this.Track)) {
 			if (!force && this.SessionActive && this.HasData && !this.SessionExported) {
@@ -2212,11 +2203,7 @@ class SoloCenter extends ConfigurationItem {
 			else {
 				this.iTrack := track
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Solo Center", "Track", track)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("Solo Center", "Track", track)
 
 				this.Control["trackDropDown"].Choose(inList(this.getAvailableTracks(simulator, car), track))
 
@@ -2745,11 +2732,7 @@ class SoloCenter extends ConfigurationItem {
 		local msgResult
 
 		updateSetting(setting, value) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Solo Center", setting, value)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Solo Center", setting, value)
 		}
 
 		switch line {
@@ -2831,11 +2814,7 @@ class SoloCenter extends ConfigurationItem {
 		local tyreCompound, tyreCompoundColor
 
 		updateSetting(setting, value) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Solo Center", setting, value)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Solo Center", setting, value)
 		}
 
 		switch line {
@@ -6018,17 +5997,11 @@ class SoloCenter extends ConfigurationItem {
 	}
 
 	getSelectedReport(default := "Running") {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		return (getMultiMapValue(settings, "Solo Center", "SelectedReport", default) || default)
+		return (getSetting("Solo Center", "SelectedReport", default) || default)
 	}
 
 	setSelectedReport(report) {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		setMultiMapValue(settings, "Solo Center", "SelectedReport", report)
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		setSetting("Solo Center", "SelectedReport", report)
 	}
 
 	selectReport(report) {
@@ -6259,13 +6232,10 @@ class SoloCenter extends ConfigurationItem {
 
 		if save {
 			report := this.SelectedReport
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Solo Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
-			setMultiMapValue(settings, "Solo Center", "Chart." . report . ".X-Axis", xAxis)
-			setMultiMapValue(settings, "Solo Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			
+			setSetting("Solo Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setSetting("Solo Center", "Chart." . report . ".X-Axis", xAxis)
+			setSetting("Solo Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
 
 			settings := readMultiMap(this.SessionDirectory . "Session Settings.ini")
 
@@ -6571,16 +6541,14 @@ class SoloCenter extends ConfigurationItem {
 				}
 			}
 			else {
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				value := getMultiMapValue(settings, "Solo Center", "Chart." . report . ".Type", kUndefined)
+				value := getSetting("Solo Center", "Chart." . report . ".Type", kUndefined)
 
 				if (value != kUndefined) {
 					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
 
 					this.iSelectedChartType := value
 
-					dataXChoice := getMultiMapValue(settings, "Solo Center", "Chart." . report . ".X-Axis")
+					dataXChoice := getSetting("Solo Center", "Chart." . report . ".X-Axis")
 
 					if (dataXChoice = "Tyre.Laps")
 						dataXChoice := "Tyre.Laps.Front.Left"
@@ -6590,7 +6558,7 @@ class SoloCenter extends ConfigurationItem {
 					loop 6
 						%"dataY" . A_Index . "Choice"% := 1
 
-					for axis, value in string2Values(";", getMultiMapValue(settings, "Solo Center", "Chart." . report . ".Y-Axises")) {
+					for axis, value in string2Values(";", getSetting("Solo Center", "Chart." . report . ".Y-Axises")) {
 						if (value = "Tyre.Laps")
 							value := "Tyre.Laps.Front.Left"
 
@@ -8672,10 +8640,9 @@ null(value) {
 
 startupSoloCenter() {
 	local icon := kIconsDirectory . "Practice.ico"
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Solo Center", "Simulator", false)
-	local car := getMultiMapValue(settings, "Solo Center", "Car", false)
-	local track := getMultiMapValue(settings, "Solo Center", "Track", false)
+	local simulator := getSetting("Solo Center", "Simulator", false)
+	local car := getSetting("Solo Center", "Car", false)
+	local track := getSetting("Solo Center", "Track", false)
 	local load := false
 	local index := 1
 	local sCenter

@@ -1669,16 +1669,12 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 											  , "Driver")
 
 				if (connection && (connection != "")) {
-					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-					serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+					serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 					if !inList(serverURLs, serverURL) {
 						serverURLs.Push(serverURL)
 
-						setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
-
-						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+						setSetting("Team Server", "Server URLs", values2String(";", serverURLs*))
 
 						settingsGui["serverURLEdit"].Delete()
 						settingsGui["serverURLEdit"].Add(serverURLs)
@@ -2495,9 +2491,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 				sessionName := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Name", "")
 				sessionIdentifier := getMultiMapValue(settingsOrCommand, "Team Settings", "Session.Identifier", false)
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+				serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 				settingsGui.Add("Text", "x16 y82 w90 h23 +0x200", translate("Server URL"))
 
@@ -2652,7 +2646,7 @@ showRaceSettingsEditor() {
 								  ? FileRead(kUserConfigDirectory . "Simulator.remote")
 								  : false)
 	local icon := kIconsDirectory . "Race Settings.ico"
-	local index, fileName, settings, appSettings, hasTeamServer
+	local index, fileName, settings, hasTeamServer
 	local candidate, ignore, data
 
 	TraySetIcon(icon, "1")
@@ -2746,13 +2740,11 @@ showRaceSettingsEditor() {
 	}
 
 	if !gSimulator {
-		appSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		gSimulator := getMultiMapValue(appSettings, "Simulator", "Simulator", false)
+		gSimulator := getSetting("Simulator", "Simulator", false)
 
 		if (gSimulator && ((remoteSimulator = gSimulator) || Application(gSimulator, kSimulatorConfiguration).isRunning())) {
-			gCar := getMultiMapValue(appSettings, "Simulator", "Car")
-			gTrack := getMultiMapValue(appSettings, "Simulator", "Track")
+			gCar := getSetting("Simulator", "Car")
+			gTrack := getSetting("Simulator", "Track")
 		}
 		else
 			gSimulator := false

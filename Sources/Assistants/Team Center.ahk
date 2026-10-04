@@ -1436,7 +1436,6 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	loadFromConfiguration(configuration) {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 		local directory, settings
 
 		super.loadFromConfiguration(configuration)
@@ -1471,14 +1470,14 @@ class TeamCenter extends ConfigurationItem {
 		this.iSessionName := getMultiMapValue(settings, "Team Settings", "Session.Name", "")
 		this.iSessionIdentifier := getMultiMapValue(settings, "Team Settings", "Session.Identifier", false)
 
-		this.iTyrePressureMode := getMultiMapValue(settings, "Team Center", "TyrePressureMode", "Reference")
-		this.iCorrectPressureLoss := getMultiMapValue(settings, "Team Center", "CorrectPressureLoss", false)
-		this.iSelectTyreSet := getMultiMapValue(settings, "Team Center", "SelectTyreSet", true)
+		this.iTyrePressureMode := getSetting("Team Center", "TyrePressureMode", "Reference")
+		this.iCorrectPressureLoss := getSetting("Team Center", "CorrectPressureLoss", false)
+		this.iSelectTyreSet := getSetting("Team Center", "SelectTyreSet", true)
 
-		this.iUseSessionData := getMultiMapValue(settings, "Team Center", "UseSessionData", true)
-		this.iUseLapsDatabase := getMultiMapValue(settings, "Team Center", "UseLapsDatabase", getMultiMapValue(settings, "Team Center", "UseTelemetryDatabase", false))
-		this.iUseCurrentMap := getMultiMapValue(settings, "Team Center", "UseCurrentMap", true)
-		this.iUseTraffic := getMultiMapValue(settings, "Team Center", "UseTraffic", false)
+		this.iUseSessionData := getSetting("Team Center", "UseSessionData", true)
+		this.iUseLapsDatabase := getSetting("Team Center", "UseLapsDatabase", getSetting("Team Center", "UseTelemetryDatabase", false))
+		this.iUseCurrentMap := getSetting("Team Center", "UseCurrentMap", true)
+		this.iUseTraffic := getSetting("Team Center", "UseTraffic", false)
 	}
 
 	createGui(configuration) {
@@ -2216,9 +2215,7 @@ class TeamCenter extends ConfigurationItem {
 			y := 70
 			width := 388
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+			serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 			if (!inList(serverURLs, this.ServerURL) && StrLen(this.ServerURL) > 0)
 				serverURLs.Push(this.ServerURL)
@@ -2845,16 +2842,12 @@ class TeamCenter extends ConfigurationItem {
 				if connection {
 					this.iConnection := connection
 
-					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-					serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+					serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 					if !inList(serverURLs, this.ServerURL) {
 						serverURLs.Push(this.ServerURL)
 
-						setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
-
-						writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+						setSetting("Team Server", "Server URLs", values2String(";", serverURLs*))
 
 						if (this.Mode = "Normal") {
 							window["serverURLEdit"].Delete()
@@ -5288,11 +5281,7 @@ class TeamCenter extends ConfigurationItem {
 		}
 
 		updateSetting(setting, value) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Team Center", setting, value)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Team Center", setting, value)
 		}
 
 		updateTelemetrySetting(provider) {
@@ -5461,11 +5450,7 @@ class TeamCenter extends ConfigurationItem {
 		local directory, sessionDB
 
 		updateSetting(setting, value) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Team Center", setting, value)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Team Center", setting, value)
 		}
 
 		if this.Simulator {
@@ -5690,11 +5675,7 @@ class TeamCenter extends ConfigurationItem {
 
 	choosePitstopMenu(line) {
 		updateSetting(setting, value) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Team Center", setting, value)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Team Center", setting, value)
 		}
 
 		uploadSetups(*) {
@@ -6898,7 +6879,7 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	initializeSimulator(simulator, car, track, force := false) {
-		local row, compound, settings, ignore, dropDown
+		local row, compound, ignore, dropDown
 
 		if simulator
 			simulator := SessionDatabase.getSimulatorName(simulator)
@@ -6917,13 +6898,9 @@ class TeamCenter extends ConfigurationItem {
 			}
 
 			if this.Simulator {
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Team Center", "Simulator", simulator)
-				setMultiMapValue(settings, "Team Center", "Car", car)
-				setMultiMapValue(settings, "Team Center", "Track", track)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("Team Center", "Simulator", simulator)
+				setSetting("Team Center", "Car", car)
+				setSetting("Team Center", "Track", track)
 
 				compounds := SessionDatabase.getTyreCompounds(simulator, car, track)
 
@@ -11068,17 +11045,11 @@ class TeamCenter extends ConfigurationItem {
 	}
 
 	getSelectedReport(default := "Running") {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		return (getMultiMapValue(settings, "Team Center", "SelectedReport", default) || default)
+		return (getSetting("Team Center", "SelectedReport", default) || default)
 	}
 
 	setSelectedReport(report) {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		setMultiMapValue(settings, "Team Center", "SelectedReport", report)
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		setSetting("Team Center", "SelectedReport", report)
 	}
 
 	selectReport(report) {
@@ -11541,13 +11512,10 @@ class TeamCenter extends ConfigurationItem {
 
 		if save {
 			report := this.SelectedReport
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Team Center", "Chart." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
-			setMultiMapValue(settings, "Team Center", "Chart." . report . ".X-Axis", xAxis)
-			setMultiMapValue(settings, "Team Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			
+			setSetting("Team Center", "Chart." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
+			setSetting("Team Center", "Chart." . report . ".X-Axis", xAxis)
+			setSetting("Team Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
 
 			settings := readMultiMap(this.SessionDirectory . "Session Settings.ini")
 
@@ -11799,16 +11767,14 @@ class TeamCenter extends ConfigurationItem {
 				}
 			}
 			else {
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				value := getMultiMapValue(settings, "Team Center", "Chart." . report . ".Plot", kUndefined)
+				value := getSetting("Team Center", "Chart." . report . ".Plot", kUndefined)
 
 				if (value != kUndefined) {
 					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
 
 					this.iSelectedChartType := value
 
-					dataXChoice := getMultiMapValue(settings, "Team Center", "Chart." . report . ".X-Axis")
+					dataXChoice := getSetting("Team Center", "Chart." . report . ".X-Axis")
 
 					if (dataXChoice = "Tyre.Laps")
 						dataXChoice := "Tyre.Laps.Front.Left"
@@ -11818,7 +11784,7 @@ class TeamCenter extends ConfigurationItem {
 					loop 6
 						%"dataY" . A_Index . "Choice"% := 1
 
-					for axis, value in string2Values(";", getMultiMapValue(settings, "Team Center", "Chart." . report . ".Y-Axises")) {
+					for axis, value in string2Values(";", getSetting("Team Center", "Chart." . report . ".Y-Axises")) {
 						if (value = "Tyre.Laps")
 							value := "Tyre.Laps.Front.Left"
 
@@ -14933,14 +14899,13 @@ loadDrivers(connector, team) {
 }
 
 startupTeamCenter() {
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Team Center", "Simulator"
-												, getMultiMapValue(settings, "Strategy Workbench", "Simulator", false))
-	local car := getMultiMapValue(settings, "Team Center", "Car"
-										  , getMultiMapValue(settings, "Strategy Workbench", "Car", false))
-	local track := getMultiMapValue(settings, "Team Center", "Track"
-											, getMultiMapValue(settings, "Strategy Workbench", "Track", false))
-	local mode := (inList(A_Args, "-Simple") ? "Simple" : getMultiMapValue(settings, "Team Center", "Mode", "Normal"))
+	local simulator := getSetting("Team Center", "Simulator"
+								, getSetting("Strategy Workbench", "Simulator", false))
+	local car := getSetting("Team Center", "Car"
+						  , getSetting("Strategy Workbench", "Car", false))
+	local track := getSetting("Team Center", "Track"
+							, getSetting("Strategy Workbench", "Track", false))
+	local mode := (inList(A_Args, "-Simple") ? "Simple" : getSetting("Team Center", "Mode", "Normal"))
 	local raceSettings := readMultiMap(kUserConfigDirectory . "Race.settings")
 	local index := inList(A_Args, "-Startup")
 	local icon := (kIconsDirectory . "Console.ico")

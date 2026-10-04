@@ -8111,8 +8111,7 @@ class SoloCenter extends ConfigurationItem {
 		if this.TelemetryCollector
 			if ((track != "Unknown") && (trackLength > 0)) {
 				if (this.TelemetryCollector == true) {
-					provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-															, "Telemetry Viewer", "Provider", "Internal")
+					provider := getSetting("Telemetry Viewer", "Provider", "Internal")
 
 					this.iTelemetryCollector := TelemetryCollector(provider, this.SessionDirectory . "Telemetry"
 																 , this.Simulator, track, trackLength)

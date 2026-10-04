@@ -915,7 +915,7 @@ class SetupWizard extends ConfiguratorPanel {
 
 		this.nextPage()
 
-		page := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Simulator Setup", "StartPage", 0)
+		page := getSetting("Simulator Setup", "StartPage", 0)
 
 		if isInteger(page) {
 			loop page

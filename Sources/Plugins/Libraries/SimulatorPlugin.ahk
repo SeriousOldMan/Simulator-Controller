@@ -1129,15 +1129,9 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 										, SessionDatabase.getTrackName(simulator, track, false)
 										, SessionDatabase.getTrackName(simulator, track, true))
 
-			Task.startTask(() {
-				local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Simulator", "Simulator", SessionDatabase.getSimulatorName(simulator))
-				setMultiMapValue(settings, "Simulator", "Car", car)
-				setMultiMapValue(settings, "Simulator", "Track", track)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
-			}, 1000, kLowPriority)
+			setSetting("Simulator", "Simulator", SessionDatabase.getSimulatorName(simulator))
+			setSetting("Simulator", "Car", car)
+			setSetting("Simulator", "Track", track)
 		}
 
 		if this.supportsTyreManagement(&mixedCompounds) {

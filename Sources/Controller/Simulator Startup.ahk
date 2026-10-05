@@ -1332,7 +1332,7 @@ launchPad(command := false, arguments*) {
 			return false
 	}
 	else if (command = "CloseOnStartup")
-		setSetting( , "CloseLaunchPad", closeCheckBox.Value)
+		setSetting("Simulator Startup", "CloseLaunchPad", closeCheckBox.Value)
 	else if (command = "EditProfile") {
 		launchPadGui.Block()
 
@@ -1590,7 +1590,7 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "x8 yp+40 w574 0x10")
 
-		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w150 h21 Checked" . getSetting( , "CloseLaunchPad", false), translate("Close on Startup"))
+		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w150 h21 Checked" . getSetting("Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
 		closeCheckBox.OnEvent("Click", closeOnStartup)
 
 		launchPadGui.Add("Button", "x259 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)

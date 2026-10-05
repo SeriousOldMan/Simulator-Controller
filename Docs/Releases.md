@@ -36,12 +36,15 @@
 
   - It is now possible to choose between a time-based and a lap-based x-axis for a strategy consumables chart.
   - Added support for the GPT-6 model family of OpenAI.
+  - The storage management of persistent application settings (window size and position, chosen menu items, selected functions, and so on) has been completely rewritten. All current settings are preserved and the changes has been thoroughly tested, but if you observe a change in behavior, let me know immediately.
   - [Internal] Migrated to AHK 2.1-alpha.33.
   - [Developer] Introduced a new application settings management module, which prevents the sporadic loss of application setting changes.
   - New and updated car models for "Setup Workbench":
     - Assetto Corsa EVO
+	  - Porsche 911 Turbo 3.6 (964) (fixed)
 	  - Caterham Academy (fixed caster value unit - clicks instead of degrees)
 	  - Caterham 485 CSR
+	  - Mercedes 190E 2.5-16 Evo II
     
 # Release history
 

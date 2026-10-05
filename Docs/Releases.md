@@ -35,6 +35,7 @@
 #### Changes
 
   - It is now possible to choose between a time-based and a lap-based x-axis for a strategy consumables chart.
+  - Added support for the GPT-6 model family of OpenAI.
   - [Internal] Migrated to AHK 2.1-alpha.33.
   - [Developer] Introduced a new application settings management module, which prevents the sporadic loss of application setting changes.
   - New and updated car models for "Setup Workbench":

@@ -713,7 +713,7 @@ class LLMConnector {
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
-			if (InStr(this.Model, "GPT 5") || InStr(this.Model, "GPT-5")) {
+			if (InStr(this.Model, "GPT 5") || InStr(this.Model, "GPT-5") || InStr(this.Model, "GPT 6") || InStr(this.Model, "GPT-6")) {
 				if body.HasProp("max_tokens") {
 					body.max_completion_tokens := body.max_tokens
 

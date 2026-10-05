@@ -36,7 +36,11 @@
 
   - It is now possible to choose between a time-based and a lap-based x-axis for a strategy consumables chart.
   - [Internal] Migrated to AHK 2.1-alpha.33.
-  - [Developer] Introduced a new application settings management module, which prevents the sporadic loss of setting changes.
+  - [Developer] Introduced a new application settings management module, which prevents the sporadic loss of application setting changes.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Caterham Academy (fixed caster value unit - clicks instead of degrees)
+	  - Caterham 485 CSR
     
 # Release history
 

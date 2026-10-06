@@ -55,9 +55,6 @@ class HIDJoystick {
 	static kHIDPInput := 0
 	static kButtonUsagePage := 0x09
 
-	/**
-	 * The numbers (17, 18, ...) of all connected game controllers.
-	 */
 	static Joysticks {
 		Get {
 			local result := []
@@ -78,10 +75,6 @@ class HIDJoystick {
 		}
 	}
 
-	/**
-	 * Returns a descriptor {Number, Button, Key} for hotkeys like "17Joy5", which cannot be
-	 * handled by the builtin AutoHotkey joystick support, *false* for everything else.
-	 */
 	static parseHotkey(theHotkey := "") {
 		local descriptor
 
@@ -96,9 +89,6 @@ class HIDJoystick {
 		return false
 	}
 
-	/**
-	 * Drop in replacement for *Hotkey* for joystick numbers beyond 16.
-	 */
 	static setHotkey(arguments*) {
 		local trigger := HIDJoystick.parseHotkey(arguments.Has(1) ? arguments[1] : "")
 		local callback := false
@@ -164,10 +154,6 @@ class HIDJoystick {
 			HIDJoystick.refresh()
 	}
 
-	/**
-	 * Registers this script as a Raw Input sink for all game controllers, so that button
-	 * state is reported even when the script does not have the input focus.
-	 */
 	static listen() {
 		local size := (A_PtrSize = 8) ? 16 : 12
 		local devices := Buffer(3 * size, 0)
@@ -178,7 +164,7 @@ class HIDJoystick {
 		if HIDJoystick.sListening
 			return true
 
-		for index, usage in [0x04, 0x05, 0x08] {		; Joystick, Gamepad, Multi-axis Controller
+		for index, usage in [0x04, 0x05, 0x08] {
 			offset := ((index - 1) * size)
 
 			NumPut("UShort", 0x01, devices, offset)
@@ -250,8 +236,6 @@ class HIDJoystick {
 					devices.Push(device)
 			}
 		}
-
-		; Keep the original path order when assigning numbers for the first time.
 
 		loop (devices.Length - 1) {
 			index := A_Index + 1
@@ -421,9 +405,6 @@ class HIDJoystick {
 		return ((name != "") ? name : path)
 	}
 
-	/**
-	 * Returns the highest button number reported by the device.
-	 */
 	static getButtonRange(preparsed) {
 		local caps := Buffer(64, 0)
 		local buttons := 0
@@ -485,8 +466,6 @@ class HIDJoystick {
 		handle := NumGet(inputData, 8, "Ptr")
 
 		if !HIDJoystick.sByHandle.Has(handle) {
-			; A device has been connected after the last enumeration...
-
 			if ((A_TickCount - HIDJoystick.sLastRefresh) < 2000)
 				return
 
@@ -520,7 +499,7 @@ class HIDJoystick {
 		if (DllCall("Hid\HidP_GetUsages", "Int", HIDJoystick.kHIDPInput, "UShort", HIDJoystick.kButtonUsagePage
 										, "UShort", 0, "Ptr", usages, "UInt*", &length, "Ptr", device.Preparsed
 										, "Ptr", report, "UInt", reportSize, "Int") != HIDJoystick.kHIDPStatusSuccess)
-			return		; Report does not carry button data (different report id)...
+			return
 
 		loop length {
 			button := NumGet(usages, (A_Index - 1) * 2, "UShort")

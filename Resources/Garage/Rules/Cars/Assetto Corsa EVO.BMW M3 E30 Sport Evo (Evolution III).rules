@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;   Modular Simulator Controller System - Assetto Corsa Competizione           ;;;
-;;;                                         Porsche 911 Turbo 3.6 (964)          ;;;
+;;;                                         BMW M3 E30 Sport Evo (Evolution III) ;;;
 ;;;                                         Setup Rules                          ;;;
 ;;;                                                                              ;;;
 ;;;   Author:     Oliver Juwig (TheBigO)                                         ;;;
@@ -11,10 +11,10 @@
 ;;;                            Initialization                                    ;;;
 ;;;------------------------------------------------------------------------------;;;
 
-[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "Porsche 911 Turbo 3.6 (964)",
+[?Initialize] => (Prove: removeSettings("Assetto Corsa EVO", "BMW M3 E30 Sport Evo (Evolution III)",
 										[Electronics.Map, Electronics.TC, Electronics.ABS,
 										 Brake.Balance, Brake.Pressure,
-										 Aero.Height.Front, Aero.Height.Rear, Aero.Wing.Front, Aero.Wing.Rear,
+										 Aero.Height.Front, Aero.Height.Rear, Aero.Wing.Front,
 										 Spring.Rate.Front.Left, Spring.Rate.Front.Right,
 										 Spring.Rate.Rear.Left, Spring.Rate.Rear.Right,
 										 Bumpstop.Rate.Front.Left, Bumpstop.Rate.Front.Right,

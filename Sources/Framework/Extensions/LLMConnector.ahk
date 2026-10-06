@@ -713,15 +713,18 @@ class LLMConnector {
 		}
 
 		CreatePrompt(body, instructions, tools, question) {
-			if (InStr(this.Model, "GPT 5") || InStr(this.Model, "GPT-5") || InStr(this.Model, "GPT 6") || InStr(this.Model, "GPT-6")) {
-				if body.HasProp("max_tokens") {
-					body.max_completion_tokens := body.max_tokens
+			local version
 
-					body.DeleteProp("max_tokens")
+			if RegExMatch(this.Model, "[0-9\.]", &version)
+				if (isNumber(version[]) && (version[] >= 5)) {
+					if body.HasProp("max_tokens") {
+						body.max_completion_tokens := body.max_tokens
+
+						body.DeleteProp("max_tokens")
+					}
+
+					body.DeleteProp("temperature")
 				}
-
-				body.DeleteProp("temperature")
-			}
 
 			return super.CreatePrompt(body, instructions, tools, question)
 		}

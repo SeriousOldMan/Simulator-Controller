@@ -7423,7 +7423,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 					showProgress({Progress: Min(A_Index, 100)})
 
 					for key, value in values {
-						settings.Push(Array(car, track, weather, mode, section, key, value))
+						settings.Push(Array(car, track, mode, weather, section, key, value))
 
 						type := editor.getSettingType(section, key, &default)
 

@@ -637,6 +637,18 @@ This little tool will help you identifying the button numbers of your hardware c
 
 Once a valid trigger is detected, the corresponding info is show for 2 seconds in the tool tip. And the hotkey string for the trigger is placed in the clipboard for further usage.
 
+##### Controllers beyond the first 16 devices
+
+AutoHotkey's built-in joystick interface uses Windows' legacy WinMM slots and only accepts controller numbers 1 through 16. These numbers and existing trigger assignments are left unchanged. Additional attached game controllers exposed by DirectInput receive numbers starting at 17, using the same button codes (for example, `17Joy3`) in the Trigger Detector, controller actions, and both Press and Hold Push-To-Talk modes.
+
+The mapping from DirectInput device instance GUIDs to extended controller numbers is stored in `Joystick Devices.ini` in your *Documents\Simulator Controller\Config* folder. Numbers are appended, never recycled, and remain reserved while devices are disconnected. Concurrent applications lock the mapping before reading and updating it, then atomically replace the file. A missing or inaccessible device is treated as having no buttons pressed. If the registry is invalid or cannot be updated, extended input is disabled for that refresh and the error is logged; existing native controller numbers are not reassigned.
+
+Keep this file with your configuration backups. Do not delete it to remove a disconnected controller or edit it while applications are running: deleting entries can allow their numbers to be reused. A previously assigned extended device retains its extended number even if Windows later places it in a native slot; that native slot continues to work independently. Windows still controls the ordering of slots 1 through 16.
+
+Extended input supports plain `NJoyB` button triggers, with up to 128 buttons per device. Axes, POV hats, keyboard modifiers, and joystick release hotkeys are not implemented for extended controllers. Buttons are polled at approximately 10 ms intervals, device discovery is refreshed approximately every 2 seconds, and very short presses or input while AutoHotkey is busy can be missed. Restart the Trigger Detector after connecting a new device. Devices not exposed as DirectInput game controllers, or held exclusively by another application, cannot be read by this extension.
+
+The instance GUID is Windows' device identity, not a hardware serial number. Driver changes, reinstalling a device, moving it to another USB port, or connecting indistinguishable controllers can change this identity. In that case the device receives a new number and its triggers must be detected and assigned again; the old number remains reserved. Copying the mapping to another PC does not guarantee the same Windows identities.
+
 #### Tab *Launchpad*
 
 On the launchpad, you can define a list of type "Other" applications, that can be launched by a push of a button on your controller. The "Launch" mode, which belongs to the "System" plugin, will use this list to occupy as many buttons on your controller, as has been defined on the *Controller* tab.

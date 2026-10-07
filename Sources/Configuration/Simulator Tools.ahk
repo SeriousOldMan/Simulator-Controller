@@ -521,7 +521,7 @@ checkInstallation() {
 		installLocation := false
 		userLocation := false
 	}
-	
+
 	if (installLocation && inList(A_Args, "-Repair")) {
 		if !A_IsAdmin {
 			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {

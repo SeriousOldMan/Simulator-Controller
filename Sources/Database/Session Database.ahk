@@ -463,8 +463,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		this.iRequestorPID := requestorPID
-		this.iTrackEditorMode := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-												, "Session Database", "Track Editor", this.TrackEditorMode)
+		this.iTrackEditorMode := getSetting("Session Database", "Track Editor", this.TrackEditorMode)
 
 		configuration := readMultiMap(kUserConfigDirectory . "Session Database.ini")
 
@@ -1793,8 +1792,6 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseTrackEditorMode(*) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
 			if (editorGui["trackEditorTypeDropDown"].Value = 2) {
 				if (!this.SelectedCar || (this.SelectedCar == true)) {
 					editorGui["trackEditorTypeDropDown"].Value := 1
@@ -1807,9 +1804,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			else
 				this.iTrackEditorMode := "Sections"
 
-			setMultiMapValue(settings, "Session Database", "Track Editor", this.TrackEditorMode)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Session Database", "Track Editor", this.TrackEditorMode)
 
 			this.updateTrackMap()
 			this.updateState()
@@ -3063,18 +3058,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local window, choices, index, car, settings
+		local window, choices, index, car
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			window := this.Window
 
 			this.iSelectedSimulator := simulator
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Session Database", "Simulator", simulator)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Session Database", "Simulator", simulator)
 
 			this.iAllTracks := []
 
@@ -3099,16 +3090,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local window, tracks, trackNames, settings
+		local window, tracks, trackNames
 
 		if (force || (car != this.SelectedCar)) {
 			this.iSelectedCar := car
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Session Database", "Car", car)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Session Database", "Car", car)
 
 			window := this.Window
 
@@ -3135,16 +3122,12 @@ class SessionDatabaseEditor extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local window, settings
+		local window
 
 		if (force || (track != this.SelectedTrack)) {
 			this.iSelectedTrack := track
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Session Database", "Track", track)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Session Database", "Track", track)
 
 			window := this.Window
 
@@ -7440,7 +7423,7 @@ selectImportSettings(sessionDatabaseEditorOrCommand, directory := false, owner :
 					showProgress({Progress: Min(A_Index, 100)})
 
 					for key, value in values {
-						settings.Push(Array(car, track, weather, mode, section, key, value))
+						settings.Push(Array(car, track, mode, weather, section, key, value))
 
 						type := editor.getSettingType(section, key, &default)
 
@@ -8382,9 +8365,7 @@ editSettings(editorOrCommand, arguments*) {
 
 		serverIdentifierEdit.Text := connections[currentConnection][1]
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+		availableServerURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 		if (!inList(availableServerURLs, connections[currentConnection][2]) && StrLen(connections[currentConnection][2]) > 0)
 			availableServerURLs.Push(connections[currentConnection][2])
@@ -8494,16 +8475,12 @@ editSettings(editorOrCommand, arguments*) {
 			if (connection && (connection != "")) {
 				connector.ValidateDataToken()
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+				availableServerURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 				if !inList(availableServerURLs, serverURL) {
 					availableServerURLs.Push(serverURL)
 
-					setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", availableServerURLs*))
-
-					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+					setSetting("Team Server", "Server URLs", values2String(";", availableServerURLs*))
 
 					serverURLEdit.Delete()
 					serverURLEdit.Add(availableServerURLs)
@@ -8712,9 +8689,7 @@ editSettings(editorOrCommand, arguments*) {
 		settingsEditorGui.Add("Text", "x24 yp+30 w117 h23 +0x200", translate("Name"))
 		serverIdentifierEdit := settingsEditorGui.Add("Edit", "x146 yp+1 w246", serverIdentifierEdit)
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		availableServerURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+		availableServerURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 		if (!inList(availableServerURLs, serverURLEdit) && StrLen(serverURLEdit) > 0)
 			availableServerURLs.Push(serverURLEdit)
@@ -9056,10 +9031,9 @@ loginDialog(connectorOrCommand := false, teamServerURL := false, owner := false,
 
 startupSessionDatabase() {
 	local icon := kIconsDirectory . "Session Database.ico"
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Session Database", "Simulator", false)
-	local car := getMultiMapValue(settings, "Session Database", "Car", false)
-	local track := getMultiMapValue(settings, "Session Database", "Track", false)
+	local simulator := getSetting("Session Database", "Simulator", false)
+	local car := getSetting("Session Database", "Car", false)
+	local track := getSetting("Session Database", "Track", false)
 	local weather := false
 	local airTemperature := 23
 	local trackTemperature := 27

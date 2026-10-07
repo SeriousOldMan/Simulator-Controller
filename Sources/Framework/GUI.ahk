@@ -16,6 +16,7 @@
 #Include "Strings.ahk"
 #Include "Localization.ahk"
 #Include "MultiMap.ahk"
+#Include "Settings.ahk"
 #Include "Configuration.ahk"
 #Include "Progress.ahk"
 
@@ -3038,7 +3039,7 @@ class Window extends Gui {
 	}
 
 	UpdatePosition(descriptor) {
-		local x, y, settings
+		local x, y
 
 		try {
 			WinGetPos(&x, &y, , , this)
@@ -3047,12 +3048,8 @@ class Window extends Gui {
 			y := screen2Window(y)
 
 			if ((x && y) && ((this.iLastX != x) || (this.iLastY != y))) {
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Window Positions", descriptor . ".X", x)
-				setMultiMapValue(settings, "Window Positions", descriptor . ".Y", y)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("Window Positions", descriptor . ".X", x)
+				setSetting("Window Positions", descriptor . ".Y", y)
 
 				this.iLastX := x
 				this.iLastY := y
@@ -3078,12 +3075,8 @@ class Window extends Gui {
 		static resizeTask := false
 
 		updateSettings(width, height) {
-			local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Width", width)
-			setMultiMapValue(settings, "Window Positions", this.Descriptor . ".Height", height)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Window Positions", this.Descriptor . ".Width", width)
+			setSetting("Window Positions", this.Descriptor . ".Height", height)
 		}
 
 		runResizers(synchronous := false) {
@@ -3339,7 +3332,7 @@ trackMouse(button, tracker) {
 }
 
 moveByMouse(window, descriptor := false, *) {
-	local winX, winY, settings
+	local winX, winY
 
 	WinGetPos(&winX, &winY, , , window)
 
@@ -3359,19 +3352,14 @@ moveByMouse(window, descriptor := false, *) {
 	winY := screen2Window(winY)
 
 	if descriptor {
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		setMultiMapValue(settings, "Window Positions", descriptor . ".X", winX)
-		setMultiMapValue(settings, "Window Positions", descriptor . ".Y", winY)
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		setSetting("Window Positions", descriptor . ".X", winX)
+		setSetting("Window Positions", descriptor . ".Y", winY)
 	}
 }
 
 getWindowPosition(descriptor, &x, &y) {
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local posX := getMultiMapValue(settings, "Window Positions", descriptor . ".X", kUndefined)
-	local posY := getMultiMapValue(settings, "Window Positions", descriptor . ".Y", kUndefined)
+	local posX := getSetting("Window Positions", descriptor . ".X", kUndefined)
+	local posY := getSetting("Window Positions", descriptor . ".Y", kUndefined)
 	local screen, screenLeft, screenRight, screenTop, screenBottom
 
 	if ((posX == kUndefined) || (posY == kUndefined))
@@ -3397,10 +3385,8 @@ getWindowPosition(descriptor, &x, &y) {
 }
 
 getWindowSize(descriptor, &width, &height) {
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-	width := getMultiMapValue(settings, "Window Positions", descriptor . ".Width", kUndefined)
-	height := getMultiMapValue(settings, "Window Positions", descriptor . ".Height", kUndefined)
+	width := getSetting("Window Positions", descriptor . ".Width", kUndefined)
+	height := getSetting("Window Positions", descriptor . ".Height", kUndefined)
 
 	if ((width == kUndefined) || (height == kUndefined))
 		return false
@@ -3589,7 +3575,7 @@ initializeGUI() {
 	DarkTheme.DarkListView.Initialize()
 
 	try {
-		Theme.CurrentTheme := %getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", "Classic") . "Theme"%()
+		Theme.CurrentTheme := %getSetting("General", "UI Theme", "Classic") . "Theme"%()
 	}
 	catch Any as exception {
 		logError(exception, true)

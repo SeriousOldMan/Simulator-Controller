@@ -1618,7 +1618,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local simulators, settings
+		local simulators
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			this.Window.Block()
@@ -1626,14 +1626,10 @@ class SetupWorkbench extends ConfigurationItem {
 			try {
 				this.iSelectedSimulator := simulator
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
 				if (simulator == true)
-					removeMultiMapValue(settings, "Setup Workbench", "Simulator")
+					removeSetting("Setup Workbench", "Simulator")
 				else
-					setMultiMapValue(settings, "Setup Workbench", "Simulator", simulator)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+					setSetting("Setup Workbench", "Simulator", simulator)
 
 				this.initializeSimulator((simulator == true) ? "Generic" : simulator)
 
@@ -1673,7 +1669,7 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local tracks, trackNames, settings
+		local tracks, trackNames
 
 		if (force || (car != this.SelectedCar[false])) {
 			this.Window.Block()
@@ -1681,14 +1677,10 @@ class SetupWorkbench extends ConfigurationItem {
 			try {
 				this.iSelectedCar := car
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
 				if (car == true)
-					removeMultiMapValue(settings, "Setup Workbench", "Car")
+					removeSetting("Setup Workbench", "Car")
 				else
-					setMultiMapValue(settings, "Setup Workbench", "Car", car)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+					setSetting("Setup Workbench", "Car", car)
 
 				this.Control["carDropDown"].Choose(inList(this.AvailableCars, this.SelectedCar))
 
@@ -1712,22 +1704,16 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local settings
-
 		if (force || (track != this.SelectedTrack[false])) {
 			this.Window.Block()
 
 			try {
 				this.iSelectedTrack := track
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
 				if (track == true)
-					removeMultiMapValue(settings, "Setup Workbench", "Track")
+					removeSetting("Setup Workbench", "Track")
 				else
-					setMultiMapValue(settings, "Setup Workbench", "Track", track)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+					setSetting("Setup Workbench", "Track", track)
 
 				if (track != true) {
 					track := inList(this.getTracks(this.SelectedSimulator, this.SelectedCar), SessionDatabase.getTrackName(this.SelectedSimulator, track))
@@ -6399,10 +6385,9 @@ factPath(path*) {
 
 startupSetupWorkbench() {
 	local icon := kIconsDirectory . "Setup.ico"
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Setup Workbench", "Simulator", false)
-	local car := getMultiMapValue(settings, "Setup Workbench", "Car", false)
-	local track := getMultiMapValue(settings, "Setup Workbench", "Track", false)
+	local simulator := getSetting("Setup Workbench", "Simulator", false)
+	local car := getSetting("Setup Workbench", "Car", false)
+	local track := getSetting("Setup Workbench", "Track", false)
 	local weather := false
 	local index := 1
 	local workbench, label

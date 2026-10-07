@@ -355,6 +355,9 @@ checkInstallation() {
 		local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
 		local packageInfo := readMultiMap(packageLocation . "\VERSION")
 		local installInfo := readMultiMap(installLocation . "\VERSION")
+		local packageComponents := string2Map(",", "->", getMultiMapValue(packageInfo
+																		, getMultiMapValue(packageInfo, "Current", "Type", "Release")
+																		, "Components", ""))
 		local installedComponents := string2Map(",", "->", getMultiMapValue(installInfo
 																		  , getMultiMapValue(installInfo, "Current", "Type", "Release")
 																		  , "Components", ""))
@@ -362,106 +365,137 @@ checkInstallation() {
 		local components := []
 		local component, version, type, ignore, part, path, destination, url, urlError, componentNr
 
-		for component, version in string2Map(",", "->"
-										   , getMultiMapValue(packageInfo, getMultiMapValue(packageInfo, "Current", "Type")
-																		 , "Components", "")) {
-			componentNr := A_Index
+		updateNeeded(components) {
+			local component, version, ignore, path, part, type, installedVersion
 
-			if ((packageLocation = installLocation) || !installedComponents.Has(component)
-													|| (VerCompare(version, installedComponents[component]) > 0)) {
-				try {
-					urlError := "Package URL not defined..."
+			for component, version in components {
+				path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
 
-					for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", ""))
-						try {
-							showProgress({progress: (gProgressCount += 2)
-										, message: translate("Downloading ") . component . translate(" files...")})
+				if (path && (path != "") && (path != "."))
+					path := (packageLocation . "\" . path . "\")
+				else
+					path := (packageLocation . "\")
 
-							deleteFile(kTempDirectory . "ComponentPackage.zip")
+				if !FileExist(path)
+					return true
 
-							Download(substituteVariables(url, {master: MASTER}), kTempDirectory . "ComponentPackage.zip")
+				for ignore, part in string2Values(",", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Content")) {
+					type := FileExist(path . part)
 
-							if !FileExist(kTempDirectory . "ComponentPackage.zip")
-								urlError := "Package URL not defined..."
-							else {
+					if !type
+						return true
+					else if InStr(type, "D") {
+						installedVersion := getMultiMapValue(readMultiMap(path . part . "\VERSION"), "Component", "Version", false)
+
+						if (installedVersion != version)
+							return true
+					}
+				}
+			}
+
+			return false
+		}
+
+		if updateNeeded(packageComponents) {
+			for component, version in packageComponents {
+				componentNr := A_Index
+
+				if ((packageLocation = installLocation) || !installedComponents.Has(component)
+														|| (VerCompare(version, installedComponents[component]) > 0)) {
+					try {
+						urlError := "Package URL not defined..."
+
+						for ignore, url in string2Values(";", getMultiMapValue(packageInfo, "Components", component . "." . version . ".Download", ""))
+							try {
 								showProgress({progress: (gProgressCount += 2)
-											, message: translate("Extracting ") . component . translate(" files...")})
+											, message: translate("Downloading ") . component . translate(" files...")})
 
-								path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+								deleteFile(kTempDirectory . "ComponentPackage.zip")
 
-								if (path && (path != "") && (path != "."))
-									path := (packageLocation . "\" . path)
-								else
-									path := packageLocation
+								Download(substituteVariables(url, {master: MASTER}), kTempDirectory . "ComponentPackage.zip")
 
-								if temporary {
-									destination := (kTempDirectory . "SC-Component" . componentNr)
+								if !FileExist(kTempDirectory . "ComponentPackage.zip")
+									urlError := "Package URL not defined..."
+								else {
+									showProgress({progress: (gProgressCount += 2)
+												, message: translate("Extracting ") . component . translate(" files...")})
 
-									deleteFile(destination)
-									deleteDirectory(destination)
+									path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
 
-									for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
-										components.Push([path . "\" . part, destination . "\" . part])
+									if (path && (path != "") && (path != "."))
+										path := (packageLocation . "\" . path)
+									else
+										path := packageLocation
+
+									if temporary {
+										destination := (kTempDirectory . "SC-Component" . componentNr)
+
+										deleteFile(destination)
+										deleteDirectory(destination)
+
+										for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content"))
+											components.Push([path . "\" . part, destination . "\" . part])
+									}
+									else
+										destination := path
+
+									DirCreate(destination)
+
+									expand(kTempDirectory . "ComponentPackage.zip", destination)
+
+									if (!DirExist(destination) || !FileExist(destination . "\*.*"))
+										throw "Archive does not contain a valid component package..."
+
+									showProgress({progress: (gProgressCount += 5)})
+
+									urlError := false
+
+									break
 								}
-								else
-									destination := path
-
-								DirCreate(destination)
-
-								expand(kTempDirectory . "ComponentPackage.zip", destination)
-
-								if (!DirExist(destination) || !FileExist(destination . "\*.*"))
-									throw "Archive does not contain a valid component package..."
-
-								showProgress({progress: (gProgressCount += 5)})
-
-								urlError := false
-
-								break
 							}
-						}
-						catch Any as exception {
-							urlError := exception
-						}
+							catch Any as exception {
+								urlError := exception
+							}
 
-					if urlError {
-						logError(urlError, true)
+						if urlError {
+							logError(urlError, true)
+
+							error := true
+						}
+					}
+					catch Any as exception {
+						logError(exception, true)
 
 						error := true
 					}
 				}
-				catch Any as exception {
-					logError(exception, true)
+				else {
+					version := installedComponents[component]
 
-					error := true
+					path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
+
+					for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
+						if (path && (path != "") && (path != "."))
+							path := ("\" . path . "\" . part)
+						else
+							path := ("\" . part)
+
+						type := FileExist(installLocation . path)
+
+						showProgress({progress: (gProgressCount += 2)
+									, message: translate("Copying ") . component . translate(" files...")})
+
+						if (type && InStr(type, "D"))
+							DirCopy(installLocation . path, packageLocation . path, 1)
+						else if type
+							FileCopy(installLocation . path, packageLocation, 1)
+					}
 				}
 			}
-			else {
-				version := installedComponents[component]
 
-				path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))
-
-				for ignore, part in string2Values(",", getMultiMapValue(installInfo, "Components", component . "." . version . ".Content")) {
-					if (path && (path != "") && (path != "."))
-						path := ("\" . path . "\" . part)
-					else
-						path := ("\" . part)
-
-					type := FileExist(installLocation . path)
-
-					showProgress({progress: (gProgressCount += 2)
-								, message: translate("Copying ") . component . translate(" files...")})
-
-					if (type && InStr(type, "D"))
-						DirCopy(installLocation . path, packageLocation . path, 1)
-					else if type
-						FileCopy(installLocation . path, packageLocation, 1)
-				}
-			}
+			if error
+				withBlockedWindows(MsgDlg, translate("Cannot download additional files, because the download repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
 		}
-
-		if error
-			withBlockedWindows(MsgDlg, translate("Cannot download additional files, because the download repository is currently unavailable. Please start `"Simulator Download`" again later."), translate("Error"), 262160)
 
 		return components
 	}
@@ -601,6 +635,7 @@ checkInstallation() {
 
 				deleteDirectory(A_MyDocuments . "\Simulator Controller")
 				deleteDirectory(kUserHomeDirectory)
+				deleteDirectory(userLocation)
 			}
 			else
 				deleteFile(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
@@ -1798,7 +1833,6 @@ updateConfigurationForV722() {
 
 	updateConfigurationForV681()
 }
-
 
 updateConfigurationForV720() {
 	local dbConfig := readMultiMap(kUserConfigDirectory . "Session Database.ini")
@@ -4093,6 +4127,8 @@ startupSimulatorTools() {
 	setDebug(false)
 	setLogLevel(kLogWarn)
 
+	startupApplication()
+
 	checkInstallation()
 
 	readToolsConfiguration(&gUpdateSettings, &gCleanupSettings, &gCopySettings, &gBuildSettings, &gSplashScreen, &gTargetConfiguration)
@@ -4114,8 +4150,6 @@ startupSimulatorTools() {
 			if !editTargets()
 				ExitApp(0)
 	}
-
-	startupApplication()
 
 	if (!kSilentMode && gSplashScreen)
 		showSplashScreen(gSplashScreen, false, false)

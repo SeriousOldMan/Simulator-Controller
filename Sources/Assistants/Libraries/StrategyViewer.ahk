@@ -228,18 +228,26 @@ class StrategyViewer {
 		return html
 	}
 
-	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID) {
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis := "Auto") {
 		local durationSession := (strategy.SessionType = "Duration")
-		local ignore, time, xAxis
+		local ignore, time, xAxis, sessionColumn
 
 		chartID := StrategyViewer.sChartID++
 
 		drawChartFunction := ("function drawChart" . chartID . "() {`nvar data = new google.visualization.DataTable();")
 
-		if durationSession
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Lap") . "');")
+		if (strategyAxis = "Auto") {
+			if durationSession
+				sessionColumn := "Lap"
+			else
+				sessionColumn := "Minute"
+		}
+		else if (strategyAxis = "Time")
+			sessionColumn := "Minute"
 		else
-			drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Minute") . "');")
+			sessionColumn := "Lap"
+
+		drawChartFunction .= ("`ndata.addColumn('number', '" . translate(sessionColumn) . "');")
 
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Fuel Level") . "');")
 		drawChartFunction .= ("`ndata.addColumn('number', '" . translate("Tyre Life") . "');")
@@ -250,20 +258,23 @@ class StrategyViewer {
 			if (A_Index > 1)
 				drawChartFunction .= ", "
 
-			xAxis := (durationSession ? lapSeries[A_Index] : time)
+			if (sessionColumn = "Lap")
+				xAxis := lapSeries[A_Index]
+			else
+				xAxis := time
 
 			drawChartFunction .= ("[" . xAxis . ", " . convertUnit("Volume", fuelSeries[A_Index]) . ", " . tyreSeries[A_Index] . "]")
 		}
 
 		drawChartFunction .= ("]);`nvar options = { curveType: 'function', legend: { position: 'Right', textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, chartArea: { left: '10%', top: '5%', right: '25%', bottom: '20%' }, hAxis: { title: '"
-							. (durationSession ? translate("Lap") : translate("Minute")) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, vAxis: { viewWindow: { min: 0 }, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
+							. translate(sessionColumn) . "', titleTextStyle: { color: '" . this.Window.Theme.TextColor . "'}, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, vAxis: { viewWindow: { min: 0 }, gridlines: { color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, backgroundColor: '" . this.Window.AltBackColor . "' };`n")
 
 		drawChartFunction .= ("`nvar chart = new google.visualization.LineChart(document.getElementById('chart_" . chartID . "')); chart.draw(data, options); }")
 
 		return ("<div id=`"chart_" . chartID . "`" style=`"width: " . Round(width - 120) . "px; height: " . Round(height) . "px`"></div>")
 	}
 
-	createInfoContent(strategy, margin := 0) {
+	createInfoContent(strategy, margin := 0, strategyAxis := "Auto") {
 		local html := ""
 		local timeSeries, lapSeries, fuelSeries, tyreSeries, drawChartFunction, chartID, width, chartArea
 		local before, after, tableCSS, margins
@@ -298,7 +309,7 @@ class StrategyViewer {
 
 			width := (this.StrategyViewer.getWidth() - 4)
 
-			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+			chartArea := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis)
 
 			before := "
 			(
@@ -322,7 +333,7 @@ class StrategyViewer {
 												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
 												 , chartID: chartID})
-			
+
 			after := "
 			(
 					</script>
@@ -344,8 +355,8 @@ class StrategyViewer {
 		return ("<html>" . before . drawChartFunction . after . "<body style='background-color: #" . this.Window.AltBackColor . "' " . margins . "><style> div, table { color: '" . this.Window.Theme.TextColor . "'; font-family: Arial, Helvetica, sans-serif; font-size: 11px }</style><style>" . tableCSS . "</style><style> #header { font-size: 12px; } table, p, div { color: #" . this.Window.Theme.TextColor . " } </style><div>" . html . "</div><br>" . chartArea . "</body></html>")
 	}
 
-	showStrategyInfo(strategy) {
-		local html := this.createInfoContent(strategy)
+	showStrategyInfo(strategy, strategyAxis := "Auto") {
+		local html := this.createInfoContent(strategy, , strategyAxis)
 
 		if this.StrategyViewer {
 			this.StrategyViewer.document.open()

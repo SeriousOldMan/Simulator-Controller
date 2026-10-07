@@ -133,7 +133,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 		local x0, x1, w1, w2, x2, w4, x4, w3, x3, x5, w5, x6, x7, lineX, lineW
-		local settings, serverURLs, choosen
+		local serverURLs, choosen
 
 		chooseSessionStorePath(*) {
 			local directory
@@ -387,9 +387,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 
 		widget4 := window.Add("Text", "x" . lineX . " yp+30 w" . lineW . " W:Grow 0x10 Hidden")
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+		serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 		chosen := inList(serverURLs, this.Value["teamServerURL"])
 		if (!chosen && (serverURLs.Length > 0))
@@ -557,7 +555,7 @@ class TeamManagementPanel extends ConfiguratorPanel {
 	connect(message := true, reconnect := false) {
 		local connector := this.Connector
 		local token, availableMinutes, connection
-		local settings, serverURLs, chosen
+		local serverURLs, chosen
 
 		if ((Trim(this.Control["teamServerURLEdit"].Text) != "") && (Trim(this.Control["teamServerNameEdit"].Text) != "")) {
 			try {
@@ -602,16 +600,12 @@ class TeamManagementPanel extends ConfiguratorPanel {
 					this.Control["teamServerDataTokenEdit"].Text := ""
 				}
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+				serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 				if !inList(serverURLs, this.Control["teamServerURLEdit"].Text) {
 					serverURLs.Push(this.Control["teamServerURLEdit"].Text)
 
-					setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
-
-					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+					setSetting("Team Server", "Server URLs", values2String(";", serverURLs*))
 
 					this.Control["teamServerURLEdit"].Delete()
 					this.Control["teamServerURLEdit"].Add(serverURLs)

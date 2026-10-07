@@ -1166,9 +1166,8 @@ class TelemetryViewer {
 
 		button := viewerGui.Add("Button", "x683 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {
-			local provider := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-														  , "Telemetry Viewer", "Provider", "Internal")
-			local newProvider, configuration, collector
+			local provider := getSetting("Telemetry Viewer", "Provider", "Internal")
+			local newProvider, collector
 
 			viewerGui.Block()
 
@@ -1176,11 +1175,7 @@ class TelemetryViewer {
 				newProvider := editTelemetrySettings(this, provider)
 
 				if (newProvider && (newProvider != provider)) {
-					configuration := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-					setMultiMapValue(configuration, "Telemetry Viewer", "Provider", newProvider)
-
-					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", configuration)
+					setSetting("Telemetry Viewer", "Provider", newProvider)
 
 					collector := this.TelemetryCollector
 
@@ -1464,8 +1459,7 @@ class TelemetryViewer {
 				this.iOwnedTelemetryCollector := false
 			}
 			else if !this.TelemetryCollector {
-				this.iTelemetryCollector := TelemetryCollector(getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-																			  , "Telemetry Viewer", "Provider", "Internal")
+				this.iTelemetryCollector := TelemetryCollector(getSetting("Telemetry Viewer", "Provider", "Internal")
 															 , this.TelemetryDirectory
 															 , simulatorOrCollector, track, trackLength)
 				this.iOwnedTelemetryCollector := true

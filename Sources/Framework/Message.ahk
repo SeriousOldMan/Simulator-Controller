@@ -28,8 +28,7 @@ showMessage(message, title := false, icon := kUndefined, duration := 1000
 	static popupPosition
 
 	if !isSet(popupPosition)
-		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-										, "General", "Popup Position", "Bottom")
+		popupPosition := getSetting("General", "Popup Position", "Bottom")
 
 	if (y = kUndefined)
 		y := popupPosition

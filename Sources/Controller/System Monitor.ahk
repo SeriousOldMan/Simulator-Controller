@@ -438,13 +438,9 @@ systemMonitor(command := false, arguments*) {
 				sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
 				sessionInfoSize := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", sessionInfoWidgets*))
-				setMultiMapValue(settings, "System Monitor", "Session Cycle", Round(sessionInfoSleep / 1000))
-				setMultiMapValue(settings, "System Monitor", "Session Size", sessionInfoSize)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("System Monitor", "Session Widgets", values2String(",", sessionInfoWidgets*))
+				setSetting("System Monitor", "Session Cycle", Round(sessionInfoSleep / 1000))
+				setSetting("System Monitor", "Session Size", sessionInfoSize)
 
 				nextSessionUpdate := A_TickCount
 			}
@@ -2471,9 +2467,9 @@ systemMonitor(command := false, arguments*) {
 
 		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 
-		sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
-		sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
-		sessionInfoSize := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
+		sessionInfoWidgets := string2Values(",", getSetting("System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+		sessionInfoSleep := (getSetting("System Monitor", "Session Cycle", 30) * 1000)
+		sessionInfoSize := getSetting("System Monitor", "Session Size", 11)
 
 		PeriodicTask(systemMonitor.Bind("UpdateDashboard"), 2000, kLowPriority).start()
 		PeriodicTask(systemMonitor.Bind("UpdateModules"), 2000, kLowPriority).start()

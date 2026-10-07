@@ -84,7 +84,7 @@ generatePassword(length) {
 
 administrationEditor(configurationOrCommand, arguments*) {
 	local task, ignore, identifier, type, which, contract
-	local dllFile, sessionDB, connection, administrationConfig
+	local dllFile, sessionDB, connection
 	local x, y, w, h, width, x0, x1, w1, w2, x2, w4, x4, w3, x3, x4, x5, w5, x6, x7
 	local button, administrationTab, compacting
 	local serverURLs, chosen
@@ -313,24 +313,20 @@ administrationEditor(configurationOrCommand, arguments*) {
 			if token {
 				connection := connector.Connect(token, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Admin")
 
-				administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+				setSetting("Server Administration", "ServerURL", administrationGui["teamServerURLEdit"].Text)
+				setSetting("Server Administration", "Login", administrationGui["teamServerNameEdit"].Text)
 
-				setMultiMapValue(administrationConfig, "Server Administration", "ServerURL", administrationGui["teamServerURLEdit"].Text)
-				setMultiMapValue(administrationConfig, "Server Administration", "Login", administrationGui["teamServerNameEdit"].Text)
-
-				serverURLs := string2Values(";", getMultiMapValue(administrationConfig, "Team Server", "Server URLs", ""))
+				serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 				if !inList(serverURLs, administrationGui["teamServerURLEdit"].Text) {
 					serverURLs.Push(administrationGui["teamServerURLEdit"].Text)
 
-					setMultiMapValue(administrationConfig, "Team Server", "Server URLs", values2String(";", serverURLs*))
+					setSetting("Team Server", "Server URLs", values2String(";", serverURLs*))
 
 					administrationGui["teamServerURLEdit"].Delete()
 					administrationGui["teamServerURLEdit"].Add(serverURLs)
 					administrationGui["teamServerURLEdit"].Choose(serverURLs.Length)
 				}
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", administrationConfig)
 
 				if keepAliveTask
 					keepAliveTask.stop()
@@ -700,8 +696,6 @@ administrationEditor(configurationOrCommand, arguments*) {
 						  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
 		}
 
-		administrationConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
 		administrationGui := Window({Descriptor: "Server Administration", Resizeable: true, Closeable: true, Options: "-MaximizeBox"})
 
 		administrationGui.SetFont("Bold", "Arial")
@@ -745,8 +739,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 		x5 := x3 + w3 + 2
 		w5 := w3 - 25
 
-		serverURLs := string2Values(";", getMultiMapValue(administrationConfig, "Team Server", "Server URLs", ""))
-		chosen := inList(serverURLs, getMultiMapValue(administrationConfig, "Server Administration", "ServerURL", "https://localhost:5001"))
+		serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
+		chosen := inList(serverURLs, getSetting("Server Administration", "ServerURL", "https://localhost:5001"))
 		if (!chosen && (serverURLs.Length > 0))
 			chosen := 1
 
@@ -754,7 +748,8 @@ administrationEditor(configurationOrCommand, arguments*) {
 		administrationGui.Add("ComboBox", "x" . x1 . " yp+1 w" . w4 . " W:Grow Choose" . chosen . " VteamServerURLEdit", serverURLs)
 
 		administrationGui.Add("Text", "x" . x0 . " yp+23 w95 h23 +0x200", translate("Login Credentials"))
-		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " h21 W:Grow(0.5) VteamServerNameEdit", getMultiMapValue(administrationConfig, "Server Administration", "Login", ""))
+		administrationGui.Add("Edit", "x" . x1 . " yp+1 w" . w3 . " h21 W:Grow(0.5) VteamServerNameEdit"
+									, getSetting("Server Administration", "Login", ""))
 		administrationGui.Add("Edit", "x" . x3 . " yp w" . w3 . " h21 X:Move(0.5) W:Grow(0.5) Password VteamServerPasswordEdit", "")
 
 		button := administrationGui.Add("Button", "x" . x2 . " yp-1 w23 h23 Default Center +0x200")

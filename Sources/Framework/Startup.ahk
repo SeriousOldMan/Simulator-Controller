@@ -52,7 +52,7 @@ loadSimulatorConfiguration() {
 		logMessage(kLogOff, "Loading configuration...")
 
 	updateNeeded(components) {
-		local component, version, ignore, part, type, installedVersion
+		local component, version, ignore, path, part, type, installedVersion
 
 		for component, version in components {
 			path := Trim(getMultiMapValue(packageInfo, "Components", component . "." . version . ".Path", ""))

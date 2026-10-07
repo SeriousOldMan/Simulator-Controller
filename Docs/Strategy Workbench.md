@@ -1,4 +1,5 @@
 ## Introduction
+
 The "Strategy Workbench" is a very valuable tool, which can be used either stand-alone or together with Cato, the AI Race Strategist. With the help of this tool, you can develop a pitstop and tyre strategy for an upcoming race. Simple sprint races with a single required pitstop are supported as well as endurance races with multiple stints and complex tyre and fuel saving strategies. An important feature of this tool is the ability to analyze telemetry data of past races, that have been collected by Cato. This telemetry information is stored in the local database at the end of a session, as long as this has been activated in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-strategist) for the given simulator.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
@@ -450,7 +451,7 @@ Attention: Depending on the given data constellation, the command "Cleanup..." c
 
 ### Strategy
 
-The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Finally, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track.
+The values in this tab and also the document display on the right side of the tabbed pane describe the currently selected strategy. The *Strategy* menu above allows you to save the current strategy, you can load a strategy from the database (or any other location on your PC) and you can compare different strategies. Also, you can export the current stragey to Cato to be used for the next race or you can clear a previously exported strategy, so that you are on your own on the track. Lastly, you can choose the type of the horizontal axis of the consumables chart in the strategy report by selecting the format in the "Strategy" menu.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%204.JPG)
 

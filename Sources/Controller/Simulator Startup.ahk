@@ -868,7 +868,7 @@ closeApplication(application) {
 launchPad(command := false, arguments*) {
 	global kSimulatorConfiguration
 
-	local ignore, theApplication, startupConfig, x, y
+	local ignore, theApplication, x, y
 	local infoButton, profileButton, settingsButton, docsButton, shortcutsButton
 	local name, options, lastModified, hasTeamServer, restart, version
 
@@ -1331,13 +1331,8 @@ launchPad(command := false, arguments*) {
 		else
 			return false
 	}
-	else if (command = "CloseOnStartup") {
-		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		setMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", closeCheckBox.Value)
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
-	}
+	else if (command = "CloseOnStartup")
+		setSetting("Simulator Startup", "CloseLaunchPad", closeCheckBox.Value)
 	else if (command = "EditProfile") {
 		launchPadGui.Block()
 
@@ -1356,14 +1351,14 @@ launchPad(command := false, arguments*) {
 				activateWindow("ahk_exe " . theApplication)
 		}
 		else {
-			startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
 			restart := inList(["Simulator Setup.exe", "Simulator Configuration.exe"], theApplication)
 
-			if ((getMultiMapValue(startupConfig, "Simulator", "Simulator", kUndefined) != kUndefined) &&
-				Application(SessionDatabase.getSimulatorName(getMultiMapValue(startupConfig, "Simulator", "Simulator")), kSimulatorConfiguration).isRunning())
-				theApplication .= (" -Simulator `"" . getMultiMapValue(startupConfig, "Simulator", "Simulator") . "`""
-								 . " -Car `"" . getMultiMapValue(startupConfig, "Simulator", "Car") . "`""
-								 . " -Track `"" . getMultiMapValue(startupConfig, "Simulator", "Track") . "`"")
+			if ((getSetting("Simulator", "Simulator", kUndefined) != kUndefined) &&
+				Application(SessionDatabase.getSimulatorName(getSetting("Simulator", "Simulator"))
+						  , kSimulatorConfiguration).isRunning())
+				theApplication .= (" -Simulator `"" . getSetting("Simulator", "Simulator") . "`""
+								 . " -Car `"" . getSetting("Simulator", "Car") . "`""
+								 . " -Track `"" . getSetting("Simulator", "Track") . "`"")
 
 			if restart {
 				launchPadGui.Block()
@@ -1407,13 +1402,9 @@ launchPad(command := false, arguments*) {
 	else {
 		availableFunctions(getControllerState(), &hasTeamServer)
 
-		startupConfig := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-		removeMultiMapValue(startupConfig, "Simulator", "Simulator")
-		removeMultiMapValue(startupConfig, "Simulator", "Car")
-		removeMultiMapValue(startupConfig, "Simulator", "Track")
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", startupConfig)
+		removeSetting("Simulator", "Simulator")
+		removeSetting("Simulator", "Car")
+		removeSetting("Simulator", "Track", true)
 
 		if clickTask {
 			clickTask.stop()
@@ -1599,7 +1590,7 @@ launchPad(command := false, arguments*) {
 
 		launchPadGui.Add("Text", "x8 yp+40 w574 0x10")
 
-		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w150 h21 Checked" . getMultiMapValue(startupConfig, "Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
+		closeCheckBox := launchPadGui.Add("CheckBox", "x16 yp+10 w150 h21 Checked" . getSetting("Simulator Startup", "CloseLaunchPad", false), translate("Close on Startup"))
 		closeCheckBox.OnEvent("Click", closeOnStartup)
 
 		launchPadGui.Add("Button", "x259 yp w80 h23 Default", translate("Close")).OnEvent("Click", closeLaunchPad)
@@ -2871,16 +2862,12 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 					connection := connector.Connect(serverToken, SessionDatabase.ID, SessionDatabase.getName("Profile"), "Driver")
 
 					if (connection && (connection != "")) {
-						settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-						serverURLs := string2Values(";", getMultiMapValue(settings, "Team Server", "Server URLs", ""))
+						serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 						if !inList(serverURLs, serverURL) {
 							serverURLs.Push(serverURL)
 
-							setMultiMapValue(settings, "Team Server", "Server URLs", values2String(";", serverURLs*))
-
-							writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+							setSetting("Team Server", "Server URLs", values2String(";", serverURLs*))
 
 							profilesEditorGui["profileServerURLEdit"].Delete()
 							profilesEditorGui["profileServerURLEdit"].Add(serverURLs)
@@ -3218,7 +3205,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 			profilesEditorGui.Add("Button", "x" . ((x0 + 8) + 286) . " yp w86 h23 Center +0x200 vprofileSessionButton", translate("Manage...")).OnEvent("Click", editStartupProfiles.Bind(kEvent, "ManageSession"))
 
-			serverURLs := string2Values(";", getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "Team Server", "Server URLs", ""))
+			serverURLs := string2Values(";", getSetting("Team Server", "Server URLs", ""))
 
 			profilesEditorGui.Add("Text", "x" . (x0 + 8) . " yp+30 w112 h23 +0x200", translate("Server URL"))
 			profilesEditorGui.Add("ComboBox", "x" . x1 . " yp+1 w256 vprofileServerURLEdit", serverURLs)

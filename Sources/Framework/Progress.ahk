@@ -58,8 +58,7 @@ class ProgressWindow extends Window {
 		local progressGui
 
 		if !ProgressWindow.sPopupPosition
-			ProgressWindow.sPopupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-															, "General", "Popup Position", "Bottom")
+			ProgressWindow.sPopupPosition := getSetting("General", "Popup Position", "Bottom")
 
 		w := (options.HasProp("Width") ? options.Width : 280)
 		h := 90

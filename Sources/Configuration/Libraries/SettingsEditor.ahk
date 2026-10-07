@@ -324,8 +324,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 	local descriptor, value, simulators, margin, choices, chosen, splashScreens, uiThemes
 	local applicationName, enabled, coreHeight, index, coreDescriptor, ignore, theTheme
 	local coreOption, coreLabel, checked, feedbackHeight, feedbackDescriptor, feedbackOption, feedbackLabel
-	local applicationSettings
-
+	
 	static modeSettings
 	static configuration
 
@@ -457,11 +456,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 			positions := ["Top", "Bottom", "2nd Screen Top", "2nd Screen Bottom"]
 
-			applicationSettings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(applicationSettings, "General", "Popup Position", positions[inList(collect(positions, translate), popupPosition.Text)])
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", applicationSettings)
+			setSetting("General", "Popup Position", positions[inList(collect(positions, translate), popupPosition.Text)])
 
 			for descriptor, value in lastPositions
 				setMultiMapValue(newSettings, "Button Box", descriptor, value)
@@ -470,11 +465,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 
 			for ignore, theTheme in getAllUIThemes(configuration)
 				if (translate(theTheme.Descriptor) = uiTheme.Text) {
-					settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-					setMultiMapValue(settings, "General", "UI Theme", theTheme.Descriptor)
-
-					writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+					setSetting("General", "UI Theme", theTheme.Descriptor)
 
 					Theme.CurrentTheme := theTheme
 
@@ -601,7 +592,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 		buttonBoxSimulationDurationInput := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Simulation Duration", false)
 		buttonBoxPosition := getMultiMapValue(settingsOrCommand, "Button Box", "Button Box Position", "Bottom Right")
 
-		popupPosition := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "Popup Position", "Bottom")
+		popupPosition := getSetting("General", "Popup Position", "Bottom")
 
 		lastPositions := CaseInsenseMap()
 
@@ -677,7 +668,7 @@ editSettings(&settingsOrCommand, owner := false, withContinue := false, fromSetu
 			settingsEditorGui.Add("Button", "XP+115 YP w105", translate("Audio") . translate("...")).OnEvent("Click", editSettings.Bind(&kEditAudio))
 		}
 
-		uiTheme := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini"), "General", "UI Theme", Theme.CurrentTheme.Descriptor)
+		uiTheme := getSetting("General", "UI Theme", Theme.CurrentTheme.Descriptor)
 
 		splashScreen := getMultiMapValue(settingsOrCommand, "Startup", "Splash Screen", false)
 		splashScreens := getAllSplashScreens(configuration)

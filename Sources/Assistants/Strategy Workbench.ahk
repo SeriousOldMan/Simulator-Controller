@@ -117,6 +117,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	iChartViewer := false
 	iStrategyViewer := false
+	iStrategyAxis := "Auto"
 
 	iSimulation := false
 	iLapsDatabase := false
@@ -370,6 +371,46 @@ class StrategyWorkbench extends ConfigurationItem {
 	StrategyViewer {
 		Get {
 			return this.iStrategyViewer
+		}
+	}
+
+	StrategyAxis {
+		Get {
+			return this.iStrategyAxis
+		}
+
+		Set {
+			local strategyViewer := this.Control["stratViewer"]
+			local strategyScrollTop := false
+			local strategyScrollLeft := false
+			
+			if this.SelectedStrategy
+				try {
+					strategyScrollTop := strategyViewer.document.body.scrollTop
+					strategyScrollLeft := strategyViewer.document.body.scrollLeft
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
+			this.iStrategyAxis := value
+
+			this.showStrategyInfo(this.SelectedStrategy, false, value)
+
+			this.updateStrategyMenu()
+
+			if (this.SelectedStrategy && (strategyScrollTop || strategyScrollLeft))
+				try {
+					strategyViewer.document.body.scrollTop := strategyScrollTop
+					strategyViewer.document.body.scrollLeft := strategyScrollLeft
+				}
+				catch Any as exception {
+					logError(exception)
+				}
+
+			setSetting("Strategy Workbench", "Strategy Axis", value)
+
+			return value
 		}
 	}
 
@@ -1162,11 +1203,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.SetFont("Norm", "Arial")
 
-		settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
+		this.iAutoInitialize := getSetting("Strategy Workbench", "Auto Initialize", true)
+		this.iStrategyAxis := getSetting("Strategy Workbench", "Strategy Axis", "Auto")
 
-		this.iAutoInitialize := getMultiMapValue(settings, "Strategy Workbench", "Auto Initialize", true)
-
-		this.iSelectedDataType := getMultiMapValue(settings, "Strategy Workbench", "Data Type", "Electronics")
+		this.iSelectedDataType := getSetting("Strategy Workbench", "Data Type", "Electronics")
 
 		chosen := inList(["Electronics", "Tyres"], this.SelectedDataType)
 
@@ -1233,7 +1273,9 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		workbenchGui.Add("DropDownList", "x435 yp w180 Choose1 +0x200 VsimulationMenuDropDown", collect(["Simulation", "---------------------------------------------", "Run Simulation", "---------------------------------------------", "Use as Strategy..."], translate)).OnEvent("Change", simulationMenu)
 
-		workbenchGui.Add("DropDownList", "x620 yp w180 Choose1 +0x200 VstrategyMenuDropDown", collect(["Strategy", "---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], translate)).OnEvent("Change", strategyMenu)
+		workbenchGui.Add("DropDownList", "x620 yp w180 Choose1 +0x200 VstrategyMenuDropDown").OnEvent("Change", strategyMenu)
+
+		this.updateStrategyMenu()
 
 		workbenchGui.SetFont("Norm", "Arial")
 		workbenchGui.SetFont("Italic", "Arial")
@@ -1743,7 +1785,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		track := this.SelectedTrack
 
 		workbenchGui["sessionTypeDropDown"].Choose(Max(1, inList(["Time", "Time + 1", "Laps", "Laps + 1"]
-															   , getMultiMapValue(settings, "Strategy Workbench", "Session Type", "Time"))))
+															   , getSetting("Strategy Workbench", "Session Type", "Time"))))
 
 		chooseSessionType()
 
@@ -2097,6 +2139,34 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["settingsMenuDropDown"].Choose(1)
 	}
 
+	updateStrategyMenu() {
+		local strategyMenu := collect(["Strategy", "---------------------------------------------"], translate)
+
+		strategyMenu.Push(translate("X-Axis") . translate(":"))
+
+		if (this.StrategyAxis = "Auto")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Auto"))
+		else
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Auto"))
+
+		if (this.StrategyAxis = "Time")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Time"))
+		else
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Time"))
+
+		if (this.StrategyAxis = "Lap")
+			strategyMenu.Push(translate("[x]") . A_Space . translate("Lap"))
+		else
+			strategyMenu.Push(translate("[  ]") . A_Space . translate("Lap"))
+
+		strategyMenu := concatenate(strategyMenu, collect(["---------------------------------------------", "Load current Race Strategy", "Load Strategy...", "Save Strategy...", "---------------------------------------------", "Compare Strategies...", "---------------------------------------------", "Set as Race Strategy", "Clear Race Strategy"], translate))
+
+		this.Control["strategyMenuDropDown"].Delete()
+		this.Control["strategyMenuDropDown"].Add(strategyMenu)
+
+		this.Control["strategyMenuDropDown"].Choose(1)
+	}
+
 	createStrategyInfo(strategy) {
 		return this.StrategyViewer.createStrategyInfo(strategy)
 	}
@@ -2109,18 +2179,18 @@ class StrategyWorkbench extends ConfigurationItem {
 		return this.StrategyViewer.createStintsInfo(strategy, &timeSeries, &lapSeries, &fuelSeries, &tyreSeries)
 	}
 
-	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID) {
-		return this.StrategyViewer.createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+	createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis := this.StrategyAxis) {
+		return this.StrategyViewer.createConsumablesChart(strategy, width, height, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis)
 	}
 
-	showStrategyInfo(strategy, plot := true) {
-		this.StrategyViewer.showStrategyInfo(strategy)
+	showStrategyInfo(strategy, plot := true, strategyAxis := this.StrategyAxis) {
+		this.StrategyViewer.showStrategyInfo(strategy, strategyAxis)
 
 		if (strategy && plot)
-			this.showStrategyPlot(strategy)
+			this.showStrategyPlot(strategy, strategyAxis)
 	}
 
-	showStrategyPlot(strategy) {
+	showStrategyPlot(strategy, strategyAxis := this.StrategyAxis) {
 		local html, drawChartFunction, chartID, width, before, after
 		local timeSeries, lapSeries, fuelSeries, tyreSeries
 
@@ -2164,7 +2234,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			width := (this.ChartViewer.getWidth() - 4)
 
-			html := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID)
+			html := this.createConsumablesChart(strategy, width, width / 2, timeSeries, lapSeries, fuelSeries, tyreSeries, &drawChartFunction, &chartID, strategyAxis)
 
 			tableCSS := this.StrategyViewer.getTableCSS()
 
@@ -2303,16 +2373,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadSimulator(simulator, force := false) {
-		local drivers, ignore, id, index, car, carNames, cars, settings
+		local drivers, ignore, id, index, car, carNames, cars
 
 		if (force || (simulator != this.SelectedSimulator)) {
 			this.iSelectedSimulator := simulator
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Strategy Workbench", "Simulator", simulator)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Strategy Workbench", "Simulator", simulator)
 
 			this.iAvailableDrivers := SessionDatabase.getAllDrivers(simulator)
 
@@ -2356,16 +2422,12 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadCar(car, force := false) {
-		local tracks, settings
+		local tracks
 
 		if (force || (car != this.SelectedCar)) {
 			this.iSelectedCar := car
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Strategy Workbench", "Car", car)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Strategy Workbench", "Car", car)
 
 			tracks := this.getTracks(this.SelectedSimulator, car)
 
@@ -2378,7 +2440,7 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	loadTrack(track, force := false) {
-		local simulator, car, settings
+		local simulator, car
 
 		if (force || (track != this.SelectedTrack)) {
 			simulator := this.SelectedSimulator
@@ -2386,11 +2448,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			this.iSelectedTrack := track
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Strategy Workbench", "Track", track)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Strategy Workbench", "Track", track)
 
 			this.Control["trackDropDown"].Choose(inList(this.getTracks(simulator, car), track))
 
@@ -2415,7 +2473,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 	loadDataType(dataType, force := false) {
 		local tyreCompound, tyreCompoundColor, lapsDB, ignore, column, categories, field, category, value, settings
-		local driverNames, index, names, schema, availableCompounds, settings, axis, value
+		local driverNames, index, names, schema, availableCompounds, axis, value
 
 		if (force || (this.SelectedDataType != dataType)) {
 			this.showTelemetryChart(false)
@@ -2423,11 +2481,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.iSelectedDataType := dataType
 			this.iSelectedDrivers := false
 
-			settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-			setMultiMapValue(settings, "Strategy Workbench", "Data Type", dataType)
-
-			writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+			setSetting("Strategy Workbench", "Data Type", dataType)
 
 			lapsDB := LapsDatabase(this.SelectedSimulator, this.SelectedCar
 								 , this.SelectedTrack, this.SelectedDrivers)
@@ -2509,16 +2563,14 @@ class StrategyWorkbench extends ConfigurationItem {
 				this.Control["dataY2DropDown"].Add(Array(translate("None"), schema*))
 				this.Control["dataY3DropDown"].Add(Array(translate("None"), schema*))
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				value := getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".Type", kUndefined)
+				value := getSetting("Strategy Workbench", "Chart." . dataType . ".Type", kUndefined)
 
 				if (value != kUndefined) {
 					this.Control["chartTypeDropDown"].Choose(inList(["Scatter", "Bar", "Bubble", "Line"], value))
 
 					this.iSelectedChartType := value
 
-					field := getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".X-Axis")
+					field := getSetting("Strategy Workbench", "Chart." . dataType . ".X-Axis")
 
 					if (field = "Tyre.Laps")
 						field := "Tyre.Laps.Front.Left"
@@ -2528,7 +2580,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					loop 3
 						this.Control["dataY" . A_Index . "DropDown"].Choose(1)
 
-					for axis, value in string2Values(";", getMultiMapValue(settings, "Strategy Workbench", "Chart." . dataType . ".Y-Axises"))
+					for axis, value in string2Values(";", getSetting("Strategy Workbench", "Chart." . dataType . ".Y-Axises"))
 						this.Control["dataY" . axis . "DropDown"].Choose(inList(schema, value) + ((axis = 1) ? 0 : 1))
 				}
 				else if (dataType = "Electronics") {
@@ -2681,13 +2733,10 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if save {
 				report := this.SelectedDataType
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Strategy Workbench", "Chart." . report . ".Type", chartType)
-				setMultiMapValue(settings, "Strategy Workbench", "Chart." . report . ".X-Axis", xAxis)
-				setMultiMapValue(settings, "Strategy Workbench", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				
+				setSetting("Strategy Workbench", "Chart." . report . ".Type", chartType)
+				setSetting("Strategy Workbench", "Chart." . report . ".X-Axis", xAxis)
+				setSetting("Strategy Workbench", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
 			}
 
 			this.showDataPlot(records, xAxis, yAxises)
@@ -2748,8 +2797,6 @@ class StrategyWorkbench extends ConfigurationItem {
 	}
 
 	selectSessionType(sessionType, additionalLaps := 0) {
-		local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
 		this.iSelectedSessionType := sessionType
 		this.iSelectedAdditionalLaps := additionalLaps
 
@@ -2768,9 +2815,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simSessionResultLabel"].Text := translate("Seconds")
 		}
 
-		setMultiMapValue(settings, "Strategy Workbench", "Session Type", sessionType)
-
-		writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+		setSetting("Strategy Workbench", "Session Type", sessionType)
 	}
 
 	chooseSettingsMenu(line) {
@@ -2788,11 +2833,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			case 3:
 				this.iAutoInitialize := !this.AutoInitialize
 
-				settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-
-				setMultiMapValue(settings, "Strategy Workbench", "Auto Initialize", this.AutoInitialize)
-
-				writeMultiMap(kUserConfigDirectory . "Application Settings.ini", settings)
+				setSetting("Strategy Workbench", "Auto Initialize", this.AutoInitialize)
 			case 5, "Strategy": ; "Load from Strategy"
 				if (simulator && car && track) {
 					strategy := this.SelectedStrategy
@@ -3393,7 +3434,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			dirName := ""
 
 		switch line {
-			case 3:
+			case 4:
+				this.StrategyAxis := "Auto"
+			case 5:
+				this.StrategyAxis := "Time"
+			case 6:
+				this.StrategyAxis := "Lap"
+			case 8:
 				fileName := kUserConfigDirectory . "Race.strategy"
 
 				if FileExist(fileName) {
@@ -3408,7 +3455,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else
 					withBlockedWindows(MsgDlg, translate("There is no active Race Strategy."), translate("Information"), 262192)
-			case 4: ; "Load Strategy..."
+			case 9: ; "Load Strategy..."
 				if GetKeyState("Ctrl") {
 					this.Window.Opt("+OwnDialogs")
 
@@ -3494,7 +3541,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						}
 					}
 				}
-			case 5: ; "Save Strategy..."
+			case 10: ; "Save Strategy..."
 				if this.SelectedStrategy {
 					fileName := (((dirName != "") ? (dirName . "\") : "") . this.SelectedStrategy.Name . ".strategy")
 					fileName := StrReplace(fileName, "n/a", "n.a.")
@@ -3533,7 +3580,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-			case 7: ; "Compare Strategies..."
+			case 12: ; "Compare Strategies..."
 				this.Window.Opt("+OwnDialogs")
 
 				translator := translateMsgDlgButtons.Bind(["Compare", "Cancel"])
@@ -3551,7 +3598,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					if (strategies.Length > 1)
 						this.compareStrategies(strategies*)
 				}
-			case 9: ; "Export Strategy..."
+			case 14: ; "Export Strategy..."
 				if this.SelectedStrategy {
 					configuration := newMultiMap()
 
@@ -3561,7 +3608,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				}
 				else
 					withBlockedWindows(MsgDlg, translate("There is no current Strategy."), translate("Information"), 262192)
-			case 10: ; "Clear Strategy..."
+			case 15: ; "Clear Strategy..."
 				deleteFile(kUserConfigDirectory . "Race.strategy")
 		}
 	}
@@ -4769,10 +4816,9 @@ convertValue(name, value) {
 
 startupStrategyWorkbench() {
 	local icon := kIconsDirectory . "Workbench.ico"
-	local settings := readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-	local simulator := getMultiMapValue(settings, "Strategy Workbench", "Simulator", false)
-	local car := getMultiMapValue(settings, "Strategy Workbench", "Car", false)
-	local track := getMultiMapValue(settings, "Strategy Workbench", "Track", false)
+	local simulator := getSetting("Strategy Workbench", "Simulator", false)
+	local car := getSetting("Strategy Workbench", "Car", false)
+	local track := getSetting("Strategy Workbench", "Track", false)
 	local weather := "Dry"
 	local airTemperature := 23
 	local trackTemperature := 27

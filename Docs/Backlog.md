@@ -15,6 +15,7 @@
   3. Configurable priority for voice output between Spotter and other Assistants
   4. Include lap time meadian value in the lap time information given by the Strategist and others
   5. Driver Input overlay (brake / throttle) by the Driving Coach
+  6. Implement a safe rejoin advise by the Spotter after a long off-track.
   
 #### Setup Workbench
   1. Collect telemetry data from multiple drivers and generate combined setup recommendations
@@ -24,7 +25,6 @@
   1. Multi session tyre management - manage tyre sets and driven laps for a whole weekend (Practice, Qualifying, Race 1, Race 2, ...)
   2. Introduce data groups (for example all data belonging to a complete weekend w. practice, qualiy and race) and make this group usable for future strategy calculation
   3. Handle DT as an alternative to reset the stint timer at the end of a race
-  4. Make X-Axis in consumption graph configurable
 
 #### Team Center
   1. Change hot target pressures for the next pitstops

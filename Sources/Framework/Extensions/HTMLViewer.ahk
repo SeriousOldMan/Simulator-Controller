@@ -1948,6 +1948,7 @@ class WebView2 extends WebView2.Base {
 	}
 }
 
+
 ;;;-------------------------------------------------------------------------;;;
 ;;;                          Public Class Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
@@ -2392,8 +2393,7 @@ initializeHTMLViewer() {
 								  , getMultiMapValue(settings, "HTML", "Viewer.*"
 															 , getMultiMapValue(settings, "HTML", "Viewer"
 																						, "IE11"))) = "WebView2")
-	 || (getMultiMapValue(readMultiMap(kUserConfigDirectory . "Application Settings.ini")
-						, "General", "HTML Viewer", "IE11") = "WebView2")) {
+	 || (getSetting("General", "HTML Viewer", "IE11") = "WebView2")) {
 		Window.DefineCustomControl("HTMLViewer", createWebView2Viewer)
 
 		kHTMLViewer := "WebView2"

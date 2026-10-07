@@ -478,9 +478,14 @@ checkInstallation() {
 	}
 
 	installInfo := readMultiMap(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install")
-	installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
-	userLocation := getMultiMapValue(installInfo, "Install", "User", userLocation)
-
+	if FileExist(A_MyDocuments . "\Simulator Controller\Config\Simulator Controller.install") {
+		installLocation := getMultiMapValue(installInfo, "Install", "Location", installLocation)
+		userLocation := getMultiMapValue(installInfo, "Install", "User", userLocation)
+	}
+	else {
+		installLocation := false
+		userLocation := false
+	}
 	if (installLocation && inList(A_Args, "-Repair")) {
 		if !A_IsAdmin {
 			if RegExMatch(DllCall("GetCommandLine", "Str"), " /restart(?!\S)") {

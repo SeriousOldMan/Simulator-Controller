@@ -37,6 +37,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Hotkeys.ahk"
 #Include "..\Framework\Extensions\GDIP.ahk"
 #Include "..\Framework\Extensions\CLR.ahk"
 #Include "Libraries\SettingsDatabase.ahk"

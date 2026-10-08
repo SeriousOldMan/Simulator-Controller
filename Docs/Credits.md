@@ -21,7 +21,7 @@ Simulator Controller today supports multiple different languages for the user in
 - @PAL2000 for the Japanese translation
 - @Samat Gimadeev for the Russian translation
 
-Also very important are several contributions to the code base of Simulator Controller by @alejandrocq, @Awesome-XV and @EightOhFour. And I want to thank Jordan Moss (@Mossi) for the initial version of his great plugin, which provides most of the Simulator Controller data and state information to SimHub to support building dashboards and overlays.
+Also very important are several contributions to the code base of Simulator Controller by @alejandrocq, @Awesome-XV and @EightOhFour and not at least Tim Harbeck (@Timmermann) fot his great contribution of a new UBS library. And I want to thank Jordan Moss (@Mossi) for the initial version of his great plugin, which provides most of the Simulator Controller data and state information to SimHub to support building dashboards and overlays.
 
 Then we have the contributors to the car meta data, especially Chris Matthews, Mirko Lesko, @neophyte, @rysimabd, @alejandrocq, @\|FuZzYyY\| and especially @inthebagbud UK, who provided many car definitions for *Assetto Corsa*, *Assetto Corsa EVO*, *Automobilista 2*, *Le Mans Ultimate* and *RaceRoom Racing Experience*, and I also want to thank @mOellemeister for important parts of the *Le Mans Ultimate* data.
 
@@ -29,7 +29,7 @@ And I don't want to forget Matus Celko (@winzarten), who was so kind to provide 
 
 A very special thanks goes to @Keith M and @Atlas, who has supported me numerous times with testing.
 
-And I don't want forget to mention Martin Moser, who contributed large parts of the marvelous icon set for Stream Deck.
+And I don't want forget to mention Martin Moser, who contributed large parts of the marvelous icon set for the Stream Deck.
 
 Also, a big thank you goes out to @Caleidosttk for providing his excellent NAS solution and some of his precious bandwidth for an additional download mirror for installation and update packages.
 

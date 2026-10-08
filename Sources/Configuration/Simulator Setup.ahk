@@ -38,6 +38,7 @@
 
 #Include "..\Framework\Extensions\HTMLViewer.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Hotkeys.ahk"
 #Include "..\Framework\Extensions\JSON.ahk"
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "Libraries\SettingsEditor.ahk"

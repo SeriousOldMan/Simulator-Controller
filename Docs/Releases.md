@@ -46,6 +46,7 @@
 	  - Porsche 911 Turbo 3.6 (964) (fixed)
 	  - Caterham Academy (fixed caster value unit - clicks instead of degrees)
 	  - Caterham 485 CSR
+	  - Ferrari 488 Challenge Evo
 	  - BMW M3 E30 Sport Evo (Evolution III)
 	  - Mercedes 190E 2.5-16 Evo II
     

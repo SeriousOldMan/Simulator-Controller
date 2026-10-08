@@ -843,13 +843,13 @@ class HIDControllers {
 
 		for button, ignore in state
 			if !device.State.Has(button)
-				HIDControllers.fireHotkey(device.Number, button)
+				HIDControllers.fireHotkey(device.ID, button)
 
 		device.State := state
 	}
 
-	static fireHotkey(number, button) {
-		local key := ("HID" . number "#" . button) ; (number . "Joy" . button)
+	static fireHotkey(id, button) {
+		local key := ("HID" . id "#" . button) ; (number . "Joy" . button)
 		local descriptor
 
 		if HIDControllers.sHotkeys.Has(key) {

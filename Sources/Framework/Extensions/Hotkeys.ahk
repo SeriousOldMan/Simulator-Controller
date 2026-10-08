@@ -208,7 +208,8 @@ class TriggerDetectorContinuation extends Continuation {
 
 			if found {
 				if !key
-					key := (controllerNumber . "Joy" . found)
+					key := (controllerNumber . ((controllerNumber > kMaxLegacyControllers) ? "HID" : "Joy")
+											 . found)
 
 				A_Clipboard := key
 
@@ -406,8 +407,8 @@ class HIDControllers {
 		if (isObject(theHotkey) || !isInstance(theHotkey, String))
 			return false
 
-		if (InStr(theHotkey, "HID") == 1) {
-			parts := string2Values("#", theHotKey)
+		if InStr(theHotkey, "HID") {
+			parts := string2Values("HID", theHotKey)
 
 			return {Device: SubStr(parts[1], 4), Key: theHotkey, Button: parts[2]}
 		}
@@ -843,13 +844,13 @@ class HIDControllers {
 
 		for button, ignore in state
 			if !device.State.Has(button)
-				HIDControllers.fireHotkey(device.ID, button)
+				HIDControllers.fireHotkey(device.Number, button)
 
 		device.State := state
 	}
 
-	static fireHotkey(id, button) {
-		local key := ("HID" . id "#" . button) ; (number . "Joy" . button)
+	static fireHotkey(number, button) {
+		local key := (number . "HID" . button)
 		local descriptor
 
 		if HIDControllers.sHotkeys.Has(key) {
@@ -880,14 +881,14 @@ class HIDControllers {
 
 class Hotkeys {
 	static registerHotkey(theHotkey, function?, state?) {
-		if (InStr(theHotkey, "HID") == 1)
+		if InStr(theHotkey, "HID")
 			return HIDControllers.setHotkey(theHotkey, function?, state?)
 		else
 			return Hotkey(theHotkey, function?, state?)
 	}
 
 	static unregisterHotkey(theHotkey) {
-		if (InStr(theHotkey, "HID") == 1)
+		if InStr(theHotkey, "HID")
 			return HIDControllers.setHotkey(theHotkey, "Off")
 		else
 			Hotkey(theHotkey, "Off")

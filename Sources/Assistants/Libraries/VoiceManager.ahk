@@ -1093,7 +1093,7 @@ class VoiceManager extends ConfigurationItem {
 
 		try {
 			for ignore, key in this.PushToTalk
-				clicked := (clicked || Hotkeys.pressed(key))
+				clicked := (clicked || keyPressed(key))
 
 			pressed := (toggle ? down : clicked)
 		}

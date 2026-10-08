@@ -13,6 +13,7 @@ global sendCommand := sendKeyboardCommand
 global installKeyboardHook := InstallKeybdHook
 global setSendDelay := SetKeyDelay
 global setHotKey := (arguments*) => Hotkeys.registerHotkey(arguments*)
+global keyPressed := (arguments*) => Hotkeys.pressed(arguments*)
 global detectProcess := detectRunningProcess
 global activateWindow := WinActivate
 global closeWindow := WinClose
@@ -109,13 +110,14 @@ detectRunningProcess(pid := false, winTitle := "", exePath := "") {
 
 initializeUtils() {
 	/*
-	global sendCommand, installKeyboardHook, setSendDelay, setHotkey, detectProcess
+	global sendCommand, installKeyboardHook, setSendDelay, setHotkey, keyPressed, detectProcess
 	global activateWindow, closeWindow, listWindows
 
 	sendCommand := sendKeyboardCommand
 	installKeyboardHook := InstallKeybdHook
 	setSendDelay := SetKeyDelay
-	setHotKey := Hotkey
+	setHotKey := (arguments*) => Hotkeys.registerHotkey(arguments*)
+	keyPressed := (arguments*) => Hotkeys.pressed(arguments*)
 	detectProcess := detectRunningProcess
 	activateWindow := WinActivate
 	closeWindow := WinClose
@@ -127,6 +129,7 @@ initializeUtils() {
 	installKeyboardHook := (*) => false
 	setSendDelay := (*) => false
 	setHotKey := (*) => false
+	keyPressed := (*) => false
 	detectProcess := (p, *) => p
 	activateWindow := (*) => false
 	closeWindow := (*) => false

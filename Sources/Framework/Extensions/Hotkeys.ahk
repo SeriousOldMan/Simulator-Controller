@@ -1,5 +1,5 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;   Modular Simulator Controller System - Extended Hotkey Managment       ;;;
+;;;   Modular Simulator Controller System - Unified Hotkey Managment        ;;;
 ;;;                                                                         ;;;
 ;;;   Author:     Tim Harbeck and Oliver Juwig (TheBigO)                    ;;;
 ;;;   License:    (2026) Creative Commons - BY-NC-SA                        ;;;

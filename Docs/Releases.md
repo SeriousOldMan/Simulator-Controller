@@ -32,6 +32,7 @@
   - Fixed a bug, that prevented the program folder to be completely removed, when Simulator Controller was uninstalled.
   - Also fixed a bug, that prevented the user data folder to be removed while uninstalling, when it was not located in the user *Documents* folder.
   - Fixed importing settings in "Session Database" when "Weather" or "Mode" were not selected as "All" for the exported settings.
+  - Fixed missing lap time information in the lap selector drop down menu of the Telemetry Viewer, when recording telemetry data in the "Setup Workbench".
   
 #### Changes
 

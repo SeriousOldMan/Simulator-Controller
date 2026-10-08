@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.2.8.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/_qZGZ6CI?inline=true) (Test build for 7.2.8. Changes: Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup, New application settings management, Support for the GPT-6 model family, New car models for "Setup Workbench", Fixed importing settings in "Session Database", Added unblocking to offline installation.)
+[7.2.8.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/_qZGZ6CI?inline=true) (Test build for 7.2.8. Changes: Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup, New application settings management, Support for the GPT-6 model family, New car models for "Setup Workbench", Fixed importing settings in "Session Database", Added unblocking to offline installation, Fixed missing lap time information in the lap selector.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7280) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-728) of this version and all the versions you might have skipped, before installing and using this version.
 

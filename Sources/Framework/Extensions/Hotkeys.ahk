@@ -525,9 +525,11 @@ class HIDControllers {
 		local known := Map()
 		local devices := []
 		local count := 0
+		local paths := Map()
+		local nextNumber := HIDControllers.FirstNumber
+		local changed := false
 		local deviceList, handle, deviceType, device, ignore, index, inner
-		local assignments, paths := Map(), number, path, nextNumber := HIDControllers.FirstNumber
-		local changed := false, mutex, waitResult
+		local assignments, number, path, mutex, waitResult
 
 		HIDControllers.sEnumerated := true
 		HIDControllers.sLastRefresh := A_TickCount
@@ -596,9 +598,9 @@ class HIDControllers {
 				assignments := readMultiMap(kUserConfigDirectory . "Controller Devices.ini")
 
 				for number, path in getMultiMapValues(assignments, "Devices")
-					if (RegExMatch(number, "^\d+$") && (number + 0 >= HIDControllers.FirstNumber)
+					if (RegExMatch(number, "^\d+$") && ((number + 0) >= HIDControllers.FirstNumber)
 													&& !paths.Has(path)) {
-						paths[path] := number + 0
+						paths[path] := (number + 0)
 						nextNumber := Max(nextNumber, number + 1)
 					}
 

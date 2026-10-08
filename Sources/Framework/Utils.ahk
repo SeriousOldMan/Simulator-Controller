@@ -12,7 +12,7 @@
 global sendCommand := sendKeyboardCommand
 global installKeyboardHook := InstallKeybdHook
 global setSendDelay := SetKeyDelay
-global setHotKey := Hotkey
+global setHotKey := dispatchHotkey
 global detectProcess := detectRunningProcess
 global activateWindow := WinActivate
 global closeWindow := WinClose
@@ -38,6 +38,7 @@ global listWindows := (arguments*) => WinGetList(arguments*)
 
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\HIDJoystick.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;
@@ -89,14 +90,23 @@ class TriggerDetectorTask extends Task {
 
 	run() {
 		local joysticks := []
-		local joyName
+		local joyName, ignore, joystickNumber
 
-		loop 16 { ; Query each joystick number to find out which ones exist.
+		loop kMaxLegacyJoysticks { ; Query each joystick number to find out which ones exist.
 			joyName := (GetKeyState(A_Index . "JoyName") ? "D" : "")
 
 			if (joyName != "")
 				joysticks.Push(A_Index)
 		}
+
+		; Everything beyond the 16 controllers supported by the legacy multimedia API is
+		; detected using Raw Input (see HIDJoystick).
+
+		HIDJoystick.refresh()
+		HIDJoystick.listen()
+
+		for ignore, joystickNumber in HIDJoystick.Joysticks
+			joysticks.Push(joystickNumber)
 
 		this.iJoysticks := joysticks
 
@@ -147,39 +157,43 @@ class TriggerDetectorContinuation extends Continuation {
 
 					; SetFormat Float, 03  ; Omit decimal point from axis position percentages.
 
-					joy_buttons := GetKeyState(joystickNumber . "JoyButtons")
-					joy_name := GetKeyState(joystickNumber . "JoyName")
-					joy_info := GetKeyState(joystickNumber . "JoyInfo")
+					joy_buttons := joystickButtons(joystickNumber)
+					joy_name := joystickName(joystickNumber)
+					joy_info := joystickInfo(joystickNumber)
 
 					buttons_down := ""
 					buttons := []
 
 					loop joy_buttons {
-						if GetKeyState(joystickNumber . "joy" . A_Index) {
+						if joystickButtonState(joystickNumber, A_Index) {
 							buttons_down := (buttons_down . A_Space . A_Index)
 
 							found := A_Index
 						}
 					}
 
-					axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
+					axis_info := ""
 
-					axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
+					if (joy_info != "") {
+						axis_info := ("X" . (GetKeyState(joystickNumber . "JoyX") ? "D" : "U"))
 
-					if InStr(joy_info, "Z")
-						axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))
+						axis_info := (axis_info . A_Space . A_Space . "Y" .  (GetKeyState(joystickNumber . "JoyY") ? "D" : "U"))
 
-					if InStr(joy_info, "R")
-						axis_info := (axis_info . A_Space . A_Space . "R" . (GetKeyState(joystickNumber . "JoyR") ? "D" : "U"))
+						if InStr(joy_info, "Z")
+							axis_info := (axis_info . A_Space . A_Space . "Z" . (GetKeyState(joystickNumber . "JoyZ") ? "D" : "U"))
 
-					if InStr(joy_info, "U")
-						axis_info := (axis_info . A_Space . A_Space . "U" . (GetKeyState(joystickNumber . "JoyU") ? "D" : "U"))
+						if InStr(joy_info, "R")
+							axis_info := (axis_info . A_Space . A_Space . "R" . (GetKeyState(joystickNumber . "JoyR") ? "D" : "U"))
 
-					if InStr(joy_info, "V")
-						axis_info := (axis_info . "" . A_Space . "" . A_Space . "V" . (GetKeyState(joystickNumber "JoyV", ) ? "D" : "U"))
+						if InStr(joy_info, "U")
+							axis_info := (axis_info . A_Space . A_Space . "U" . (GetKeyState(joystickNumber . "JoyU") ? "D" : "U"))
 
-					if InStr(joy_info, "P")
-						axis_info := (axis_info . A_Space . A_Space . "POV" . (GetKeyState(joystickNumber "JoyPOV") ? "D" : "U"))
+						if InStr(joy_info, "V")
+							axis_info := (axis_info . "" . A_Space . "" . A_Space . "V" . (GetKeyState(joystickNumber "JoyV", ) ? "D" : "U"))
+
+						if InStr(joy_info, "P")
+							axis_info := (axis_info . A_Space . A_Space . "POV" . (GetKeyState(joystickNumber "JoyPOV") ? "D" : "U"))
+					}
 
 					buttonsDown := translate("Buttons Down:")
 				}
@@ -614,6 +628,42 @@ exitProcesses(title, message, silent := false, force := false, excludes := [], u
 
 		return true
 	}
+}
+
+joystickName(number) {
+	return ((number > kMaxLegacyJoysticks) ? HIDJoystick.getName(number) : GetKeyState(number . "JoyName"))
+}
+
+joystickButtons(number) {
+	return ((number > kMaxLegacyJoysticks) ? HIDJoystick.getButtonCount(number) : GetKeyState(number . "JoyButtons"))
+}
+
+joystickInfo(number) {
+	return ((number > kMaxLegacyJoysticks) ? "" : GetKeyState(number . "JoyInfo"))
+}
+
+joystickButtonState(number, button) {
+	return ((number > kMaxLegacyJoysticks) ? HIDJoystick.getButtonState(number, button)
+										   : GetKeyState(number . "Joy" . button))
+}
+
+keyIsPressed(key) {
+	local trigger := HIDJoystick.parseHotkey(key)
+
+	if trigger {
+		HIDJoystick.listen()
+
+		return HIDJoystick.getButtonState(trigger.Number, trigger.Button)
+	}
+	else
+		return GetKeyState(key, "P")
+}
+
+dispatchHotkey(arguments*) {
+	if HIDJoystick.parseHotkey(arguments.Has(1) ? arguments[1] : "")
+		return HIDJoystick.setHotkey(arguments*)
+	else
+		return Hotkey(arguments*)
 }
 
 triggerDetector(callback := false, options := ["Joy", "Key"]) {

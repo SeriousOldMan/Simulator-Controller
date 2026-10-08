@@ -1,31 +1,8 @@
 # Latest stable release
 
-## 7.2.7.0
-
-#### Date: 10/02/26
-
-#### Fixes
-
-  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug occurred only when *Le Mans Ultimate* was configured for certain languages ​​that do not use the Latin alphabet, such as Chinese.
-  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected properly by the game.
-  
-#### Changes
-
-  - Support has been added for full offline installation, which may sometimes be required for our fellows which live behind a great firewall and are not able to use a VPN.
-  - [Internal] Improved internal memory management of the Driving Coach.
-  - New and updated car models for "Setup Workbench":
-    - Assetto Corsa EVO
-	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
-	  - Ferrari SF-25 (removed the TC and ABS settings)
-	  - Porsche 911 GT3 RS (992)
-	  - Caterham Academy
-	  - Ferrari F2004
-
-# Upcoming release
-
 ## 7.2.8.0
 
-#### Date: 10/09/26 (planned)
+#### Date: 10/09/26
 
 #### Fixes
 
@@ -51,7 +28,32 @@
 	  - BMW M3 E30 Sport Evo (Evolution III)
 	  - Mercedes 190E 2.5-16 Evo II
     
+# Upcoming release
+
+Not yet planned...
+
 # Release history
+
+## 7.2.7.0
+
+#### Date: 10/02/26
+
+#### Fixes
+
+  - Fixed a very complex problem, that prevented refuel calculation for LMP2 cars in *Le Mans Ultimate*. The bug occurred only when *Le Mans Ultimate* was configured for certain languages ​​that do not use the Latin alphabet, such as Chinese.
+  - Fixed several problems, that prevented modified setup files for *Assetto Corsa EVO* to be detected properly by the game.
+  
+#### Changes
+
+  - Support has been added for full offline installation, which may sometimes be required for our fellows which live behind a great firewall and are not able to use a VPN.
+  - [Internal] Improved internal memory management of the Driving Coach.
+  - New and updated car models for "Setup Workbench":
+    - Assetto Corsa EVO
+	  - Porsche 911 GT3 Cup (992) (removed the Caster setting)
+	  - Ferrari SF-25 (removed the TC and ABS settings)
+	  - Porsche 911 GT3 RS (992)
+	  - Caterham Academy
+	  - Ferrari F2004
 
 ## 7.2.6.0
 

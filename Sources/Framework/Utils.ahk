@@ -6,13 +6,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                         Local Include Section                           ;;;
-;;;-------------------------------------------------------------------------;;;
-
-#Include "Extensions\Hotkeys.ahk"
-
-
-;;;-------------------------------------------------------------------------;;;
 ;;;                   Global Functions Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
@@ -43,8 +36,9 @@ global listWindows := (arguments*) => WinGetList(arguments*)
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
-#Include "..\Framework\Extensions\Messages.ahk"
-#Include "..\Framework\Extensions\Task.ahk"
+#Include "Extensions\Messages.ahk"
+#Include "Extensions\Task.ahk"
+#Include "Extensions\Hotkeys.ahk"
 
 
 ;;;-------------------------------------------------------------------------;;;

@@ -3,7 +3,7 @@ Type=Development
 [Development]
 Version=7.2.8.0-beta
 Target=7.2.8.0-release
-Date=10/05/26
+Date=10/07/26
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/_qZGZ6CI?inline=true
 Changes=Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup, New application settings management, New car models for "Setup Workbench", Support for the GPT-6 model family, Fixed importing settings in "Session Database", Added unblocking to offline installation
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3

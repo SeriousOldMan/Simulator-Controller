@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\..\Framework\Extensions\Hotkeys.ahk"
 #Include "ConfigurationItemList.ahk"
 
 

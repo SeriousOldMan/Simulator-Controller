@@ -37,6 +37,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Hotkeys.ahk"
 #Include "..\Framework\Extensions\Messages.ahk"
 #Include "..\Framework\Extensions\SpeechSynthesizer.ahk"
 #Include "..\Framework\Extensions\SpeechRecognizer.ahk"
@@ -1204,7 +1205,7 @@ class VoiceServer extends ConfigurationItem {
 
 		try {
 			for ignore, key in this.PushToTalk
-				clicked := (clicked || GetKeyState(key, "P"))
+				clicked := (clicked || keyPressed(key))
 
 			pressed := (toggle ? down : clicked)
 		}

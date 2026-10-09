@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\Hotkeys.ahk"
 #Include "ControllerEditor.ahk"
 
 
@@ -583,7 +584,7 @@ class ControllerStepWizard extends StepWizard {
 					throw "Unknown function type detected in ControllerStepWizard.updateFunctionTriggers..."
 			}
 
-			wizard.toggleTriggerDetector(callback, ["Joy", "Key", "Multi"])
+			wizard.toggleTriggerDetector(callback, ["Button", "Key", "Multi"])
 		}
 	}
 
@@ -716,7 +717,7 @@ class ControllerStepWizard extends StepWizard {
 				Sleep(2000)
 
 				wizard.toggleTriggerDetector(ObjBindMethod(this, "registerHotkey", function, row, hotkey)
-										   , ["Joy", "Key", "Multi"])
+										   , ["Button", "Key", "Multi"])
 
 				return
 			}

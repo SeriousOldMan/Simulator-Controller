@@ -1905,7 +1905,7 @@ class TelemetryViewer {
 							info := sessionDB.readTelemetryInfo(simulator, car, track, fileName)
 
 							if isNumber(lap) {
-								setMultiMapValue(info, "Lap", "Driver", driver)
+								setMultiMapValue(info, "Lap", "Driver", sessionDB.getDriverName(simulator, driver))
 
 								if (lapTime && (lapTime != "-"))
 									setMultiMapValue(info, "Lap", "LapTime", lapTime)

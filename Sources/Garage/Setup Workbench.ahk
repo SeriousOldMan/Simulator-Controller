@@ -76,17 +76,212 @@ global kDebugRules := 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; LabelsMap                                                               ;;;
+;;; DiaryEntry                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class LabelsMap extends SectionMap {
-	__Item[key] {
-		Get {
-			return (this.Has(key) ? super.__Item[key] : key)
-		}
+class DiaryEntry {
+	iDescriptor := ""
 
-		Set {
-			return (super.__Item[key] := value)
+	Type {
+		Get {
+			return this.Properties["Type"]
+		}
+	}
+
+	Descriptor {
+		Get {
+			return this.iDescriptor
+		}
+	}
+
+	Properties {
+		Get {
+			local properties
+
+			this.parseDescriptor(this.Descriptor, &properties)
+
+			return properties
+		}
+	}
+
+	Property[name] {
+		Get {
+			return this.Properties[name]
+		}
+	}
+
+	Payload {
+		Get {
+			local payload
+
+			this.parseDescriptor(this.Descriptor, , &payload)
+
+			return payload
+		}
+	}
+
+	HTML {
+		Get {
+			throw "Virtual property DiaryEntry.HTML must be implemented in a subclass..."
+		}
+	}
+
+	__New(descriptor) {
+		this.iDescriptor := descriptor
+	}
+
+	static fromDescriptor(descriptor) {
+		return %type . "Entry"%(descriptor)
+	}
+
+	parseDescriptor(descriptor, &properties?, &payload?) {
+		local ignore, line
+
+		descriptor := string2Values("###++++++###++++++###", descriptor)
+
+		if (descriptor.Length > 1)
+			payload := descriptor[2]
+
+		properties := CaseInsenseMap()
+
+		for ignore, line in string2Values("`n", descriptor[1])
+			if (Trim(line) != "") {
+				line := string2Values("=", line)
+
+				properties[line[1]] := line[2]
+			}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SelectionEntry                                                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SelectionEntry extends DiaryEntry {
+	Simulator {
+		Get {
+			return this.Property["Simulator"]
+		}
+	}
+
+	Car {
+		Get {
+			local car := this.Property["Car"]
+
+			return ((car != translate("All")) ? SessionDatabase.getCarName(this.Simulator, car) : car)
+		}
+	}
+
+	Track {
+		Get {
+			local track := this.Property["Track"]
+
+			return ((track != translate("All")) ? SessionDatabase.getTrackName(this.Simulator, track) : track)
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; CharacteristicsEntry                                                    ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class CharacteristicsEntry extends DiaryEntry {
+	Characteristics {
+		Get {
+			local characteristics := []
+			local ignore, characteristic
+
+			for ignore, characteristic in string2Values("`n", this.Payload) {
+				characteristic := string2Values("=", characteristic)
+
+				characteristics.Push({Characteristic: characteristic[1]
+									, Importance: string2Values("/", characteristic[2])[1]
+									, Severity: string2Values("/", characteristic[2])[2]})
+			}
+
+			return characteristics
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SetupEntry                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SetupEntry extends DiaryEntry {
+	Setup {
+		Get {
+			return this.Property["Setup"]
+		}
+	}
+
+	FileName {
+		Get {
+			return this.Property["FileName"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LoadEntry                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class LoadEntry extends SetupEntry {
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SaveEntry                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SaveEntry extends SetupEntry {
+	Settings {
+		Get {
+			local settings := []
+			local ignore, setting
+
+			for ignore, setting in string2Values("`n", this.Payload) {
+				setting := string2Values("=", setting)
+
+				settings.Push({Category: setting[1], Setting: setting[2], Value: setting[3]})
+			}
+
+			return settings
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LapEntry                                                                ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class LapEntry extends DiaryEntry {
+	Lap {
+		Get {
+			return this.Property["Lap"]
+		}
+	}
+
+	LapTime {
+		Get {
+			return this.Property["Lap Time"]
+		}
+	}
+
+	SectorTimes {
+		Get {
+			return this.Property["Sector Times"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; NotesEntry                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class NotesEntry extends DiaryEntry {
+	Notes {
+		Get {
+			return this.Payload
 		}
 	}
 }
@@ -136,6 +331,18 @@ class SetupWorkbench extends ConfigurationItem {
 	iSetup := false
 
 	iKnowledgeBase := false
+
+	class LabelsMap extends SectionMap {
+		__Item[key] {
+			Get {
+				return (this.Has(key) ? super.__Item[key] : key)
+			}
+
+			Set {
+				return (super.__Item[key] := value)
+			}
+		}
+	}
 
 	class WorkbenchWindow extends Window {
 		iWorkbench := false
@@ -719,7 +926,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 				this.logDiary("Selection")
 
-				characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+				characteristicLabels := toMap(getMultiMapValues(this.Definition
+															  , "Workbench.Characteristics.Labels")
+											, SetupWorkbench.LabelsMap)
 
 				characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
 
@@ -1115,7 +1324,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 	loadCharacteristics(simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+		local characteristicLabels := toMap(getMultiMapValues(this.Definition
+															, "Workbench.Characteristics.Labels")
+										  , SetupWorkbench.LabelsMap)
 		local compiler, group, ignore, groupOption, option, characteristic
 
 		this.iCharacteristics := []
@@ -1205,7 +1416,8 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		return toMap(getMultiMapValues(this.Definition, "Workbench.Settings.Labels"), LabelsMap)[setting]
+		return toMap(getMultiMapValues(this.Definition, "Workbench.Settings.Labels")
+				   , SetupWorkbench.LabelsMap)[setting]
 	}
 
 	loadSettings(simulator := false, car := false, fast := false) {
@@ -1405,7 +1617,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 			setMultiMapValues(this.Definition, section, values, false)
 
-			setMultiMapValues(this.Definition, section, toMap(getMultiMapValues(this.Definition, section), LabelsMap))
+			setMultiMapValues(this.Definition, section
+							, toMap(getMultiMapValues(this.Definition, section), SetupWorkbench.LabelsMap))
 		}
 
 		car := this.SelectedCar["*"]
@@ -1535,7 +1748,7 @@ class SetupWorkbench extends ConfigurationItem {
 			case "Lap":
 				FileAppend("###------###------###`n"
 						 . "Type=Lap`n"
-						 . "Name=" . arguments[1] . "`n"
+						 . "Lap=" . arguments[1] . "`n"
 						 . "Lap Time=" . arguments[2] . "`n"
 						 . "Sector Times=" . arguments[3] . "`n", this.Diary, "UTF-16")
 		}
@@ -1547,7 +1760,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 	logSave(editor, setup) {
 		local categories := getMultiMapValues(this.Definition, "Workbench.Categories")
-		local categoriesLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		local categoriesLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Categories.Labels")
+									  , SetupWorkbench.LabelsMap)
 		local settingsList := []
 		local ignore, setting, handler, unit, originalValue, modifiedValue, value
 		local candidate, settings
@@ -1980,7 +2194,9 @@ class SetupWorkbench extends ConfigurationItem {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-			characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+			characteristicLabels := toMap(getMultiMapValues(this.Definition
+														  , "Workbench.Characteristics.Labels")
+										, SetupWorkbench.LabelsMap)
 
 			this.SelectedCharacteristics.Push(characteristic)
 
@@ -2074,7 +2290,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu := Menu()
 
-		characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+		characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+									, SetupWorkbench.LabelsMap)
 
 		menuIndex := 1
 
@@ -2191,7 +2408,8 @@ class SetupWorkbench extends ConfigurationItem {
 				issues := []
 
 				characteristicLabels := toMap(getMultiMapValues(this.Definition
-															  , "Workbench.Characteristics.Labels"), LabelsMap)
+															  , "Workbench.Characteristics.Labels")
+											, SetupWorkbench.LabelsMap)
 
 				for ignore, characteristic in this.SelectedCharacteristics {
 					noIssue := false
@@ -3565,12 +3783,14 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels"), LabelsMap)
+		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+									, SetupWorkbench.LabelsMap)
 
 		if settingsLabels.Has(setting)
 			return settingsLabels[setting]
 		else {
-			settingsLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels"), LabelsMap)
+			settingsLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels")
+								  , SetupWorkbench.LabelsMap)
 
 			return (settingsLabels.Has(setting) ? settingsLabels[setting] : setting)
 		}
@@ -3601,7 +3821,8 @@ class SetupEditor extends ConfigurationItem {
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
+								, SetupWorkbench.LabelsMap)
 
 		this.SettingsListView.Delete()
 
@@ -4174,7 +4395,8 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels"), LabelsMap)
+		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+									, SetupWorkbench.LabelsMap)
 
 		if settingsLabels.Has(setting)
 			return settingsLabels[setting]
@@ -4222,7 +4444,8 @@ class SetupComparator extends ConfigurationItem {
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
+								, SetupWorkbench.LabelsMap)
 
 		this.SettingsListView.Delete()
 
@@ -5134,7 +5357,9 @@ class SetupEngineer extends ConfigurationItem {
 					workbench := this.Workbench
 					issues := []
 
-					characteristicLabels := toMap(getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+					characteristicLabels := toMap(getMultiMapValues(workbench.Definition
+																  , "Workbench.Characteristics.Labels")
+												, SetupWorkbench.LabelsMap)
 
 					for ignore, characteristic in workbench.SelectedCharacteristics {
 						widgets := workbench.SelectedCharacteristicsWidgets[characteristic]

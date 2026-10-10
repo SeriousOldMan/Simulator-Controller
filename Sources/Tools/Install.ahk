@@ -38,4 +38,4 @@ SetWorkingDir(".\Binaries")
 
 RunWait("Powershell -Command Get-ChildItem -Path '.' | Unblock-File", , "Hide")
 
-Run(".\Binaries\Simulator Tools.exe", , "Hide")
+Run("Simulator Tools.exe", , "Hide")

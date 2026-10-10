@@ -3,9 +3,9 @@ Type=Development
 [Development]
 Version=7.3.0.0-dev
 Target=7.3.0.0-release
-Date=10/09/26
+Date=10/10/26
 Download=
-Changes=Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Updated to AHK 2.1.alpha.33
+Changes=Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Updated to AHK 2.1.alpha.33, Fixed offline installer
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.8.0-release

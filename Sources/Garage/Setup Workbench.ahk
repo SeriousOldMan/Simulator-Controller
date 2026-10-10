@@ -420,7 +420,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 		DirCreate(diaryFolder)
 
-		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . translate("Diary ") . A_Now . ".txt")
+		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . A_Now . ".diary")
 
 		SetupWorkbench.Instance := this
 
@@ -1510,25 +1510,34 @@ class SetupWorkbench extends ConfigurationItem {
 	logDiary(type, arguments*) {
 		switch type, false {
 			case "Selection":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Selection")}) . "`n`n"
-						 . translate("Simulator:") . A_Space . this.SelectedSimulator[true] . "`n"
-						 . translate("Car:") . A_Space . this.SelectedCar[true] . "`n"
-						 . translate("Track:") . A_Space . this.SelectedTrack[true] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###`n"
+						 . "Type=Selection`n"
+						 . "Simulator=" . this.SelectedSimulator[true] . "`n"
+						 . "Car=" . this.SelectedCar[true] . "`n"
+						 . "Track=" . this.SelectedTrack[true] . "`n", this.Diary, "UTF-16")
 			case "Characteristics":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Characteristics")}) . "`n`n"
-						 . arguments[1] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###`n"
+						 . "Type=Characteristics`n"
+						 . "###++++++###++++++###`n"
+						 . arguments[1] . "`n", this.Diary, "UTF-16")
 			case "Load":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Load")}) . "`n`n"
-						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###`n"
+						 . "Type=Load`n"
+						 . "Setup=" . arguments[1] . "`n"
+						 . "FileName=" . arguments[2] . "`n", this.Diary, "UTF-16")
 			case "Save":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
-						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
-						 . arguments[3] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###`n"
+						 . "Type=Save`n"
+						 . "Setup=" . arguments[1] . "`n"
+						 . "FileName=" . arguments[2] . "`n"
+						 . "###++++++###++++++###`n"
+						 . arguments[3] . "`n", this.Diary, "UTF-16")
 			case "Lap":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Lap")}) . "`n`n"
-						 . translate("Name:") . A_Space . arguments[1] . "`n"
-						 . translate("Lap Time:") . A_Space . arguments[2] . "`n"
-						 . translate("Sector Times:") . A_Space . arguments[3] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###`n"
+						 . "Type=Lap`n"
+						 . "Name=" . arguments[1] . "`n"
+						 . "Lap Time=" . arguments[2] . "`n"
+						 . "Sector Times=" . arguments[3] . "`n", this.Diary, "UTF-16")
 		}
 	}
 
@@ -1605,7 +1614,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if inList(kPressureUnits, unit)
 						unit := getUnit("Pressure")
 
-					settingsList.Push(categoriesLabels[category] . translate(": ") . label . translate(" = ") . value . A_Space . translate(unit))
+					settingsList.Push(categoriesLabels[category] . "=" . label . "=" . value . A_Space . translate(unit))
 				}
 			}
 		}
@@ -1902,9 +1911,7 @@ class SetupWorkbench extends ConfigurationItem {
 		if this.SetupEngineer
 			activateWindow(this.SetupEngineer.Window)
 		else {
-			this.iSetupEngineer := SetupEngineer(this
-											   , readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
-											   , this.Diary)
+			this.iSetupEngineer := SetupEngineer(this, readMultiMap(kUserConfigDirectory . "Setup Workbench.ini"))
 
 			this.SetupEngineer.show()
 		}
@@ -2197,8 +2204,7 @@ class SetupWorkbench extends ConfigurationItem {
 					knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
 
-					issues.Push(characteristicLabels[characteristic] . translate(" -> ")
-							  . value1 . translate("%") . translate(" / ") . value2 . translate("%"))
+					issues.Push(characteristicLabels[characteristic] . "=" . value1 . "/" . value2)
 				}
 
 				if !noIssue {
@@ -4621,8 +4627,6 @@ class SetupEngineer extends ConfigurationItem {
 
 	iInstructions := CaseInsenseWeakMap()
 
-	iDiary := false
-
 	iMode := "Analysis"
 
 	iIssues := false
@@ -4841,7 +4845,7 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	__New(setupWorkbench, configuration, diary := false) {
+	__New(setupWorkbench, configuration) {
 		this.iWorkbench := setupWorkbench
 
 		super.__New(configuration)
@@ -5605,10 +5609,12 @@ class SetupEngineer extends ConfigurationItem {
 
 		if answer
 			try {
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Analysis")}) . "`n`n"
-						 . translate("Lap:") . A_Space . telemetry.Name . "`n`n"
-						 . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n"
-						 . answer . "`n`n", this.Workbench.Diary, "UTF-16")
+				FileAppend("###------###------###`n"
+						 . "Type=Analysis`n"
+						 . "Lap=" . telemetry.Name . "`n"
+						 . "Lap Time=" . lapTimeDisplayValue(telemetry.LapTime) . "`n"
+						 . "###++++++###++++++###`n"
+						 . answer . "`n", this.Workbench.Diary, "UTF-16")
 			}
 			catch Any as exception {
 				logError(exception)
@@ -5622,19 +5628,14 @@ class SetupEngineer extends ConfigurationItem {
 
 		static report := true
 
-		printCall(call) {
+		printChange(call) {
 			local arguments := call[2].Clone()
 
 			loop arguments.Length
 				if !arguments.Has(A_Index)
 					arguments[A_Index] := ""
 
-			arguments := values2String(", ", arguments*)
-
-			if (StrLen(arguments) > 80)
-				arguments := (SubStr(arguments, 1, 80) . translate("..."))
-
-			return ("Call: " . call[1].Name . "(" . arguments . ")")
+			return values2String("=", arguments*)
 		}
 
 		try {
@@ -5644,9 +5645,10 @@ class SetupEngineer extends ConfigurationItem {
 				this.Connector.Ask(analysis, , , &calls := [])
 
 				try {
-					FileAppend(substituteVariables(translate("-- %header% --------")
-												 , {header: translate("Recommendations")}) . "`n`n"
-							 . values2String("`n", collect(calls, printCall)*) . "`n`n"
+					FileAppend("###------###------###`n"
+							 . "Type=Recommendations`n"
+							 . "###++++++###++++++###`n"
+							 . values2String("`n", collect(calls, printChange)*) . "`n"
 							 , this.Workbench.Diary, "UTF-16")
 				}
 				catch Any as exception {

@@ -30,7 +30,18 @@
     
 # Upcoming release
 
-Not yet planned...
+## 7.3.0.0
+
+#### Date: 10/16/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug that caused the driver name to be shown as the internal ID, when recorded telemetry data was saved from the "Setup Workbench".
+  
+#### Changes
+
+  - An all new USB device manager has been implemented with great support by @Timmermann. This new manager now can handle more than 16 USB devices, thereby solving all issues with unrecognized steering wheels reported by some users.
+  - [Internal] Migrated to AHK 2.1-alpha.34.
 
 # Release history
 

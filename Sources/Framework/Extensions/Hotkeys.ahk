@@ -439,8 +439,8 @@ class HIDControllers {
 				state := function
 				function := unset
 			}
-
-			descriptor.Callback := function
+			else
+				descriptor.Callback := function
 		}
 
 		if isSet(state)

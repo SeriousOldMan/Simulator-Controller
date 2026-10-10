@@ -237,3 +237,4 @@ Database Synchronizer=%kBinariesDirectory%Database Synchronizer.exe <- %kSources
 Track Mapper=%kBinariesDirectory%Track Mapper.exe <- %kSourcesDirectory%Database\Track Mapper.ahk; %kFrameworkDirectory%, %kExtensionsDirectory%, %kSourcesDirectory%Database\Libraries\, %kHomeDirectory%VERSION
 Simulator Setup=%kBinariesDirectory%Simulator Setup.exe <- %kSourcesDirectory%Configuration\Simulator Setup.ahk; %kFrameworkDirectory%, %kExtensionsDirectory%, %kSourcesDirectory%Configuration\Libraries\, %kPluginsDirectory%, %kUserPluginsDirectory%, %kHomeDirectory%VERSION
 Simulator Settings=%kBinariesDirectory%Simulator Settings.exe <- %kSourcesDirectory%Configuration\Simulator Settings.ahk; %kFrameworkDirectory%, %kExtensionsDirectory%, %kSourcesDirectory%Configuration\Libraries\SettingsEditor.ahk, %kHomeDirectory%VERSION
+Install=%kHomeDirectory%Install.exe <- %kSourcesDirectory%Tools\Install.ahk; %kHomeDirectory%VERSION

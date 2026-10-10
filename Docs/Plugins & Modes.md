@@ -295,9 +295,10 @@ With *telemetryCoaching* you can supply a function to enable or disable active, 
 
 Additional commands for Aiden are available using the *assistantCommands* parameter:
 
-	assistantCommands: Interrupt *interruptFunction*, ...
-
-With *Interrupt* you can interrupt the currently running speech of Aiden.
+	assistantCommands: Call *callFunction*, Accept *acceptFunction*, Reject *rejectFunction*,
+					   Interrupt *interruptFunction*, Mute *muteFunction*, Unmute *unmuteFunction*
+	
+All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. To *answer* "Yes" to a question asked by Aiden, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter. A little bit different is the *Call* action. This action will activate Aiden and will make it the active listening dialog partner for voice control by the push of a button. This is similar to issuing the "Hey Aiden" activation command. With *Interrupt* you can interrupt the currently running speech of Aiden, and last but not least, you can use *Mute* and *Unmute*, when you temporarely want to deactivate voice ouput for Aiden.
 
 ## Plugin *Race Engineer*
 

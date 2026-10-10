@@ -2117,6 +2117,7 @@ class TelemetryViewer {
 	}
 
 	lapLabel(lap) {
+		local fileName := false
 		local theLap, driver, lapTime, sectorTimes
 
 		lapTimeDisplayValue(lapTime) {
@@ -2130,7 +2131,10 @@ class TelemetryViewer {
 				return lapTime
 		}
 
-		this.getLapInformation(lap, false, &driver, &lapTime, &sectorTimes)
+		if isInteger(lap)
+			fileName := (this.TelemetryDirectory . "Lap " . lap . ".telemetry")
+
+		this.getLapInformation(lap, fileName, &driver, &lapTime, &sectorTimes)
 
 		if isNumber(lap)
 			theLap := lap

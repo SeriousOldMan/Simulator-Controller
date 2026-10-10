@@ -410,7 +410,7 @@ class HIDControllers {
 		if InStr(theHotkey, "HID") {
 			parts := string2Values("HID", theHotKey)
 
-			return {Device: SubStr(parts[1], 4), Key: theHotkey, Button: parts[2]}
+			return {Device: parts[1] + 0, Key: theHotkey, Button: parts[2] + 0}
 		}
 
 		return false

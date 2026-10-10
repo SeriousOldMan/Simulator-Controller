@@ -1102,6 +1102,9 @@ class VoiceManager extends ConfigurationItem {
 			lastDown := A_TickCount
 			isPressed := true
 
+			if !toggle
+				logMessage(kLogDebug, "Hold & Talk input detected as pressed.")
+
 			if (((lastDown - lastUp) < speed) && (clicks == 1))
 				activation := true
 			else {
@@ -1113,6 +1116,9 @@ class VoiceManager extends ConfigurationItem {
 		else if (!pressed && isPressed) {
 			lastUp := A_TickCount
 			isPressed := false
+
+			if !toggle
+				logMessage(kLogDebug, "Hold & Talk input released after " . (lastUp - lastDown) . " ms.")
 
 			if ((lastUp - lastDown) < speed)
 				clicks += 1

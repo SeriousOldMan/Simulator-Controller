@@ -76,80 +76,126 @@ global kDebugRules := 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; DiaryEntry                                                              ;;;
+;;; Diary                                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class DiaryEntry {
-	iDescriptor := ""
+class Diary {
+	iEntries := []
 
-	Type {
+	class DiaryEntry {
+		iDescriptor := ""
+
+		Type {
+			Get {
+				return this.Properties["Type"]
+			}
+		}
+
+		Descriptor {
+			Get {
+				return this.iDescriptor
+			}
+		}
+
+		Properties {
+			Get {
+				local properties
+
+				this.parseDescriptor(this.Descriptor, &properties)
+
+				return properties
+			}
+		}
+
+		Property[name] {
+			Get {
+				return this.Properties[name]
+			}
+		}
+
+		Payload {
+			Get {
+				local payload
+
+				this.parseDescriptor(this.Descriptor, , &payload)
+
+				return payload
+			}
+		}
+
+		HTML {
+			Get {
+				throw "Virtual property DiaryEntry.HTML must be implemented in a subclass..."
+			}
+		}
+
+		__New(descriptor) {
+			this.iDescriptor := descriptor
+		}
+
+		static fromDescriptor(descriptor) {
+			return %type . "Entry"%(descriptor)
+		}
+
+		parseDescriptor(descriptor, &properties?, &payload?) {
+			local ignore, line
+
+			descriptor := string2Values("###++++++###++++++###", descriptor)
+
+			if (descriptor.Length > 1)
+				payload := descriptor[2]
+
+			properties := CaseInsenseMap()
+
+			for ignore, line in string2Values("`n", descriptor[1])
+				if (Trim(line) != "") {
+					line := string2Values("=", line)
+
+					properties[line[1]] := line[2]
+				}
+		}
+
+		superseeds(entry) {
+			return false
+		}
+	}
+
+	Entries {
 		Get {
-			return this.Properties["Type"]
+			return this.iEntries
 		}
 	}
 
 	Descriptor {
 		Get {
-			return this.iDescriptor
+			return values2String("###------###------###", collect(this.Entries, (e) => e.Descriptor)*)
 		}
 	}
 
-	Properties {
-		Get {
-			local properties
-
-			this.parseDescriptor(this.Descriptor, &properties)
-
-			return properties
-		}
+	__New(entries) {
+		this.iEntries := entries
 	}
 
-	Property[name] {
-		Get {
-			return this.Properties[name]
-		}
+	static readDiary(fileName) {
+		local entries := collect(string2Values("###------###------###", FileRead(fileName))
+							   , (d) => Diary.DiaryEntry.fromDescriptor(d))
+		local superfluousEntries := []
+		local lastEntry := false
+
+		do(entries, (entry) {
+			if (lastEntry && entry.superseeds(lastEntry))
+				superfluousEntries.Push(lastEntry)
+
+			lastEntry := entry
+		})
+
+		return Diary(choose(entries, (e) => !inList(superfluousEntries, e)))
 	}
 
-	Payload {
-		Get {
-			local payload
+	writeDiary(fileName) {
+		deleteFile(fileName)
 
-			this.parseDescriptor(this.Descriptor, , &payload)
-
-			return payload
-		}
-	}
-
-	HTML {
-		Get {
-			throw "Virtual property DiaryEntry.HTML must be implemented in a subclass..."
-		}
-	}
-
-	__New(descriptor) {
-		this.iDescriptor := descriptor
-	}
-
-	static fromDescriptor(descriptor) {
-		return %type . "Entry"%(descriptor)
-	}
-
-	parseDescriptor(descriptor, &properties?, &payload?) {
-		local ignore, line
-
-		descriptor := string2Values("###++++++###++++++###", descriptor)
-
-		if (descriptor.Length > 1)
-			payload := descriptor[2]
-
-		properties := CaseInsenseMap()
-
-		for ignore, line in string2Values("`n", descriptor[1])
-			if (Trim(line) != "") {
-				line := string2Values("=", line)
-
-				properties[line[1]] := line[2]
-			}
+		FileAppend(this.Descriptor, fileName)
 	}
 }
 
@@ -157,7 +203,29 @@ class DiaryEntry {
 ;;; SelectionEntry                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SelectionEntry extends DiaryEntry {
+class SelectionEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			return substituteVariables("Type=Selection`nSimulator=%simulator%`nCar=%car%`nTrack=%track%"
+									 , {simulator: this.Property["Simulator"]
+									  , car: this.Property["Car"]
+									  , track: this.Property["Track"]})
+		}
+	}
+
+	HTML {
+		Get {
+			local html := "<table>"
+
+			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . this.Simulator . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . this.Car . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . this.Track . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
+
 	Simulator {
 		Get {
 			return this.Property["Simulator"]
@@ -179,13 +247,48 @@ class SelectionEntry extends DiaryEntry {
 			return ((track != translate("All")) ? SessionDatabase.getTrackName(this.Simulator, track) : track)
 		}
 	}
+
+	superseeds(entry) {
+		return isInstance(entry, SelectionEntry)
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; CharacteristicsEntry                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class CharacteristicsEntry extends DiaryEntry {
+class CharacteristicsEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			return ("Type=Characteristics`n###++++++###++++++###`n" . this.Payload)
+		}
+	}
+
+	HTML {
+		Get {
+			local html := ""
+			local characteristics := this.Characteristics.Clone()
+			local ignore, characteristic
+
+			if (characteristics.Length > 0) {
+				html .= "<table>"
+				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Importance") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Severity") . "</th></tr>")
+
+				for ignore, characteristic in characteristics {
+					html .= ("<tr><td>" . characteristic.Characteristic . "</td>")
+					html .= ("<td>" . characteristic.Importance . "</td>")
+					html .= ("<td>" . characteristic.Severity . "</td></tr>")
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
+		}
+	}
+
 	Characteristics {
 		Get {
 			local characteristics := []
@@ -202,13 +305,40 @@ class CharacteristicsEntry extends DiaryEntry {
 			return characteristics
 		}
 	}
+
+	superseeds(entry) {
+		if isInstance(entry, CharacteristicsEntry)
+			return all(entry.Characteristics, (c1) => exist(this.Characteristics
+														  , (c2) => (c1.Characteristic = c2.Charecteristic)))
+		else
+			return false
+	}
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupEntry                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SetupEntry extends DiaryEntry {
+class SetupEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			return substituteVariables("Type=" . this.Type . "`nSetup=%setup%`nFileName=%fileName%"
+									 , {setup: this.Property["Setup"]
+									  , fileName: this.Property["FileName"]})
+		}
+	}
+
+	HTML {
+		Get {
+			local html := "<table>"
+
+			html .= ("<tr><td><b>" . translate("Setup:") . "</b></td><td>" . this.Setup . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("File:") . "</b></td><td>" . this.FileName . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
 	Setup {
 		Get {
 			return this.Property["Setup"]
@@ -234,6 +364,40 @@ class LoadEntry extends SetupEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SaveEntry extends SetupEntry {
+	Descriptor {
+		Get {
+			return (super.Decriptor . "`n###++++++###++++++###`n" . this.Payload)
+		}
+	}
+
+	HTML {
+		Get {
+			local html := super.HTML
+			local settings := this.Settings.Clone()
+			local lastCategory := false
+			local ignore, setting
+
+			if (settings.Length > 0) {
+				html .= "<br><br><table>"
+				html .= ("<tr><th class=`"th-std`">" . translate("Category") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Setting") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Value") . "</th></tr>")
+
+				for ignore, setting in bubbleSort(&settings, (s1, s2) => strGreater(s1.Category, s2.Category)) {
+					html .= ("<tr><td>" . ((setting.Category != lastCategory) ? setting.Category : "") . "</td>")
+					html .= ("<td>" . setting.Setting . "</td>")
+					html .= ("<td>" . setting.Value . "</td></tr>")
+
+					lastCategory := setting.Category
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
+		}
+	}
+
 	Settings {
 		Get {
 			local settings := []
@@ -254,7 +418,28 @@ class SaveEntry extends SetupEntry {
 ;;; LapEntry                                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class LapEntry extends DiaryEntry {
+class LapEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			return substituteVariables("Type=Lap`nLap=%lap%`nLap Time=%lapTime%`nSector Times=%sectorTimes%"
+									 , {lap: this.Property["Lap"]
+									  , lapTime: this.Property["Lap Time"]
+									  , sectorTimes: this.Property["Sector Times"]})
+		}
+	}
+
+	HTML {
+		Get {
+			local html := "<table>"
+
+			html .= ("<tr><td><b>" . translate("Lap:") . "</b></td><td>" . this.Lap . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . this.LapTime . "</td></tr>")
+			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . this.SectorTimes . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
 	Lap {
 		Get {
 			return this.Property["Lap"]
@@ -275,10 +460,106 @@ class LapEntry extends DiaryEntry {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; AnalysisEntry                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class AnalysisEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			local descriptor := substituteVariables("Type=Analysis`nLap=%lap%`nLap Time=%lapTime%"
+												  , {lap: this.Property["Lap"]
+												   , lapTime: this.Property["Lap Time"]})
+
+			return (descriptor . "`n###++++++###++++++###`n" . this.Payload)
+		}
+	}
+
+	HTML {
+		Get {
+			return this.Payload
+		}
+	}
+
+	Lap {
+		Get {
+			return this.Property["Lap"]
+		}
+	}
+
+	LapTime {
+		Get {
+			return this.Property["Lap Time"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; RecommendationsEntry                                                    ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class RecommendationsEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			return ("Type=Recommendations`n###++++++###++++++###`n" . this.Payload)
+		}
+	}
+
+	HTML {
+		Get {
+			local html := ""
+			local settings := this.Settings.Clone()
+			local ignore, setting
+
+			if (settings.Length > 0) {
+				html .= "<table>"
+				html .= ("<th class=`"th-std`">" . translate("Setting") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Increment") . "</th></tr>")
+
+				for ignore, setting in settings {
+					html .= ("<td>" . setting.Setting . "</td>")
+					html .= ("<td>" . setting.Increment . "</td></tr>")
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
+		}
+	}
+
+	Settings {
+		Get {
+			local settings := []
+			local ignore, setting
+
+			for ignore, setting in string2Values("`n", this.Payload) {
+				setting := string2Values("=", setting)
+
+				settings.Push({Setting: setting[1], Increment: setting[2]})
+			}
+
+			return settings
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; NotesEntry                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class NotesEntry extends DiaryEntry {
+class NotesEntry extends Diary.DiaryEntry {
+	Descriptor {
+		Get {
+			return ("Type=Notes`n###++++++###++++++###`n" . this.Payload)
+		}
+	}
+
+	HTML {
+		Get {
+			return ("<p>" . this.Notes . "</p>")
+		}
+	}
+
 	Notes {
 		Get {
 			return this.Payload

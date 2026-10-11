@@ -80,6 +80,7 @@ global kDebugRules := 2
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Diary {
+	iDiary := false
 	iEntries := []
 
 	class DiaryEntry {
@@ -134,6 +135,8 @@ class Diary {
 		}
 
 		static fromDescriptor(descriptor) {
+			local type := string2Values("=", choose(string2Values("`n", descriptor), (l) => (l != ""))[1])[2]
+
 			return %type . "Entry"%(descriptor)
 		}
 
@@ -160,6 +163,12 @@ class Diary {
 		}
 	}
 
+	Diary {
+		Get {
+			return this.iDiary
+		}
+	}
+
 	Entries {
 		Get {
 			return this.iEntries
@@ -172,15 +181,24 @@ class Diary {
 		}
 	}
 
-	__New(entries) {
+	__New(diary, entries) {
+		this.iDiary := diary
 		this.iEntries := entries
 	}
 
 	static readDiary(fileName) {
-		local entries := collect(string2Values("###------###------###", FileRead(fileName))
-							   , (d) => Diary.DiaryEntry.fromDescriptor(d))
+		local entries := string2Values("###------###------###", FileRead(fileName))
 		local superfluousEntries := []
 		local lastEntry := false
+
+		entries := collect(entries, (d) {
+					   if (Trim(d) != "")
+						   return Diary.DiaryEntry.fromDescriptor(Trim(d))
+					   else
+						   return false
+				   })
+
+		entries := choose(entries, (e) => e)
 
 		do(entries, (entry) {
 			if (lastEntry && entry.superseeds(lastEntry))
@@ -189,7 +207,7 @@ class Diary {
 			lastEntry := entry
 		})
 
-		return Diary(choose(entries, (e) => !inList(superfluousEntries, e)))
+		return Diary(fileName, choose(entries, (e) => !inList(superfluousEntries, e)))
 	}
 
 	writeDiary(fileName) {
@@ -204,15 +222,6 @@ class Diary {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SelectionEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			return substituteVariables("Type=Selection`nSimulator=%simulator%`nCar=%car%`nTrack=%track%"
-									 , {simulator: this.Property["Simulator"]
-									  , car: this.Property["Car"]
-									  , track: this.Property["Track"]})
-		}
-	}
-
 	HTML {
 		Get {
 			local html := "<table>"
@@ -258,12 +267,6 @@ class SelectionEntry extends Diary.DiaryEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class CharacteristicsEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			return ("Type=Characteristics`n###++++++###++++++###`n" . this.Payload)
-		}
-	}
-
 	HTML {
 		Get {
 			local html := ""
@@ -309,7 +312,7 @@ class CharacteristicsEntry extends Diary.DiaryEntry {
 	superseeds(entry) {
 		if isInstance(entry, CharacteristicsEntry)
 			return all(entry.Characteristics, (c1) => exist(this.Characteristics
-														  , (c2) => (c1.Characteristic = c2.Charecteristic)))
+														  , (c2) => (c1.Characteristic = c2.Characteristic)))
 		else
 			return false
 	}
@@ -320,14 +323,6 @@ class CharacteristicsEntry extends Diary.DiaryEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SetupEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			return substituteVariables("Type=" . this.Type . "`nSetup=%setup%`nFileName=%fileName%"
-									 , {setup: this.Property["Setup"]
-									  , fileName: this.Property["FileName"]})
-		}
-	}
-
 	HTML {
 		Get {
 			local html := "<table>"
@@ -364,12 +359,6 @@ class LoadEntry extends SetupEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SaveEntry extends SetupEntry {
-	Descriptor {
-		Get {
-			return (super.Decriptor . "`n###++++++###++++++###`n" . this.Payload)
-		}
-	}
-
 	HTML {
 		Get {
 			local html := super.HTML
@@ -419,15 +408,6 @@ class SaveEntry extends SetupEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class LapEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			return substituteVariables("Type=Lap`nLap=%lap%`nLap Time=%lapTime%`nSector Times=%sectorTimes%"
-									 , {lap: this.Property["Lap"]
-									  , lapTime: this.Property["Lap Time"]
-									  , sectorTimes: this.Property["Sector Times"]})
-		}
-	}
-
 	HTML {
 		Get {
 			local html := "<table>"
@@ -464,16 +444,6 @@ class LapEntry extends Diary.DiaryEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AnalysisEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			local descriptor := substituteVariables("Type=Analysis`nLap=%lap%`nLap Time=%lapTime%"
-												  , {lap: this.Property["Lap"]
-												   , lapTime: this.Property["Lap Time"]})
-
-			return (descriptor . "`n###++++++###++++++###`n" . this.Payload)
-		}
-	}
-
 	HTML {
 		Get {
 			return this.Payload
@@ -498,12 +468,6 @@ class AnalysisEntry extends Diary.DiaryEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RecommendationsEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			return ("Type=Recommendations`n###++++++###++++++###`n" . this.Payload)
-		}
-	}
-
 	HTML {
 		Get {
 			local html := ""
@@ -548,12 +512,6 @@ class RecommendationsEntry extends Diary.DiaryEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class NotesEntry extends Diary.DiaryEntry {
-	Descriptor {
-		Get {
-			return ("Type=Notes`n###++++++###++++++###`n" . this.Payload)
-		}
-	}
-
 	HTML {
 		Get {
 			return ("<p>" . this.Notes . "</p>")
@@ -594,6 +552,7 @@ class SetupWorkbench extends ConfigurationItem {
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
 
+	iDiaryDirectory := false
 	iDiary := false
 
 	iCharacteristics := []
@@ -727,6 +686,12 @@ class SetupWorkbench extends ConfigurationItem {
 	SimulatorSettings {
 		Get {
 			return this.iSimulatorSettings
+		}
+	}
+
+	DiaryDirectory {
+		Get {
+			return this.iDiaryDirectory
 		}
 	}
 
@@ -908,7 +873,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		DirCreate(diaryFolder)
 
-		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . A_Now . ".diary")
+		this.iDiaryDirectory := (normalizeDirectoryPath(diaryFolder) . "\")
+		this.iDiary := (this.DiaryDirectory . A_Now . ".diary")
 
 		SetupWorkbench.Instance := this
 
@@ -965,8 +931,8 @@ class SetupWorkbench extends ConfigurationItem {
 			workbench.editSetup()
 		}
 
-		editDiary(*) {
-			Run("Notepad.exe `"" . this.Diary . "`"")
+		browseDiaries(*) {
+			this.browseDiaries()
 		}
 
 		loadIssues(*) {
@@ -1097,7 +1063,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
 		button := workbenchGui.Add("Button", "x1148 yp+6 w23 h23 X:Move")
-		button.OnEvent("Click", editDiary)
+		button.OnEvent("Click", browseDiaries)
 		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L2 T2 R2 B2")
 
 		button := workbenchGui.Add("Button", "x1172 yp w23 h23 X:Move")
@@ -2004,34 +1970,34 @@ class SetupWorkbench extends ConfigurationItem {
 	logDiary(type, arguments*) {
 		switch type, false {
 			case "Selection":
-				FileAppend("###------###------###`n"
+				FileAppend("###------###------###"
 						 . "Type=Selection`n"
 						 . "Simulator=" . this.SelectedSimulator[true] . "`n"
 						 . "Car=" . this.SelectedCar[true] . "`n"
-						 . "Track=" . this.SelectedTrack[true] . "`n", this.Diary, "UTF-16")
+						 . "Track=" . this.SelectedTrack[true], this.Diary, "UTF-16")
 			case "Characteristics":
-				FileAppend("###------###------###`n"
+				FileAppend("###------###------###"
 						 . "Type=Characteristics`n"
-						 . "###++++++###++++++###`n"
-						 . arguments[1] . "`n", this.Diary, "UTF-16")
+						 . "###++++++###++++++###"
+						 . arguments[1], this.Diary, "UTF-16")
 			case "Load":
-				FileAppend("###------###------###`n"
+				FileAppend("###------###------###"
 						 . "Type=Load`n"
 						 . "Setup=" . arguments[1] . "`n"
-						 . "FileName=" . arguments[2] . "`n", this.Diary, "UTF-16")
+						 . "FileName=" . arguments[2], this.Diary, "UTF-16")
 			case "Save":
-				FileAppend("###------###------###`n"
+				FileAppend("###------###------###"
 						 . "Type=Save`n"
 						 . "Setup=" . arguments[1] . "`n"
 						 . "FileName=" . arguments[2] . "`n"
-						 . "###++++++###++++++###`n"
-						 . arguments[3] . "`n", this.Diary, "UTF-16")
+						 . "###++++++###++++++###"
+						 . arguments[3], this.Diary, "UTF-16")
 			case "Lap":
-				FileAppend("###------###------###`n"
+				FileAppend("###------###------###"
 						 . "Type=Lap`n"
 						 . "Lap=" . arguments[1] . "`n"
 						 . "Lap Time=" . arguments[2] . "`n"
-						 . "Sector Times=" . arguments[3] . "`n", this.Diary, "UTF-16")
+						 . "Sector Times=" . arguments[3], this.Diary, "UTF-16")
 		}
 	}
 
@@ -2742,6 +2708,12 @@ class SetupWorkbench extends ConfigurationItem {
 		finally {
 			this.Window.Unblock()
 		}
+	}
+
+	browseDiaries() {
+		withBlockedWindows(() {
+			DiaryBrowser(this, this.DiaryDirectory).browseDiaries(this.Diary)
+		})
 	}
 
 	editSetup() {
@@ -5105,6 +5077,313 @@ class FileSetupComparator extends SetupComparator {
 	}
 }
 
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; DiaryBrowser                                                            ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class DiaryBrowser {
+	iWorkbench := false
+	iDiaryDirectory := false
+
+	iWindow := false
+
+	iDiariesListView := false
+	iEntriesListView := false
+
+	iAvailableDiaries := []
+	iAvailableEntries := []
+
+	iSelectedDiary := false
+	iSelectedEntry := false
+
+	iResult := false
+
+	class BrowserWindow extends Window {
+		iBrowser := false
+
+		__New(browser, arguments*) {
+			this.iBrowser := browser
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iBrowser.close()
+		}
+	}
+
+	class BrowserResizer extends Window.Resizer {
+		iBrowser := false
+		iRedraw := false
+
+		__New(browser, arguments*) {
+			this.iBrowser := browser
+
+			super.__New(browser.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawBrowser"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawBrowser() {
+			local ignore, button
+
+			if this.iRedraw {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				try {
+					WinRedraw(this.iBrowser.Window)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
+	Workbench {
+		Get {
+			return this.iWorkbench
+		}
+	}
+
+	DiaryDirectory {
+		Get {
+			return this.iDiaryDirectory
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
+	DiariesListView {
+		Get {
+			return this.iDiariesListView
+		}
+	}
+
+	EntriesListView {
+		Get {
+			return this.iEntriesListView
+		}
+	}
+
+	AvailableDiaries {
+		Get {
+			return this.iAvailableDiaries
+		}
+	}
+
+	AvailableEntries {
+		Get {
+			return this.iAvailableEntries
+		}
+	}
+
+	SelectedDiary {
+		Get {
+			return this.iSelectedDiary
+		}
+	}
+
+	SelectedEntry {
+		Get {
+			return this.iSelectedEntry
+		}
+	}
+
+	__New(setupWorkbench, diaryDirectory) {
+		this.iWorkbench := setupWorkbench
+		this.iDiaryDirectory := diaryDirectory
+	}
+
+	createGui() {
+		local browserGui
+
+		selectDiary(listView, line, *) {
+			if line
+				this.selectDiary(this.AvailableDiaries[line])
+		}
+
+		selectEntry(listView, line, *) {
+			if line
+				this.selectEntry(this.SelectedDiary.Entries[line])
+		}
+
+		browserGui := DiaryBrowser.BrowserWindow(this, {Descriptor: "Setup Workbench.Diary Browser"
+													  , Resizeable:  "Deferred", Scrollable: false}
+													 , translate("Diaries"))
+
+		this.iWindow := browserGui
+
+		browserGui.SetFont("s10 Bold", "Arial")
+
+		browserGui.Add("Text", "x8 w480 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(browserGui, "Setup Workbench.Diary Browser"))
+
+		browserGui.SetFont("s9 Norm", "Arial")
+
+		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Diaries")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diaries-browser")
+
+		browserGui.SetFont("s8 Norm", "Arial")
+
+		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
+
+		this.iDiariesListView := browserGui.Add("ListView", "x16 yp+10 w130 h480 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
+		this.iDiariesListView.OnEvent("Click", selectDiary)
+		this.iDiariesListView.OnEvent("DoubleClick", selectDiary)
+		this.iDiariesListView.OnEvent("ItemSelect", selectDiary)
+
+		this.iEntriesListView := browserGui.Add("ListView", "x150 yp w330 h130 W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Type"], translate))
+		this.iEntriesListView.OnEvent("Click", selectEntry)
+		this.iEntriesListView.OnEvent("DoubleClick", selectEntry)
+		this.iEntriesListView.OnEvent("ItemSelect", selectEntry)
+
+		browserGui.Add(DiaryBrowser.BrowserResizer(this))
+
+		this.updateState()
+	}
+
+	loadDiaries() {
+		local diaries := []
+		local name, date, time
+
+		loop Files, this.DiaryDirectory . "*.diary", "F" {
+			diaries.Push(Diary.readDiary(A_LoopFileFullPath))
+
+			SplitPath(A_LoopFileName, , , , &name)
+
+			date := FormatTime(name, "ShortDate")
+			time := FormatTime(name, "HH:mm")
+
+			this.DiariesListView.Add("", date, time)
+		}
+
+		this.DiariesListView.ModifyCol()
+
+		loop 2
+			this.DiariesListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.iAvailableDiaries := diaries
+	}
+
+	loadDiary(diary) {
+		local ignore, entry
+
+		this.EntriesListView.Delete()
+
+		for ignore, entry in diary.Entries
+			this.EntriesListView.Add("", translate(entry.Type))
+
+		this.EntriesListView.ModifyCol()
+
+		loop 1
+			this.EntriesListView.ModifyCol(A_Index, "AutoHdr")
+
+		return diary
+	}
+
+	loadEntry(entry) {
+	}
+
+	selectDiary(diary, force := false) {
+		local ignore, candidate
+
+		if ((!this.SelectedDiary || (this.SelectedDiary != diary)) || force) {
+			this.iSelectedDiary := diary
+
+			for ignore, candidate in this.AvailableDiaries
+				if (diary = candidate) {
+					this.DiariesListView.Modify(A_Index, "Select Vis")
+
+					break
+				}
+
+			this.loadDiary(diary)
+
+			this.updateState()
+		}
+	}
+
+	selectEntry(entry, force := false) {
+		local ignore, candidate
+
+		if ((!this.SelectedEntry || (this.SelectedEntry != entry)) || force) {
+			this.iSelectedEntry := entry
+
+			for ignore, candidate in this.SelectedDiary.Entries
+				if (entry = candidate) {
+					this.EntriesListView.Modify(A_Index, "Select Vis")
+
+					break
+				}
+
+			this.loadEntry(entry)
+
+			this.updateState()
+		}
+	}
+
+	updateState() {
+	}
+
+	browseDiaries(fileName) {
+		local window, x, y, w, h
+
+		this.createGui()
+
+		window := this.Window
+
+		try {
+			window.Opt("+Owner" . this.Workbench.Window.Hwnd)
+
+			if getWindowPosition("Setup Workbench.Diary Browser", &x, &y)
+				window.Show("x" . x . " y" . y)
+			else
+				window.Show()
+
+			if getWindowSize("Setup Workbench.Diary Browser", &w, &h)
+				this.Window.Resize("Initialize", w, h)
+
+			this.loadDiaries()
+
+			this.selectDiary(first(this.AvailableDiaries, (d) => (d.Diary = fileName)))
+
+			loop
+				Sleep(200)
+			until this.iResult
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	close() {
+		this.iResult := true
+	}
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupEngineer                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -6115,12 +6394,12 @@ class SetupEngineer extends ConfigurationItem {
 
 		if answer
 			try {
-				FileAppend("###------###------###`n"
+				FileAppend("###------###------###"
 						 . "Type=Analysis`n"
 						 . "Lap=" . telemetry.Name . "`n"
 						 . "Lap Time=" . lapTimeDisplayValue(telemetry.LapTime) . "`n"
-						 . "###++++++###++++++###`n"
-						 . answer . "`n", this.Workbench.Diary, "UTF-16")
+						 . "###++++++###++++++###"
+						 . answer, this.Workbench.Diary, "UTF-16")
 			}
 			catch Any as exception {
 				logError(exception)
@@ -6151,10 +6430,10 @@ class SetupEngineer extends ConfigurationItem {
 				this.Connector.Ask(analysis, , , &calls := [])
 
 				try {
-					FileAppend("###------###------###`n"
+					FileAppend("###------###------###"
 							 . "Type=Recommendations`n"
-							 . "###++++++###++++++###`n"
-							 . values2String("`n", collect(calls, printChange)*) . "`n"
+							 . "###++++++###++++++###"
+							 . values2String("`n", collect(calls, printChange)*)
 							 , this.Workbench.Diary, "UTF-16")
 				}
 				catch Any as exception {

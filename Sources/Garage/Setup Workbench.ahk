@@ -5139,6 +5139,10 @@ class DiaryBrowser {
 
 				this.iRedraw := false
 
+				this.iBrowser.Control["htmlViewer"].Resized()
+
+				this.iBrowser.windowResized()
+
 				try {
 					WinRedraw(this.iBrowser.Window)
 				}
@@ -5222,13 +5226,11 @@ class DiaryBrowser {
 		local browserGui
 
 		selectDiary(listView, line, *) {
-			if line
-				this.selectDiary(this.AvailableDiaries[line])
+			this.selectDiary(line ? this.AvailableDiaries[line] : false)
 		}
 
 		selectEntry(listView, line, *) {
-			if line
-				this.selectEntry(this.SelectedDiary.Entries[line])
+			this.selectEntry(line ? this.SelectedDiary.Entries[line] : false)
 		}
 
 		browserGui := DiaryBrowser.BrowserWindow(this, {Descriptor: "Setup Workbench.Diary Browser"
@@ -5250,15 +5252,19 @@ class DiaryBrowser {
 
 		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iDiariesListView := browserGui.Add("ListView", "x16 yp+10 w130 h480 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
+		this.iDiariesListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
 		this.iDiariesListView.OnEvent("Click", selectDiary)
 		this.iDiariesListView.OnEvent("DoubleClick", selectDiary)
 		this.iDiariesListView.OnEvent("ItemSelect", selectDiary)
 
-		this.iEntriesListView := browserGui.Add("ListView", "x150 yp w330 h130 W:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Type"], translate))
+		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Type"], translate))
 		this.iEntriesListView.OnEvent("Click", selectEntry)
 		this.iEntriesListView.OnEvent("DoubleClick", selectEntry)
 		this.iEntriesListView.OnEvent("ItemSelect", selectEntry)
+
+		browserGui.Add("Button", "x66 yp+144 w80 h24 Y:Move vaddNotesButton", translate("Notes") . translate("..."))
+
+		browserGui.Add("HTMLViewer", "x150 ys w330 h493 H:Grow W:Grow Border vhtmlViewer")
 
 		browserGui.Add(DiaryBrowser.BrowserResizer(this))
 
@@ -5293,18 +5299,22 @@ class DiaryBrowser {
 
 		this.EntriesListView.Delete()
 
-		for ignore, entry in diary.Entries
-			this.EntriesListView.Add("", translate(entry.Type))
+		if diary
+			for ignore, entry in diary.Entries
+				this.EntriesListView.Add("", translate(entry.Type))
 
 		this.EntriesListView.ModifyCol()
 
 		loop 1
 			this.EntriesListView.ModifyCol(A_Index, "AutoHdr")
 
-		return diary
+		loadEntry(false)
 	}
 
 	loadEntry(entry) {
+		this.Control["htmlViewer"].document.open()
+		this.Control["htmlViewer"].document.write(entry ? entry.HTML : "")
+		this.Control["htmlViewer"].document.close()
 	}
 
 	selectDiary(diary, force := false) {
@@ -5321,6 +5331,9 @@ class DiaryBrowser {
 				}
 
 			this.loadDiary(diary)
+
+			if (diary.Entries.Length > 0)
+				this.selectEntry(diary.Entries[1])
 
 			this.updateState()
 		}
@@ -5346,6 +5359,9 @@ class DiaryBrowser {
 	}
 
 	updateState() {
+	}
+
+	windowResized() {
 	}
 
 	browseDiaries(fileName) {

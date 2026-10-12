@@ -2900,7 +2900,7 @@ class DrivingCoach extends GridRaceAssistant {
 					bestLapTime := Min(bestLapTime, lapTime)
 				}
 			}
-			else if ((lapNumber < analyzedLaps) || (lapNumber <= (this.BaseLap + (2 * this.LearningLaps)))) {
+			else if ((lapNumber < analyzedLaps) || (lapNumber < (this.BaseLap + (2 * this.LearningLaps)))) {
 				analyzedLaps := 0
 				lastLapTime := 2147483647
 				bestLapTime := 2147483647

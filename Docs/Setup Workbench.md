@@ -333,7 +333,7 @@ The "Setup Workbench" *records* all your actions in the form of a diary. The fol
 - All actions taken by the AI-based Setup Engineer
 - Information about each driven lap (lap time, sector times, ...), if the telemetry system is running
 
-You can open a browser for all recent diiaries by clicking on the small button with the book icon in the upper right corner of the main window.
+You can open a browser for all recent diaries by clicking on the small button with the book icon in the upper right corner of the main window.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Diary%20Browser.jpg)
 

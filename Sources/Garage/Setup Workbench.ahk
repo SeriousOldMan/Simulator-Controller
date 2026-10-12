@@ -80,7 +80,7 @@ global kDebugRules := 2
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class Diary {
-	iDiary := false
+	iFileName := false
 	iEntries := []
 
 	class DiaryEntry {
@@ -95,6 +95,10 @@ class Diary {
 		Descriptor {
 			Get {
 				return this.iDescriptor
+			}
+
+			Set {
+				return (this.iDescriptor := value)
 			}
 		}
 
@@ -163,9 +167,9 @@ class Diary {
 		}
 	}
 
-	Diary {
+	FileName {
 		Get {
-			return this.iDiary
+			return this.iFileName
 		}
 	}
 
@@ -181,8 +185,8 @@ class Diary {
 		}
 	}
 
-	__New(diary, entries) {
-		this.iDiary := diary
+	__New(fileName, entries) {
+		this.iFileName := fileName
 		this.iEntries := entries
 	}
 
@@ -224,16 +228,15 @@ class Diary {
 class SelectionEntry extends Diary.DiaryEntry {
 	HTML {
 		Get {
-			local html := "<table>"
+			local html := "<table class=`"table-std`">"
 
-			html .= ("<tr><td><b>" . translate("Simulator:") . "</b></td><td>" . this.Simulator . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Car:") . "</b></td><td>" . this.Car . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . this.Track . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td>" . this.Simulator . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td>" . this.Car . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td>" . this.Track . "</td></tr>")
 
 			return (html . "</table>")
 		}
 	}
-
 
 	Simulator {
 		Get {
@@ -263,26 +266,26 @@ class SelectionEntry extends Diary.DiaryEntry {
 }
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; CharacteristicsEntry                                                    ;;;
+;;; IssuesEntry                                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class CharacteristicsEntry extends Diary.DiaryEntry {
+class IssuesEntry extends Diary.DiaryEntry {
 	HTML {
 		Get {
 			local html := ""
-			local characteristics := this.Characteristics.Clone()
-			local ignore, characteristic
+			local îssues := this.Issues.Clone()
+			local ignore, issue
 
-			if (characteristics.Length > 0) {
-				html .= "<table>"
+			if (îssues.Length > 0) {
+				html .= "<table class=`"table-std`">"
 				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Importance") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Severity") . "</th></tr>")
 
-				for ignore, characteristic in characteristics {
-					html .= ("<tr><td>" . characteristic.Characteristic . "</td>")
-					html .= ("<td>" . characteristic.Importance . "</td>")
-					html .= ("<td>" . characteristic.Severity . "</td></tr>")
+				for ignore, issue in îssues {
+					html .= ("<tr><td>" . issue.Characteristic . "</td>")
+					html .= ("<td>" . issue.Importance . "</td>")
+					html .= ("<td>" . issue.Severity . "</td></tr>")
 				}
 
 				return (html . "</table>")
@@ -292,27 +295,27 @@ class CharacteristicsEntry extends Diary.DiaryEntry {
 		}
 	}
 
-	Characteristics {
+	Issues {
 		Get {
-			local characteristics := []
-			local ignore, characteristic
+			local issues := []
+			local ignore, issue
 
-			for ignore, characteristic in string2Values("`n", this.Payload) {
-				characteristic := string2Values("=", characteristic)
+			for ignore, issue in string2Values("`n", this.Payload) {
+				issue := string2Values("=", issue)
 
-				characteristics.Push({Characteristic: characteristic[1]
-									, Importance: string2Values("/", characteristic[2])[1]
-									, Severity: string2Values("/", characteristic[2])[2]})
+				issues.Push({Characteristic: issue[1]
+						   , Importance: string2Values("/", issue[2])[1]
+						   , Severity: string2Values("/", issue[2])[2]})
 			}
 
-			return characteristics
+			return issues
 		}
 	}
 
 	superseeds(entry) {
-		if isInstance(entry, CharacteristicsEntry)
-			return all(entry.Characteristics, (c1) => exist(this.Characteristics
-														  , (c2) => (c1.Characteristic = c2.Characteristic)))
+		if isInstance(entry, IssuesEntry)
+			return all(entry.Issues, (c1) => exist(this.Issues
+												 , (c2) => (c1.Characteristic = c2.Characteristic)))
 		else
 			return false
 	}
@@ -325,10 +328,10 @@ class CharacteristicsEntry extends Diary.DiaryEntry {
 class SetupEntry extends Diary.DiaryEntry {
 	HTML {
 		Get {
-			local html := "<table>"
+			local html := "<table class=`"table-std`">"
 
-			html .= ("<tr><td><b>" . translate("Setup:") . "</b></td><td>" . this.Setup . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("File:") . "</b></td><td>" . this.FileName . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Setup:") . "</th><td>" . this.Setup . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("File:") . "</th><td>" . this.FileName . "</td></tr>")
 
 			return (html . "</table>")
 		}
@@ -367,7 +370,7 @@ class SaveEntry extends SetupEntry {
 			local ignore, setting
 
 			if (settings.Length > 0) {
-				html .= "<br><br><table>"
+				html .= "<br><br><table class=`"table-std`">"
 				html .= ("<tr><th class=`"th-std`">" . translate("Category") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Setting") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Value") . "</th></tr>")
@@ -410,11 +413,11 @@ class SaveEntry extends SetupEntry {
 class LapEntry extends Diary.DiaryEntry {
 	HTML {
 		Get {
-			local html := "<table>"
+			local html := "<table class=`"table-std`">"
 
-			html .= ("<tr><td><b>" . translate("Lap:") . "</b></td><td>" . this.Lap . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Lap Time:") . "</b></td><td>" . this.LapTime . "</td></tr>")
-			html .= ("<tr><td><b>" . translate("Sector Times:") . "</b></td><td>" . this.SectorTimes . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Sector Times:") . "</th><td>" . this.SectorTimes . "</td></tr>")
 
 			return (html . "</table>")
 		}
@@ -446,7 +449,12 @@ class LapEntry extends Diary.DiaryEntry {
 class AnalysisEntry extends Diary.DiaryEntry {
 	HTML {
 		Get {
-			return this.Payload
+			local html := "<table class=`"table-std`">"
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+
+			return (html . "</table><br><br>" . this.Payload)
 		}
 	}
 
@@ -475,7 +483,7 @@ class RecommendationsEntry extends Diary.DiaryEntry {
 			local ignore, setting
 
 			if (settings.Length > 0) {
-				html .= "<table>"
+				html .= "<table class=`"table-std`">"
 				html .= ("<th class=`"th-std`">" . translate("Setting") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Increment") . "</th></tr>")
 
@@ -1975,9 +1983,9 @@ class SetupWorkbench extends ConfigurationItem {
 						 . "Simulator=" . this.SelectedSimulator[true] . "`n"
 						 . "Car=" . this.SelectedCar[true] . "`n"
 						 . "Track=" . this.SelectedTrack[true], this.Diary, "UTF-16")
-			case "Characteristics":
+			case "Issues":
 				FileAppend("###------###------###"
-						 . "Type=Characteristics`n"
+						 . "Type=Issues`n"
 						 . "###++++++###++++++###"
 						 . arguments[1], this.Diary, "UTF-16")
 			case "Load":
@@ -2680,7 +2688,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
 
-					this.logDiary("Characteristics", values2String("`n", issues*))
+					this.logDiary("Issues", values2String("`n", issues*))
 				}
 			}
 
@@ -5097,6 +5105,8 @@ class DiaryBrowser {
 	iSelectedDiary := false
 	iSelectedEntry := false
 
+	iContent := false
+
 	iResult := false
 
 	class BrowserWindow extends Window {
@@ -5257,7 +5267,7 @@ class DiaryBrowser {
 		this.iDiariesListView.OnEvent("DoubleClick", selectDiary)
 		this.iDiariesListView.OnEvent("ItemSelect", selectDiary)
 
-		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Type"], translate))
+		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Actions"], translate))
 		this.iEntriesListView.OnEvent("Click", selectEntry)
 		this.iEntriesListView.OnEvent("DoubleClick", selectEntry)
 		this.iEntriesListView.OnEvent("ItemSelect", selectEntry)
@@ -5312,9 +5322,177 @@ class DiaryBrowser {
 	}
 
 	loadEntry(entry) {
-		this.Control["htmlViewer"].document.open()
-		this.Control["htmlViewer"].document.write(entry ? entry.HTML : "")
-		this.Control["htmlViewer"].document.close()
+		this.showEntry(entry ? entry.HTML : "")
+	}
+
+	showEntry(content) {
+		local viewer := this.Control["htmlViewer"]
+		local height := (viewer.getHeight() - 4)
+		local html := ""
+		local document, height, ignore, tag
+
+		getCSS() {
+			local script
+
+			script := "
+			(
+				.table-std, .th-std, .td-std {
+					border-collapse: collapse;
+					padding: .3em .5em;
+				}
+
+				.th-std, .td-std {
+					text-align: center;
+					color: #%textColor%;
+				}
+
+				.th-std, .caption-std {
+					background-color: #%headerBackColor%;
+					color: #%textColor%;
+					border: thin solid #%frameColor%;
+				}
+
+				.td-std {
+					border-left: thin solid #%frameColor%;
+					border-right: thin solid #%frameColor%;
+				}
+
+				.th-left {
+					text-align: left;
+				}
+
+				.td-left {
+					text-align: left;
+				}
+
+				.th-right {
+					text-align: right;
+				}
+
+				.td-right {
+					text-align: right;
+				}
+
+				table, th, td {
+					border-collapse: collapse;
+					padding: .3em .5em;
+				}
+
+				th, td {
+					color: #%textColor%;
+				}
+
+				th, caption {
+					font-size: 12px;
+					background-color: #%headerBackColor%;
+					color: #%textColor%;
+					border: thin solid #%frameColor%;
+				}
+
+				td {
+					font-size: 12px;
+					border-left: thin solid #%frameColor%;
+					border-right: thin solid #%frameColor%;
+				}
+
+				tfoot {
+					border-bottom: thin solid #%frameColor%;
+				}
+
+				caption {
+					font-size: 1.5em;
+					border-radius: .5em .5em 0 0;
+					padding: .5em 0 0 0
+				}
+
+				table tbody tr:nth-child(even) {
+					background-color: #%evenRowColor%;
+				}
+
+				table tbody tr:nth-child(odd) {
+					background-color: #%evenRowColor%;
+				}
+
+				h1, h2, h3, h4, h5, p, ul, ol {
+					font-family: Arial;
+					color: #%textColor%;
+				}
+			)"
+
+			return substituteVariables(script, {evenRowColor: this.Window.Theme.ListBackColor["EvenRow"]
+											  , oddRowColor: this.Window.Theme.ListBackColor["OddRow"]
+											  , altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
+											  , textColor: this.Window.Theme.TextColor
+											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
+		}
+
+		this.iContent := content
+
+		if !content {
+			width := viewer.getWidth() - 10
+
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<style> table, p, div { color: #%fontColor% } </style>
+					<div style="width: %width%px; height: %height%px; text-align: center">
+						<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
+							<br>
+							<br>
+							<br>
+							<br>
+							%html%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
+		}
+		else {
+			width := viewer.getWidth() - 20
+
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						%CSS%
+					</style>
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'>
+					<div style="width: %width%px; font-family: Arial; font-size: 12px">
+						<p style="font-family: Arial; font-size: 12px; margin: auto">
+							%html%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
+		}
+
+		content := StrReplace(content, "%", "\%")
+
+		for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
+			content := StrReplace(content, tag, "")
+
+		viewer.document.open()
+		viewer.document.write(substituteVariables(document
+												, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+												 , CSS: getCSS()
+												 , width: width, height: height, html: content
+												 , backColor: this.Window.AltBackColor}))
+		viewer.document.close()
 	}
 
 	selectDiary(diary, force := false) {
@@ -5332,7 +5510,7 @@ class DiaryBrowser {
 
 			this.loadDiary(diary)
 
-			if (diary.Entries.Length > 0)
+			if (diary && (diary.Entries.Length > 0))
 				this.selectEntry(diary.Entries[1])
 
 			this.updateState()
@@ -5359,9 +5537,14 @@ class DiaryBrowser {
 	}
 
 	updateState() {
+		if (this.SelectedEntry && (this.SelectedDiary.FileName = this.Workbench.Diary))
+			this.Control["addNotesButton"].Enabled := true
+		else
+			this.Control["addNotesButton"].Enabled := false
 	}
 
 	windowResized() {
+		this.showEntry(this.iContent)
 	}
 
 	browseDiaries(fileName) {
@@ -5384,7 +5567,7 @@ class DiaryBrowser {
 
 			this.loadDiaries()
 
-			this.selectDiary(first(this.AvailableDiaries, (d) => (d.Diary = fileName)))
+			this.selectDiary(first(this.AvailableDiaries, (d) => (d.FileName = fileName)))
 
 			loop
 				Sleep(200)
@@ -6432,9 +6615,13 @@ class SetupEngineer extends ConfigurationItem {
 		printChange(call) {
 			local arguments := call[2].Clone()
 
-			loop arguments.Length
+			loop arguments.Length {
 				if !arguments.Has(A_Index)
 					arguments[A_Index] := ""
+
+				if ((A_Index = 1) && arguments.Has(A_Index))
+					arguments[1] := this.Workbench.getLabel(arguments[1])
+			}
 
 			return values2String("=", arguments*)
 		}

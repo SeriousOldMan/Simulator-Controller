@@ -12,16 +12,7 @@ Before we dive into the workflow of the "Setup Workbench", let's have a look at 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.jpg)
 
-You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be noted in the form of a diary. The following entries will be made:
-
-- Each selection of simulator, car and/or track
-- Every change to the issues in the *Characteristics* pane of the main window
-- Loading a setup
-- Saving a setup incl. information about the changed setup settings
-- All actions taken by the AI-based Setup Engineer
-- Information about each driven lap (lap time, sector times, ...), if the telemetry system is running
-
-By the way, this diary can be opened with a click of the button with the small book icon directly beside the settings button. You may make notes in this file as well, but make sure to save them, before you go back to the "Setup Workbench", otherwise new entries may be lost.
+You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be noted in the form of a diary. You can view all the recent diaries with the [Diary Browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser) by clicking on the small button with the book icon directly beside the settings button.
 
 Good to know: If you do not configure a diary folder, the diary will be written to the *Simulator Controller\Temp\Setup Workbench\Diary* folder in your user *Documents* folder. But as the path suggests, it may be lost, once the *Temp* folder is cleaned up.
 
@@ -330,6 +321,23 @@ If you're working on more than one issue at a time, it's likely that you'll have
 ### Disclaimer
 
 The rules for the recommendations have been compiled from different sources, above all my own experiences. That said, I do not take responsibility for the correctness of all the recommendations, especially when generating recommendations for complex and partly contradictory multi-problem cases. If you find an error in the recommendations, please let me know. I always strive to improve the quality of my software.
+
+## Diary browser
+
+The "Setup Workbench" *records* all your actions in the form of a diary. The following entries will be made:
+
+- Each selection of simulator, car and/or track
+- Every change to the issues in the *Characteristics* pane of the main window
+- Loading a setup
+- Saving a setup incl. information about the changed setup settings
+- All actions taken by the AI-based Setup Engineer
+- Information about each driven lap (lap time, sector times, ...), if the telemetry system is running
+
+You can open a browser for all recent diiaries by clicking on the small button with the book icon in the upper right corner of the main window.
+
+![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Diary%20Browser.jpg)
+
+In the upper left list, you can select the session you want to inspect. The last one will always be the current one. If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. If you have selected the current session, you can add your own notes to the diary by clicking on the "Notes..." button.
 
 ## How it works
 

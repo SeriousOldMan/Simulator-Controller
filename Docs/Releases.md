@@ -37,10 +37,19 @@
 #### Fixes
 
   - Fixed a bug that caused the driver name to be shown as the internal ID, when recorded telemetry data was saved from the "Setup Workbench".
+  - Once again fixed a bug in the new offline installer.
+  - Fixed a bug when applying setup recommendations in the "Setup Workbench" with a connected OpenAI model with a version greater or equal to GPT-5.
   
 #### Changes
 
+  - The diary system of the "Setup Workbench" has been completely rewritten.
+    - A new diary browser gives you access to all recent sessions of the "Setup Workbench" and all important actions taken while working with the "Setup Workbench".
+    - You can add your own notes to the diary of the active session.
+	- To support all this, a new diary file format has been implemented.
+    - The old diary files will still be preserved, but are invisible to the new diary browser.
+	- See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser) for more information.
   - An all new USB device manager has been implemented with great support by @Timmermann. This new manager now can handle more than 16 USB devices, thereby solving all issues with unrecognized steering wheels reported by some users.
+  - [Internal] Increased compatibility of function/tool calling for OpenAI models with a version greater or equal to GPT-5.
   - [Internal] Migrated to AHK 2.1-alpha.34.
 
 # Release history

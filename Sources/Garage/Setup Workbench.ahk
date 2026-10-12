@@ -5256,7 +5256,7 @@ class DiaryBrowser {
 		browserGui.SetFont("s9 Norm", "Arial")
 
 		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Diaries")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diaries-browser")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser")
 
 		browserGui.SetFont("s8 Norm", "Arial")
 

@@ -76,17 +76,459 @@ global kDebugRules := 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; LabelsMap                                                               ;;;
+;;; Diary                                                                   ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class LabelsMap extends SectionMap {
-	__Item[key] {
-		Get {
-			return (this.Has(key) ? super.__Item[key] : key)
+class Diary {
+	iFileName := false
+	iEntries := []
+
+	class DiaryEntry {
+		iDescriptor := ""
+
+		Type {
+			Get {
+				return this.Properties["Type"]
+			}
 		}
 
-		Set {
-			return (super.__Item[key] := value)
+		Descriptor {
+			Get {
+				return this.iDescriptor
+			}
+
+			Set {
+				return (this.iDescriptor := value)
+			}
+		}
+
+		Properties {
+			Get {
+				local properties
+
+				this.parseDescriptor(this.Descriptor, &properties)
+
+				return properties
+			}
+		}
+
+		Property[name] {
+			Get {
+				return this.Properties[name]
+			}
+		}
+
+		Payload {
+			Get {
+				local payload
+
+				this.parseDescriptor(this.Descriptor, , &payload)
+
+				return payload
+			}
+		}
+
+		HTML {
+			Get {
+				throw "Virtual property DiaryEntry.HTML must be implemented in a subclass..."
+			}
+		}
+
+		__New(descriptor) {
+			this.iDescriptor := descriptor
+		}
+
+		static fromDescriptor(descriptor) {
+			local type := string2Values("=", choose(string2Values("`n", descriptor), (l) => (l != ""))[1])[2]
+
+			return %type . "Entry"%(descriptor)
+		}
+
+		parseDescriptor(descriptor, &properties?, &payload?) {
+			local ignore, line
+
+			descriptor := string2Values("###++++++###++++++###", descriptor)
+
+			if (descriptor.Length > 1)
+				payload := descriptor[2]
+
+			properties := CaseInsenseMap()
+
+			for ignore, line in string2Values("`n", descriptor[1])
+				if (Trim(line) != "") {
+					line := string2Values("=", line)
+
+					properties[line[1]] := line[2]
+				}
+		}
+
+		superseeds(entry) {
+			return false
+		}
+	}
+
+	FileName {
+		Get {
+			return this.iFileName
+		}
+	}
+
+	Entries {
+		Get {
+			return this.iEntries
+		}
+	}
+
+	Descriptor {
+		Get {
+			return values2String("###------###------###", collect(this.Entries, (e) => e.Descriptor)*)
+		}
+	}
+
+	__New(fileName, entries) {
+		this.iFileName := fileName
+		this.iEntries := entries
+	}
+
+	static readDiary(fileName) {
+		local entries := string2Values("###------###------###", FileRead(fileName))
+		local superfluousEntries := []
+		local lastEntry := false
+
+		entries := collect(entries, (d) {
+					   if (Trim(d) != "")
+						   return Diary.DiaryEntry.fromDescriptor(Trim(d))
+					   else
+						   return false
+				   })
+
+		entries := choose(entries, (e) => e)
+
+		do(entries, (entry) {
+			if (lastEntry && entry.superseeds(lastEntry))
+				superfluousEntries.Push(lastEntry)
+
+			lastEntry := entry
+		})
+
+		return Diary(fileName, choose(entries, (e) => !inList(superfluousEntries, e)))
+	}
+
+	writeDiary(fileName) {
+		deleteFile(fileName)
+
+		FileAppend(this.Descriptor, fileName)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SelectionEntry                                                          ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SelectionEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			local html := "<table class=`"table-std`">"
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td>" . this.Simulator . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td>" . this.Car . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td>" . this.Track . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
+	Simulator {
+		Get {
+			return this.Property["Simulator"]
+		}
+	}
+
+	Car {
+		Get {
+			local car := this.Property["Car"]
+
+			return ((car != translate("All")) ? SessionDatabase.getCarName(this.Simulator, car) : car)
+		}
+	}
+
+	Track {
+		Get {
+			local track := this.Property["Track"]
+
+			return ((track != translate("All")) ? SessionDatabase.getTrackName(this.Simulator, track) : track)
+		}
+	}
+
+	superseeds(entry) {
+		return isInstance(entry, SelectionEntry)
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; IssuesEntry                                                             ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class IssuesEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			local html := ""
+			local îssues := this.Issues.Clone()
+			local ignore, issue
+
+			if (îssues.Length > 0) {
+				html .= "<table class=`"table-std`">"
+				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Importance") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Severity") . "</th></tr>")
+
+				for ignore, issue in îssues {
+					html .= ("<tr><td>" . issue.Characteristic . "</td>")
+					html .= ("<td>" . issue.Importance . "</td>")
+					html .= ("<td>" . issue.Severity . "</td></tr>")
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
+		}
+	}
+
+	Issues {
+		Get {
+			local issues := []
+			local ignore, issue
+
+			for ignore, issue in string2Values("`n", this.Payload) {
+				issue := string2Values("=", issue)
+
+				issues.Push({Characteristic: issue[1]
+						   , Importance: string2Values("/", issue[2])[1]
+						   , Severity: string2Values("/", issue[2])[2]})
+			}
+
+			return issues
+		}
+	}
+
+	superseeds(entry) {
+		if isInstance(entry, IssuesEntry)
+			return all(entry.Issues, (c1) => exist(this.Issues
+												 , (c2) => (c1.Characteristic = c2.Characteristic)))
+		else
+			return false
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SetupEntry                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SetupEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			local html := "<table class=`"table-std`">"
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Setup:") . "</th><td>" . this.Setup . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("File:") . "</th><td>" . this.FileName . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
+	Setup {
+		Get {
+			return this.Property["Setup"]
+		}
+	}
+
+	FileName {
+		Get {
+			return this.Property["FileName"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LoadEntry                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class LoadEntry extends SetupEntry {
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; SaveEntry                                                               ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class SaveEntry extends SetupEntry {
+	HTML {
+		Get {
+			local html := super.HTML
+			local settings := this.Settings.Clone()
+			local lastCategory := false
+			local ignore, setting
+
+			if (settings.Length > 0) {
+				html .= "<br><br><table class=`"table-std`">"
+				html .= ("<tr><th class=`"th-std`">" . translate("Category") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Setting") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Value") . "</th></tr>")
+
+				for ignore, setting in bubbleSort(&settings, (s1, s2) => strGreater(s1.Category, s2.Category)) {
+					html .= ("<tr><td>" . ((setting.Category != lastCategory) ? setting.Category : "") . "</td>")
+					html .= ("<td>" . setting.Setting . "</td>")
+					html .= ("<td>" . setting.Value . "</td></tr>")
+
+					lastCategory := setting.Category
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
+		}
+	}
+
+	Settings {
+		Get {
+			local settings := []
+			local ignore, setting
+
+			for ignore, setting in string2Values("`n", this.Payload) {
+				setting := string2Values("=", setting)
+
+				settings.Push({Category: setting[1], Setting: setting[2], Value: setting[3]})
+			}
+
+			return settings
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; LapEntry                                                                ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class LapEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			local html := "<table class=`"table-std`">"
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Sector Times:") . "</th><td>" . this.SectorTimes . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
+	Lap {
+		Get {
+			return this.Property["Lap"]
+		}
+	}
+
+	LapTime {
+		Get {
+			return this.Property["Lap Time"]
+		}
+	}
+
+	SectorTimes {
+		Get {
+			return this.Property["Sector Times"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; AnalysisEntry                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class AnalysisEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			local html := "<table class=`"table-std`">"
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+
+			return (html . "</table><br><br>" . this.Payload)
+		}
+	}
+
+	Lap {
+		Get {
+			return this.Property["Lap"]
+		}
+	}
+
+	LapTime {
+		Get {
+			return this.Property["Lap Time"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; RecommendationsEntry                                                    ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class RecommendationsEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			local html := ""
+			local settings := this.Settings.Clone()
+			local ignore, setting
+
+			if (settings.Length > 0) {
+				html .= "<table class=`"table-std`">"
+				html .= ("<th class=`"th-std`">" . translate("Setting") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Increment") . "</th></tr>")
+
+				for ignore, setting in settings {
+					html .= ("<td>" . setting.Setting . "</td>")
+					html .= ("<td>" . setting.Increment . "</td></tr>")
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
+		}
+	}
+
+	Settings {
+		Get {
+			local settings := []
+			local ignore, setting
+
+			for ignore, setting in string2Values("`n", this.Payload) {
+				setting := string2Values("=", setting)
+
+				settings.Push({Setting: setting[1], Increment: setting[2]})
+			}
+
+			return settings
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; NotesEntry                                                              ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class NotesEntry extends Diary.DiaryEntry {
+	HTML {
+		Get {
+			return ("<p>" . this.Notes . "</p>")
+		}
+	}
+
+	Notes {
+		Get {
+			return this.Payload
 		}
 	}
 }
@@ -118,6 +560,7 @@ class SetupWorkbench extends ConfigurationItem {
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
 
+	iDiaryDirectory := false
 	iDiary := false
 
 	iCharacteristics := []
@@ -136,6 +579,18 @@ class SetupWorkbench extends ConfigurationItem {
 	iSetup := false
 
 	iKnowledgeBase := false
+
+	class LabelsMap extends SectionMap {
+		__Item[key] {
+			Get {
+				return (this.Has(key) ? super.__Item[key] : key)
+			}
+
+			Set {
+				return (super.__Item[key] := value)
+			}
+		}
+	}
 
 	class WorkbenchWindow extends Window {
 		iWorkbench := false
@@ -239,6 +694,12 @@ class SetupWorkbench extends ConfigurationItem {
 	SimulatorSettings {
 		Get {
 			return this.iSimulatorSettings
+		}
+	}
+
+	DiaryDirectory {
+		Get {
+			return this.iDiaryDirectory
 		}
 	}
 
@@ -420,7 +881,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		DirCreate(diaryFolder)
 
-		this.iDiary := (normalizeDirectoryPath(diaryFolder) . "\" . translate("Diary ") . A_Now . ".txt")
+		this.iDiaryDirectory := (normalizeDirectoryPath(diaryFolder) . "\")
+		this.iDiary := (this.DiaryDirectory . A_Now . ".diary")
 
 		SetupWorkbench.Instance := this
 
@@ -477,8 +939,8 @@ class SetupWorkbench extends ConfigurationItem {
 			workbench.editSetup()
 		}
 
-		editDiary(*) {
-			Run("Notepad.exe `"" . this.Diary . "`"")
+		browseDiaries(*) {
+			this.browseDiaries()
 		}
 
 		loadIssues(*) {
@@ -609,7 +1071,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
 		button := workbenchGui.Add("Button", "x1148 yp+6 w23 h23 X:Move")
-		button.OnEvent("Click", editDiary)
+		button.OnEvent("Click", browseDiaries)
 		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L2 T2 R2 B2")
 
 		button := workbenchGui.Add("Button", "x1172 yp w23 h23 X:Move")
@@ -719,7 +1181,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 				this.logDiary("Selection")
 
-				characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+				characteristicLabels := toMap(getMultiMapValues(this.Definition
+															  , "Workbench.Characteristics.Labels")
+											, SetupWorkbench.LabelsMap)
 
 				characteristics := string2Values(",", getMultiMapValue(state, "Characteristics", "Characteristics"))
 
@@ -1115,7 +1579,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 	loadCharacteristics(simulator := false, car := false, track := false, fast := false) {
 		local knowledgeBase := this.KnowledgeBase
-		local characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+		local characteristicLabels := toMap(getMultiMapValues(this.Definition
+															, "Workbench.Characteristics.Labels")
+										  , SetupWorkbench.LabelsMap)
 		local compiler, group, ignore, groupOption, option, characteristic
 
 		this.iCharacteristics := []
@@ -1205,7 +1671,8 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		return toMap(getMultiMapValues(this.Definition, "Workbench.Settings.Labels"), LabelsMap)[setting]
+		return toMap(getMultiMapValues(this.Definition, "Workbench.Settings.Labels")
+				   , SetupWorkbench.LabelsMap)[setting]
 	}
 
 	loadSettings(simulator := false, car := false, fast := false) {
@@ -1405,7 +1872,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 			setMultiMapValues(this.Definition, section, values, false)
 
-			setMultiMapValues(this.Definition, section, toMap(getMultiMapValues(this.Definition, section), LabelsMap))
+			setMultiMapValues(this.Definition, section
+							, toMap(getMultiMapValues(this.Definition, section), SetupWorkbench.LabelsMap))
 		}
 
 		car := this.SelectedCar["*"]
@@ -1510,25 +1978,34 @@ class SetupWorkbench extends ConfigurationItem {
 	logDiary(type, arguments*) {
 		switch type, false {
 			case "Selection":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Selection")}) . "`n`n"
-						 . translate("Simulator:") . A_Space . this.SelectedSimulator[true] . "`n"
-						 . translate("Car:") . A_Space . this.SelectedCar[true] . "`n"
-						 . translate("Track:") . A_Space . this.SelectedTrack[true] . "`n`n", this.Diary, "UTF-16")
-			case "Characteristics":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Characteristics")}) . "`n`n"
-						 . arguments[1] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###"
+						 . "Type=Selection`n"
+						 . "Simulator=" . this.SelectedSimulator[true] . "`n"
+						 . "Car=" . this.SelectedCar[true] . "`n"
+						 . "Track=" . this.SelectedTrack[true], this.Diary, "UTF-16")
+			case "Issues":
+				FileAppend("###------###------###"
+						 . "Type=Issues`n"
+						 . "###++++++###++++++###"
+						 . arguments[1], this.Diary, "UTF-16")
 			case "Load":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Load")}) . "`n`n"
-						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###"
+						 . "Type=Load`n"
+						 . "Setup=" . arguments[1] . "`n"
+						 . "FileName=" . arguments[2], this.Diary, "UTF-16")
 			case "Save":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Save")}) . "`n`n"
-						 . translate("Setup:") . A_Space . arguments[1] . translate(" (") . arguments[2] . translate(")") . "`n`n"
-						 . arguments[3] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###"
+						 . "Type=Save`n"
+						 . "Setup=" . arguments[1] . "`n"
+						 . "FileName=" . arguments[2] . "`n"
+						 . "###++++++###++++++###"
+						 . arguments[3], this.Diary, "UTF-16")
 			case "Lap":
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Lap")}) . "`n`n"
-						 . translate("Name:") . A_Space . arguments[1] . "`n"
-						 . translate("Lap Time:") . A_Space . arguments[2] . "`n"
-						 . translate("Sector Times:") . A_Space . arguments[3] . "`n`n", this.Diary, "UTF-16")
+				FileAppend("###------###------###"
+						 . "Type=Lap`n"
+						 . "Lap=" . arguments[1] . "`n"
+						 . "Lap Time=" . arguments[2] . "`n"
+						 . "Sector Times=" . arguments[3], this.Diary, "UTF-16")
 		}
 	}
 
@@ -1538,7 +2015,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 	logSave(editor, setup) {
 		local categories := getMultiMapValues(this.Definition, "Workbench.Categories")
-		local categoriesLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		local categoriesLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Categories.Labels")
+									  , SetupWorkbench.LabelsMap)
 		local settingsList := []
 		local ignore, setting, handler, unit, originalValue, modifiedValue, value
 		local candidate, settings
@@ -1605,7 +2083,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if inList(kPressureUnits, unit)
 						unit := getUnit("Pressure")
 
-					settingsList.Push(categoriesLabels[category] . translate(": ") . label . translate(" = ") . value . A_Space . translate(unit))
+					settingsList.Push(categoriesLabels[category] . "=" . label . "=" . value . A_Space . translate(unit))
 				}
 			}
 		}
@@ -1902,9 +2380,7 @@ class SetupWorkbench extends ConfigurationItem {
 		if this.SetupEngineer
 			activateWindow(this.SetupEngineer.Window)
 		else {
-			this.iSetupEngineer := SetupEngineer(this
-											   , readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
-											   , this.Diary)
+			this.iSetupEngineer := SetupEngineer(this, readMultiMap(kUserConfigDirectory . "Setup Workbench.ini"))
 
 			this.SetupEngineer.show()
 		}
@@ -1973,7 +2449,9 @@ class SetupWorkbench extends ConfigurationItem {
 			x := (this.CharacteristicsArea.X + 8)
 			y := (this.CharacteristicsArea.Y + 8 + (numCharacteristics * kCharacteristicHeight))
 
-			characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+			characteristicLabels := toMap(getMultiMapValues(this.Definition
+														  , "Workbench.Characteristics.Labels")
+										, SetupWorkbench.LabelsMap)
 
 			this.SelectedCharacteristics.Push(characteristic)
 
@@ -2067,7 +2545,8 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu := Menu()
 
-		characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+		characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+									, SetupWorkbench.LabelsMap)
 
 		menuIndex := 1
 
@@ -2184,7 +2663,8 @@ class SetupWorkbench extends ConfigurationItem {
 				issues := []
 
 				characteristicLabels := toMap(getMultiMapValues(this.Definition
-															  , "Workbench.Characteristics.Labels"), LabelsMap)
+															  , "Workbench.Characteristics.Labels")
+											, SetupWorkbench.LabelsMap)
 
 				for ignore, characteristic in this.SelectedCharacteristics {
 					noIssue := false
@@ -2197,8 +2677,7 @@ class SetupWorkbench extends ConfigurationItem {
 					knowledgeBase.setFact(characteristic . ".Weight", value1, true)
 					knowledgeBase.setFact(characteristic . ".Value", value2, true)
 
-					issues.Push(characteristicLabels[characteristic] . translate(" -> ")
-							  . value1 . translate("%") . translate(" / ") . value2 . translate("%"))
+					issues.Push(characteristicLabels[characteristic] . "=" . value1 . "/" . value2)
 				}
 
 				if !noIssue {
@@ -2209,7 +2688,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
 
-					this.logDiary("Characteristics", values2String("`n", issues*))
+					this.logDiary("Issues", values2String("`n", issues*))
 				}
 			}
 
@@ -2237,6 +2716,12 @@ class SetupWorkbench extends ConfigurationItem {
 		finally {
 			this.Window.Unblock()
 		}
+	}
+
+	browseDiaries() {
+		withBlockedWindows(() {
+			DiaryBrowser(this, this.DiaryDirectory).browseDiaries(this.Diary)
+		})
 	}
 
 	editSetup() {
@@ -3559,12 +4044,14 @@ class SetupEditor extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels"), LabelsMap)
+		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+									, SetupWorkbench.LabelsMap)
 
 		if settingsLabels.Has(setting)
 			return settingsLabels[setting]
 		else {
-			settingsLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels"), LabelsMap)
+			settingsLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Settings.Labels")
+								  , SetupWorkbench.LabelsMap)
 
 			return (settingsLabels.Has(setting) ? settingsLabels[setting] : setting)
 		}
@@ -3595,7 +4082,8 @@ class SetupEditor extends ConfigurationItem {
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
+								, SetupWorkbench.LabelsMap)
 
 		this.SettingsListView.Delete()
 
@@ -4168,7 +4656,8 @@ class SetupComparator extends ConfigurationItem {
 	}
 
 	getLabel(setting) {
-		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels"), LabelsMap)
+		local settingsLabels := toMap(getMultiMapValues(this.Configuration, "Setup.Settings.Labels")
+									, SetupWorkbench.LabelsMap)
 
 		if settingsLabels.Has(setting)
 			return settingsLabels[setting]
@@ -4216,7 +4705,8 @@ class SetupComparator extends ConfigurationItem {
 
 		categories := getMultiMapValues(this.Workbench.Definition, "Workbench.Categories")
 
-		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels"), LabelsMap)
+		categoriesLabels := toMap(getMultiMapValues(this.Workbench.Definition, "Workbench.Categories.Labels")
+								, SetupWorkbench.LabelsMap)
 
 		this.SettingsListView.Delete()
 
@@ -4595,6 +5085,504 @@ class FileSetupComparator extends SetupComparator {
 	}
 }
 
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; DiaryBrowser                                                            ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class DiaryBrowser {
+	iWorkbench := false
+	iDiaryDirectory := false
+
+	iWindow := false
+
+	iDiariesListView := false
+	iEntriesListView := false
+
+	iAvailableDiaries := []
+	iAvailableEntries := []
+
+	iSelectedDiary := false
+	iSelectedEntry := false
+
+	iContent := false
+
+	iResult := false
+
+	class BrowserWindow extends Window {
+		iBrowser := false
+
+		__New(browser, arguments*) {
+			this.iBrowser := browser
+
+			super.__New(arguments*)
+		}
+
+		Close(*) {
+			this.iBrowser.close()
+		}
+	}
+
+	class BrowserResizer extends Window.Resizer {
+		iBrowser := false
+		iRedraw := false
+
+		__New(browser, arguments*) {
+			this.iBrowser := browser
+
+			super.__New(browser.Window, arguments*)
+
+			Task.startTask(ObjBindMethod(this, "RedrawBrowser"), 500, kHighPriority)
+		}
+
+		Resize(deltaWidth, deltaHeight) {
+			this.iRedraw := true
+		}
+
+		RedrawBrowser() {
+			local ignore, button
+
+			if this.iRedraw {
+				for ignore, button in ["LButton", "MButton", "RButton"]
+					if GetKeyState(button)
+						return Task.CurrentTask
+
+				this.iRedraw := false
+
+				this.iBrowser.Control["htmlViewer"].Resized()
+
+				this.iBrowser.windowResized()
+
+				try {
+					WinRedraw(this.iBrowser.Window)
+				}
+				catch Any as exception {
+					logError(exception)
+
+					return false
+				}
+			}
+
+			return Task.CurrentTask
+		}
+	}
+
+	Workbench {
+		Get {
+			return this.iWorkbench
+		}
+	}
+
+	DiaryDirectory {
+		Get {
+			return this.iDiaryDirectory
+		}
+	}
+
+	Window {
+		Get {
+			return this.iWindow
+		}
+	}
+
+	Control[name] {
+		Get {
+			return this.Window[name]
+		}
+	}
+
+	DiariesListView {
+		Get {
+			return this.iDiariesListView
+		}
+	}
+
+	EntriesListView {
+		Get {
+			return this.iEntriesListView
+		}
+	}
+
+	AvailableDiaries {
+		Get {
+			return this.iAvailableDiaries
+		}
+	}
+
+	AvailableEntries {
+		Get {
+			return this.iAvailableEntries
+		}
+	}
+
+	SelectedDiary {
+		Get {
+			return this.iSelectedDiary
+		}
+	}
+
+	SelectedEntry {
+		Get {
+			return this.iSelectedEntry
+		}
+	}
+
+	__New(setupWorkbench, diaryDirectory) {
+		this.iWorkbench := setupWorkbench
+		this.iDiaryDirectory := diaryDirectory
+	}
+
+	createGui() {
+		local browserGui
+
+		selectDiary(listView, line, *) {
+			this.selectDiary(line ? this.AvailableDiaries[line] : false)
+		}
+
+		selectEntry(listView, line, *) {
+			this.selectEntry(line ? this.SelectedDiary.Entries[line] : false)
+		}
+
+		browserGui := DiaryBrowser.BrowserWindow(this, {Descriptor: "Setup Workbench.Diary Browser"
+													  , Resizeable:  "Deferred", Scrollable: false}
+													 , translate("Diaries"))
+
+		this.iWindow := browserGui
+
+		browserGui.SetFont("s10 Bold", "Arial")
+
+		browserGui.Add("Text", "x8 w480 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(browserGui, "Setup Workbench.Diary Browser"))
+
+		browserGui.SetFont("s9 Norm", "Arial")
+
+		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Diaries")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diaries-browser")
+
+		browserGui.SetFont("s8 Norm", "Arial")
+
+		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
+
+		this.iDiariesListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
+		this.iDiariesListView.OnEvent("Click", selectDiary)
+		this.iDiariesListView.OnEvent("DoubleClick", selectDiary)
+		this.iDiariesListView.OnEvent("ItemSelect", selectDiary)
+
+		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Actions"], translate))
+		this.iEntriesListView.OnEvent("Click", selectEntry)
+		this.iEntriesListView.OnEvent("DoubleClick", selectEntry)
+		this.iEntriesListView.OnEvent("ItemSelect", selectEntry)
+
+		browserGui.Add("Button", "x66 yp+144 w80 h24 Y:Move vaddNotesButton", translate("Notes") . translate("..."))
+
+		browserGui.Add("HTMLViewer", "x150 ys w330 h493 H:Grow W:Grow Border vhtmlViewer")
+
+		browserGui.Add(DiaryBrowser.BrowserResizer(this))
+
+		this.updateState()
+	}
+
+	loadDiaries() {
+		local diaries := []
+		local name, date, time
+
+		loop Files, this.DiaryDirectory . "*.diary", "F" {
+			diaries.Push(Diary.readDiary(A_LoopFileFullPath))
+
+			SplitPath(A_LoopFileName, , , , &name)
+
+			date := FormatTime(name, "ShortDate")
+			time := FormatTime(name, "HH:mm")
+
+			this.DiariesListView.Add("", date, time)
+		}
+
+		this.DiariesListView.ModifyCol()
+
+		loop 2
+			this.DiariesListView.ModifyCol(A_Index, "AutoHdr")
+
+		this.iAvailableDiaries := diaries
+	}
+
+	loadDiary(diary) {
+		local ignore, entry
+
+		this.EntriesListView.Delete()
+
+		if diary
+			for ignore, entry in diary.Entries
+				this.EntriesListView.Add("", translate(entry.Type))
+
+		this.EntriesListView.ModifyCol()
+
+		loop 1
+			this.EntriesListView.ModifyCol(A_Index, "AutoHdr")
+
+		loadEntry(false)
+	}
+
+	loadEntry(entry) {
+		this.showEntry(entry ? entry.HTML : "")
+	}
+
+	showEntry(content) {
+		local viewer := this.Control["htmlViewer"]
+		local height := (viewer.getHeight() - 4)
+		local html := ""
+		local document, height, ignore, tag
+
+		getCSS() {
+			local script
+
+			script := "
+			(
+				.table-std, .th-std, .td-std {
+					border-collapse: collapse;
+					padding: .3em .5em;
+				}
+
+				.th-std, .td-std {
+					text-align: center;
+					color: #%textColor%;
+				}
+
+				.th-std, .caption-std {
+					background-color: #%headerBackColor%;
+					color: #%textColor%;
+					border: thin solid #%frameColor%;
+				}
+
+				.td-std {
+					border-left: thin solid #%frameColor%;
+					border-right: thin solid #%frameColor%;
+				}
+
+				.th-left {
+					text-align: left;
+				}
+
+				.td-left {
+					text-align: left;
+				}
+
+				.th-right {
+					text-align: right;
+				}
+
+				.td-right {
+					text-align: right;
+				}
+
+				table, th, td {
+					border-collapse: collapse;
+					padding: .3em .5em;
+				}
+
+				th, td {
+					color: #%textColor%;
+				}
+
+				th, caption {
+					font-size: 12px;
+					background-color: #%headerBackColor%;
+					color: #%textColor%;
+					border: thin solid #%frameColor%;
+				}
+
+				td {
+					font-size: 12px;
+					border-left: thin solid #%frameColor%;
+					border-right: thin solid #%frameColor%;
+				}
+
+				tfoot {
+					border-bottom: thin solid #%frameColor%;
+				}
+
+				caption {
+					font-size: 1.5em;
+					border-radius: .5em .5em 0 0;
+					padding: .5em 0 0 0
+				}
+
+				table tbody tr:nth-child(even) {
+					background-color: #%evenRowColor%;
+				}
+
+				table tbody tr:nth-child(odd) {
+					background-color: #%evenRowColor%;
+				}
+
+				h1, h2, h3, h4, h5, p, ul, ol {
+					font-family: Arial;
+					color: #%textColor%;
+				}
+			)"
+
+			return substituteVariables(script, {evenRowColor: this.Window.Theme.ListBackColor["EvenRow"]
+											  , oddRowColor: this.Window.Theme.ListBackColor["OddRow"]
+											  , altBackColor: this.Window.AltBackColor, backColor: this.Window.BackColor
+											  , textColor: this.Window.Theme.TextColor
+											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
+		}
+
+		this.iContent := content
+
+		if !content {
+			width := viewer.getWidth() - 10
+
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+					<style> table, p, div { color: #%fontColor% } </style>
+					<div style="width: %width%px; height: %height%px; text-align: center">
+						<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
+							<br>
+							<br>
+							<br>
+							<br>
+							%html%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
+		}
+		else {
+			width := viewer.getWidth() - 20
+
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						%CSS%
+					</style>
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'>
+					<div style="width: %width%px; font-family: Arial; font-size: 12px">
+						<p style="font-family: Arial; font-size: 12px; margin: auto">
+							%html%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
+		}
+
+		content := StrReplace(content, "%", "\%")
+
+		for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
+			content := StrReplace(content, tag, "")
+
+		viewer.document.open()
+		viewer.document.write(substituteVariables(document
+												, {fontColor: this.Window.Theme.TextColor
+												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+												 , CSS: getCSS()
+												 , width: width, height: height, html: content
+												 , backColor: this.Window.AltBackColor}))
+		viewer.document.close()
+	}
+
+	selectDiary(diary, force := false) {
+		local ignore, candidate
+
+		if ((!this.SelectedDiary || (this.SelectedDiary != diary)) || force) {
+			this.iSelectedDiary := diary
+
+			for ignore, candidate in this.AvailableDiaries
+				if (diary = candidate) {
+					this.DiariesListView.Modify(A_Index, "Select Vis")
+
+					break
+				}
+
+			this.loadDiary(diary)
+
+			if (diary && (diary.Entries.Length > 0))
+				this.selectEntry(diary.Entries[1])
+
+			this.updateState()
+		}
+	}
+
+	selectEntry(entry, force := false) {
+		local ignore, candidate
+
+		if ((!this.SelectedEntry || (this.SelectedEntry != entry)) || force) {
+			this.iSelectedEntry := entry
+
+			for ignore, candidate in this.SelectedDiary.Entries
+				if (entry = candidate) {
+					this.EntriesListView.Modify(A_Index, "Select Vis")
+
+					break
+				}
+
+			this.loadEntry(entry)
+
+			this.updateState()
+		}
+	}
+
+	updateState() {
+		if (this.SelectedEntry && (this.SelectedDiary.FileName = this.Workbench.Diary))
+			this.Control["addNotesButton"].Enabled := true
+		else
+			this.Control["addNotesButton"].Enabled := false
+	}
+
+	windowResized() {
+		this.showEntry(this.iContent)
+	}
+
+	browseDiaries(fileName) {
+		local window, x, y, w, h
+
+		this.createGui()
+
+		window := this.Window
+
+		try {
+			window.Opt("+Owner" . this.Workbench.Window.Hwnd)
+
+			if getWindowPosition("Setup Workbench.Diary Browser", &x, &y)
+				window.Show("x" . x . " y" . y)
+			else
+				window.Show()
+
+			if getWindowSize("Setup Workbench.Diary Browser", &w, &h)
+				this.Window.Resize("Initialize", w, h)
+
+			this.loadDiaries()
+
+			this.selectDiary(first(this.AvailableDiaries, (d) => (d.FileName = fileName)))
+
+			loop
+				Sleep(200)
+			until this.iResult
+		}
+		finally {
+			window.Destroy()
+		}
+	}
+
+	close() {
+		this.iResult := true
+	}
+}
+
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 ;;; SetupEngineer                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
@@ -4620,8 +5608,6 @@ class SetupEngineer extends ConfigurationItem {
 	iTemplates := false
 
 	iInstructions := CaseInsenseWeakMap()
-
-	iDiary := false
 
 	iMode := "Analysis"
 
@@ -4841,7 +5827,7 @@ class SetupEngineer extends ConfigurationItem {
 		}
 	}
 
-	__New(setupWorkbench, configuration, diary := false) {
+	__New(setupWorkbench, configuration) {
 		this.iWorkbench := setupWorkbench
 
 		super.__New(configuration)
@@ -5130,7 +6116,9 @@ class SetupEngineer extends ConfigurationItem {
 					workbench := this.Workbench
 					issues := []
 
-					characteristicLabels := toMap(getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels"), LabelsMap)
+					characteristicLabels := toMap(getMultiMapValues(workbench.Definition
+																  , "Workbench.Characteristics.Labels")
+												, SetupWorkbench.LabelsMap)
 
 					for ignore, characteristic in workbench.SelectedCharacteristics {
 						widgets := workbench.SelectedCharacteristicsWidgets[characteristic]
@@ -5605,10 +6593,12 @@ class SetupEngineer extends ConfigurationItem {
 
 		if answer
 			try {
-				FileAppend(substituteVariables(translate("-- %header% --------"), {header: translate("Analysis")}) . "`n`n"
-						 . translate("Lap:") . A_Space . telemetry.Name . "`n`n"
-						 . translate("Lap Time:") . A_Space . lapTimeDisplayValue(telemetry.LapTime) . "`n`n"
-						 . answer . "`n`n", this.Workbench.Diary, "UTF-16")
+				FileAppend("###------###------###"
+						 . "Type=Analysis`n"
+						 . "Lap=" . telemetry.Name . "`n"
+						 . "Lap Time=" . lapTimeDisplayValue(telemetry.LapTime) . "`n"
+						 . "###++++++###++++++###"
+						 . answer, this.Workbench.Diary, "UTF-16")
 			}
 			catch Any as exception {
 				logError(exception)
@@ -5622,19 +6612,18 @@ class SetupEngineer extends ConfigurationItem {
 
 		static report := true
 
-		printCall(call) {
+		printChange(call) {
 			local arguments := call[2].Clone()
 
-			loop arguments.Length
+			loop arguments.Length {
 				if !arguments.Has(A_Index)
 					arguments[A_Index] := ""
 
-			arguments := values2String(", ", arguments*)
+				if ((A_Index = 1) && arguments.Has(A_Index))
+					arguments[1] := this.Workbench.getLabel(arguments[1])
+			}
 
-			if (StrLen(arguments) > 80)
-				arguments := (SubStr(arguments, 1, 80) . translate("..."))
-
-			return ("Call: " . call[1].Name . "(" . arguments . ")")
+			return values2String("=", arguments*)
 		}
 
 		try {
@@ -5644,9 +6633,10 @@ class SetupEngineer extends ConfigurationItem {
 				this.Connector.Ask(analysis, , , &calls := [])
 
 				try {
-					FileAppend(substituteVariables(translate("-- %header% --------")
-												 , {header: translate("Recommendations")}) . "`n`n"
-							 . values2String("`n", collect(calls, printCall)*) . "`n`n"
+					FileAppend("###------###------###"
+							 . "Type=Recommendations`n"
+							 . "###++++++###++++++###"
+							 . values2String("`n", collect(calls, printChange)*)
 							 , this.Workbench.Diary, "UTF-16")
 				}
 				catch Any as exception {

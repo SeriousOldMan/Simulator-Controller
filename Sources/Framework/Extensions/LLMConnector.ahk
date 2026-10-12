@@ -724,6 +724,9 @@ class LLMConnector {
 					}
 
 					body.DeleteProp("temperature")
+
+					if ((tools.Length > 0) && (version[] >= 5))
+						body.reasoning_effort := "none"
 				}
 
 			return super.CreatePrompt(body, instructions, tools, question)

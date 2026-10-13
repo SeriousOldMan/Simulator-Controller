@@ -77,14 +77,14 @@ global kDebugRules := 2
 ;;;-------------------------------------------------------------------------;;;
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; Diary                                                                   ;;;
+;;; Logbook                                                                 ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class Diary {
+class Logbook {
 	iFileName := false
 	iEntries := []
 
-	class DiaryEntry {
+	class LogbookEntry {
 		iDescriptor := ""
 
 		Type {
@@ -131,7 +131,7 @@ class Diary {
 
 		HTML {
 			Get {
-				throw "Virtual property DiaryEntry.HTML must be implemented in a subclass..."
+				throw "Virtual property LogbookEntry.HTML must be implemented in a subclass..."
 			}
 		}
 
@@ -191,14 +191,14 @@ class Diary {
 		this.iEntries := entries
 	}
 
-	static readDiary(fileName) {
+	static readLogbook(fileName) {
 		local entries := string2Values("###------###------###", FileRead(fileName))
 		local superfluousEntries := []
 		local lastEntry := false
 
 		entries := collect(entries, (d) {
 					   if (Trim(d) != "")
-						   return Diary.DiaryEntry.fromDescriptor(Trim(d))
+						   return Logbook.LogbookEntry.fromDescriptor(Trim(d))
 					   else
 						   return false
 				   })
@@ -212,10 +212,10 @@ class Diary {
 			lastEntry := entry
 		})
 
-		return Diary(fileName, choose(entries, (e) => !inList(superfluousEntries, e)))
+		return Logbook(fileName, choose(entries, (e) => !inList(superfluousEntries, e)))
 	}
 
-	writeDiary(fileName) {
+	writeLogbook(fileName) {
 		deleteFile(fileName)
 
 		FileAppend(this.Descriptor, fileName)
@@ -226,7 +226,7 @@ class Diary {
 ;;; SelectionEntry                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SelectionEntry extends Diary.DiaryEntry {
+class SelectionEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := "<table class=`"table-std`">"
@@ -270,7 +270,7 @@ class SelectionEntry extends Diary.DiaryEntry {
 ;;; IssuesEntry                                                             ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class IssuesEntry extends Diary.DiaryEntry {
+class IssuesEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := ""
@@ -326,7 +326,7 @@ class IssuesEntry extends Diary.DiaryEntry {
 ;;; SetupEntry                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class SetupEntry extends Diary.DiaryEntry {
+class SetupEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := "<table class=`"table-std`">"
@@ -411,7 +411,7 @@ class SaveEntry extends SetupEntry {
 ;;; LapEntry                                                                ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class LapEntry extends Diary.DiaryEntry {
+class LapEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := "<table class=`"table-std`">"
@@ -447,7 +447,7 @@ class LapEntry extends Diary.DiaryEntry {
 ;;; AnalysisEntry                                                           ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class AnalysisEntry extends Diary.DiaryEntry {
+class AnalysisEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := "<table class=`"table-std`">"
@@ -476,7 +476,7 @@ class AnalysisEntry extends Diary.DiaryEntry {
 ;;; RecommendationsEntry                                                    ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class RecommendationsEntry extends Diary.DiaryEntry {
+class RecommendationsEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := ""
@@ -520,7 +520,7 @@ class RecommendationsEntry extends Diary.DiaryEntry {
 ;;; NotesEntry                                                              ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class NotesEntry extends Diary.DiaryEntry {
+class NotesEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			return markdown2HTML(this.Notes)
@@ -561,8 +561,8 @@ class SetupWorkbench extends ConfigurationItem {
 	iSelectedTrack := true
 	iSelectedWeather := "Dry"
 
-	iDiaryDirectory := false
-	iDiary := false
+	iLogbookDirectory := false
+	iLogbook := false
 
 	iCharacteristics := []
 	iSettings := []
@@ -698,15 +698,15 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	DiaryDirectory {
+	LogbookDirectory {
 		Get {
-			return this.iDiaryDirectory
+			return this.iLogbookDirectory
 		}
 	}
 
-	Diary {
+	Logbook {
 		Get {
-			return this.iDiary
+			return this.iLogbook
 		}
 	}
 
@@ -849,7 +849,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	__New(simulator := false, car := false, track := false, weather := false) {
 		local found := false
-		local definition, ignore, fileName, diaryFolder
+		local definition, ignore, fileName, logbookFolder
 
 		if simulator {
 			this.iSelectedSimulator := SessionDatabase.getSimulatorName(simulator)
@@ -874,16 +874,19 @@ class SetupWorkbench extends ConfigurationItem {
 
 		super.__New(kSimulatorConfiguration)
 
-		diaryFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
-									  , "Setup Workbench", "Diary", kTempDirectory . "Setup Workbench\Diary")
+		logbookFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
+										, "Setup Workbench", "Diary"
+										, kTempDirectory . "Setup Workbench\Logbook")
+		logbookFolder := getMultiMapValue(readMultiMap(kUserConfigDirectory . "Setup Workbench.ini")
+										, "Setup Workbench", "Logbook", logbookFolder)
 
-		if (!diaryFolder || (diaryFolder = ""))
-			diaryFolder := (kTempDirectory . "Setup Workbench\Diary")
+		if (!logbookFolder || (logbookFolder = ""))
+			logbookFolder := (kTempDirectory . "Setup Workbench\Logbook")
 
-		DirCreate(diaryFolder)
+		DirCreate(logbookFolder)
 
-		this.iDiaryDirectory := (normalizeDirectoryPath(diaryFolder) . "\")
-		this.iDiary := (this.DiaryDirectory . A_Now . ".diary")
+		this.iLogbookDirectory := (normalizeDirectoryPath(logbookFolder) . "\")
+		this.iLogbook := (this.LogbookDirectory . A_Now . ".logbook")
 
 		SetupWorkbench.Instance := this
 
@@ -904,13 +907,13 @@ class SetupWorkbench extends ConfigurationItem {
 		chooseSimulator(*) {
 			workbench.loadSimulator((workbenchGui["simulatorDropDown"].Text = translate("Generic")) ? true : workbenchGui["simulatorDropDown"].Text)
 
-			workbench.logDiary("Selection")
+			workbench.logLogbook("Selection")
 		}
 
 		chooseCar(*) {
 			workbench.loadCar((workbenchGui["carDropDown"].Text = translate("All")) ? true : workbenchGui["carDropDown"].Text)
 
-			workbench.logDiary("Selection")
+			workbench.logLogbook("Selection")
 		}
 
 		chooseTrack(*) {
@@ -926,7 +929,7 @@ class SetupWorkbench extends ConfigurationItem {
 				workbench.loadTrack(tracks[inList(trackNames, workbenchGui["trackDropDown"].Text)])
 			}
 
-			workbench.logDiary("Selection")
+			workbench.logLogbook("Selection")
 		}
 
 		chooseWeather(*) {
@@ -940,8 +943,8 @@ class SetupWorkbench extends ConfigurationItem {
 			workbench.editSetup()
 		}
 
-		browseDiaries(*) {
-			this.browseDiaries()
+		browseLogbooks(*) {
+			this.browseLogbooks()
 		}
 
 		loadIssues(*) {
@@ -1072,7 +1075,7 @@ class SetupWorkbench extends ConfigurationItem {
 		workbenchGui.Add("Text", "x454 yp+5 w150 h26", translate("Recommendations"))
 
 		button := workbenchGui.Add("Button", "x1148 yp+6 w23 h23 X:Move")
-		button.OnEvent("Click", browseDiaries)
+		button.OnEvent("Click", browseLogbooks)
 		setButtonIcon(button, kIconsDirectory . "Book.ico", 1, "L2 T2 R2 B2")
 
 		button := workbenchGui.Add("Button", "x1172 yp w23 h23 X:Move")
@@ -1180,7 +1183,7 @@ class SetupWorkbench extends ConfigurationItem {
 				this.loadTrack(track, false)
 				this.loadWeather(weather, false)
 
-				this.logDiary("Selection")
+				this.logLogbook("Selection")
 
 				characteristicLabels := toMap(getMultiMapValues(this.Definition
 															  , "Workbench.Characteristics.Labels")
@@ -1222,7 +1225,7 @@ class SetupWorkbench extends ConfigurationItem {
 		else
 			this.loadSimulator(true, true)
 
-		this.logDiary("Selection")
+		this.logLogbook("Selection")
 
 		return false
 	}
@@ -1976,47 +1979,47 @@ class SetupWorkbench extends ConfigurationItem {
 		this.iDefinition := this.iOriginalDefinition.Clone()
 	}
 
-	logDiary(type, arguments*) {
+	logLogbook(type, arguments*) {
 		switch type, false {
 			case "Selection":
 				FileAppend("###------###------###"
 						 . "Type=Selection`n"
 						 . "Simulator=" . this.SelectedSimulator[true] . "`n"
 						 . "Car=" . this.SelectedCar[true] . "`n"
-						 . "Track=" . this.SelectedTrack[true], this.Diary, "UTF-16")
+						 . "Track=" . this.SelectedTrack[true], this.Logbook, "UTF-16")
 			case "Issues":
 				FileAppend("###------###------###"
 						 . "Type=Issues`n"
 						 . "###++++++###++++++###"
-						 . arguments[1], this.Diary, "UTF-16")
+						 . arguments[1], this.Logbook, "UTF-16")
 			case "Load":
 				FileAppend("###------###------###"
 						 . "Type=Load`n"
 						 . "Setup=" . arguments[1] . "`n"
-						 . "FileName=" . arguments[2], this.Diary, "UTF-16")
+						 . "FileName=" . arguments[2], this.Logbook, "UTF-16")
 			case "Save":
 				FileAppend("###------###------###"
 						 . "Type=Save`n"
 						 . "Setup=" . arguments[1] . "`n"
 						 . "FileName=" . arguments[2] . "`n"
 						 . "###++++++###++++++###"
-						 . arguments[3], this.Diary, "UTF-16")
+						 . arguments[3], this.Logbook, "UTF-16")
 			case "Lap":
 				FileAppend("###------###------###"
 						 . "Type=Lap`n"
 						 . "Lap=" . arguments[1] . "`n"
 						 . "Lap Time=" . arguments[2] . "`n"
-						 . "Sector Times=" . arguments[3], this.Diary, "UTF-16")
+						 . "Sector Times=" . arguments[3], this.Logbook, "UTF-16")
 			case "Notes":
 				FileAppend("###------###------###"
 						 . "Type=Notes`n"
 						 . "###++++++###++++++###"
-						 . arguments[1], this.Diary, "UTF-16")
+						 . arguments[1], this.Logbook, "UTF-16")
 		}
 	}
 
 	logLoad(editor, setup) {
-		this.logDiary("Load", setup.Name, setup.FileName)
+		this.logLogbook("Load", setup.Name, setup.FileName)
 	}
 
 	logSave(editor, setup) {
@@ -2094,11 +2097,11 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 		}
 
-		this.logDiary("Save", setup.Name, setup.FileName, values2String("`n", settingsList*))
+		this.logLogbook("Save", setup.Name, setup.FileName, values2String("`n", settingsList*))
 	}
 
 	logLap(name, lapTime, sectorTimes) {
-		this.logDiary("Lap", name, lapTime, sectorTimes ? values2String(", ", sectorTimes*) : translate("-"))
+		this.logLogbook("Lap", name, lapTime, sectorTimes ? values2String(", ", sectorTimes*) : translate("-"))
 	}
 
 	loadSimulator(simulator, force := false) {
@@ -2694,7 +2697,7 @@ class SetupWorkbench extends ConfigurationItem {
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
 
-					this.logDiary("Issues", values2String("`n", issues*))
+					this.logLogbook("Issues", values2String("`n", issues*))
 				}
 			}
 
@@ -2724,9 +2727,9 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	browseDiaries() {
+	browseLogbooks() {
 		withBlockedWindows(() {
-			DiaryBrowser(this, this.DiaryDirectory).browseDiaries(this.Diary)
+			LogbookBrowser(this, this.LogbookDirectory).browseLogbooks(this.Logbook)
 		})
 	}
 
@@ -5093,22 +5096,22 @@ class FileSetupComparator extends SetupComparator {
 
 
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
-;;; DiaryBrowser                                                            ;;;
+;;; LogbookBrowser                                                          ;;;
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
-class DiaryBrowser {
+class LogbookBrowser {
 	iWorkbench := false
-	iDiaryDirectory := false
+	iLogbookDirectory := false
 
 	iWindow := false
 
-	iDiariesListView := false
+	iLogbooksListView := false
 	iEntriesListView := false
 
-	iAvailableDiaries := []
+	iAvailableLogbooks := []
 	iAvailableEntries := []
 
-	iSelectedDiary := false
+	iSelectedLogbook := false
 	iSelectedEntry := false
 
 	iContent := false
@@ -5179,9 +5182,9 @@ class DiaryBrowser {
 		}
 	}
 
-	DiaryDirectory {
+	LogbookDirectory {
 		Get {
-			return this.iDiaryDirectory
+			return this.iLogbookDirectory
 		}
 	}
 
@@ -5197,9 +5200,9 @@ class DiaryBrowser {
 		}
 	}
 
-	DiariesListView {
+	LogbooksListView {
 		Get {
-			return this.iDiariesListView
+			return this.iLogbooksListView
 		}
 	}
 
@@ -5209,9 +5212,9 @@ class DiaryBrowser {
 		}
 	}
 
-	AvailableDiaries {
+	AvailableLogbooks {
 		Get {
-			return this.iAvailableDiaries
+			return this.iAvailableLogbooks
 		}
 	}
 
@@ -5221,9 +5224,9 @@ class DiaryBrowser {
 		}
 	}
 
-	SelectedDiary {
+	SelectedLogbook {
 		Get {
-			return this.iSelectedDiary
+			return this.iSelectedLogbook
 		}
 	}
 
@@ -5233,45 +5236,45 @@ class DiaryBrowser {
 		}
 	}
 
-	__New(setupWorkbench, diaryDirectory) {
+	__New(setupWorkbench, logbookDirectory) {
 		this.iWorkbench := setupWorkbench
-		this.iDiaryDirectory := diaryDirectory
+		this.iLogbookDirectory := logbookDirectory
 	}
 
 	createGui() {
 		local browserGui
 
-		selectDiary(listView, line, *) {
-			this.selectDiary(line ? this.AvailableDiaries[line] : false)
+		selectLogbook(listView, line, *) {
+			this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
 		}
 
 		selectEntry(listView, line, *) {
-			this.selectEntry(line ? this.SelectedDiary.Entries[line] : false)
+			this.selectEntry(line ? this.SelectedLogbook.Entries[line] : false)
 		}
 
-		browserGui := DiaryBrowser.BrowserWindow(this, {Descriptor: "Setup Workbench.Diary Browser"
-													  , Resizeable:  "Deferred", Scrollable: false}
-													 , translate("Diary"))
+		browserGui := LogbookBrowser.BrowserWindow(this, {Descriptor: "Setup Workbench.Logbook Browser"
+														, Resizeable:  "Deferred", Scrollable: false}
+													   , translate("Logbook"))
 
 		this.iWindow := browserGui
 
 		browserGui.SetFont("s10 Bold", "Arial")
 
-		browserGui.Add("Text", "x8 w480 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(browserGui, "Setup Workbench.Diary Browser"))
+		browserGui.Add("Text", "x8 w480 Center H:Center", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(browserGui, "Setup Workbench.Logbook Browser"))
 
 		browserGui.SetFont("s9 Norm", "Arial")
 
-		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Diary")
-					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser")
+		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Logbook")
+					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser")
 
 		browserGui.SetFont("s8 Norm", "Arial")
 
 		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iDiariesListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
-		this.iDiariesListView.OnEvent("Click", selectDiary)
-		this.iDiariesListView.OnEvent("DoubleClick", selectDiary)
-		this.iDiariesListView.OnEvent("ItemSelect", selectDiary)
+		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
+		this.iLogbooksListView.OnEvent("Click", selectLogbook)
+		this.iLogbooksListView.OnEvent("DoubleClick", selectLogbook)
+		this.iLogbooksListView.OnEvent("ItemSelect", selectLogbook)
 
 		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Actions"], translate))
 		this.iEntriesListView.OnEvent("Click", selectEntry)
@@ -5282,41 +5285,41 @@ class DiaryBrowser {
 
 		browserGui.Add("HTMLViewer", "x150 ys w330 h493 H:Grow W:Grow Border vhtmlViewer")
 
-		browserGui.Add(DiaryBrowser.BrowserResizer(this))
+		browserGui.Add(LogbookBrowser.BrowserResizer(this))
 
 		this.updateState()
 	}
 
-	loadDiaries() {
-		local diaries := []
+	loadLogbooks() {
+		local logbooks := []
 		local name, date, time
 
-		loop Files, this.DiaryDirectory . "*.diary", "F" {
-			diaries.Push(Diary.readDiary(A_LoopFileFullPath))
+		loop Files, this.LogbookDirectory . "*.logbook", "F" {
+			logbooks.Push(Logbook.readLogbook(A_LoopFileFullPath))
 
 			SplitPath(A_LoopFileName, , , , &name)
 
 			date := FormatTime(name, "ShortDate")
 			time := FormatTime(name, "HH:mm")
 
-			this.DiariesListView.Add("", date, time)
+			this.LogbooksListView.Add("", date, time)
 		}
 
-		this.DiariesListView.ModifyCol()
+		this.LogbooksListView.ModifyCol()
 
 		loop 2
-			this.DiariesListView.ModifyCol(A_Index, "AutoHdr")
+			this.LogbooksListView.ModifyCol(A_Index, "AutoHdr")
 
-		this.iAvailableDiaries := diaries
+		this.iAvailableLogbooks := logbooks
 	}
 
-	loadDiary(diary) {
+	loadLogbook(logbook) {
 		local ignore, entry
 
 		this.EntriesListView.Delete()
 
-		if diary
-			for ignore, entry in diary.Entries
+		if logbook
+			for ignore, entry in logbook.Entries
 				this.EntriesListView.Add("", translate(entry.Type))
 
 		this.EntriesListView.ModifyCol()
@@ -5501,23 +5504,23 @@ class DiaryBrowser {
 		viewer.document.close()
 	}
 
-	selectDiary(diary, force := false) {
+	selectLogbook(logbook, force := false) {
 		local ignore, candidate
 
-		if ((!this.SelectedDiary || (this.SelectedDiary != diary)) || force) {
-			this.iSelectedDiary := diary
+		if ((!this.SelectedLogbook || (this.SelectedLogbook != logbook)) || force) {
+			this.iSelectedLogbook := logbook
 
-			for ignore, candidate in this.AvailableDiaries
-				if (diary = candidate) {
-					this.DiariesListView.Modify(A_Index, "Select Vis")
+			for ignore, candidate in this.AvailableLogbooks
+				if (logbook = candidate) {
+					this.LogbooksListView.Modify(A_Index, "Select Vis")
 
 					break
 				}
 
-			this.loadDiary(diary)
+			this.loadLogbook(logbook)
 
-			if (diary && (diary.Entries.Length > 0))
-				this.selectEntry(diary.Entries[1])
+			if (logbook && (logbook.Entries.Length > 0))
+				this.selectEntry(logbook.Entries[1])
 			else
 				this.selectEntry(false)
 
@@ -5531,7 +5534,7 @@ class DiaryBrowser {
 		if ((!this.SelectedEntry || (this.SelectedEntry != entry)) || force) {
 			this.iSelectedEntry := entry
 
-			for ignore, candidate in this.SelectedDiary.Entries
+			for ignore, candidate in this.SelectedLogbook.Entries
 				if (entry = candidate) {
 					this.EntriesListView.Modify(A_Index, "Select Vis")
 
@@ -5546,22 +5549,22 @@ class DiaryBrowser {
 
 	addNotes() {
 		local newNotes := editNotes(this, "")
-		local newDiary
+		local newLogbook
 
 		if newNotes {
-			this.Workbench.logDiary("Notes", newNotes)
+			this.Workbench.logLogbook("Notes", newNotes)
 
-			newDiary := Diary.readDiary(this.SelectedDiary.FileName)
+			newLogbook := Logbook.readLogbook(this.SelectedLogbook.FileName)
 
-			this.AvailableDiaries[inList(this.AvailableDiaries, this.SelectedDiary)] := newDiary
+			this.AvailableLogbooks[inList(this.AvailableLogbooks, this.SelectedLogbook)] := newLogbook
 
-			this.selectDiary(newDiary)
-			this.selectEntry(newDiary.Entries[newDiary.Entries.Length])
+			this.selectLogbook(newLogbook)
+			this.selectEntry(newLogbook.Entries[newLogbook.Entries.Length])
 		}
 	}
 
 	updateState() {
-		if (this.SelectedEntry && (this.SelectedDiary.FileName = this.Workbench.Diary))
+		if (this.SelectedEntry && (this.SelectedLogbook.FileName = this.Workbench.Logbook))
 			this.Control["addNotesButton"].Enabled := true
 		else
 			this.Control["addNotesButton"].Enabled := false
@@ -5571,7 +5574,7 @@ class DiaryBrowser {
 		this.showEntry(this.iContent)
 	}
 
-	browseDiaries(fileName) {
+	browseLogbooks(fileName) {
 		local window, x, y, w, h
 
 		this.createGui()
@@ -5581,17 +5584,17 @@ class DiaryBrowser {
 		try {
 			window.Opt("+Owner" . this.Workbench.Window.Hwnd)
 
-			if getWindowPosition("Setup Workbench.Diary Browser", &x, &y)
+			if getWindowPosition("Setup Workbench.Logbook Browser", &x, &y)
 				window.Show("x" . x . " y" . y)
 			else
 				window.Show()
 
-			if getWindowSize("Setup Workbench.Diary Browser", &w, &h)
+			if getWindowSize("Setup Workbench.Logbook Browser", &w, &h)
 				this.Window.Resize("Initialize", w, h)
 
-			this.loadDiaries()
+			this.loadLogbooks()
 
-			this.selectDiary(first(this.AvailableDiaries, (d) => (d.FileName = fileName)))
+			this.selectLogbook(first(this.AvailableLogbooks, (d) => (d.FileName = fileName)))
 
 			loop
 				Sleep(200)
@@ -6622,7 +6625,7 @@ class SetupEngineer extends ConfigurationItem {
 						 . "Lap=" . telemetry.Name . "`n"
 						 . "Lap Time=" . lapTimeDisplayValue(telemetry.LapTime) . "`n"
 						 . "###++++++###++++++###"
-						 . answer, this.Workbench.Diary, "UTF-16")
+						 . answer, this.Workbench.Logbook, "UTF-16")
 			}
 			catch Any as exception {
 				logError(exception)
@@ -6661,7 +6664,7 @@ class SetupEngineer extends ConfigurationItem {
 							 . "Type=Recommendations`n"
 							 . "###++++++###++++++###"
 							 . values2String("`n", collect(calls, printChange)*)
-							 , this.Workbench.Diary, "UTF-16")
+							 , this.Workbench.Logbook, "UTF-16")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -6827,17 +6830,17 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 			this.updateState()
 		}
 
-		chooseDiaryPath(*) {
+		chooseLogbookPath(*) {
 			local directory
 
 			editorGui.Opt("+OwnDialogs")
 
 			OnMessage(0x44, translateSelectCancelButtons)
-			directory := withBlockedWindows(FileSelect, "D1", editorGui["diaryPathEdit"].Text, translate("Select Diary Folder..."))
+			directory := withBlockedWindows(FileSelect, "D1", editorGui["logbookPathEdit"].Text, translate("Select Logbook Folder..."))
 			OnMessage(0x44, translateSelectCancelButtons, 0)
 
 			if (directory != "")
-				editorGui["diaryPathEdit"].Text := directory
+				editorGui["logbookPathEdit"].Text := directory
 		}
 
 		chooseModelPath(field, *) {
@@ -6931,9 +6934,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 		w4 := w1 - 24
 		x6 := x1 + w4 + 1
 
-		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w120 h23 +0x200", translate("Diary Folder"))
-		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VdiaryPathEdit")
-		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseDiaryPath)
+		editorGui.Add("Text", "x" . (x + 8) . " yp+10 w120 h23 +0x200", translate("Logbook Folder"))
+		editorGui.Add("Edit", "x" . x1 . " yp w" . w2 . " h21 W:Grow VlogbookPathEdit")
+		editorGui.Add("Button", "x" . x4 . " yp-1 w23 h23 X:Move", translate("...")).OnEvent("Click", chooseLogbookPath)
 
 		editorGui.SetFont("Norm", "Arial")
 		editorGui.SetFont("Bold Italic", "Arial")
@@ -7097,7 +7100,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 
 		super.loadFromConfiguration(configuration)
 
-		this.Value["DiaryPath"] := getMultiMapValue(configuration, "Setup Workbench", "Diary", "")
+		this.Value["LogbookPath"] := getMultiMapValue(configuration, "Setup Workbench", "Logbook"
+													, getMultiMapValue(configuration
+																	 , "Setup Workbench", "Diary", ""))
 
 		service := getMultiMapValue(configuration, "Setup Engineer Service", "Service", false)
 
@@ -7159,9 +7164,9 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 
 		super.saveToConfiguration(configuration)
 
-		value := this.Control["diaryPathEdit"].Text
+		value := this.Control["logbookPathEdit"].Text
 
-		setMultiMapValue(configuration, "Setup Workbench", "Diary", (Trim(value) != "") ? Trim(value) : false)
+		setMultiMapValue(configuration, "Setup Workbench", "Logbook", (Trim(value) != "") ? Trim(value) : false)
 
 		this.saveProviderConfiguration()
 
@@ -7300,7 +7305,7 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 	loadConfigurator(configuration, simulators := false) {
 		this.loadFromConfiguration(configuration)
 
-		this.Control["diaryPathEdit"].Text := (this.Value["DiaryPath"] ? this.Value["DiaryPath"] : "")
+		this.Control["logbookPathEdit"].Text := (this.Value["LogbookPath"] ? this.Value["LogbookPath"] : "")
 
 		this.loadProviderConfiguration(this.iCurrentProvider)
 
@@ -7384,16 +7389,16 @@ editNotes(browserOrCommand, arguments*) {
 	else {
 		result := false
 
-		notesGui := Window({Descriptor: "Setup Workbench.Diary Browser.Notes", Resizeable: true, Options: "0x400000"}, translate("Diary"))
+		notesGui := Window({Descriptor: "Setup Workbench.Logbook Browser.Notes", Resizeable: true, Options: "0x400000"}, translate("Logbook"))
 
 		notesGui.SetFont("Bold", "Arial")
 
-		notesGui.Add("Text", "w480 Center W:Grow", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(notesGui, "Setup Workbench.Diary Browser.Notes"))
+		notesGui.Add("Text", "w480 Center W:Grow", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(notesGui, "Setup Workbench.Logbook Browser.Notes"))
 
 		notesGui.SetFont("Norm", "Arial")
 
 		notesGui.Add("Documentation", "x183 YP+20 w130 Center W:Grow", translate("Notes")
-				   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser")
+				   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser")
 
 		notesGui.SetFont("Norm", "Arial")
 
@@ -7408,12 +7413,12 @@ editNotes(browserOrCommand, arguments*) {
 
 		notesGui.Show("AutoSize Center")
 
-		if getWindowPosition("Setup Workbench.Diary Browser.Notes", &x, &y)
+		if getWindowPosition("Setup Workbench.Logbook Browser.Notes", &x, &y)
 			notesGui.Show("x" . x . " y" . y)
 		else
 			notesGui.Show("AutoSize Center")
 
-		if getWindowSize("Setup Workbench.Diary Browser.Notes", &w, &h)
+		if getWindowSize("Setup Workbench.Logbook Browser.Notes", &w, &h)
 			notesGui.Resize("Initialize", w, h)
 
 		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
@@ -7550,7 +7555,7 @@ startupSetupWorkbench() {
 			else
 				workbench.loadSimulator(true, true)
 
-			workbench.logDiary("Selection")
+			workbench.logLogbook("Selection")
 		}
 		else
 			Task.startTask(ObjBindMethod(workbench, "restoreState"), 100)

@@ -74,7 +74,7 @@ markdown2HTML(markdown) {
 	}
 
 	renderer := hoedown_html_renderer_new(0, 0)
-	document := hoedown_document_new(renderer, 0, 16)
+	document := hoedown_document_new(renderer, 0xF, 16)
 
 	html := hoedown_buffer_new(16)
 

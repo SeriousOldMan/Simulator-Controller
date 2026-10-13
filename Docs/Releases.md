@@ -40,6 +40,7 @@
   - Once again fixed a bug in the new offline installer.
   - Fixed a bug when applying setup recommendations in the "Setup Workbench" with a connected OpenAI model with a version greater or equal to GPT-5.
   - Fixed the Driving Coach *not* to praise a good lap multiple times on tracks with very long laps like Le Mans.
+  - Fixed several dangling documentation links in the Wiki, as well as in the application windows.
   
 #### Changes
 

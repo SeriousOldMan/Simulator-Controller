@@ -337,7 +337,7 @@ You can open a browser for all recent logbook entries by clicking on the small b
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Logbook%20Browser.jpg)
 
-In the upper left list, you can select the session you want to inspect. The last one will always be the current one. If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. If you have selected the current session, you can add your own notes to the logbook by clicking on the "Notes..." button. This will open a window, where you can enter your notes. A subset (excl. tables) of the [Markdown](https://www.markdownguide.org/) text formatting language is supported.
+In the upper left list, you can select the session you want to inspect. The last one will always be the current one. If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. If you have selected the current session, you can add your own notes to the logbook by clicking on the "Notes..." button. This will open a window, where you can enter your notes. Text formatting using the [Markdown](https://www.markdownguide.org/) language incl. most extensions is supported.
 
 ## How it works
 

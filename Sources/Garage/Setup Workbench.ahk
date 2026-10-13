@@ -43,6 +43,7 @@
 #Include "..\Framework\Extensions\RuleEngine.ahk"
 #Include "..\Framework\Extensions\ScriptEngine.ahk"
 #Include "..\Framework\Extensions\LLMConnector.ahk"
+#Include "..\Framework\Extensions\Markdown.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\Database\Libraries\TelemetryViewer.ahk"
 #Include "..\Configuration\Libraries\ConfigurationEditor.ahk"
@@ -522,7 +523,7 @@ class RecommendationsEntry extends Diary.DiaryEntry {
 class NotesEntry extends Diary.DiaryEntry {
 	HTML {
 		Get {
-			return ("<p>" . this.Notes . "</p>")
+			return markdown2HTML(this.Notes)
 		}
 	}
 
@@ -2006,6 +2007,11 @@ class SetupWorkbench extends ConfigurationItem {
 						 . "Lap=" . arguments[1] . "`n"
 						 . "Lap Time=" . arguments[2] . "`n"
 						 . "Sector Times=" . arguments[3], this.Diary, "UTF-16")
+			case "Notes":
+				FileAppend("###------###------###"
+						 . "Type=Notes`n"
+						 . "###++++++###++++++###"
+						 . arguments[1], this.Diary, "UTF-16")
 		}
 	}
 
@@ -5272,7 +5278,7 @@ class DiaryBrowser {
 		this.iEntriesListView.OnEvent("DoubleClick", selectEntry)
 		this.iEntriesListView.OnEvent("ItemSelect", selectEntry)
 
-		browserGui.Add("Button", "x66 yp+144 w80 h24 Y:Move vaddNotesButton", translate("Notes") . translate("..."))
+		browserGui.Add("Button", "x66 yp+144 w80 h24 Y:Move vaddNotesButton", translate("Notes") . translate("...")).OnEvent("Click", (*) => this.addNotes())
 
 		browserGui.Add("HTMLViewer", "x150 ys w330 h493 H:Grow W:Grow Border vhtmlViewer")
 
@@ -5512,6 +5518,8 @@ class DiaryBrowser {
 
 			if (diary && (diary.Entries.Length > 0))
 				this.selectEntry(diary.Entries[1])
+			else
+				this.selectEntry(false)
 
 			this.updateState()
 		}
@@ -5533,6 +5541,22 @@ class DiaryBrowser {
 			this.loadEntry(entry)
 
 			this.updateState()
+		}
+	}
+
+	addNotes() {
+		local newNotes := editNotes(this, "")
+		local newDiary
+
+		if newNotes {
+			this.Workbench.logDiary("Notes", newNotes)
+
+			newDiary := Diary.readDiary(this.SelectedDiary.FileName)
+
+			this.AvailableDiaries[inList(this.AvailableDiaries, this.SelectedDiary)] := newDiary
+
+			this.selectDiary(newDiary)
+			this.selectEntry(newDiary.Entries[newDiary.Entries.Length])
 		}
 	}
 
@@ -7345,6 +7369,79 @@ class WorkbenchSettingsEditor extends ConfiguratorPanel {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Function Section                         ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+editNotes(browserOrCommand, arguments*) {
+	global kOk, kCancel
+
+	local x, y, w, h
+
+	static notesGui, result, notesEdit
+
+	if (browserOrCommand == kOk)
+		result := kOk
+	else if (browserOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+
+		notesGui := Window({Descriptor: "Setup Workbench.Diary Browser.Notes", Resizeable: true, Options: "0x400000"}, translate("Diary"))
+
+		notesGui.SetFont("Bold", "Arial")
+
+		notesGui.Add("Text", "w480 Center W:Grow", translate("Modular Simulator Controller System")).OnEvent("Click", moveByMouse.Bind(notesGui, "Setup Workbench.Diary Browser.Notes"))
+
+		notesGui.SetFont("Norm", "Arial")
+
+		notesGui.Add("Documentation", "x183 YP+20 w130 Center W:Grow", translate("Notes")
+				   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser")
+
+		notesGui.SetFont("Norm", "Arial")
+
+		choices := []
+
+		notesGui.Add("Edit", "x16 y60 w484 h200 Multi vnotesEdit W:Grow H:Grow", arguments[1])
+
+		notesGui.Add("Button", "x175 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editNotes.Bind(kOk))
+		notesGui.Add("Button", "x261 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editNotes.Bind(kCancel))
+
+		notesGui.Opt("+Owner" . browserOrCommand.Window.Hwnd)
+
+		notesGui.Show("AutoSize Center")
+
+		if getWindowPosition("Setup Workbench.Diary Browser.Notes", &x, &y)
+			notesGui.Show("x" . x . " y" . y)
+		else
+			notesGui.Show("AutoSize Center")
+
+		if getWindowSize("Setup Workbench.Diary Browser.Notes", &w, &h)
+			notesGui.Resize("Initialize", w, h)
+
+		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
+			notesGui["notesEdit"].Value := FileRead(kUserConfigDirectory . "Audio Settings.ini")
+
+		browserOrCommand.Window.Block()
+
+		try {
+			loop
+				Sleep(200)
+			until result
+		}
+		finally {
+			browserOrCommand.Window.Unblock()
+			browserOrCommand.Window.Show("NoActivate")
+		}
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk)
+				return notesGui["notesEdit"].Value
+		}
+		finally {
+			notesGui.Destroy()
+		}
+	}
+}
 
 lapTimeDisplayValue(lapTime) {
 	local seconds, fraction, minutes

@@ -337,7 +337,7 @@ You can open a browser for all recent diaries by clicking on the small button wi
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Diary%20Browser.jpg)
 
-In the upper left list, you can select the session you want to inspect. The last one will always be the current one. If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. If you have selected the current session, you can add your own notes to the diary by clicking on the "Notes..." button.
+In the upper left list, you can select the session you want to inspect. The last one will always be the current one. If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. If you have selected the current session, you can add your own notes to the diary by clicking on the "Notes..." button. This will open a window, where you can enter your notes. A subset (excl. tables) of the [Markdown](https://www.markdownguide.org/) text formatting language is supported.
 
 ## How it works
 

@@ -52,6 +52,7 @@
   - An all new USB device manager has been implemented with great support by @Timmermann. This new manager now can handle more than 16 USB devices, thereby solving all issues with unrecognized steering wheels reported by some users.
   - [Internal] Increased compatibility of function/tool calling for OpenAI models with a version greater or equal to GPT-5.
   - [Internal] Migrated to AHK 2.1-alpha.34.
+  - [Developer] A Markdown processor and HTML generator has been integrated.
 
 # Release history
 

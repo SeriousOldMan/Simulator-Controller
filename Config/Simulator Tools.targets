@@ -116,6 +116,7 @@ Code Editor.1=%kBinariesDirectory%Code Editor\ <- %kHomeDirectory%Utilities\3rd 
 Code Runtime.1=%kBinariesDirectory%Code Runtime\ <- %kHomeDirectory%Utilities\3rd Party\Code Runtime\lua54.dll
 Code Runtime.2=%kBinariesDirectory%Code Runtime\ <- %kHomeDirectory%Utilities\3rd Party\Code Runtime\lua55.dll
 Code Runtime.3=%kBinariesDirectory%Code Runtime\ <- %kHomeDirectory%Utilities\3rd Party\Code Runtime\luac55.exe
+Markdown Converter.1=%kBinariesDirectory%Markdown\ <- %kHomeDirectory%Utilities\3rd Party\Markdown Coverter\hoedown.dll
 Setup Workbench Configuration.1=%kResourcesDirectory%Garage\Setup Workbench.ini <- %kSourcesDirectory%Garage\Setup Workbench.ini
 Setup Workbench Configuration.2=%kTranslationsDirectory% <- %kSourcesDirectory%Garage\Translations\Setup Workbench.*
 Setup Workbench Configuration.3=%kResourcesDirectory%Garage\Definitions\ <- %kSourcesDirectory%Garage\Definitions\*.ini

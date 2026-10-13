@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.3.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YfLNB19T?inline=true) (Early build for 7.3.0. Changes: Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Fixed setup recommendation for OpenAI GPT >= 5 in "Setup Workbench", Updated to AHK 2.1.alpha.34, Increased GPT-6 compatibilty with tool calls, Fixed offline installer, Fixed Driving Coach motivation duplicates.)
+[7.3.0.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YfLNB19T?inline=true) (Early build for 7.3.0. Changes: Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Fixed setup recommendation for OpenAI GPT >= 5 in "Setup Workbench", Updated to AHK 2.1.alpha.34, Increased GPT-6 compatibilty with tool calls, Fixed offline installer, Fixed Driving Coach motivation duplicates, New Markdown processor.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7300) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-730) of this version and all the versions you might have skipped, before installing and using this version.
 

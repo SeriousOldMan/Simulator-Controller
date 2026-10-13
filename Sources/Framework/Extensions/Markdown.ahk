@@ -87,7 +87,7 @@ markdown2HTML(markdown) {
 
 	hoedown_buffer_free(html)
 	hoedown_document_free(document)
-	hoedown_hstml_renderer_free(renderer)
+	hoedown_html_renderer_free(renderer)
 
 	return result
 }

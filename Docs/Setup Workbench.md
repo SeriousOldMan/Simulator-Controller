@@ -12,7 +12,7 @@ Before we dive into the workflow of the "Setup Workbench", let's have a look at 
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Setup%20Workbench%20Settings.jpg)
 
-You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be noted in the form of a diary. You can view all the recent diaries with the [Diary Browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser) by clicking on the small button with the book icon directly beside the settings button.
+You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be noted in the form of a diary. You can view all the recent diary entries with the [Diary Browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser) by clicking on the small button with the book icon directly beside the settings button.
 
 Good to know: If you do not configure a diary folder, the diary will be written to the *Simulator Controller\Temp\Setup Workbench\Diary* folder in your user *Documents* folder. But as the path suggests, it may be lost, once the *Temp* folder is cleaned up.
 

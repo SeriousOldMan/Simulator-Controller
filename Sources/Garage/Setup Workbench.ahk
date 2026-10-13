@@ -5251,7 +5251,7 @@ class DiaryBrowser {
 
 		browserGui := DiaryBrowser.BrowserWindow(this, {Descriptor: "Setup Workbench.Diary Browser"
 													  , Resizeable:  "Deferred", Scrollable: false}
-													 , translate("Diaries"))
+													 , translate("Diary"))
 
 		this.iWindow := browserGui
 
@@ -5261,7 +5261,7 @@ class DiaryBrowser {
 
 		browserGui.SetFont("s9 Norm", "Arial")
 
-		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Diaries")
+		browserGui.Add("Documentation", "x158 YP+20 w180 Center H:Center", translate("Diary")
 					   , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser")
 
 		browserGui.SetFont("s8 Norm", "Arial")

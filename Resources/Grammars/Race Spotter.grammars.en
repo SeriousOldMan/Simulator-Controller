@@ -285,6 +285,9 @@ AccidentBehind.3=Behind was an accident. This may help us.
 AccidentBehindDriver.1=There was an accident behind by %forName% %surName%.
 AccidentBehindDriver.2=Accident behind by %forName% %surName%, this can give you some air.
 AccidentBehindDriver.3=Behind was an accident by %forName% %surName%. This may help us.
+AccidentRejoin.1=Okay, calm down and take care when you resume.
+AccidentRejoin.2=That's bad. Be careful when you rejoin.
+AccidentRejoin.3=Damn, but now watch out for traffic.
 // Flag Warnings //
 YellowFull.1=Full course yellow, full course yellow.
 YellowFull.2=Attention full course yellow.

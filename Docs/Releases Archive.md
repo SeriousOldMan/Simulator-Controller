@@ -321,7 +321,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Changes
 
-  - The user name can now be changed in the [profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#User-profile) and it can be specified where this name will be used throughout the Simulator Controller applications and tools. Using this it is now possible, for example, to let the Assistants call you by a different name than the driver name provided in the data.
+  - The user name can now be changed in the [profile dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#user-profile) and it can be specified where this name will be used throughout the Simulator Controller applications and tools. Using this it is now possible, for example, to let the Assistants call you by a different name than the driver name provided in the data.
   - Information about the currently chosen TC and ABS settings is now available for *Automobilista 2*, if provided by the simulator (and available for the current car, of course).
   - The urgency of low fuel and low energy warnings of the Race Engineer has been reduced, if more than one lap can still be run on the remaining fuel/energy.
   - Information about the current setting of the brake balance is now available for most simulators.
@@ -371,7 +371,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The strength of relative toe reduction / increase due to tyre temperatures has been reduced in "Setup Workbench".
   - New article for *News, tips and tricks* about the recently added automatic language translation.
   - [Experts] A new [module "Environment"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-enviroment) has been defined for the *Lua* script engine, which supports global state handling.
-  - [Experts] Two new controller action functions ["ask" and "command"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#Assistant-interface) let you generate synthetical voice input by any external trigger, for example a press of a button on your Stream Deck. This allows you to use the Assistants without voice control for even the most exotic cases.
+  - [Experts] Two new controller action functions ["ask" and "command"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions#assistant-interface) let you generate synthetical voice input by any external trigger, for example a press of a button on your Stream Deck. This allows you to use the Assistants without voice control for even the most exotic cases.
     - The same functionality is available in the "Interaction" topic in the *Lua* [script module "Assistants"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules#module-assistants).
     - Lastly, "Assistant.Command" has been added as predefined function/predicate in all rule sets and *Lua* enviromments that are executed in an Assistant process, for example in a *Reasoning* booster. (Note: "Assistant.Ask" was already available, but an additional optional parameter has been added.)
   - [Experts] The [integrated HTML engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#html-engine-settings) can now be configured individually for each application.
@@ -403,7 +403,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The function of the Control key has been reverted when running the Assistant test mode from "Simulator Setup" and "Simulator Configuration". By default configured boosters and all translators (see below) are now active and can be disabled by holding down the Control key when clicking the "Play" button.
   - The speech processing pipeline now supports a translation process. Using this translator, which can be configured to use translation services by Azure, Google, DeepL and OpenAI compatible GPT service providers, it is possible to support any language, not only the builtin ones. The results are not perfect, but good enough. And the best, Azure, Google and DeepL all have a really huge free contingent.
   
-    See [the updated quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information on how to setup a translator. Also read [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Supported-languages-and-commands) and [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-listener) part of the documentaion, to understand all the consequences of using translated languages.
+    See [the updated quick start guide](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Quick-Start-Guide) for more information on how to setup a translator. Also read [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#supported-languages-and-commands) and [this](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-listener) part of the documentaion, to understand all the consequences of using translated languages.
   - More in-place editors are available on the *Plugins* tab when a Race Assistant plugin is selected in "Simulator Configuration". See the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) for more information.
   - [Internal] Updated all copyright notes to 2026.
 
@@ -495,7 +495,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - The label in a Button Box visual representation now shows starting coaching modes of the Driving Coach in light gray color.
   - The Driving Coach informs now more precisely about the start of the coaching.
   - The Driving Coach provides a new coaching mode that helps you to learn braking points and effective braking techniques. When this coaching mode is active, the Coach will tell you how to brake and also will tell you exactly where to brake and where to release the brake again. This coaching mode is based on telemetry data, therefore using a reference lap from a fast and experienced driver is the key for success.
-    - See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#Practicing-braking-points) for more information about this new coching mode.
+    - See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-braking-points) for more information about this new coching mode.
     - A [new voice command for the Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Driving-Coach-Commands-(EN)) lets you activate brake coaching.
 	- New "Brake Coaching" function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), which automatically starts telemetry based coaching and brake coaching by the Driving Coach when this startup profile is active.
 	- Brake coaching can also be started by choosing the corresponding item in the tray menu of the Simulator Controller process.
@@ -801,7 +801,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   
 #### Changes
 
-  - [Important] The collection of telemetry data can now be enabled in the "Solo Center" without having the Telemetry Viewer open. Additionally, the Telemetry Viewer will no longer be opened by the *Auto Telemetry* setting. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer) for more information.
+  - [Important] The collection of telemetry data can now be enabled in the "Solo Center" without having the Telemetry Viewer open. Additionally, the Telemetry Viewer will no longer be opened by the *Auto Telemetry* setting. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#telemetry-Viewer) for more information.
   - A new [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" instructs the Coach during on-track coaching to automatically write the telemetry of the fastest lap of the current session to the session database, if that lap was faster as any lap already stored in the database.
   - A lot of optimizations and enhancements for the Spotter:
     - Driver names are now sometimes mentioned in information shout outs by the Strategist and the Spotter. For example, if you ask for the gap to the car ahead, you may occasionally also be told the name of the driver, who is actually driving the car ahead.
@@ -895,7 +895,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     - Use the famous voices from ElevenLabs, where you can create your own voices easily from a couple of samples. So, if you want the Race Spotter to talk with your favorite Crew Chief voice, then give at a go. All voices being marked as "personal", "default" or "workspace" are available in the standard configuration, but with an additional step any voice from the community can be used.
 	- ElevenLabs services for speech recognition is also supported.
 	
-    See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#ElevenLabs) for more information.
+    See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#elevenLabs) for more information.
   - It is now possible to select the cars to be shown in the *Positions* report in "Race Reports", "Solo Center" and "Team Center".
   - The icons in "Simulator Startup" has been arranged a bit to reflect the typical workflow better.
   - [Internal] (Once again) optimized startup process for *Le Mans Ultimate*.
@@ -1882,7 +1882,7 @@ IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOl
   5. Optimized performance of the builtin database engine for large tables.
   6. Lap telemetry entries in the "Session Database" can now be opened in the Telemetry Browser by double-clicking on them.
   7. Significantly reduced Jitter in telemetry charts.
-  8. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer) for more information.
+  8. Recording of lap telemetry data is now also supported in the "Team Center". See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#telemetry-viewer) for more information.
   9. Thanks to our community member @Diego Falcone Dev_Dk HawkOne we now have a full translation for the Italian language.
   10. It is now possible ot use a voice which was trained for a specific language for another language. The results are mediocre for the speech synthesizer built into Windows, but very usable for voices supplied by Azure or Google. It is kind of cool to hear an Italian speak English.
   11. [Internal] A new system process observes all user processes and immediately kills them in case of malfunction. The most important and malicious type of malfunction is too much memory consumption, for which the threshold could be defined in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings).
@@ -1894,7 +1894,7 @@ IMPORTANT: Please take a look at the [Update Notes](https://github.com/SeriousOl
   3. Brake ducts have been removed for *RaceRoom Racing Experience* in the meta data of "Setup Workbench", because these are not available in this simulator.
   4. Fixed the calculation of lap times and sector times for *RaceRoom Racing Experience* in all applications.
   5. Optimized colors for the "Light" UI theme.
-  6. Added a complete new data category for low level car telemetry incl. a graphical browser. This is initially supported in the "Solo Center", but will be integrated into the "Team Center" as well. The future goal is to make the AI aware of this data category as well. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer) for more information.
+  6. Added a complete new data category for low level car telemetry incl. a graphical browser. This is initially supported in the "Solo Center", but will be integrated into the "Team Center" as well. The future goal is to make the AI aware of this data category as well. See the new [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#telemetry-viewer) for more information.
   7. Lap telemetry data can be saved to and retrieved from the session database.
   8. The ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) has been extended with a section for lap telemetry data:
 	 - Telemetry data can uploaded, downloaded, renamed and deleted.
@@ -3742,7 +3742,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   12. A lot of new tyre compound data has been added for *Automobilista 2* (many thanks to Chris Matthews to provide the data).
   13. Fixed a regression where in many lists and reports the last name of the drivers where missing.
   14. Implemented state caching in "Simulator Setup" which results in a significant performance improvement when stepping to a page, which had already been visited.
-  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the *Push-To-Talk* trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Push-To-Talk-behavior) for more information.
+  15. A preset has been added to "Simulator Setup" to enable a toggle mode for the *Push-To-Talk* trigger. Please see the [revised documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#push-to-talk-behavior) for more information.
   16. New car models for "Setup Advisor":
       - Assetto Corsa
         - Pagani Zonda R

@@ -175,9 +175,9 @@ Good to know: Beside the dark gray dot which marks the start/finish line, a seco
 
 The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
 
-- [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Telemetry-Viewer)
-- [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#Telemetry-Viewer)
-- [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#Telemetry-Viewer)
+- [Setup Workbench](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer)
+- [Solo Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center#telemetry-viewer)
+- [Team Center](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#telemetry-viewer)
 
 ###### Importing telemetry data
 

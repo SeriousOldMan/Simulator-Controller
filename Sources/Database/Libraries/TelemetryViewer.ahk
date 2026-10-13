@@ -1162,7 +1162,7 @@ class TelemetryViewer {
 		viewerGui.SetFont("s9 Norm", "Arial")
 
 		viewerGui.Add("Documentation", "x201 YP+20 w351 H:Center Center", translate("Telemetry Viewer")
-					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#Telemetry-Viewer")
+					 , "https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetry-viewer")
 
 		button := viewerGui.Add("Button", "x683 yp+5 w23 h23 X:Move" . (!this.Collect ? " Disabled" : ""))
 		button.OnEvent("Click", (*) {

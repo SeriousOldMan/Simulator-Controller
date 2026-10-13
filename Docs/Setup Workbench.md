@@ -173,7 +173,7 @@ Please, note that all of this also applies to the AI Race Assistants, but you ha
 
   4. *F1 25*
   
-     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode). Unfortunately, Simulator Controller cannot be used on the same machine as *F1 25* at the time of this writing, because it is flagged by Javelin as cheating software. However, there are solutions to this problem. See the [special notes for *F1 25*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25) for more information.
+     The UDP configuration must allow for UDP packets to reach any system on the network (aka broadcast mode). Unfortunately, Simulator Controller cannot be used on the same machine as *F1 25* at the time of this writing, because it is flagged by Javelin as cheating software. However, there are solutions to this problem. See the [special notes for *F1 25*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-f1-25) for more information.
 
 If you have used the quick setup method of "Simulator Setup", the plugins may already have been installed, but activation is a manual step.
 
@@ -362,7 +362,7 @@ During the first phase, the rule engine analyses all given problems and their "I
 
 As you can see, these rules define the changes to be applied to the setup settings to compensate for a specific problem, fast corner exit understeer in this example. It is self-explanatory, that a lot of settings might be influenced by many applicable rules at the same time. The generic rule set of "Setup Workbench" will handle this by computing the resulting setting as the best possible compromise for all resulting changes.
 
-A totally different story is the Setup Engineer, which will rely on the anylytical capabilities of the configured LLM. The telemetry data is supplied to the LLM in the user prompt as a large CSV table. Additional information and instructions how to use the telemetry data are supplied as system instructions to the LLM. These [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Setup-Engineer) can be modified to suite your needs.
+A totally different story is the Setup Engineer, which will rely on the anylytical capabilities of the configured LLM. The telemetry data is supplied to the LLM in the user prompt as a large CSV table. Additional information and instructions how to use the telemetry data are supplied as system instructions to the LLM. These [instructions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer) can be modified to suite your needs.
 
 ## Managing Car Setups
 

@@ -43,12 +43,12 @@
   
 #### Changes
 
-  - The diary system of the "Setup Workbench" has been completely rewritten.
-    - A new diary browser gives you access to all recent sessions of the "Setup Workbench" and all important actions taken while working with the "Setup Workbench".
-    - You can add your own notes to the diary of the active session.
-	- To support all this, a new diary file format has been implemented.
-    - The old diary files will still be preserved, but are invisible to the new diary browser.
-	- See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#diary-browser) for more information.
+  - The diary system of the "Setup Workbench" has been completely rewritten (and is now named "Logbook").
+    - A new logbook browser gives you access to all recent sessions of the "Setup Workbench" and all important actions taken while working with the "Setup Workbench".
+    - You can add your own notes to the logbook of the active session.
+	- To support all this, a new logbook file format has been implemented.
+    - The old diary files will still be preserved, but are invisible to the new logbook browser.
+	- See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) for more information.
   - An all new USB device manager has been implemented with great support by @Timmermann. This new manager now can handle more than 16 USB devices, thereby solving all issues with unrecognized steering wheels reported by some users.
   - [Internal] Increased compatibility of function/tool calling for OpenAI models with a version greater or equal to GPT-5.
   - [Internal] Migrated to AHK 2.1-alpha.35.
@@ -230,7 +230,7 @@
 	- The motivation mode can also be activated from the tray menu of the "Simulator Controller" process.
 	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
 	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
-  - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Piper) for more information.
+  - A new speech synthesis method is supported. [Piper](https://github.com/OHF-Voice/piper1-gpl/tree/main), which is in widespread use for home automation, can now be used to generate speech using a web server in your local network (or even on localhost). See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#piper) for more information.
   - Sliders for Volume, Pitch and Speed will now be disabled in voice configuration, if the corresponding option is not supported by the chosen speech synthesis method.
   - The car meta data for the latest version of *RaceRoom Racing Experience* has been included.
   - A new article has been written for the *News* system.
@@ -341,7 +341,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Changed settings are no longer saved in the issue analyzer in "Setup Workbench" when the dialog is cancelled and the analysis run is not started.
   - The automatic detection of suspension bottom out events introduced with the last release has been finalized for all simulators, except *Project Motor Racing* (which does not supply nessecary data in the API).
-  - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Suspension) for more information.
+  - The mathematical model, which is used to detect bottom out events, is now fully customizeable in the issue analyzer of "Setup Workbench". See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#suspension) for more information.
   - The recommendations for bottom out issues have been changed and optimized in "Setup Workbench".
     - The weighting of the spring stiffness has changed.
 	- Bumpstop rates will be taken into account, if available.
@@ -502,7 +502,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- The decision for a specific tyre compound mixture will either be taken based on the configured number of laps usable for a compound mixture (setting ["Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database") or by the tyre wear (see above), if this information is available in the simulator API. You can choose between the different methods using the setting ["Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) in the "Session Database".
 	- The max. tyre wear for all available tyre compounds will also be passed to the *Reasoning* booster for the synthetical "Pitstop Planning" event for pitstop planning by the LLM, if enabled.
 	- More details can be found in the [extended documentation for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) and for [tyre compound handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) in general.
-  - In preparation for the upcoming support for the Russian language, Yandex can be used now for speech recognition. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#Yandex) for more information.
+  - In preparation for the upcoming support for the Russian language, Yandex can be used now for speech recognition. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#yandex) for more information.
   - And support for using [GPT services from Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#yandex) has been added to the Driving Coach and the Assistant boosters.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
@@ -607,7 +607,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Optimized and standardized the naming of the data folders of loaded sessions in "Solo Center" and "Team Center".
   - Standardized folder paths for stored telemetry data for Driving Coach, "Solo Center", "Team Center" and "Setup Workbench". Documentation updated accordingly.
-  - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#Analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
+  - The "Setup Workbench" can now analyze telemetry data from a session after it already ended, as long as the telemetry data is still available. The Issue Analyzer can then create handling issues based on the telemetry data. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) for more information.
   - The automatic installation of Windows runtimes and language specific speech recognition libraries can now be rejected on the "Basic" configuration page in "Simulator Setup". Once rejected, they can still be installed later on using the extended configuration mode.
   - [Internal] The background processes for the Race Engineer, the Race Strategist and the Race Spotter got new icons. You can see them in the tray menu of Windows. The old colors have been preserved for a recognition effect.
   
@@ -709,10 +709,10 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Changed session finish detection for races based on a fixed number of laps.
   - Support has been added to run Simulator Controller in a virtualized environment like [VirtualBox](https://www.virtualbox.org/).
-  - Support has been added to connect to simulators running on a remote machine, which can also be consoles. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#Connecting-to-remote-simulators) for more information.
+  - Support has been added to connect to simulators running on a remote machine, which can also be consoles. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#connecting-to-remote-simulators) for more information.
     - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers#simulator-startup) has been added to "Simulator Startup", which let's you start Simulator Controller for games running on a remote machine.
     - A new [keyboard modifier](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Keyboard-Modifiers#simulator-setup) has been added to "Simulator Setup", which let's you configure simulators not running on the PC, where Simulator Controller is installed.
-  - Full documentation and an installation video have been added for the [*F1 25* integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-f125), especially the [important notes on operation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#Special-notes-for-F1-25).
+  - Full documentation and an installation video have been added for the [*F1 25* integration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-f125), especially the [important notes on operation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#special-notes-for-f1-25).
     - As the *F1 25* integration is now considered stable and is officially supported, I want to thank @Awesome-XV for the great base implementation of the "F125" plugin.
 	- With the special requirement to run Simulator Controller remotely to the *F1 25* game, problems may still lurk around the corner. Therefore, please report any issues you encounter.
   - The car meta data for *Automobilista 2* has been updated by @inthebagbud UK.

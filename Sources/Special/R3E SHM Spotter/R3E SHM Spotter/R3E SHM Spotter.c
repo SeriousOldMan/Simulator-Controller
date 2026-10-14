@@ -659,6 +659,15 @@ BOOL checkAccident() {
 		double running = max(0, min(1, fabs(carDistance / map_buffer->layout_length)));
 		double avgSpeed = getAverageSpeed(running);
 
+		if (id == playerIdx)
+		{
+			if ((speed < (avgSpeed / 5)) && (map_buffer->brake == 0)) {
+				sendSpotterMessage("rejoinWarning");
+				
+				return TRUE;
+			}
+		}
+			
 		if (id != playerIdx) {
 			if (speed >= 1) {
 				if (speed < (avgSpeed / 2))

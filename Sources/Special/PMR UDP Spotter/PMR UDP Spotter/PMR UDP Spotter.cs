@@ -650,7 +650,7 @@ namespace PMRUDPSpotter {
 
 		int thresholdSpeed = 60;
 
-        bool checkAccident(ref UDPRaceInfo raceInfo, ref UDPParticipantRaceState playerVehicle)
+        bool checkAccident(ref UDPRaceInfo raceInfo, ref UDPParticipantRaceState playerVehicle, ref UDPVehicleTelemetry playerTelemetry)
         {
 			bool accident = false;
 
@@ -717,6 +717,15 @@ namespace PMRUDPSpotter {
                     double speed = vehicleSpeed(ref telemetry);
                     double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.LapProgress)));
                     double avgSpeed = getAverageSpeed(running);
+					
+					if (vehicle.IsPlayer)
+					{
+						if ((speed < (avgSpeed / 5)) && ((float)playerTelemetry.Input.Brake == 0)) {
+							SendSpotterMessage("rejoinWarning");
+							
+							return true;
+						}
+					}
 
                     if (!vehicle.IsPlayer)
                     {
@@ -1290,7 +1299,7 @@ namespace PMRUDPSpotter {
 									cycle += 1;
 
 									if (enabled)
-										if (checkAccident(ref raceInfo, ref playerVehicle))
+										if (checkAccident(ref raceInfo, ref playerVehicle, ref playerTelemetry))
 											wait = false;
 										else if (checkFlagState(ref raceInfo, ref playerVehicle) || checkPositions(ref playerVehicle, ref playerTelemetry))
 											wait = false;

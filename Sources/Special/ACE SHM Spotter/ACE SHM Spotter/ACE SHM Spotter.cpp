@@ -1048,6 +1048,8 @@ bool checkAccident() {
 	}
 
 	if (driverRunning >= 0) {
+		SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+		
 		try
 		{
 			float driverDistance = driverRunning * trackLength;
@@ -1056,6 +1058,15 @@ bool checkAccident() {
 				double speed = getSpeed(i, milliSeconds);
 				double running = getRunning(i);
 				double avgSpeed = -1;
+					
+				if (i == carID)
+				{
+					if ((speed < (avgSpeed / 5)) && (pf->brake == 0)) {
+						sendSpotterMessage("rejoinWarning");
+						
+						return true;
+					}
+				}
 				
 				if (i != carID) {
 					if (speed >= 5) {

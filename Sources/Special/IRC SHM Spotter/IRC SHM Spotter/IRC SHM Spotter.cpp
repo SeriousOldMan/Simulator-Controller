@@ -805,6 +805,23 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 							continue;
 
 						float avgSpeed = getAverageSpeed(running);
+						
+						
+					
+						if (carIndex == playerCarIndex)
+						{
+							char* rawValue;
+							float brake = 0;
+							
+							if (getRawDataValue(rawValue, header, data, "Brake"))
+								brake = *(float*)rawValue;
+							
+							if ((speed < (avgSpeed / 5)) && (brake == 0)) {
+								sendSpotterMessage("rejoinWarning");
+								
+								return true;
+							}
+						}
 
 						if (carIndex != playerCarIndex) {
 							if (speed >= 1) {

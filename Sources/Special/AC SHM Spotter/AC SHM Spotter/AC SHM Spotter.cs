@@ -832,6 +832,15 @@ namespace ACSHMSpotter {
                         double speed = car.speedMS * 3.6;
                         double running = Math.Max(0, Math.Min(1, car.splinePosition));
                         double avgSpeed = getAverageSpeed(running);
+					
+						if (car.carId == driver.carId)
+						{
+							if ((speed < (avgSpeed / 5)) && (physics.Brake == 0)) {
+								SendSpotterMessage("rejoinWarning");
+								
+								return true;
+							}
+						}
 
                         if (car.carId != driver.carId)
 						{

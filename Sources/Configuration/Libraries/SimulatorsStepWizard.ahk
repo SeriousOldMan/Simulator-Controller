@@ -67,10 +67,12 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 							key := descriptor[3]
 							value := wizard.getSimulatorValue(simulator, key, descriptor[4])
 
-							if (arguments != "")
-								arguments .= "; "
+							if (Trim(value) != "") {
+								if (arguments != "")
+									arguments .= "; "
 
-							arguments .= (key . ": " . value)
+								arguments .= (key . ": " . value)
+							}
 						}
 
 					for ignore, mode in ["Pitstop", "Assistant"] {

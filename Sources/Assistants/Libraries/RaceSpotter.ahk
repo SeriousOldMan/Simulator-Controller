@@ -3716,13 +3716,12 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 	}
 
-	rejoinWarning(type, arguments*) {
+	rejoinWarning(arguments*) {
 		local lap := this.KnowledgeBase.getValue("Lap", 0)
 
 		static lastAccident := false
 
-		if (this.this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false]
-													   && this.Running) {
+		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
 			this.pushAlert("AccidentRejoin")
 
 			lastAccident := lap

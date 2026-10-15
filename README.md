@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.2.8.0-release](https://cutt.ly/4yQRZfx9) (Changes: Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup, New application settings management, Support for the GPT-6 model family, New car models for "Setup Workbench", Fixed importing settings in "Session Database", Added unblocking to offline installation, Fixed missing lap time information in the telemetry lap selector.)
+[7.3.0.0-release](https://cutt.ly/GyEircGl) (Changes: Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Fixed setup recommendation for OpenAI GPT >= 5 in "Setup Workbench", Updated to AHK 2.1.alpha.35, Increased GPT-6 compatibilty with tool calls, Fixed offline installer, Fixed Driving Coach motivation duplicates, New Markdown processor, Fixed documentation links.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7280) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-728) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7300) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-730) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.2.7.0-release](https://cutt.ly/KynPKGlI) (Changes: Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files, Support for offline installation.)
+[7.2.8.0-release](https://cutt.ly/4yQRZfx9) (Changes: Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup, New application settings management, Support for the GPT-6 model family, New car models for "Setup Workbench", Fixed importing settings in "Session Database", Added unblocking to offline installation, Fixed missing lap time information in the telemetry lap selector.)
 
-[7.2.6.0-release](https://cutt.ly/1yvGGygW) (Changes: Fixed standings and gap calculation for iRacing, Potential fix for team session handover for LMU, Optimized telemetry startup in "Solo Center", Caching for track spline for ACC, Wildcard matching for setup settings in car rules, New car models for "Setup Workbench", Track data for LMU DLC, Fixed instruction handling in Assistant booster.)
+[7.2.7.0-release](https://cutt.ly/KynPKGlI) (Changes: Improved memory cleanup for the Driving Coach, New car models for the "Setup Workbench", Fixed refuel calculation for LMP2 for Chinese LMU, Fixed reliability of updated ACE setup files, Support for offline installation.)
 
 #### Current development build
 
-[7.3.0.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/1MPKUk1K?inline=true) (Test build for 7.3.0. Changes: Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Fixed setup recommendation for OpenAI GPT >= 5 in "Setup Workbench", Updated to AHK 2.1.alpha.35, Increased GPT-6 compatibilty with tool calls, Fixed offline installer, Fixed Driving Coach motivation duplicates, New Markdown processor, Fixed documentation links.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7300) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-730) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

@@ -13,7 +13,7 @@
 
 
 ;;;-------------------------------------------------------------------------;;;
-;;;                    Public Function Declaration Section                  ;;;
+;;;                   Private Function Declaration Section                  ;;;
 ;;;-------------------------------------------------------------------------;;;
 
 hoedown_html_renderer_new(render_flags := 0, nesting_level := 0) {
@@ -29,8 +29,9 @@ hoedown_buffer_new(unit) {
 	return DllCall("hoedown\hoedown_buffer_new", "uint", unit, "ptr")
 }
 
-hoedown_document_render(hoedown_document, hoedown_buffer, &data, size := "") {
+hoedown_document_render(hoedown_document, hoedown_buffer, &data) {
 	local dataA := ""
+	local size
 
 	StrPutVar(string, &var, encoding) {
 		VarSetStrCapacity(&var

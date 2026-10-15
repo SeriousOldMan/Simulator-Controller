@@ -3,9 +3,9 @@ Type=Development
 [Development]
 Version=7.3.1.0-dev
 Target=7.3.1.0-release
-Date=10/14/26
+Date=10/15/26
 Download=
-Changes=Spotter warns for bad rejoins
+Changes=Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.2.8.0-release

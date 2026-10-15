@@ -215,6 +215,10 @@ class Logbook {
 		return Logbook(fileName, choose(entries, (e) => !inList(superfluousEntries, e)))
 	}
 
+	superfluous() {
+		return (this.Entries.Length = 1)
+	}
+
 	writeLogbook(fileName) {
 		deleteFile(fileName)
 
@@ -5271,7 +5275,7 @@ class LogbookBrowser {
 
 		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time"], translate))
+		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "#"], translate))
 		this.iLogbooksListView.OnEvent("Click", selectLogbook)
 		this.iLogbooksListView.OnEvent("DoubleClick", selectLogbook)
 		this.iLogbooksListView.OnEvent("ItemSelect", selectLogbook)
@@ -5295,14 +5299,18 @@ class LogbookBrowser {
 		local name, date, time
 
 		loop Files, this.LogbookDirectory . "*.logbook", "F" {
-			logbooks.Push(Logbook.readLogbook(A_LoopFileFullPath))
+			lBook := Logbook.readLogbook(A_LoopFileFullPath)
 
-			SplitPath(A_LoopFileName, , , , &name)
+			if (!lBook.superfluous() || (A_LoopFileFullPath = this.Workbench.Logbook)) {
+				logbooks.Push(lBook)
 
-			date := FormatTime(name, "ShortDate")
-			time := FormatTime(name, "HH:mm")
+				SplitPath(A_LoopFileName, , , , &name)
 
-			this.LogbooksListView.Add("", date, time)
+				date := FormatTime(name, "ShortDate")
+				time := FormatTime(name, "HH:mm")
+
+				this.LogbooksListView.Add("", date, time, lBook.Entries.Length)
+			}
 		}
 
 		this.LogbooksListView.ModifyCol()

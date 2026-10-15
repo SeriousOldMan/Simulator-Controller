@@ -5462,7 +5462,7 @@ class LogbookBrowser {
 			)"
 		}
 		else {
-			width := viewer.getWidth() - 20
+			width := viewer.getWidth() - 35
 
 			document := "
 			(
@@ -7420,9 +7420,6 @@ editNotes(browserOrCommand, arguments*) {
 
 		if getWindowSize("Setup Workbench.Logbook Browser.Notes", &w, &h)
 			notesGui.Resize("Initialize", w, h)
-
-		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
-			notesGui["notesEdit"].Value := FileRead(kUserConfigDirectory . "Audio Settings.ini")
 
 		browserOrCommand.Window.Block()
 

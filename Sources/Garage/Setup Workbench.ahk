@@ -5296,7 +5296,7 @@ class LogbookBrowser {
 
 	loadLogbooks() {
 		local logbooks := []
-		local name, date, time, superfluous
+		local name, date, time
 
 		loop Files, this.LogbookDirectory . "*.logbook", "F" {
 			lBook := Logbook.readLogbook(A_LoopFileFullPath)

@@ -5296,7 +5296,7 @@ class LogbookBrowser {
 
 	loadLogbooks() {
 		local logbooks := []
-		local name, date, time
+		local name, date, time, superfluous
 
 		loop Files, this.LogbookDirectory . "*.logbook", "F" {
 			lBook := Logbook.readLogbook(A_LoopFileFullPath)
@@ -5311,6 +5311,8 @@ class LogbookBrowser {
 
 				this.LogbooksListView.Add("", date, time, lBook.Entries.Length)
 			}
+			else
+				deleteFile(A_LoopFileFullPath)
 		}
 
 		this.LogbooksListView.ModifyCol()
@@ -5470,7 +5472,7 @@ class LogbookBrowser {
 			)"
 		}
 		else {
-			width := viewer.getWidth() - 20
+			width := viewer.getWidth() - 35
 
 			document := "
 			(
@@ -7428,9 +7430,6 @@ editNotes(browserOrCommand, arguments*) {
 
 		if getWindowSize("Setup Workbench.Logbook Browser.Notes", &w, &h)
 			notesGui.Resize("Initialize", w, h)
-
-		if FileExist(kUserConfigDirectory . "Audio Settings.ini")
-			notesGui["notesEdit"].Value := FileRead(kUserConfigDirectory . "Audio Settings.ini")
 
 		browserOrCommand.Window.Block()
 

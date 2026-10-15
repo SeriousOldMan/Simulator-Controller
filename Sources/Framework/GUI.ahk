@@ -2606,7 +2606,7 @@ class Window extends Gui {
 		}
 	}
 
-	MinWidth[resize := true, restrict := true] {
+	MinWidth[resize := true, restrict := Window.sConstrainWindow] {
 		Get {
 			return this.iMinWidth
 		}
@@ -2625,7 +2625,7 @@ class Window extends Gui {
 		}
 	}
 
-	MinHeight[resize := true, restrict := true] {
+	MinHeight[resize := true, restrict := Window.sConstrainWindow] {
 		Get {
 			return this.iMinHeight
 		}

@@ -33,7 +33,7 @@
 
 #### Fixes
 
-  - None this time...
+  - Fixed the handling of the *ConstrainWindow* core setting.
   
 #### Changes
 

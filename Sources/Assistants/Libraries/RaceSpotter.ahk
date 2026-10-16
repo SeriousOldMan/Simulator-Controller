@@ -3716,6 +3716,18 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 	}
 
+	rejoinWarning(arguments*) {
+		local lap := this.KnowledgeBase.getValue("Lap", 0)
+
+		static lastAccident := false
+
+		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
+			this.pushAlert("AccidentRejoin")
+
+			lastAccident := lap
+		}
+	}
+
 	greenFlag(arguments*) {
 		local speaker
 

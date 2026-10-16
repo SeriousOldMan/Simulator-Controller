@@ -627,6 +627,15 @@ bool checkAccident(const SharedMemory* sharedData)
 			double speed = sharedData->mSpeeds[i] * 3.6;
 			double running = max(0, min(1, std::abs(vehicle.mCurrentLapDistance / sharedData->mTrackLength)));
 			double avgSpeed = getAverageSpeed(running);
+					
+			if (sharedData->mViewedParticipantIndex == i)
+			{
+				if ((speed < (avgSpeed / 5)) && (sharedData->mBrake == 0)) {
+					sendSpotterMessage("rejoinWarning");
+					
+					return true;
+				}
+			}
 
 			if (sharedData->mViewedParticipantIndex != i)
 			{

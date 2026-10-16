@@ -752,6 +752,15 @@ namespace F125UDPSpotter {
                     double speed = vehicleSpeed(carMotion);
 					float carRunning = (trackLength > 0) ? Math.Max(0, Math.Min(1, Math.Abs(carLap.LapDistance) / trackLength)) : 0;
                     double avgSpeed = getAverageSpeed(carRunning);
+					
+					if (i == playerIdx)
+                    {
+                        if ((speed < (avgSpeed / 5)) && (receiver.GetCarTelemetryData().CarTelemetry[playerIdx].Brake == 0)) {
+							SendSpotterMessage("rejoinWarning");
+							
+							return true;
+						}
+					}
 
                     if (i != playerIdx)
                     {

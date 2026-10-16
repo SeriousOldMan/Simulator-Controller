@@ -761,7 +761,16 @@ namespace RF2SHMSpotter {
                     double speed = vehicleSpeed(ref vehicle);
                     double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
                     double avgSpeed = getAverageSpeed(running);
-
+					
+					if (vehicle.mIsPlayer == 1)
+                    {
+                        if ((speed < (avgSpeed / 5)) && (GetPlayerTelemetry(vehicle.mID, ref telemetry).mFilteredBrake == 0)) {
+							SendSpotterMessage("rejoinWarning");
+							
+							return true;
+						}
+					}
+					
                     if (vehicle.mIsPlayer != 1)
                     {
                         if (speed >= 1)

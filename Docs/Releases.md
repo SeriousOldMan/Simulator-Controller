@@ -27,7 +27,20 @@
     
 # Upcoming release
 
-Not yet planned...
+## 7.3.1.0
+
+#### Date: 10/23/26 (planned)
+
+#### Fixes
+
+  - Fixed the handling of the *ConstrainWindow* core setting.
+  
+#### Changes
+
+  - The Spotter now reminds you to do a proper rejoin after an accident or off-track.
+  - Minor enhancements of the new Logbook of the "Setup Workbench"
+    - Empty Logbooks will get deleted automatically.
+	- The number of available action entries are shown in the list of available Logbooks.
 
 # Release history
 

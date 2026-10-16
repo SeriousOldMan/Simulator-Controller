@@ -157,6 +157,7 @@
     - [Telemetry Viewer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#telemetry-viewer)
     - [Setup Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#setup-engineer)
   - [Understanding the Recommendations](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#understanding-the-recommendations)
+  - [Logbook](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser)
   - [How it works](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#how-it-works)
   - [Managing Car Setups](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#managing-car-setups)
   - [Extending and Customizing](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#extending-and-cutomizing-setup-workbench)

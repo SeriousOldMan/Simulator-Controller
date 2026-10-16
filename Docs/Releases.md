@@ -34,9 +34,11 @@
 #### Fixes
 
   - Fixed the handling of the *ConstrainWindow* core setting.
+  - Fixed a bug, that prevented chat messages to be sent in *rFactor 2* and *Le Mans Ultimate*.
   
 #### Changes
 
+  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible.
   - The Spotter now reminds you to do a proper rejoin after an accident or off-track.
   - Minor enhancements of the new Logbook of the "Setup Workbench"
     - Empty Logbooks will get deleted automatically.

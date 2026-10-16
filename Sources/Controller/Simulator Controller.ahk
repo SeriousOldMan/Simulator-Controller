@@ -954,7 +954,7 @@ class SimulatorController extends ConfigurationItem {
 	}
 
 	getVoiceCommandDescriptor(command) {
-		local descriptor, pid, activationCommand
+		local descriptor, pid, activationCommand, name
 
 		static registered := false
 		static registeredCommands := false
@@ -978,7 +978,16 @@ class SimulatorController extends ConfigurationItem {
 				if !registered {
 					activationCommand := StrReplace(getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false), ";", ",")
 
-					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", "Controller", "Controller", pid
+					if InStr(activationCommand, ":") {
+						activationCommand := string2Values(":", activationCommand)
+
+						name := activationCommand[1]
+						activationCommand := activationCommand[2]
+					}
+					else
+						name := "Controller"
+
+					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", name, "Controller", pid
 																								 , activationCommand, "activationCommand", false, false, false, false
 																								 , false, false, false, true, true)
 							  , this.VoiceServer)

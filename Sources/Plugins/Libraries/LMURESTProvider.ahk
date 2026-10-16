@@ -819,7 +819,7 @@ class LMURESTProvider {
 						if isNumber(capacity)
 							return capacity
 						else
-							throw "Invalid fuel  capacity value..."
+							throw "Invalid fuel capacity value..."
 					}
 				}
 				catch Any {

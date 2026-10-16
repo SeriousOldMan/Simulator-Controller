@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.3.1.0-dev]() (Early build for 7.3.1. Changes: Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting.)
+[7.3.1.0-dev]() (Early build for 7.3.1. Changes: Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2 and LMU, Support of a name for the controller speech activation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7300) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-730) of this version and all the versions you might have skipped, before installing and using this version.
 

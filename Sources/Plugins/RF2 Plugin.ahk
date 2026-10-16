@@ -49,7 +49,14 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	class ChatAction extends ControllerAction {
+		iMode := false
 		iMessage := ""
+
+		Mode {
+			Get {
+				return this.iMode
+			}
+		}
 
 		Message {
 			Get {
@@ -57,7 +64,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		__New(function, label, message) {
+		__New(mode, function, label, message) {
+			this.iMode := mode
 			this.iMessage := message
 
 			super.__New(function, label)
@@ -66,8 +74,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		fireAction(function, trigger) {
 			local message := this.Message
 
-			if this.Controller.findPlugin(kACCPlugin).activateWindow() {
-				Send("{Enter}")
+			if this.Mode.Plugin.activateWindow() {
+				Send(this.Mode.Plugin.OpenChatHotkey)
 				Sleep(100)
 				Send(message)
 				Sleep(100)
@@ -146,7 +154,8 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 				if !this.iChatMode
 					this.iChatMode := RF2Plugin.ChatMode(this)
 
-				this.iChatMode.registerAction(RF2Plugin.ChatAction(function, message[1], message[2]))
+				this.iChatMode.registerAction(RF2Plugin.ChatAction(this.iChatMode, function
+																 , message[1], message[2]))
 			}
 			else
 				this.logFunctionNotFound(descriptor)

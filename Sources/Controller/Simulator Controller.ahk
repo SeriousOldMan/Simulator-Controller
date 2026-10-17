@@ -1079,7 +1079,7 @@ class SimulatorController extends ConfigurationItem {
 							 && getMultiMapValue(this.Configuration, "Voice Control", "Listener", false)) {
 			pid := ProcessExist()
 
-			activationCommand := StrReplace(, ";", ",")
+			activationCommand := StrReplace(activationCommand, ";", ",")
 
 			if InStr(activationCommand, ":") {
 				activationCommand := string2Values(":", activationCommand)
@@ -1101,7 +1101,7 @@ class SimulatorController extends ConfigurationItem {
 			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", descriptor, "Text", "*", "chatMessage")
 									, controller.VoiceServer)
 
-			this.iChatHandler := {Descriptor: descriptor, Handler: handler)
+			this.iChatHandler := {Descriptor: descriptor, Handler: handler}
 		}
 	}
 

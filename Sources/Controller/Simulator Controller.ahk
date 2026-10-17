@@ -486,6 +486,7 @@ class SimulatorController extends ConfigurationItem {
 
 	iVoiceServer := false
 	iVoiceCommands := CaseInsenseMap()
+	iChatHandler := false
 
 	iLastEvent := A_TickCount
 
@@ -976,7 +977,10 @@ class SimulatorController extends ConfigurationItem {
 				pid := ProcessExist()
 
 				if !registered {
-					activationCommand := StrReplace(getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false), ";", ",")
+					activationCommand := getMultiMapValue(this.Configuration, "Voice Control", "ActivationCommand", false)
+					activationCommand := StrReplace(getMultiMapValue(this.Configuration
+																   , "Voice Control", "ControllerActivation", activationCommand)
+												  , ";", ",")
 
 					if InStr(activationCommand, ":") {
 						activationCommand := string2Values(":", activationCommand)
@@ -988,7 +992,8 @@ class SimulatorController extends ConfigurationItem {
 						name := "Controller"
 
 					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", name, "Controller", pid
-																								 , activationCommand, "activationCommand", false, false, false, false
+																								 , activationCommand, "controllerActivation"
+																								 , false, false, false, false
 																								 , false, false, false, true, true)
 							  , this.VoiceServer)
 
@@ -996,7 +1001,7 @@ class SimulatorController extends ConfigurationItem {
 				}
 
 				if !registeredCommands.Has(command) {
-					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "voiceCommand")
+					messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", "Controller", false, command, "controllerCommand")
 											, this.VoiceServer)
 
 					registeredCommands[command] := true
@@ -1014,20 +1019,39 @@ class SimulatorController extends ConfigurationItem {
 			first := false
 		else
 			playSound("SCSoundPlayer", getFileName("Activated.wav", kUserHomeDirectory . "Sounds\", kResourcesDirectory . "Sounds\")
-										 , getAudioSettings("Controller"))
+									 , getAudioSettings("Controller"))
 	}
 
-	activationCommand(words*) {
+	controllerActivation(words*) {
 		this.acknowledgeVoiceCommand()
 	}
 
-	voiceCommand(grammar, command, words*) {
+	controllerCommand(grammar, command, words*) {
 		local ignore, handler
 
 		this.acknowledgeVoiceCommand()
 
 		for ignore, handler in this.iVoiceCommands[command][2]
 			handler.Call()
+	}
+
+	chatActivation(words*) {
+		this.acknowledgeVoiceCommand()
+	}
+
+	chatMessage(grammar, command, words*) {
+		if (Trim(text) != "") {
+			this.acknowledgeVoiceCommand()
+
+			protectionOn()
+
+			try {
+				this.iChatHandler.Handler.Call(text)
+			}
+			finally {
+				protectionOff()
+			}
+		}
 	}
 
 	enableVoiceCommand(command, handler) {
@@ -1043,6 +1067,50 @@ class SimulatorController extends ConfigurationItem {
 
 		if index
 			handlers.RemoveAt(index)
+	}
+
+	enableChatMessage(activationCommand, handler) {
+		local descriptor, pid
+
+		if this.iChatHandler
+			disableChatMessage()
+
+		if (this.VoiceServer && getMultiMapValue(this.Configuration, "Voice Control", "Recognizer", false)
+							 && getMultiMapValue(this.Configuration, "Voice Control", "Listener", false)) {
+			pid := ProcessExist()
+
+			activationCommand := StrReplace(, ";", ",")
+
+			if InStr(activationCommand, ":") {
+				activationCommand := string2Values(":", activationCommand)
+
+				descriptor := activationCommand[1]
+				activationCommand := activationCommand[2]
+			}
+			else
+				descriptor := "Chat"
+
+			messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", descriptor, "Controller", pid
+																						 , activationCommand, "chatActivation"
+																						 , false, false, false, false
+																						 , false, false, false, true, true
+																						 , kUndefined, kUndefined, kUndefined
+																						 , false, false, "Text")
+					  , this.VoiceServer)
+
+			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", descriptor, "Text", "*", "chatMessage")
+									, controller.VoiceServer)
+
+			this.iChatHandler := {Descriptor: descriptor, Handler: handler)
+		}
+	}
+
+	disableChatMessage() {
+		if this.iChatHandler {
+			messageSend(kFileMessage, "Voice", "unregisterVoiceClient:" . values2String(";", this.iChatHandler.Descriptor, ProcessExist()))
+
+			this.iChatHandler := false
+		}
 	}
 
 	connectAction(plugin, function, action) {
@@ -1085,6 +1153,14 @@ class SimulatorController extends ConfigurationItem {
 		for ignore, fnController in this.FunctionController
 			if fnController.hasFunction(function)
 				fnController.disconnectAction(plugin, function, action)
+	}
+
+	connectChat(plugin, activationCommand) {
+		this.enableChatMessage(activationCommand, ObjBindMethod(plugin, "handleChatMessage"))
+	}
+
+	disconnectChat(plugin) {
+		this.disableChatMessage()
 	}
 
 	updateLastEvent() {

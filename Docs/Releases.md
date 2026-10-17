@@ -38,8 +38,8 @@
   
 #### Changes
 
-  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible.
   - The Spotter now reminds you to do a proper rejoin after an accident or off-track.
+  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible.
   - Minor enhancements of the new Logbook of the "Setup Workbench"
     - Empty Logbooks will get deleted automatically.
 	- The number of available action entries are shown in the list of available Logbooks.

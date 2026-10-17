@@ -38,13 +38,37 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	iChatMode := false
 
 	class ChatMode extends ControllerMode {
+		iChatActivation := false
+
 		Mode {
 			Get {
 				return kChatMode
 			}
 		}
 
+		ChatActivation {
+			Get {
+				return this.iChatActivation
+			}
+		}
+
+		__New(plugin, chatActivation := false) {
+			this.iChatActivation := chatActivation
+
+			super.__New(plugin)
+		}
+
 		updateActions(session) {
+		}
+
+		handleChatMessage(message) {
+			if this.Mode.Plugin.activateWindow() {
+				Send(this.Mode.Plugin.OpenChatHotkey)
+				Sleep(100)
+				Send(message)
+				Sleep(100)
+				Send("{Enter}")
+			}
 		}
 	}
 
@@ -72,15 +96,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		fireAction(function, trigger) {
-			local message := this.Message
-
-			if this.Mode.Plugin.activateWindow() {
-				Send(this.Mode.Plugin.OpenChatHotkey)
-				Sleep(100)
-				Send(message)
-				Sleep(100)
-				Send("{Enter}")
-			}
+			this.Mode.handleChatMessage(this.Message)
 		}
 	}
 
@@ -152,14 +168,36 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 				message := string2Values("|", message)
 
 				if !this.iChatMode
-					this.iChatMode := RF2Plugin.ChatMode(this)
+					this.iChatMode := Sector397Plugin.ChatMode(this, getMultiMapValue(configuration, "Chat Configuration"
+																								   , "ChatActivation", false))
 
-				this.iChatMode.registerAction(RF2Plugin.ChatAction(this.iChatMode, function
-																 , message[1], message[2]))
+				this.iChatMode.registerAction(Sector397Plugin.ChatAction(this.iChatMode, function
+																	   , message[1], message[2]))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
 		}
+	}
+
+	activate() {
+		super.activate()
+
+		if this.ChatActivation
+			this.Controller.connectChat(this, this.ChatActivation)
+	}
+
+	deactivate() {
+		super.deactivate()
+
+		if this.ChatActivation
+			this.Controller.disconnectChat(this)
+	}
+
+	handleChatMessage(message) {
+		local chatMode := this.findMode(kChatMode)
+
+		if chatMode
+			chatMode.handleChatMessage(message)
 	}
 
 	updateSession(session, force := false) {

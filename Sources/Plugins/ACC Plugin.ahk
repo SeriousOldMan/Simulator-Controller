@@ -121,18 +121,49 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	class ChatMode extends ControllerMode {
+		iChatActivation := false
+
 		Mode {
 			Get {
 				return kChatMode
 			}
 		}
 
+		ChatActivation {
+			Get {
+				return this.iChatActivation
+			}
+		}
+
+		__New(plugin, chatActivation := false) {
+			this.iChatActivation := chatActivation
+
+			super.__New(plugin)
+		}
+
 		updateActions(session) {
+		}
+
+		handleChatMessage(message) {
+			if this.Mode.Plugin.activateWindow() {
+				Send("{Enter}")
+				Sleep(100)
+				Send(message)
+				Sleep(100)
+				Send("{Enter}")
+			}
 		}
 	}
 
 	class ChatAction extends ControllerAction {
+		iMode := false
 		iMessage := ""
+
+		Mode {
+			Get {
+				return this.iMode
+			}
+		}
 
 		Message {
 			Get {
@@ -140,22 +171,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		__New(function, label, message) {
+		__New(mode, function, label, message) {
+			this.iMode := mode
 			this.iMessage := message
 
 			super.__New(function, label)
 		}
 
 		fireAction(function, trigger) {
-			local message := this.Message
-
-			if this.Controller.findPlugin(kACCPlugin).activateWindow() {
-				Send("{Enter}")
-				Sleep(100)
-				Send(message)
-				Sleep(100)
-				Send("{Enter}")
-			}
+			this.Mode.handleChatMessage(this.Message)
 		}
 	}
 
@@ -235,7 +259,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if !this.iChatMode
 					this.iChatMode := ACCPlugin.ChatMode(this)
 
-				this.iChatMode.registerAction(ACCPlugin.ChatAction(function, message[1], message[2]))
+				this.iChatMode.registerAction(ACCPlugin.ChatAction(this.iChatMode, function, message[1], message[2]))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
@@ -268,6 +292,20 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 			ACCPlugin.sCarData := data
 		}
+	}
+
+	activate() {
+		super.activate()
+
+		if this.ChatActivation
+			this.Controller.connectChat(this, this.ChatActivation)
+	}
+
+	deactivate() {
+		super.deactivate()
+
+		if this.ChatActivation
+			this.Controller.disconnectChat(this)
 	}
 
 	simulatorStartup(simulator) {

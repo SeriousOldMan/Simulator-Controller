@@ -26,7 +26,13 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
+		window.Add("Text", "x16 y80 w120 h23 +0x200", translate("Activation"))
+		window.Add("Edit", "x140 yp w333 h21 W:Grow VchatActivationEdit"
+						 , getMultiMapValue(this.Configuration, "Voice Control", "ChatActivation", ""))
+
+		window.Add("Text", "x56 yp+30 w" . (473 - 56 - 40) . " 0x10 W:Grow")
+
+		window.Add("ListView", "x16 y120 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
 		window.Add("Text", "x16 y335 w81 h23 Y:Move +0x200", translate("Button"))
 		window.Add("Text", "x98 y335 w12 h23 Y:Move +0x200", translate("#"))
@@ -77,6 +83,11 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		super.saveToConfiguration(configuration)
 
+		if (Trim(this.Editor.Window["chatActivationEdit"].Text) != "")
+			setMultiMapValue(configuration, "Voice Control", "ChatActivation", this.Editor.Window["chatActivationEdit"].Text)
+		else
+			removeMultiMapValue(configuration, "Voice Control", "ChatActivation")
+
 		for ignore, chatMessage in this.ItemList
 			setMultiMapValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", chatMessage[1]), values2String("|", chatMessage[2], chatMessage[3]))
 	}
@@ -120,14 +131,14 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		if ((Trim(this.Control["chatMessageLabelEdit"].Text) = "") || (Trim(this.Control["chatMessageMessageEdit"].Text) = "")) {
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			
+
 			return false
 		}
 		else if isNew
 			for ignore, item in this.ItemList
 				if (item[1] = this.Control["chatMessageNumberEdit"].Text) {
 					withBlockedWindows(MsgDlg, translate("A chat message for this button already exists - please use different values..."), translate("Error"), 262160)
-					
+
 					return false
 				}
 
@@ -139,7 +150,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		if (chatMessage && (chatMessage[1] != this.ItemList[this.CurrentItem][1])) {
 			withBlockedWindows(MsgDlg, translate("The button number of an existing chat message may not be changed..."), translate("Error"), 262160)
-			
+
 			return false
 		}
 		else

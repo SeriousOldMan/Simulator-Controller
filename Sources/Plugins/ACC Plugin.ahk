@@ -78,6 +78,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iChatMode := false
 	iPitstopMode := false
 
+	iChatActivation := false
+
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
@@ -121,24 +123,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	}
 
 	class ChatMode extends ControllerMode {
-		iChatActivation := false
-
 		Mode {
 			Get {
 				return kChatMode
 			}
-		}
-
-		ChatActivation {
-			Get {
-				return this.iChatActivation
-			}
-		}
-
-		__New(plugin, chatActivation := false) {
-			this.iChatActivation := chatActivation
-
-			super.__New(plugin)
 		}
 
 		updateActions(session) {
@@ -213,6 +201,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
+	ChatActivation {
+		Get {
+			return this.iChatActivation
+		}
+	}
+
 	UDPProvider {
 		Get {
 			return this.iUDPProvider
@@ -249,6 +243,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		local function, descriptor, message
 
 		super.loadFromConfiguration(configuration)
+
+		this.iChatActivation := getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
 
 		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
 			function := this.Controller.findFunction(descriptor)

@@ -112,12 +112,6 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	ChatActivation {
-		Get {
-			return this.iChatActivation
-		}
-	}
-
 	__New(controller, name, simulator, configuration := false, register := true) {
 		super.__New(controller, name, simulator, configuration, true)
 
@@ -157,6 +151,10 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		this.iChatActivation := getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
 
+		if this.iChatActivation
+			if !this.iChatMode
+				this.iChatMode := Sector397Plugin.ChatMode(this)
+
 		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
 			function := this.Controller.findFunction(descriptor)
 
@@ -177,14 +175,14 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	activate() {
 		super.activate()
 
-		if this.ChatActivation
-			this.Controller.connectChat(this, this.ChatActivation)
+		if this.iChatActivation
+			this.Controller.connectChat(this, this.iChatActivation)
 	}
 
 	deactivate() {
 		super.deactivate()
 
-		if this.ChatActivation
+		if this.iChatActivation
 			this.Controller.disconnectChat(this)
 	}
 

@@ -201,12 +201,6 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	ChatActivation {
-		Get {
-			return this.iChatActivation
-		}
-	}
-
 	UDPProvider {
 		Get {
 			return this.iUDPProvider
@@ -245,6 +239,10 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		super.loadFromConfiguration(configuration)
 
 		this.iChatActivation := getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
+
+		if this.iChatActivation
+			if !this.iChatMode
+				this.iChatMode := ACCPlugin.ChatMode(this)
 
 		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
 			function := this.Controller.findFunction(descriptor)
@@ -293,14 +291,14 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	activate() {
 		super.activate()
 
-		if this.ChatActivation
-			this.Controller.connectChat(this, this.ChatActivation)
+		if this.iChatActivation
+			this.Controller.connectChat(this, this.iChatActivation)
 	}
 
 	deactivate() {
 		super.deactivate()
 
-		if this.ChatActivation
+		if this.iChatActivation
 			this.Controller.disconnectChat(this)
 	}
 

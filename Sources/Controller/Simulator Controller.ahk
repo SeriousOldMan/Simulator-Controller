@@ -1039,7 +1039,7 @@ class SimulatorController extends ConfigurationItem {
 		this.acknowledgeVoiceCommand()
 	}
 
-	chatMessage(grammar, command, words*) {
+	chatMessage(grammar, command, text) {
 		if (Trim(text) != "") {
 			this.acknowledgeVoiceCommand()
 
@@ -1073,7 +1073,7 @@ class SimulatorController extends ConfigurationItem {
 		local descriptor, pid
 
 		if this.iChatHandler
-			disableChatMessage()
+			this.disableChatMessage()
 
 		if (this.VoiceServer && getMultiMapValue(this.Configuration, "Voice Control", "Recognizer", false)
 							 && getMultiMapValue(this.Configuration, "Voice Control", "Listener", false)) {
@@ -1099,7 +1099,7 @@ class SimulatorController extends ConfigurationItem {
 					  , this.VoiceServer)
 
 			messageSend(kFileMessage, "Voice", "registerVoiceCommand:" . values2String(";", descriptor, "Text", "*", "chatMessage")
-									, controller.VoiceServer)
+									, this.VoiceServer)
 
 			this.iChatHandler := {Descriptor: descriptor, Handler: handler}
 		}

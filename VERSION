@@ -3,9 +3,9 @@ Type=Development
 [Development]
 Version=7.3.1.0-dev
 Target=7.3.1.0-release
-Date=10/15/26
+Date=10/17/26
 Download=
-Changes=Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2 and LMU, Support of a name for the controller speech activation
+Changes=Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2 and LMU, Support of a name for the controller speech activation, Speech support for in-game chat messages
 Components=Media->6.9.0,Configuration->7.2.2,Utilities->7.2.3
 [Release]
 Version=7.3.0.0-release

@@ -1591,7 +1591,7 @@ class RaceAssistant extends ConfigurationItem {
 										   , "Remaining", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0)) . volumeUnit)
 										   , "Consumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))  . volumeUnit))
 
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining", kUndefined) != kUndefined)
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Energy.Remaining")
 						knowledge["Energy"] := Map("Remaining", knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining") . " %")
 				}
 				catch Any as exception {
@@ -2681,7 +2681,7 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
 
-			if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption", kUndefined) != kUndefined) {
+			if knowledgeBase.hasValue("Lap." . lapNumber . ".Energy.Consumption") {
 				setMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.AvgConsumption", 0), 1))
 				setMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption"), 1))
 				setMultiMapValue(sessionInfo, "Stint", "Energy.Remaining", Round(getMultiMapValue(data, "Car Data", "EnergyRemaining", 0), 1))

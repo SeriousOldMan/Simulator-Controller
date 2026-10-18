@@ -1188,7 +1188,7 @@ class RaceEngineer extends RaceAssistant {
 						tyres["Temperatures"] := tyreTemperatures
 						tyres["Pressures"] := tyrePressures
 
-						if (knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear.FL", kUndefined) != kUndefined) {
+						if knowledgeBase.hasValue("Lap." . lapNr . ".Tyre.Wear.FL") {
 							tyreWear := Map()
 
 							for postfix, tyre in Map("FL", "FrontLeft", "FR", "FrontRight"
@@ -1202,7 +1202,7 @@ class RaceEngineer extends RaceAssistant {
 
 						brakes := Map()
 
-						if (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Wear.FL", kUndefined) != kUndefined) {
+						if knowledgeBase.hasValue("Lap." . lapNr . ".Brake.Wear.FL") {
 							brakeWear := Map()
 
 							for postfix, brake in Map("FL", "FrontLeft", "FR", "FrontRight"
@@ -1212,7 +1212,7 @@ class RaceEngineer extends RaceAssistant {
 							brakes["Wear"] := brakeWear
 						}
 
-						if (knowledgeBase.getValue("Lap." . lapNr . ".Brake.Temperature.FL", kUndefined) != kUndefined) {
+						if knowledgeBase.hasValue("Lap." . lapNr . ".Brake.Temperature.FL") {
 							brakeTemperatures := Map()
 
 							for postfix, brake in Map("FL", "FrontLeft", "FR", "FrontRight"
@@ -1328,7 +1328,7 @@ class RaceEngineer extends RaceAssistant {
 												, "Setup", setupPressures)
 					}
 
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", kUndefined) != kUndefined)
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Tyre.Wear.FL")
 						tyres["Wear"] := Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", 0) . percent)
 										   , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FR", 0) . percent)
 										   , "RearLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.RL", 0) . percent)
@@ -1372,7 +1372,7 @@ class RaceEngineer extends RaceAssistant {
 													 , "RearLeft", (convert("Temperature", this.CurrentBrakeTemperatures[3]) . temperatureUnit)
 													 , "RearRight", (convert("Temperature", this.CurrentBrakeTemperatures[4]) . temperatureUnit)))
 
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Wear.FL", kUndefined) != kUndefined) {
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Brake.Wear.FL") {
 						if !knowledge.Has("Brakes")
 							knowledge["Brakes"] := Map()
 
@@ -1389,7 +1389,7 @@ class RaceEngineer extends RaceAssistant {
 
 			if this.activeTopic(options, "Damage")
 				try {
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Front", kUndefined) != kUndefined)
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Damage.Bodywork.Front")
 						bodyworkDamage := [knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Front", 0)
 										 , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Rear", 0)
 										 , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Bodywork.Left", 0)
@@ -1406,7 +1406,7 @@ class RaceEngineer extends RaceAssistant {
 												 , "Left", (Round(bodyworkDamage[3] / bodyWorkDamageSum * 100, 1) . percent)
 												 , "Right", (Round(bodyworkDamage[4] / bodyWorkDamageSum * 100, 1) . percent)))
 
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.FL", kUndefined) != kUndefined)
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Damage.Suspension.FL")
 						suspensionDamage := [knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.FL", 0)
 										   , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.FR", 0)
 										   , knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Suspension.RL", 0)
@@ -1427,7 +1427,7 @@ class RaceEngineer extends RaceAssistant {
 												   , "RearRight", (Round(suspensionDamage[4] / suspensionDamageSum * 100, 1) . percent)))
 					}
 
-					if ((knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine", kUndefined) != kUndefined)
+					if (knowledgeBase.hasValue("Lap." . lapNumber . ".Damage.Engine")
 					 && (knowledgeBase.getValue("Lap." . lapNumber . ".Damage.Engine") > 0)) {
 						if !knowledge.Has("Damage")
 							knowledge["Damage"] := Map()
@@ -1484,7 +1484,7 @@ class RaceEngineer extends RaceAssistant {
 					pitstops := []
 
 					loop knowledgeBase.getValue("Pitstop.Last", 0)
-						if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined) {
+						if knowledgeBase.hasValue("Pitstop." . A_Index . ".Lap") {
 							pitstop := getPastPitstop(A_Index)
 
 							if pitstop
@@ -3694,7 +3694,7 @@ class RaceEngineer extends RaceAssistant {
 										, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RL")
 										, knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Temperature.RR")]
 
-		if (knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL", kUndefined) != kUndefined)
+		if knowledgeBase.hasValue("Lap." . lapNumber . ".Brake.Temperature.FL")
 			this.iCurrentBrakeTemperatures := [knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FL")
 											 , knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.FR")
 											 , knowledgeBase.getValue("Lap." . lapNumber . ".Brake.Temperature.RL")

@@ -2455,6 +2455,15 @@ class Variables extends CaseInsenseMap {
 		this[variable.Variable[true]] := value
 	}
 
+	hasValue(var) {
+		local fullName := (isInstance(var, Variable) ? var.Variable[true] : var)
+
+		if this.Has(fullName)
+			return true
+		else
+			return false
+	}
+
 	getValue(var, default := kNotInitialized) {
 		local fullName := (isInstance(var, Variable) ? var.Variable[true] : var)
 
@@ -2964,6 +2973,10 @@ class ResultSet {
 				}
 			}
 		}
+	}
+
+	hasValue(var) {
+		return (this.getValue(var, kUndefined) != kUndefined)
 	}
 
 	getValue(var, default := kNotInitialized) {
@@ -3882,6 +3895,10 @@ class KnowledgeBase {
 		this.Facts.setValue(fact, value, propagate)
 	}
 
+	hasValue(fact) {
+		return this.Facts.hasValue(fact)
+	}
+
 	getValue(fact, default := kNotInitialized) {
 		return this.Facts.getValue(fact, default)
 	}
@@ -4078,6 +4095,17 @@ class Facts {
 			}
 			else
 				throw "Unknown fact `"" . fact . "`" encountered in Facts.setValue..."
+	}
+
+	hasValue(fact) {
+		local facts := this.Facts
+
+		if isInstance(fact, Variable)
+			fact := fact.Variable[true]
+		else if isInstance(fact, Literal)
+			fact := fact.Literal
+
+		return facts.Has(fact)
 	}
 
 	getValue(fact, default := kNotInitialized) {

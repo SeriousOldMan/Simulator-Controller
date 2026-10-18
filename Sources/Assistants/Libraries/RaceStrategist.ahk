@@ -1433,7 +1433,7 @@ class RaceStrategist extends GridRaceAssistant {
 					for ignore, lap in knowledge["Laps"] {
 						lapNr := lap["Nr"]
 
-						if (knowledgeBase.getValue("Lap." . lapNr . ".Tyre.Wear.FL", kUndefined) != kUndefined) {
+						if knowledgeBase.hasValue("Lap." . lapNr . ".Tyre.Wear.FL") {
 							tyreWear := Map()
 
 							for postfix, tyre in Map("FL", "FrontLeft", "FR", "FrontRight"
@@ -1455,7 +1455,7 @@ class RaceStrategist extends GridRaceAssistant {
 				try {
 					lapNumber := knowledgeBase.getValue("Lap", 0)
 
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", kUndefined) != kUndefined)
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Tyre.Wear.FL")
 						knowledge["Tyres"]["Wear"]
 							:= Map("FrontLeft", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FL", 0) . percent)
 							     , "FrontRight", (knowledgeBase.getValue("Lap." . lapNumber . ".Tyre.Wear.FR", 0) . percent)
@@ -1492,7 +1492,7 @@ class RaceStrategist extends GridRaceAssistant {
 				else
 					try {
 						loop knowledgeBase.getValue("Pitstop.Last", 0)
-							if (knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined) != kUndefined)
+							if knowledgeBase.hasValue("Pitstop." . A_Index . ".Lap")
 								pitstops.Push(Map("Nr", pitstops.Length + 1
 												, "Lap", knowledgeBase.getValue("Pitstop." . A_Index . ".Lap")))
 					}
@@ -2674,7 +2674,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 				wear := false
 
-				if (knowledgeBase.getValue(prefix . ".Tyre.Wear.FL", kUndefined) != kUndefined)
+				if knowledgeBase.hasValue(prefix . ".Tyre.Wear.FL")
 					wear := [Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FL"))
 						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.FR"))
 						   , Round(knowledgeBase.getValue(prefix . ".Tyre.Wear.RL"))

@@ -12,6 +12,7 @@
 #Include "..\Framework\Extensions\Math.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
+#Include "Libraries\Sector397Plugin.ahk"
 #Include "Libraries\LMURESTProvider.ahk"
 #Include "Libraries\LMUProvider.ahk"
 #Include "RF2 Plugin.ahk"

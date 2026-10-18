@@ -172,24 +172,24 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	activate() {
-		super.activate()
+	simulatorStartup(simulator) {
+		super.simulatorStartup(simulator)
 
-		if this.iChatActivation
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
 			this.Controller.connectChat(this, this.iChatActivation)
 	}
 
-	deactivate() {
-		super.deactivate()
+	simulatorShutdown(simulator) {
+		super.simulatorShutdown(simulator)
 
-		if this.iChatActivation
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
 			this.Controller.disconnectChat(this)
 	}
 
 	handleChatMessage(message) {
 		local chatMode := this.findMode(kChatMode)
 
-		if chatMode
+		if (chatMode && (this.Session >= kSessionOther))
 			chatMode.handleChatMessage(message)
 	}
 

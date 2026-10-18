@@ -288,25 +288,28 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	activate() {
-		super.activate()
-
-		if this.iChatActivation
-			this.Controller.connectChat(this, this.iChatActivation)
-	}
-
-	deactivate() {
-		super.deactivate()
-
-		if this.iChatActivation
-			this.Controller.disconnectChat(this)
-	}
-
 	simulatorStartup(simulator) {
 		if (simulator = kACCApplication)
 			Task.startTask(ObjBindMethod(ACCPlugin, "requireCarDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
+
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
+			this.Controller.connectChat(this, this.iChatActivation)
+	}
+
+	simulatorShutdown(simulator) {
+		super.simulatorShutdown(simulator)
+
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
+			this.Controller.disconnectChat(this)
+	}
+
+	handleChatMessage(message) {
+		local chatMode := this.findMode(kChatMode)
+
+		if (chatMode && (this.Session >= kSessionOther))
+			chatMode.handleChatMessage(message)
 	}
 
 	driverActive(data, driverForname, driverSurname) {

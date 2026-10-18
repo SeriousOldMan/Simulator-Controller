@@ -2139,7 +2139,7 @@ class LMURESTProvider {
 
 		send(message) {
 			try {
-				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, JSON.print(Map("message", message)), false)
+				result := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, JSON.print(message), false)
 			}
 			catch Any as exception {
 				logError(exception)

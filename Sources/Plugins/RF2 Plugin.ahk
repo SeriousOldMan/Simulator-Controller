@@ -50,7 +50,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 
 		handleChatMessage(message) {
-			if this.Mode.Plugin.activateWindow() {
+			if this.Plugin.activateWindow() {
 				Send(this.Mode.Plugin.OpenChatHotkey)
 				Sleep(100)
 				Send(message)

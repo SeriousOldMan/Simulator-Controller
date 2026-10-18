@@ -26,13 +26,18 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("Text", "x16 y80 w120 h23 +0x200", translate("Activation"))
-		window.Add("Edit", "x140 yp w333 h21 W:Grow VchatActivationEdit"
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		window.Add("GroupBox", "x16 y80 w457 h45 W:Grow", translate("Speech"))
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("Text", "x24 yp+17 w80 h23 +0x200", translate("Activation"))
+		window.Add("Edit", "x110 yp w120 h21 W:Grow(0.5) VchatActivationEdit"
 						 , getMultiMapValue(this.Configuration, "Voice Control", "ChatActivation", ""))
 
-		window.Add("Text", "x56 yp+30 w" . (473 - 56 - 40) . " 0x10 W:Grow")
-
-		window.Add("ListView", "x16 y120 w457 h205 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
+		window.Add("ListView", "x16 y135 w457 h190 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
 		window.Add("Text", "x16 y335 w81 h23 Y:Move +0x200", translate("Button"))
 		window.Add("Text", "x98 y335 w12 h23 Y:Move +0x200", translate("#"))
@@ -61,6 +66,8 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		setButtonIcon(window["chatMessageDeleteButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VchatMessageUpdateButton")
 		setButtonIcon(window["chatMessageUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
+
+		window.Add("Text", "x56 yp+30 w" . (473 - 56 - 40) . " 0x10 W:Grow")
 
 		this.initializeList(editor, window["chatMessagesListView"], window["chatMessageAddButton"], window["chatMessageDeleteButton"], window["chatMessageUpdateButton"])
 	}

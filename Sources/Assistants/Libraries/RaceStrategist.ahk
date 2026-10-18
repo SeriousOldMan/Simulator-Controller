@@ -1951,7 +1951,7 @@ class RaceStrategist extends GridRaceAssistant {
 
 		this.updateConfigurationValues({UseTraffic: getMultiMapValue(settings, "Strategy Settings", "Traffic.Simulation", false)})
 
-		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+		if hasMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")
 			for compound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")) {
 				splitCompound(compound, &tyreCompound, &tyreCompoundColor)
 
@@ -4528,7 +4528,7 @@ class RaceStrategist extends GridRaceAssistant {
 			this.Provider.supportsPitstop(&mixedCompounds, &tyreService, &brakeService)
 
 			loop getMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
-				if (getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", kUndefined) != kUndefined) {
+				if hasMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap") {
 					pitstop := {Nr: A_Index
 							  , Time: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time")
 							  , Lap: getMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap")

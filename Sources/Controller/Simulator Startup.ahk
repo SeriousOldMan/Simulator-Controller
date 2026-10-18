@@ -1785,7 +1785,7 @@ loadStartupProfiles(target, fileName := false) {
 		}
 
 		for ignore, function in functions
-			if (getMultiMapValue(settings, "Profiles", name . ".Function." . function[2], kUndefined) != kUndefined)
+			if hasMultiMapValue(settings, "Profiles", name . ".Function." . function[2])
 				profile["Function." . function[2]] := getMultiMapValue(settings, "Profiles", name . ".Function." . function[2])
 
 		profiles.Push(profile)
@@ -2191,7 +2191,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 			}
 
 			for ignore, function in functions
-				if (getMultiMapValue(settings, "Profiles", name . ".Function." . function[2], kUndefined) != kUndefined)
+				if hasMultiMapValue(settings, "Profiles", name . ".Function." . function[2])
 					profile["Function." . function[2]] := getMultiMapValue(settings, "Profiles", name . ".Function." . function[2])
 
 			profiles.Push(profile)

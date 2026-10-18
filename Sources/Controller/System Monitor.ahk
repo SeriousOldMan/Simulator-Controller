@@ -460,7 +460,7 @@ systemMonitor(command := false, arguments*) {
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Track") . "</td></tr>")
 		html .= ("<tr><th class=`"th-std th-left`">" . translate("Session") . "</th><td class=`"td-wdg`">" . translate(getMultiMapValue(sessionState, "Session", "Type")) . "</td></tr>")
 
-		if (getMultiMapValue(sessionState, "Session", "Profile", kUndefined) != kUndefined)
+		if hasMultiMapValue(sessionState, "Session", "Profile")
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Profile") . "</th><td class=`"td-wdg`">" . getMultiMapValue(sessionState, "Session", "Profile") . "</td></tr>")
 		else
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Profile") . "</th><td class=`"td-wdg`">" . translate("Standard") . "</td></tr>")
@@ -1048,7 +1048,7 @@ systemMonitor(command := false, arguments*) {
 			if ((engineDamage > 0) || isDebug())
 				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Engine") . "</th><td class=`"td-wdg`">" . displayValue("Float", engineDamage, 1) . translate("%") . "</td></tr>")
 
-			if ((getMultiMapValue(sessionState, "Damage", "Lap.Delta", kUndefined) != kUndefined) && (getMultiMapValue(sessionState, "Damage", "Lap.Delta") != 0))
+			if (hasMultiMapValue(sessionState, "Damage", "Lap.Delta") && (getMultiMapValue(sessionState, "Damage", "Lap.Delta") != 0))
 				html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Lap time delta") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Lap.Delta", 0), 1) . translate(" Seconds") . "</td></tr>")
 
 			html .= ("<tr><th class=`"th-std th-left`" colspan=`"2`">" . translate("Repair time") . "</th><td class=`"td-wdg`">" . displayValue("Float", getMultiMapValue(sessionState, "Damage", "Time.Repairs", 0), 1) . translate(" Seconds") . "</td></tr>")
@@ -1450,7 +1450,7 @@ systemMonitor(command := false, arguments*) {
 			else
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Position") . "</th><td class=`"td-wdg`">" . positionOverall . "</td></tr>")
 
-			if (getMultiMapValue(sessionState, "Standings", "Focus.Lap.Time", kUndefined) != kUndefined) {
+			if hasMultiMapValue(sessionState, "Standings", "Focus.Lap.Time") {
 				nr := getMultiMapValue(sessionState, "Standings", "Focus.Nr")
 				delta := getMultiMapValue(sessionState, "Standings", "Focus.Delta")
 
@@ -1469,7 +1469,7 @@ systemMonitor(command := false, arguments*) {
 					}
 			}
 
-			if (getMultiMapValue(sessionState, "Standings", "Leader.Lap.Time", kUndefined) != kUndefined) {
+			if hasMultiMapValue(sessionState, "Standings", "Leader.Lap.Time") {
 				nr := getMultiMapValue(sessionState, "Standings", "Leader.Nr")
 				delta := getMultiMapValue(sessionState, "Standings", "Leader.Delta")
 
@@ -1490,7 +1490,7 @@ systemMonitor(command := false, arguments*) {
 					}
 			}
 
-			if (getMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time", kUndefined) != kUndefined) {
+			if hasMultiMapValue(sessionState, "Standings", "Ahead.Lap.Time") {
 				nr := getMultiMapValue(sessionState, "Standings", "Ahead.Nr")
 				delta := getMultiMapValue(sessionState, "Standings", "Ahead.Delta")
 
@@ -1511,7 +1511,7 @@ systemMonitor(command := false, arguments*) {
 					}
 			}
 
-			if (getMultiMapValue(sessionState, "Standings", "Behind.Lap.Time", kUndefined) != kUndefined) {
+			if hasMultiMapValue(sessionState, "Standings", "Behind.Lap.Time") {
 				nr := getMultiMapValue(sessionState, "Standings", "Behind.Nr")
 				delta := getMultiMapValue(sessionState, "Standings", "Behind.Delta")
 
@@ -1639,9 +1639,9 @@ systemMonitor(command := false, arguments*) {
 			html .= ("<tr><td><b>" . translate("Track:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Track") . "</td></tr>")
 			html .= ("<tr><td><b>" . translate("Session:") . "</b></td><td>" . translate(displayState) . "</td></tr>")
 
-			if (getMultiMapValue(controllerState, "Simulation", "Information", kUndefined) != kUndefined)
+			if hasMultiMapValue(controllerState, "Simulation", "Information")
 				html .= ("<tr><td><b>" . translate("State:") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Information") . "</td></tr>")
-			else if (getMultiMapValue(controllerState, "Simulation", "Profile", kUndefined) != kUndefined)
+			else if hasMultiMapValue(controllerState, "Simulation", "Profile")
 				html .= ("<tr><td><b>" . translate("Profile: ") . "</b></td><td>" . getMultiMapValue(controllerState, "Simulation", "Profile") . "</td></tr>")
 
 			html .= "</table>"
@@ -1689,7 +1689,7 @@ systemMonitor(command := false, arguments*) {
 						state .= translate(" (Silent)")
 					else if !getMultiMapValue(configuration, "Voice", "Speaker", true)
 						state .= translate(" (Silent)")
-					else if (getMultiMapValue(configuration, "Voice", "Muted", kUndefined) != kUndefined) {
+					else if hasMultiMapValue(configuration, "Voice", "Muted") {
 						if getMultiMapValue(configuration, "Voice", "Muted")
 							state .= translate(" (Muted)")
 					}

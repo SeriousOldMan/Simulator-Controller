@@ -1345,7 +1345,7 @@ class RaceEngineer extends RaceAssistant {
 					if lastPitstop {
 						pitstopHistory := this.createPitstopHistory()
 
-						if (getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap", kUndefined) != kUndefined) {
+						if hasMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap") {
 							stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 
 							tyres["Laps"] := Map("FrontLeft", getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".TyreLapsFrontLeft") + stintLaps
@@ -2965,7 +2965,7 @@ class RaceEngineer extends RaceAssistant {
 									  , "Session.Setup.Tyre.Wet.Pressure.RR", getDeprecatedValue(settings, "Session Setup", "Race Setup"
 																										 , "Tyre.Wet.Pressure.RR", 28.2)))
 
-		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+		if hasMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")
 			for compound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")) {
 				splitCompound(compound, &tyreCompound, &tyreCompoundColor)
 
@@ -3500,7 +3500,7 @@ class RaceEngineer extends RaceAssistant {
 																					   , knowledgeBase.getValue("Tyre.Pressure.Loss.RR", 0)))
 
 			if lastPitstop {
-				if (getMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap", kUndefined) != kUndefined) {
+				if hasMultiMapValue(pitstopHistory, "Pitstops", lastPitstop . ".Lap") {
 					stintLaps := (lapNumber - (knowledgeBase.getValue("Pitstop." . lastPitstop . ".Lap")))
 
 					setMultiMapValue(sessionInfo, "Tyres", "Laps"
@@ -3531,7 +3531,7 @@ class RaceEngineer extends RaceAssistant {
 					for index, position in ["FL", "FR", "RL", "RR"]
 						setMultiMapValue(sessionInfo, "Damage", "Suspension." . position, Round(suspensionDamage[index], 2))
 
-				if (getMultiMapValue(data, "Car Data", "EngineDamage", kUndefined) != kUndefined)
+				if hasMultiMapValue(data, "Car Data", "EngineDamage")
 					setMultiMapValue(sessionInfo, "Damage", "Engine", Round(getMultiMapValue(data, "Car Data", "EngineDamage"), 2))
 
 				setMultiMapValue(sessionInfo, "Damage", "Lap.Delta", Round(Max(knowledgeBase.getValue("Damage.Bodywork.Lap.Delta", 0)
@@ -3801,7 +3801,7 @@ class RaceEngineer extends RaceAssistant {
 		this.iCurrentTyrePressures := tyrePressures
 		this.iCurrentTyreTemperatures := tyreTemperatures
 
-		if (getMultiMapValue(data, "Car Data", "BrakeTemperatures", kUndefined) != kUndefined)
+		if hasMultiMapValue(data, "Car Data", "BrakeTemperatures")
 			this.iCurrentBrakeTemperatures := string2Values(",", getMultiMapValue(data, "Car Data", "BrakeTemperatures"))
 		else
 			this.iCurrentBrakeTemperatures := false

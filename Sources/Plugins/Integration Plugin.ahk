@@ -182,7 +182,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			if (getMultiMapValue(sessionInfo, "Session", "Simulator", kNull) = kNull)
 				state["Profile"] := kNull
-			else if (getMultiMapValue(sessionInfo, "Session", "Profile", kUndefined) != kUndefined)
+			else if hasMultiMapValue(sessionInfo, "Session", "Profile")
 				state["Profile"] := getMultiMapValue(sessionInfo, "Session", "Profile")
 			else
 				state["Profile"] := translate("Standard", this.Language)
@@ -774,7 +774,7 @@ class IntegrationPlugin extends ControllerPlugin {
 			state["ClassPosition"] := positionClass
 
 			for ignore, opponent in ["Leader", "Ahead", "Behind", "Focus"]
-				if (getMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time", kUndefined) != kUndefined) {
+				if hasMultiMapValue(sessionInfo, "Standings", opponent . ".Lap.Time") {
 					nr := getMultiMapValue(sessionInfo, "Standings", opponent . ".Nr", false)
 					delta := getMultiMapValue(sessionInfo, "Standings", opponent . ".Delta")
 
@@ -854,7 +854,7 @@ class IntegrationPlugin extends ControllerPlugin {
 
 			state := Map("Corner", getMultiMapValue(coachingState, "Instructions", "Corner", kNull), "Hints", hints)
 
-			if (getMultiMapValue(coachingState, "Instructions", "Name", kUndefined) != kUndefined)
+			if hasMultiMapValue(coachingState, "Instructions", "Name")
 				state["Name"] := getMultiMapValue(coachingState, "Instructions", "Name")
 		}
 

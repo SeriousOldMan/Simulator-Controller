@@ -88,7 +88,7 @@ class LMUSetup extends FileSetup {
 		/*
 		setting := StrSplit(getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting), ".", , 2)
 
-		return (getMultiMapValue(this.Data[original], setting[1], setting[2], kUndefined) != kUndefined)
+		return hasMultiMapValue(this.Data[original], setting[1], setting[2])
 		*/
 
 		return super.valueAvailable(setting, original)
@@ -99,9 +99,9 @@ class LMUSetup extends FileSetup {
 		local path := StrSplit(getMultiMapValue(this.Editor.Configuration, "Setup.Settings", setting), ".", , 2)
 
 		try {
-			if (getMultiMapValue(data, path[1], path[2], kUndefined) != kUndefined)
+			if hasMultiMapValue(data, path[1], path[2])
 				return StrSplit(getMultiMapValue(data, path[1], path[2]), "//", , 2)[1]
-			else if (getMultiMapValue(data, path[1], "//" . path[2], kUndefined) != kUndefined)
+			else if hasMultiMapValue(data, path[1], "//" . path[2])
 				return StrSplit(getMultiMapValue(data, path[1], "//" . path[2]), "//", , 2)[1]
 			else
 				throw "Undefined setting..."
@@ -116,9 +116,9 @@ class LMUSetup extends FileSetup {
 		local data := (display ? display : this.Data)
 
 		try {
-			if (getMultiMapValue(data, path[1], path[2], kUndefined) != kUndefined)
+			if hasMultiMapValue(data, path[1], path[2])
 				setMultiMapValue(data, path[1], path[2], value)
-			else if (getMultiMapValue(data, path[1], "//" . path[2], kUndefined) != kUndefined) {
+			else if hasMultiMapValue(data, path[1], "//" . path[2]) {
 				removeMultiMapValue(data, path[1], "//" . path[2])
 
 				setMultiMapValue(data, path[1], path[2], value)

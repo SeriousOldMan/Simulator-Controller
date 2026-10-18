@@ -2130,6 +2130,23 @@ class LMURESTProvider {
 		}
 	}
 
+	class ChatData extends LMURESTProvider.RESTData {
+		POSTURL {
+			Get {
+				return "http://localhost:6397/rest/chat"
+			}
+		}
+
+		send(message) {
+			try {
+				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, JSON.print(Map("message", message)), false)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		}
+	}
+
 	static WheelTypes {
 		Get {
 			return LMURestProvider.sWheelTypes

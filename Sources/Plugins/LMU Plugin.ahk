@@ -39,6 +39,12 @@ class LMUPlugin extends Sector397Plugin {
 
 	iAdjustRefuelAmount := false
 
+	class ChatMode extends Sector397Plugin.ChatMode {
+		handleChatMessage(message) {
+			LMURestProvider.ChatData().send(message)
+		}
+	}
+
 	class LMUProvider extends LMUProvider {
 		iPlugin := false
 
@@ -51,6 +57,10 @@ class LMUPlugin extends Sector397Plugin {
 		getRefuelAmount(setupData) {
 			return this.iPlugin.getOptionHandler("Refuel").Call("Get", , setupData)
 		}
+	}
+
+	createChatMode() {
+		return LMUPlugin.ChatMode(this)
 	}
 
 	createSimulatorProvider() {

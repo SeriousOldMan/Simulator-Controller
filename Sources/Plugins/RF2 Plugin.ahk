@@ -153,7 +153,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 		if this.iChatActivation
 			if !this.iChatMode
-				this.iChatMode := Sector397Plugin.ChatMode(this)
+				this.iChatMode := this.createChatMode()
 
 		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
 			function := this.Controller.findFunction(descriptor)
@@ -172,24 +172,28 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	activate() {
-		super.activate()
+	createChatMode() {
+		return Sector397Plugin.ChatMode(this)
+	}
 
-		if this.iChatActivation
+	simulatorStartup(simulator) {
+		super.simulatorStartup(simulator)
+
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
 			this.Controller.connectChat(this, this.iChatActivation)
 	}
 
-	deactivate() {
-		super.deactivate()
+	simulatorShutdown(simulator) {
+		super.simulatorShutdown(simulator)
 
-		if this.iChatActivation
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
 			this.Controller.disconnectChat(this)
 	}
 
 	handleChatMessage(message) {
 		local chatMode := this.findMode(kChatMode)
 
-		if chatMode
+		if (chatMode && (this.Session >= kSessionOther))
 			chatMode.handleChatMessage(message)
 	}
 

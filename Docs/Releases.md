@@ -34,13 +34,13 @@
 #### Fixes
 
   - Fixed the handling of the *ConstrainWindow* core setting.
-  - Fixed a bug, that prevented chat messages to be sent in *rFactor 2* and *Le Mans Ultimate*.
+  - Fixed a bug, that prevented chat messages to be sent in *rFactor 2*.
   
 #### Changes
 
   - The Spotter now reminds you to do a proper rejoin after an accident or off-track.
-  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible. See the [updated documentation](*) for more information.
-  - Messages for the in-game chat of *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* can now be given by voice. See the [updated documentation](*) for more information.
+  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) about the *Push-To-Talk* configuration for more information.
+  - Messages for the in-game chat of *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* can now be given by voice. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat) for more information.
   - Minor enhancements of the new Logbook of the "Setup Workbench"
     - Empty Logbooks will get deleted automatically.
 	- The number of available action entries are shown in the list of available Logbooks.

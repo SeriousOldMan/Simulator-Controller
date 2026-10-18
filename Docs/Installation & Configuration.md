@@ -504,7 +504,7 @@ Note: Additionally to this default configuration, you can specify the spoken and
 With the last option, you have to configure a *Push-To-Talk* function for voice recognition, which will greatly enhance the voice recognition quality and will avoid almost all false positives, if you are not in a very quite environment. The argument to be entered in the field is a key code as defined in the AutoHotkey [key list](https://www.autohotkey.com/docs/KeyList.htm). For example, "LControl" defines the left control key on the keyboard, whereas "4Joy2" defines the second button on your 4th connected hardware controller.
 Using the second entry field *Activation* you can supply a keyword or a complete phrase to focus the voice recognition framework to the commands you defined as voice commands for the controller itself, normally using [controller actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). The recognition language for this activation command will always be the one chosen by the language dropdown menu above. For more information on how to use multiple voice *communication partners*, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands).
 
-Good to know: You can also provide a name for the controller to be used in combined commands like "Jim, activate wiper" (when you have defined a custom command "?Activate wiper"), if *Jim* is the name you want to use for your !controller!. The value for the !Activation! field will then has to be "Jim: Hey Jim". So you can use "Hey Jim" as single activation phrase, but also can target the controller in a combined phrase directly, as in the example above.
+Good to know: You can also provide a name for the controller to be used in combined commands like "Jim, activate wiper" (when you have defined a custom command "?Activate wiper"), if *Jim* is the name you want to use for your *controller*. The value for the *Activation* field then has to be "Jim: Hi Jim". So you can use "Hi Jim" as single activation phrase, but also can target the controller in a combined phrase directly, as in the example above.
 
 ###### Notes
 
@@ -660,7 +660,13 @@ Many simulation games provide an ingame multiplayer text based chat system. Sinc
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%206.JPG)
 
-In the first field, you define the push button function for the given chat message on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system, when the corresponding button is pressed.
+It is possible to create chat messages using voice. Using the field *Activation* you can supply a keyword or a complete phrase to focus the voice recognition framework to listen for chat messages. The recognition language for this activation command will be the one chosen by the language dropdown menu in the [*Voice Control* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). For more information on how to use multiple voice *communication partners*, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands).
+
+When the chat is chosen as target for your voice input, each of your *commands* will be interpreted as a message to be sent to the in-game chat. For this to work properly a voice recognition method must be used, which can handle free speech, like Azure or Google.
+
+Good to know: You can also provide a name for the controller to be used in combined commands like "Message, Thanks for letting me pass", if *Message* is the name you want to use for the chat system. The value for the *Activation* field then has to be "Message: Hi Message". So you can use "Hi Message" as single activation phrase, but also can target the chat system in a combined phrase directly, as in the example above.
+
+In many cases, you additionally may want to use a set of predefined chat messages, if you have a controller with some buttons to spare for this. These can be defined in the list below. Using the first field below the list, you define the push button function for the given chat message on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system, when the corresponding button is pressed.
 
 #### Tab *Driving Coach*
 

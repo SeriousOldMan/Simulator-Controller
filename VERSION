@@ -5,7 +5,7 @@ Version=7.3.1.0-dev
 Target=7.3.1.0-release
 Date=10/19/26
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/kpGSu0hr?inline=true
-Changes=Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2, Support of a name for the controller speech activation, Speech support for in-game chat messages, Fixed LMU chat mode
+Changes=Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2, Support of a name for the controller speech activation, Speech support for in-game chat messages, Fixed LMU chat mode, Updated LLM Runtime
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.0.0-release

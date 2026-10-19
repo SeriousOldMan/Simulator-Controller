@@ -35,7 +35,8 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 7.3.1
 
-If you are using the chat system, you must remove or substitute the special characters of AutoHotkey from your defined message texts. Example: "WTF{!}" -> "WTF!".
+- If you are using the chat system, you must remove or substitute the special characters of AutoHotkey from your defined message texts. Example: "WTF{!}" -> "WTF!".
+- The local LLM Runtime has been updated. If you are using the LLM Runtime, you may want to update it to the new version. Open "Simulator Setup", remove the "Local runtime system for LLMs" preset and reinstall it.
 
 ## Release 7.3.0
 

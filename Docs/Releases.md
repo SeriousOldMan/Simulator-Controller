@@ -44,11 +44,12 @@
   - Messages for the in-game chat of *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* can now be given by voice. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat) for more information.
   - [Important] It is no longer necessary or even possible to use special keys of AutoHotkey or escape sequences in the message texts of the chat system.
   - Several plugin arguments (*closePitstopMFD* and *openChat*) have been removed for *Le Mans Ultimate*, which are actually not used anymore.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731).
   - Minor enhancements of the new Logbook of the "Setup Workbench"
     - Empty Logbooks will get deleted automatically.
 	- The number of available action entries are shown in the list of available Logbooks.
 
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731) if you are using the chat system.
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731) if you are using the chat system and/or if you are using the local LLM Runtime.
 
 # Release history
 

@@ -58,13 +58,9 @@ class RF2Plugin extends Sector397Plugin {
 	}
 
 	loadFromConfiguration(configuration) {
-		local chatMode := false
-
-		if getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
-			if !this.ChatMode
-				chatMode := this.createChatMode()
-
-		super.loadFromConfiguration(configuration, chatMode)
+		super.loadFromConfiguration(configuration
+								  , getMultiMapValue(configuration, "Voice Control", "ChatActivation", false) ? this.createChatMode()
+																											  : false)
 	}
 
 	createChatMode() {
@@ -74,10 +70,10 @@ class RF2Plugin extends Sector397Plugin {
 	registerMode(mode) {
 		if (mode.Mode = kChatMode) {
 			if (this.OpenChatHotkey && (Trim(this.OpenChatHotkey) != ""))
-				this.registerMode(mode)
+				super.registerMode(mode)
 		}
 		else
-			this.registerMode(mode)
+			super.registerMode(mode)
 	}
 
 	getPitstopActions(&allActions, &selectActions) {

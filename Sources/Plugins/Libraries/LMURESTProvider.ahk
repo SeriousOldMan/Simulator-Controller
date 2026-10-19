@@ -2116,7 +2116,7 @@ class LMURESTProvider {
 	class GarageData extends LMURESTProvider.RESTData {
 		POSTURL {
 			Get {
-				return "http://localhost:6397/rest/garage/refreshsetups"
+				return "http://localhost:6397/rest/garage/refreshsetups/"
 			}
 		}
 
@@ -2133,13 +2133,13 @@ class LMURESTProvider {
 	class ChatData extends LMURESTProvider.RESTData {
 		POSTURL {
 			Get {
-				return "http://localhost:6397/rest/chat"
+				return "http://localhost:6397/rest/chat/"
 			}
 		}
 
 		send(message) {
 			try {
-				result := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, JSON.print(message), false)
+				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, message, false)
 			}
 			catch Any as exception {
 				logError(exception)

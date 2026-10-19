@@ -1982,10 +1982,11 @@ class ControllerMode {
 		}
 	}
 
-	__New(plugin) {
+	__New(plugin, register := true) {
 		this.iPlugin := plugin
 
-		plugin.registerMode(this)
+		if register
+			plugin.registerMode(this)
 	}
 
 	registerAction(action) {

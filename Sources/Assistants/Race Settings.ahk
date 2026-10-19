@@ -1271,7 +1271,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 								  , 99)
 		}
 
-		if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+		if hasMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")
 			for tyreCompound, tyreLaps in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))
 				loop tyreSetListView.GetCount()
 					if (translate(tyreCompound) = tyreSetListView.GetText(A_Index, 1))

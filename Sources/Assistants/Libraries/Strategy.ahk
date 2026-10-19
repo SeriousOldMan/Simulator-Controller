@@ -3265,7 +3265,7 @@ class Strategy extends ConfigurationItem {
 				fixedPitstop := {Lap: getMultiMapValue(configuration, "Fixed", "Lap." . A_Index)
 							   , Compound: getMultiMapValue(configuration, "Fixed", "Compound." . A_Index)}
 
-				if (getMultiMapValue(configuration, "Fixed", "Refuel." . A_Index, kUndefined) != kUndefined)
+				if hasMultiMapValue(configuration, "Fixed", "Refuel." . A_Index)
 					fixedPitstop.Refuel := getMultiMapValue(configuration, "Fixed", "Refuel." . A_Index)
 
 				fixedPitstops[Integer(getMultiMapValue(configuration, "Fixed", "Pitstop." . A_Index))] := fixedPitstop

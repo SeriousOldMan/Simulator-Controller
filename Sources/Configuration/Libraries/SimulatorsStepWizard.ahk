@@ -439,7 +439,7 @@ class SimulatorsStepWizard extends ActionsStepWizard {
 					else {
 						isToggle := true
 
-						if (getMultiMapValue(pluginLabels, code, subAction . ".Increase", kUndefined) != kUndefined)
+						if hasMultiMapValue(pluginLabels, code, subAction . ".Increase")
 							this.setAction(count, mode, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 						else
 							this.setAction(count, mode, action, [isInformationRequest, "Toggle", false, false], label)

@@ -1092,22 +1092,22 @@ class RaceAssistant extends ConfigurationItem {
 		options["PushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
 
 		if getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Speaker", true)
-			options["SpeakerBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+			options["SpeakerBooster"] := (hasMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model") ? this.AssistantType : false)
 		else
 			options["SpeakerBooster"] := false
 
 		if getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Listener", true)
-			options["ListenerBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+			options["ListenerBooster"] := (hasMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model") ? this.AssistantType : false)
 		else
 			options["ListenerBooster"] := false
 
 		if getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Conversation", true)
-			options["ConversationBooster"] := ((getMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model", kUndefined) != kUndefined) ? this.AssistantType : false)
+			options["ConversationBooster"] := (hasMultiMapValue(configuration, "Conversation Booster", this.AssistantType . ".Model") ? this.AssistantType : false)
 		else
 			options["ConversationBooster"] := false
 
 		if getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Agent", true) {
-			if ((getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model", kUndefined) != kUndefined)
+			if (hasMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Model")
 			 || (InStr(getMultiMapValue(configuration, "Agent Booster", this.AssistantType . ".Service", ""), "Rules") == 1))
 				options["AgentBooster"] := this.AssistantType
 			else
@@ -1591,7 +1591,7 @@ class RaceAssistant extends ConfigurationItem {
 										   , "Remaining", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.Remaining", 0)) . volumeUnit)
 										   , "Consumption", (convert("Volume", knowledgeBase.getValue("Lap." . lapNumber . ".Fuel.AvgConsumption", 0))  . volumeUnit))
 
-					if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining", kUndefined) != kUndefined)
+					if knowledgeBase.hasValue("Lap." . lapNumber . ".Energy.Remaining")
 						knowledge["Energy"] := Map("Remaining", knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Remaining") . " %")
 				}
 				catch Any as exception {
@@ -2681,7 +2681,7 @@ class RaceAssistant extends ConfigurationItem {
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Fuel", Floor(knowledgeBase.getValue("Lap.Remaining.Fuel", 0)))
 			setMultiMapValue(sessionInfo, "Stint", "Laps.Remaining.Stint", Floor(knowledgeBase.getValue("Lap.Remaining.Stint", 0)))
 
-			if (knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption", kUndefined) != kUndefined) {
+			if knowledgeBase.hasValue("Lap." . lapNumber . ".Energy.Consumption") {
 				setMultiMapValue(sessionInfo, "Stint", "Energy.AvgConsumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.AvgConsumption", 0), 1))
 				setMultiMapValue(sessionInfo, "Stint", "Energy.Consumption", Round(knowledgeBase.getValue("Lap." . lapNumber . ".Energy.Consumption"), 1))
 				setMultiMapValue(sessionInfo, "Stint", "Energy.Remaining", Round(getMultiMapValue(data, "Car Data", "EnergyRemaining", 0), 1))
@@ -2765,10 +2765,10 @@ class RaceAssistant extends ConfigurationItem {
 																				 , Round(brakeWear[3], 2), Round(brakeWear[4], 2)))
 			}
 
-			if (getMultiMapValue(data, "Car Data", "WaterTemperature", kUndefined) != kUndefined)
+			if hasMultiMapValue(data, "Car Data", "WaterTemperature")
 				setMultiMapValue(sessionInfo, "Engine", "WaterTemperature", getMultiMapValue(data, "Car Data", "WaterTemperature"))
 
-			if (getMultiMapValue(data, "Car Data", "OilTemperature", kUndefined) != kUndefined)
+			if hasMultiMapValue(data, "Car Data", "OilTemperature")
 				setMultiMapValue(sessionInfo, "Engine", "OilTemperature", getMultiMapValue(data, "Car Data", "OilTemperature"))
 		}
 

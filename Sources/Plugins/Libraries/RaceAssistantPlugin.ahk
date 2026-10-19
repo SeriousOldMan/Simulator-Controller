@@ -903,7 +903,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						this.createRaceAssistantAction(controller, "TeamServer", arguments[2])
 				}
 
-				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Session", "Mode", kUndefined) != kUndefined))
+				if (this.StartupSettings && hasMultiMapValue(this.StartupSettings, "Session", "Mode"))
 					if (getMultiMapValue(this.StartupSettings, "Session", "Mode") = "Team")
 						this.enableTeamServer()
 					else
@@ -963,7 +963,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if assistantSpeaker {
 				this.iSpeaker := (((assistantSpeaker = kTrue) || (assistantSpeaker = "On")) ? true : assistantSpeaker)
 
-				if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, this.Plugin, "Silent", kUndefined) != kUndefined))
+				if (this.StartupSettings && hasMultiMapValue(this.StartupSettings, this.Plugin, "Silent"))
 					if getMultiMapValue(this.StartupSettings, this.Plugin, "Silent", false) {
 						this.iSpeaker := false
 

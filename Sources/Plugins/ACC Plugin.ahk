@@ -136,7 +136,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			if this.Plugin.activateWindow() {
 				Send("{Enter}")
 				Sleep(100)
-				Send(message)
+				SendText(message)
 				Sleep(100)
 				Send("{Enter}")
 			}

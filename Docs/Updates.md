@@ -35,7 +35,7 @@ Note: Some of you probably want to have more control. No problem. All the files 
 
 ## Release 7.3.1
 
-Nothing to do.
+If you are using the chat system, you must remove or substitute the special characters of AutoHotkey from your defined message texts. Example: "WTF{!}" -> "WTF!".
 
 ## Release 7.3.0
 

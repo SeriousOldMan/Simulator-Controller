@@ -550,7 +550,7 @@ This plugin handles the *Assetto Corsa Competizione* simulation game. This plugi
 
 ### Mode *Chat*
 
-The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "Assetto Corsa Competizione" activates the chat system only there.
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since *Assetto Corsa Competizione* activates the chat system only there.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
@@ -905,7 +905,7 @@ Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\B
 
 ### Mode *Chat*
 
-The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "rFactor 2" activates the chat system only there.
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since +rFactor 2* activates the chat system only there.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Button%20Box%205.JPG)
 
@@ -1336,7 +1336,7 @@ Important: You must install a plugin into *Le Mans Ultimate* plugins directory (
 
 ### Mode *Chat*
 
-The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since "Le Mans Ultimate" activates the chat system only there.
+The mode "Chat" binds all the configured chat messages to buttons on your controller hardware. The chat messages can be defined in the [Chat tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat). The messages will be only availabe in a multiuser race scenario, since *Le Mans Ultimate* activates the chat system only there.
 
 ### Mode *Pitstop*
 

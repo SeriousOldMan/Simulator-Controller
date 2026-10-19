@@ -35,7 +35,7 @@ class RF2Plugin extends Sector397Plugin {
 			if this.Plugin.activateWindow() {
 				Send(this.Plugin.OpenChatHotkey)
 				Sleep(100)
-				Send(message)
+				SendText(message)
 				Sleep(100)
 				Send("{Entser}")
 			}

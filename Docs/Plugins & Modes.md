@@ -590,7 +590,7 @@ First, you need to define, how to open and close the Pitstop MFD in *Assetto Cor
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
 
 *Assetto Corsa Competizione* provides an UDP interface to gather the position information for all the cars in the grid. The default login to this service is 127.0.0.1,9000,asd, (where the last argument, the *commandPassword*, is empty). If you have changed the connection information in the ACC configuration, you have to provide this connection information using the *udpConnection* in the plugin configuration:
 
@@ -721,7 +721,7 @@ Use the *...Option* and *...Choice* parameters to specify the keys, that will be
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -835,7 +835,7 @@ The parameter *pitstopMFDMode* determines, how the communication to the simulato
 
 If the opening of the Pitstop MFD for *iRacing* is requested without specifying which type of MFD is meant (for example by calling the controller action *openPitstopMFD* without specifying the optional argument for the *descriptor* parameter), the MFD for the fuel settings will be opened.
 
-As a special case, you can provide "Off" as the argument to *togglePitstopFuelMFD* or *togglePitstopTyreMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *togglePitstopFuelMFD* or *togglePitstopTyreMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -946,7 +946,7 @@ First, you can define, how to open and close the Pitstop MFD (aka HUD) in *rFact
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own. In all other cases, it is strongly recommended to supply at least the key code for opening the Pitstop MFD. Although it is technically possible to leave the MFD closed, while changes are applied to the pitstop settings, it has been reported that this can lead to errors.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own. In all other cases, it is strongly recommended to supply at least the key code for opening the Pitstop MFD. Although it is technically possible to leave the MFD closed, while changes are applied to the pitstop settings, it has been reported that this can lead to errors.
 
 If you want to use the "Chat" mode, you have to define the key, which activates the chat entry field in *Le Mans Ultimate* using the *openChat* parameter. The key "t" is the typical default in *Le Mans Ultimate* for this command binding by the way.
 	
@@ -1056,7 +1056,7 @@ Use the *...Option* and *...Choice* parameters to specify the keys, that will be
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -1172,7 +1172,7 @@ Use the *...Option* and *...Choice* parameters to specify the keys, that will be
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -1277,7 +1277,7 @@ Use the *...Option* and *...Choice* parameters to specify the keys, that will be
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the opening and thereby the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 
@@ -1346,7 +1346,6 @@ Similar to the pitstop mode the plugin for *Assetto Corsa Competizione*, you can
 
 All this will be achieved using the following plugin arguments:
 
-	openPitstopMFD: p; closePitstopMFD: p; openChat: t;
 	pitstopCommands: Refuel Dial.1 5, TyreAllAround Dial.2, PitstopPlan Button.1, PitstopPrepare Button.5,
 					 TyreCompound Button.2 Button.6, RepairRequest Button.3 Button.7, DriverSelect Button.4 Button.8
 
@@ -1367,17 +1366,15 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you can define, how to open and close the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional, since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
+First, you can define, how to open the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional (and might not even work due to *Easy AntiCheat*), since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
-	openPitstopMFD: *openHotkey*; closePitstopMFD: *closeHotkey*; requestPitstop: *requestPitstopHotkey*;
-	openChat: *openChatHotkey*;
+	openPitstopMFD: *openPitstopMFDHotkey*; closePitstopMFD: *closePitstopMFDHotkey*;
+	requestPitstop: *requestPitstopHotkey*;
 	pitstopMFDMode: Event | Input | Play | Raw | Default
 
 The parameter *pitstopMFDMode* determines, how the communication to the simulator is handled. You can try different values for this parameter, if the Pitstop MFD does not open. Simulator Controller simulates keyboard input for the simulator and there are different ways to do that. These are named "Event", Input", "Play", "Raw" and "Default". For whatever reason, there is not the one method, which works for every Windows installation. For me, "Event" works best and is therefore the standard, if you don't supply the parameter.
 
-As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings had been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own. Please note, that opening and closing the Pitstop MFD is actually not necessary for *Le Mans Ultimate* to control the pitstop settings, so you can ignore these parameters, if you do not want to use the "Off" setting.
-
-If you want to use the "Chat" mode, you have to define the key, which activates the chat entry field in *Le Mans Ultimate* using the *openChat* parameter. The key "t" is the typical default in *Le Mans Ultimate* for this command binding by the way.
+As a special case, you can provide "Off" as the argument to *openPitstopMFD*. This will disable the complete control of the Pitstop MFD. The software, and especially the *Race Assistants* still *think*, that the pitstop settings have been changed, which is helpful, if you only want to get the target settings by voice, but want to dial them into the Pitstop MFD by your own. Please note, that opening he Pitstop MFD is actually not necessary for *Le Mans Ultimate* to control the pitstop settings, so you can ignore this parameter, if you do not want to use the "Off" setting.
 	
 With the plugin parameter *pitstopCommands* you can supply a list of the settings, you want to tweak from your hardware controller, when the "Pitstop" mode is active. For most settings, you can supply either one binary or two unary controller function to control the setting, depending on the available buttons or dials. For *stepped* settings (for example tyre pressure and fuel amount) you can supply an additional argument to define the number of increments you want change in one step.
 

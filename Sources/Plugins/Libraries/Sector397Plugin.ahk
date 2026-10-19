@@ -29,9 +29,6 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 	iClosePitstopMFDHotkey := false
 	iRequestPitstopHotkey := false
 
-	iOpenChatHotkey := false
-
-	iPitstopMode := false
 	iChatMode := false
 
 	iChatActivation := false
@@ -97,24 +94,12 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	OpenChatHotkey {
-		Get {
-			return this.iOpenChatHotkey
-		}
-	}
-
 	__New(controller, name, simulator, configuration := false, register := true) {
 		super.__New(controller, name, simulator, configuration, true)
 
 		if (this.Active || (isDebug() && isDevelopment())) {
-			this.iPitstopMode := this.findMode(kPitstopMode)
-
-			this.iOpenChatHotkey := this.getArgumentValue("openChat", false)
-
-			if (this.iChatMode && this.OpenChatHotkey && (Trim(this.OpenChatHotkey) != ""))
+			if this.iChatMode
 				this.registerMode(this.iChatMode)
-			else
-				this.iChatMode := false
 
 			if !inList(A_Args, "-Replay")
 				this.iOpenPitstopMFDHotkey := this.getArgumentValue("openPitstopMFD", false)
@@ -135,16 +120,14 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		}
 	}
 
-	loadFromConfiguration(configuration) {
+	loadFromConfiguration(configuration, chatMode := false) {
 		local function, descriptor, message
+
+		this.iChatMode := chatMode
 
 		super.loadFromConfiguration(configuration)
 
 		this.iChatActivation := getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
-
-		if this.iChatActivation
-			if !this.iChatMode
-				this.iChatMode := this.createChatMode()
 
 		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
 			function := this.Controller.findFunction(descriptor)
@@ -153,7 +136,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 				message := string2Values("|", message)
 
 				if !this.iChatMode
-					this.iChatMode := Sector397Plugin.ChatMode(this)
+					this.iChatMode := this.createChatMode()
 
 				this.iChatMode.registerAction(Sector397Plugin.ChatAction(this.iChatMode, function
 																	   , message[1], message[2]))
@@ -199,7 +182,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		if (inList(activeModes, this.iChatMode))
 			this.iChatMode.updateActions(session)
 
-		if (inList(activeModes, this.iPitstopMode))
+		if (inList(activeModes, this.findMode(kPitstopMode)))
 			this.iPitstopMode.updateActions(session)
 	}
 

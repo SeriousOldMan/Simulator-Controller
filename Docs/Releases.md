@@ -43,6 +43,7 @@
   - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) about the *Push-To-Talk* configuration for more information.
   - Messages for the in-game chat of *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* can now be given by voice. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat) for more information.
   - [Important] It is no longer necessary or even possible to use special keys of AutoHotkey or escape sequences in the message texts of the chat system.
+  - Several plugin arguments (*closePitstopMFD* and *openChat*) have been removed for *Le Mans Ultimate*, which are actually not used anymore.
   - Minor enhancements of the new Logbook of the "Setup Workbench"
     - Empty Logbooks will get deleted automatically.
 	- The number of available action entries are shown in the list of available Logbooks.

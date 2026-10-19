@@ -30,6 +30,8 @@ global kRF2Plugin := "RF2"
 class RF2Plugin extends Sector397Plugin {
 	iSelectedDriver := false
 
+	iOpenChatHotkey := false
+
 	class ChatMode extends Sector397Plugin.ChatMode {
 		handleChatMessage(message) {
 			if this.Plugin.activateWindow() {
@@ -42,8 +44,40 @@ class RF2Plugin extends Sector397Plugin {
 		}
 	}
 
+	OpenChatHotkey {
+		Get {
+			return this.iOpenChatHotkey
+		}
+	}
+
+	__New(controller, name, simulator, configuration := false, register := true) {
+		super.__New(controller, name, simulator, configuration, true)
+
+		if (this.Active || (isDebug() && isDevelopment()))
+			this.iOpenChatHotkey := this.getArgumentValue("openChat", false)
+	}
+
+	loadFromConfiguration(configuration) {
+		local chatMode := false
+
+		if getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
+			if !this.ChatMode
+				chatMode := this.createChatMode()
+
+		super.loadFromConfiguration(configuration, chatMode)
+	}
+
 	createChatMode() {
 		return RF2Plugin.ChatMode(this)
+	}
+
+	registerMode(mode) {
+		if (mode.Mode = kChatMode) {
+			if (this.OpenChatHotkey && (Trim(this.OpenChatHotkey) != ""))
+				this.registerMode(mode)
+		}
+		else
+			this.registerMode(mode)
 	}
 
 	getPitstopActions(&allActions, &selectActions) {

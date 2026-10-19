@@ -68,6 +68,10 @@ class LMUPlugin extends Sector397Plugin {
 		return LMUPlugin.LMUProvider(this, this.Car, this.Track)
 	}
 
+	handleChatMessage(message) {
+		LMURestProvider.ChatData().send(message)
+	}
+
 	getPitstopActions(&allActions, &selectActions) {
 		allActions := CaseInsenseMap("NoRefuel", "No Refuel", "Refuel", "Refuel"
 								   , "TyreCompound", "Tyre Compound"

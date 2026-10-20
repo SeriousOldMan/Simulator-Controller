@@ -367,7 +367,7 @@ Nothing to do.
 
 ## Release 6.2.7
 
-A filter has been integrated which removes characters from car names and track names, before these are stored in the session database. This can make exsiting database entries inaccessible. In fact the foloowing characters are now removed from car and track names: "/" , ":", "*", "?", "<", ">", "|"
+A filter has been integrated which removes characters from car names and track names, before these are stored in the session database. This can make exsiting database entries inaccessible. In fact the following characters are now removed from car and track names: "/" , ":", "*", "?", "<", ">", "|"
 
 If you already have collected data for cars or tracks, which have a character from this list in their names, for example: "McLaren Cosworth MP4/8", you may envounter problems to access the data. You can do the following:
 

@@ -35,7 +35,8 @@
 
   - Fixed the handling of the *ConstrainWindow* core setting.
   - Fixed a bug, that prevented chat messages to be sent in *rFactor 2*.
-  - Fixed chat mode for *Le Mans Ultimate* as well, which completely stopped working with the introduction of Easy AntiCheat.
+  - Fixed chat mode for *Le Mans Ultimate* as well, which completely stopped working with the introduction of *Easy Anti-Cheat*.
+  - Fixed another premature session end condition for *Le Mans Ultimate*.
   
 #### Changes
 

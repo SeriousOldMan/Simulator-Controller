@@ -1366,7 +1366,7 @@ Note: You can use all these commands in the *pitstopCommands* list as well, whic
 
 ### Configuration
 
-First, you can define, how to open the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional (and might not even work due to *Easy AntiCheat*), since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
+First, you can define, how to open the Pitstop MFD (aka HUD) in *Le Mans Ultimate*. This is actually optional (and may not even work due to *Easy Anti-Cheat*), since the menu have not to be open for the control of the pitstop settings. If you want to use the "PitstopRequest" controller action (see below), supply an argument for *requestPitstop*. Please supply the bindings you have defined in the controller setup in *Le Mans Ultimate*.
 
 	openPitstopMFD: *openPitstopMFDHotkey*; closePitstopMFD: *closePitstopMFDHotkey*;
 	requestPitstop: *requestPitstopHotkey*;

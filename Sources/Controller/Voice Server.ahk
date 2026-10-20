@@ -1580,6 +1580,9 @@ class VoiceServer extends ConfigurationItem {
 		if (translatedLanguage == false)
 			translatedLanguage := this.Language["Translated"]
 
+		if (translator == false)
+			translator := this.Translator
+
 		client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)
 
 		if (client && (this.ActiveVoiceClient == client))

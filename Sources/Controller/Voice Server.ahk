@@ -1574,13 +1574,13 @@ class VoiceServer extends ConfigurationItem {
 		if (listener == true)
 			listener := this.Listener
 
-		if (originalLanguage == false)
+		if ((originalLanguage == false) || (originalLanguage == true))
 			originalLanguage := this.Language["Original"]
 
-		if (translatedLanguage == false)
+		if ((translatedLanguage == false) || (translatedLanguage == true))
 			translatedLanguage := this.Language["Translated"]
 
-		if (translator == false)
+		if (translator == true)
 			translator := this.Translator
 
 		client := (this.VoiceClients.Has(descriptor) ? this.VoiceClients[descriptor] : false)

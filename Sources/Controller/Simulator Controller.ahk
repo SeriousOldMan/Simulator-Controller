@@ -992,9 +992,9 @@ class SimulatorController extends ConfigurationItem {
 						name := "Controller"
 
 					messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", name, "Controller", pid
-																								 , activationCommand, "controllerActivation"
-																								 , false, false, false, false
-																								 , false, false, false, true, true)
+																								 , activationCommand, "controllerActivation", false, false
+																								 , true, true, true
+																								 , false, false, true, true)
 							  , this.VoiceServer)
 
 					registered := true
@@ -1091,9 +1091,9 @@ class SimulatorController extends ConfigurationItem {
 				descriptor := "Chat"
 
 			messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", descriptor, "Controller", pid
-																						 , activationCommand, "chatActivation"
-																						 , false, false, false, false
-																						 , false, false, false, true, true
+																						 , activationCommand, "chatActivation" , false, false
+																						 , true, true, true
+																						 , false, false, true, true
 																						 , kUndefined, kUndefined, kUndefined
 																						 , false, false, "Text")
 					  , this.VoiceServer)

@@ -1182,6 +1182,7 @@ class LMURESTProvider {
 
 		getState(internal := false) {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+			local mState := kUndefined
 
 			if data {
 				if internal
@@ -1191,20 +1192,25 @@ class LMURESTProvider {
 				else
 					if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
 						return "Not Driving"
-					else if (data.Has("status") && (data["status"] = "unavailable"))
-						return "Inactive"
-					else if data.Has("MultiStintState") {
-						switch data["MultiStintState"], false {
-							case "Disabled":
-								return "Disabled"
-							case "Driving", "END_OF_RACE_GRACE":
-								return "Driving"
-							default:
-								return "Paused"
-						}
+					else {
+						if data.Has("MultiStintState")
+							switch data["MultiStintState"], false {
+								case "Disabled":
+									mState := "Disabled"
+								case "Driving", "END_OF_RACE_GRACE":
+									mState := "Driving"
+								default:
+									mState := "Paused"
+							}
+
+						if ((mState != "Driving") && (mState != "Paused")
+												  && data.Has("status") && (data["status"] = "unavailable"))
+							return "Inactive"
+						else if (mState != kUndefined)
+							return mState
+						else
+							return "Paused"
 					}
-					else
-						return "Paused"
 			}
 			else
 				return "Inactive"

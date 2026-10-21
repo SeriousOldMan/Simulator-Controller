@@ -173,7 +173,7 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 
 	updateSession(session, force := false) {
 		local lastSession := this.Session
-		local activeModes
+		local activeModes, pitstopMode
 
 		super.updateSession(session, force)
 
@@ -182,8 +182,10 @@ class Sector397Plugin extends RaceAssistantSimulatorPlugin {
 		if (inList(activeModes, this.iChatMode))
 			this.iChatMode.updateActions(session)
 
-		if (inList(activeModes, this.findMode(kPitstopMode)))
-			this.iPitstopMode.updateActions(session)
+		pitstopMode := this.findMode(kPitstopMode)
+
+		if (inList(activeModes, pitstopMode))
+			pitstopMode.updateActions(session)
 	}
 
 	openPitstopMFD(descriptor := false) {

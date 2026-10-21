@@ -555,7 +555,7 @@ class LMUProvider extends Sector397Provider {
 						logMessage(kLogInfo, "SHM LMU Session State: Running [" . sessionState . "](" . sessionData.State[true] . ")...")
 
 				switch sessionState, false {
-					case "Driving":
+					case "Driving", "Disabled":
 						setMultiMapValue(data, "Session Data", "Active", true)
 						setMultiMapValue(data, "Session Data", "Paused", false)
 					case "Not Driving", "Paused":
@@ -568,8 +568,6 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
 							setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
 						}
-					case "Disabled":
-						setMultiMapValue(data, "Session Data", "Paused", false)
 					case "Inactive":
 						setMultiMapValue(data, "Session Data", "Active", false)
 					default:

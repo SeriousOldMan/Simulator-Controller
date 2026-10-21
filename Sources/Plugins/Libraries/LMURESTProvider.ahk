@@ -1189,31 +1189,28 @@ class LMURESTProvider {
 					return ((data.Has("status") ? (data["status"] . ", ") : " , ")
 						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : " , ")
 						  . (data.Has("MultiStintState") ? data["MultiStintState"] : ""))
-				else
-					if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
-						return "Not Driving"
-					else {
-						if data.Has("MultiStintState")
-							switch data["MultiStintState"], false {
-								case "Disabled":
-									mState := "Disabled"
-								case "Driving", "END_OF_RACE_GRACE":
-									mState := "Driving"
-								default:
-									mState := "Paused"
-							}
+				else {
+					if data.Has("MultiStintState")
+						switch data["MultiStintState"], false {
+							case "Disabled":
+								mState := "Disabled"
+							case "Driving", "END_OF_RACE_GRACE":
+								mState := "Driving"
+							default:
+								mState := "Paused"
+						}
 
-						if ((mState != "Driving") && (mState != "Paused")
-												  && data.Has("status") && (data["status"] = "unavailable"))
-							return "Inactive"
-						else if (mState != kUndefined)
-							return mState
+					if data.Has("teamVehicleState")
+						if (data["teamVehicleState"]= "OTHER TEAMMATE DRIVING")
+							return "Not Driving"
 						else
-							return "Paused"
-					}
+							return ((mState = "Driving") ? "Driving" : "Paused")
+
+					return ((mState = kUndefined) ? "Inactive" : mState)
+				}
 			}
 			else
-				return "Inactive"
+				return "No Data"
 		}
 
 		getDuration(session) {

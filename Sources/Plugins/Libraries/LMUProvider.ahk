@@ -568,7 +568,7 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
 							setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
 						}
-					case "Inactive":
+					case "Inactive", "No Data":
 						setMultiMapValue(data, "Session Data", "Active", false)
 					default:
 						throw "Unknown session state detected in LMUProvider.readSessionData..."

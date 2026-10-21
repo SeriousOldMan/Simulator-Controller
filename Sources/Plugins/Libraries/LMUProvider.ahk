@@ -354,7 +354,7 @@ class LMUProvider extends Sector397Provider {
 
 		static wasActive := false
 		static waitForFinish := false
-		static waitForDriverSwap := false
+		; static waitForDriverSwap := false
 
 		if !tyreTypes {
 			tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
@@ -576,20 +576,25 @@ class LMUProvider extends Sector397Provider {
 
 				active := getMultiMapValue(data, "Session Data", "Active", false)
 
-				if (logRequests && !active)
-					logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionState . "](" . sessionData.State[true] . ")...")
-
 				if !active {
 					if (wasActive && (getMultiMapValue(data, "Stint Data", "InPit", false)
 								   || getMultiMapValue(data, "Stint Data", "InPitLane", false)))
 						waitForFinish := (A_TickCount + 20000)
 
 					if (waitForFinish && (A_TickCount < waitForFinish)) {
+						if logRequests
+							logMessage(kLogWarn, "Calculated LMU Session State: Waiting for Shutdown...")
+
 						setMultiMapValue(data, "Session Data", "Paused", true)
 						setMultiMapValue(data, "Session Data", "Active", true)
 					}
-					else
+					else {
 						waitForFinish := false
+
+						if (logRequests && !active)
+							logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionState . "](" . sessionData.State[true] . ")...")
+					}
+
 				}
 
 				wasActive := active

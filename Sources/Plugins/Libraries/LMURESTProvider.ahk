@@ -1162,9 +1162,9 @@ class LMURESTProvider {
 			}
 		}
 
-		State[internal := false] {
+		State[info := false] {
 			Get {
-				return this.getState(internal)
+				return this.getState(info)
 			}
 		}
 
@@ -1180,33 +1180,29 @@ class LMURESTProvider {
 			}
 		}
 
-		getState(internal := false) {
+		getState(info := false) {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
-			local mState := kUndefined
 
 			if data {
-				if internal
-					return ((data.Has("status") ? (data["status"] . ", ") : " , ")
-						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : " , ")
-						  . (data.Has("MultiStintState") ? data["MultiStintState"] : ""))
+				if info
+					return ((data.Has("status") ? (data["status"] . ", ") : "-, ")
+						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : "-, ")
+						  . (data.Has("MultiStintState") ? data["MultiStintState"] : "-"))
 				else {
-					if data.Has("MultiStintState")
+					if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
+						return "Not Driving"
+					else if data.Has("MultiStintState") {
 						switch data["MultiStintState"], false {
 							case "Disabled":
-								mState := "Disabled"
+								return "Disabled"
 							case "Driving", "END_OF_RACE_GRACE":
-								mState := "Driving"
+								return "Driving"
 							default:
-								mState := "Paused"
+								return "Paused"
 						}
-
-					if data.Has("teamVehicleState")
-						if (data["teamVehicleState"]= "OTHER TEAMMATE DRIVING")
-							return "Not Driving"
-						else
-							return ((mState = "Driving") ? "Driving" : "Paused")
-
-					return ((mState = kUndefined) ? "Inactive" : mState)
+					}
+					else
+						return "Inactive"
 				}
 			}
 			else

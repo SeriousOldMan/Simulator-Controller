@@ -1,5 +1,36 @@
 # Latest stable release
 
+## 7.3.1.0
+
+#### Date: 10/23/26
+
+#### Fixes
+
+  - Fixed the handling of the *ConstrainWindow* core setting.
+  - Fixed a bug, that prevented chat messages to be sent in *rFactor 2*.
+  - Fixed chat mode for *Le Mans Ultimate* as well, which completely stopped working with the introduction of *Easy Anti-Cheat*.
+  - Fixed another premature session end condition for *Le Mans Ultimate*.
+  
+#### Changes
+
+  - The Spotter now reminds you to do a proper rejoin after an accident or off-track.
+  - Minor enhancements of the new Logbook of the "Setup Workbench"
+    - Empty Logbooks will get deleted automatically.
+	- The number of available action entries are shown in the list of available Logbooks.
+  - Messages for the in-game chat of *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* can now be given by voice. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat) for more information.
+  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) about the *Push-To-Talk* configuration for more information.
+  - [Important] It is no longer necessary or even possible to use special keys of AutoHotkey or escape sequences in the message texts of the chat system.
+  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731).
+  - [Internal] Several plugin arguments (*closePitstopMFD* and *openChat*) have been removed for *Le Mans Ultimate*, which are actually not used anymore.
+
+Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731) if you are using the chat system and/or if you are using the local LLM Runtime.
+    
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.3.0.0
 
 #### Date: 10/16/26
@@ -24,35 +55,6 @@
   - [Internal] Increased compatibility of function/tool calling for OpenAI models with a version greater or equal to GPT-5.
   - [Internal] Migrated to AHK 2.1-alpha.35.
   - [Developer] A Markdown processor and HTML generator has been integrated.
-    
-# Upcoming release
-
-## 7.3.1.0
-
-#### Date: 10/23/26 (planned)
-
-#### Fixes
-
-  - Fixed the handling of the *ConstrainWindow* core setting.
-  - Fixed a bug, that prevented chat messages to be sent in *rFactor 2*.
-  - Fixed chat mode for *Le Mans Ultimate* as well, which completely stopped working with the introduction of *Easy Anti-Cheat*.
-  - Fixed another premature session end condition for *Le Mans Ultimate*.
-  
-#### Changes
-
-  - The Spotter now reminds you to do a proper rejoin after an accident or off-track.
-  - Minor enhancements of the new Logbook of the "Setup Workbench"
-    - Empty Logbooks will get deleted automatically.
-	- The number of available action entries are shown in the list of available Logbooks.
-  - Messages for the in-game chat of *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate* can now be given by voice. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-chat) for more information.
-  - The activation phrase for voice commands of the controller itself can now also contain a name for the controller, so that commands like "Controller, activate wiper" will be possible. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) about the *Push-To-Talk* configuration for more information.
-  - [Important] It is no longer necessary or even possible to use special keys of AutoHotkey or escape sequences in the message texts of the chat system.
-  - [Important] A new version of the local LLM Runtime is available. If you are using the local runtime, please follow the instructions in the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731).
-  - [Internal] Several plugin arguments (*closePitstopMFD* and *openChat*) have been removed for *Le Mans Ultimate*, which are actually not used anymore.
-
-Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731) if you are using the chat system and/or if you are using the local LLM Runtime.
-
-# Release history
 
 ## 7.2.8.0
 

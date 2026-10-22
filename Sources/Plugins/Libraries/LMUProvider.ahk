@@ -579,7 +579,7 @@ class LMUProvider extends Sector397Provider {
 				if !active {
 					if (wasActive && (getMultiMapValue(data, "Stint Data", "InPit", false)
 								   || getMultiMapValue(data, "Stint Data", "InPitLane", false)))
-						waitForFinish := (A_TickCount + 20000)
+						waitForFinish := (A_TickCount + 5000)
 
 					if (waitForFinish && (A_TickCount < waitForFinish)) {
 						if logRequests

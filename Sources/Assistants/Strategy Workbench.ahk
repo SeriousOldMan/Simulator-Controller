@@ -383,7 +383,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			local strategyViewer := this.Control["stratViewer"]
 			local strategyScrollTop := false
 			local strategyScrollLeft := false
-			
+
 			if this.SelectedStrategy
 				try {
 					strategyScrollTop := strategyViewer.document.body.scrollTop
@@ -618,8 +618,7 @@ class StrategyWorkbench extends ConfigurationItem {
 				if compound
 					compound := normalizeCompound(compound)
 
-				workbenchGui["tyreSetDropDown"].Choose(inList(collect(workbench.AvailableTyreCompounds
-																	, translate), compound))
+				workbenchGui["tyreSetDropDown"].Choose(inList(collect(this.AvailableTyreCompounds, translate), compound))
 				workbenchGui["tyreSetLapsEdit"].Text := laps
 				workbenchGui["tyreSetCountEdit"].Text := count
 			}
@@ -654,9 +653,19 @@ class StrategyWorkbench extends ConfigurationItem {
 					workbench.TyreSetListView.Modify(row, "", compound, workbenchGui["tyreSetLapsEdit"].Text
 															, workbenchGui["tyreSetCountEdit"].Text)
 				}
-				else
-					workbench.TyreSetListView.Modify(row, "Col2", workbenchGui["tyreSetLapsEdit"].Text
-																, workbenchGui["tyreSetCountEdit"].Text)
+				else {
+					if (Trim(workbenchGui["tyreSetLapsEdit"].Text) = "")
+						workbenchGui["tyreSetLapsEdit"].Text := workbenchGui["tyreSetLapsEdit"].Text["Current"]
+
+					if (Trim(workbenchGui["tyreSetCountEdit"].Text) = "")
+						workbenchGui["tyreSetCountEdit"].Text := workbenchGui["tyreSetCountEdit"].Text["Current"]
+
+					if (workbenchGui["tyreSetCountEdit"].Text = 0)
+						deleteTyreSet()
+					else
+						workbench.TyreSetListView.Modify(row, "Col2", workbenchGui["tyreSetLapsEdit"].Text
+																	, workbenchGui["tyreSetCountEdit"].Text)
+				}
 
 				workbench.TyreSetListView.ModifyCol()
 			}
@@ -748,7 +757,21 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		validateInteger(minValue, field, operation, value?) {
 			if (operation = "Validate")
-				return (isInteger(value) && (value >= minValue))
+				if (Trim(value) = "")
+					return false
+				else
+					return (isInteger(value) && (value >= minValue))
+		}
+
+		validateLap(field, operation, value?) {
+			if (operation = "Validate")
+				if (Trim(value) = "") {
+					this.updateState()
+
+					return true
+				}
+				else
+					return (isInteger(value) && (value >= 1))
 		}
 
 		validateSimInitialFuelAmount(arguments*) {
@@ -790,21 +813,36 @@ class StrategyWorkbench extends ConfigurationItem {
 		}
 
 		chooseSimFixedPitstop(listView, line, *) {
+			local refuel
+
 			if line {
 				workbenchGui["simFixedPitstopEdit"].Text := workbench.FixedPitstopsListView.GetText(line)
 				workbenchGui["simFixedPitstopLapEdit"].Text := workbench.FixedPitstopsListView.GetText(line, 2)
 
-				if kFixedPitstopRefuel
-					workbenchGui["simFixedPitstopRefuelEdit"].Text := workbench.FixedPitstopsListView.GetText(line, 3)
+				if kFixedPitstopRefuel {
+					refuel := workbench.FixedPitstopsListView.GetText(line, 3)
 
-				if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("-"))
+					switch refuel, false {
+						case translate("Optional"):
+							workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Choose(1)
+						case translate("Required"):
+							workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Choose(2)
+						default:
+							workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Choose(3)
+
+							workbenchGui["simFixedPitstopRefuelEdit"].Text := refuel
+					}
+				}
+
+				if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("No change"))
 					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(1)
+				else if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("Optional"))
+					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(2)
+				else if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("Required"))
+					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(3)
 				else {
 					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(inList(collect(this.AvailableTyreCompounds, translate)
-																				, workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel)) + 1)
-
-					if (workbenchGui["simFixedPitstopCompoundDropDown"].Value = 1)
-						workbench.FixedPitstopsListView.Modify(line, "Col4", translate("-"))
+																				, workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel)) + 3)
 				}
 			}
 
@@ -813,36 +851,71 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		updateSimFixedPitstop(*) {
 			local row := workbench.FixedPitstopsListView.GetNext(0)
+			local tyreChange, refuel
 
-			if (row > 0)
+			if (row > 0) {
+				if (Trim(workbenchGui["simFixedPitstopEdit"].Text) = "")
+					workbenchGui["simFixedPitstopEdit"].Text := workbenchGui["simFixedPitstopEdit"].Text["Current"]
+
+				if (Trim(workbenchGui["simFixedPitstopLapEdit"].Text) = "")
+					workbenchGui["simFixedPitstopLapEdit"].Text := translate("Any")
+
+				if (kFixedPitstopRefuel && (Trim(workbenchGui["simFixedPitstopRefuelEdit"].Text) = ""))
+					workbenchGui["simFixedPitstopRefuelEdit"].Text := workbenchGui["simFixedPitstopRefuelEdit"].Text["Current"]
+
+				if kFixedPitstopRefuel
+					switch workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Value {
+						case 1, 2:
+							refuel := workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Text
+						case 3:
+							refuel := workbenchGui["simFixedPitstopRefuelEdit"].Text
+
+							if (refuel = "") {
+								refuel := 0
+
+								workbenchGui["simFixedPitstopRefuelEdit"].Text := 0
+							}
+					}
+
+				if (workbenchGui["simFixedPitstopCompoundDropDown"].Value <= 3)
+					tyreChange := workbenchGui["simFixedPitstopCompoundDropDown"].Text
+				else
+					tyreChange := this.AvailableTyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 3]
+
 				if kFixedPitstopRefuel
 					workbench.FixedPitstopsListView.Modify(row, ""
 														 , workbenchGui["simFixedPitstopEdit"].Text
 														 , workbenchGui["simFixedPitstopLapEdit"].Text
-														 , workbenchGui["simFixedPitstopRefuelEdit"].Text
-														 , (workbenchGui["simFixedPitstopCompoundDropDown"].Value = 1) ? translate("-")
-																													   : translate(this.AvailableTyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 1]))
+														 , refuel, tyreChange)
 				else
 					workbench.FixedPitstopsListView.Modify(row, ""
 														 , workbenchGui["simFixedPitstopEdit"].Text
 														 , workbenchGui["simFixedPitstopLapEdit"].Text
-														 , (workbenchGui["simFixedPitstopCompoundDropDown"].Value = 1) ? translate("-")
-																													   : translate(this.AvailableTyreCompounds[workbenchGui["simFixedPitstopCompoundDropDown"].Value - 1]))
+														 , tyreChange)
+
+				if (workbenchGui["simFixedPitstopCompoundDropDown"].Value <= 3)
+					workbench.FixedPitstopsListView.Modify(row, "Col4", workbenchGui["simFixedPitstopCompoundDropDown"].Text)
+
+				this.updateState()
+			}
 		}
 
 		addSimFixedPitstop(*) {
 			if kFixedPitstopRefuel
-				workbench.FixedPitstopsListView.Add("Vis Select", 1, 1, 0, translate("-"))
+				workbench.FixedPitstopsListView.Add("Vis Select", 1, 1, translate("Optional"), translate("Optional"))
 			else
-				workbench.FixedPitstopsListView.Add("Vis Select", 1, 1, translate("-"))
+				workbench.FixedPitstopsListView.Add("Vis Select", 1, 1, translate("Optional"))
 
 			workbenchGui["simFixedPitstopEdit"].Text := 1
 			workbenchGui["simFixedPitstopLapEdit"].Text := 1
 
-			if kFixedPitstopRefuel
+			if kFixedPitstopRefuel {
 				workbenchGui["simFixedPitstopRefuelEdit"].Text := 0
 
-			workbenchGui["simFixedPitstopCompoundDropDown"].Choose(1)
+				workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Choose(1)
+			}
+
+			workbenchGui["simFixedPitstopCompoundDropDown"].Choose(2)
 
 			workbench.updateState()
 		}
@@ -1451,7 +1524,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		x := 32
 		x2 := x + 220
 		x3 := x2 + 100
-		w3 := 140
+		w3 := 133
 		x4 := x3 + w3 - 50
 		x5 := x4 + 25
 
@@ -1460,25 +1533,29 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.iFixedPitstopsListView.OnEvent("DoubleClick", chooseSimFixedPitstop)
 		this.iFixedPitstopsListView.OnEvent("ItemSelect", selectSimFixedPitstop)
 
-		workbenchGui.Add("Text", "x" . x2 . " ys+34 w100 h23 +0x200", translate("Pitstop"))
+		workbenchGui.Add("Text", "x" . x2 . " ys+34 w100 h23 +0x200", translate("Pitstop / Lap"))
 		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopEdit").OnEvent("Change", updateSimFixedPitstop)
 		workbenchGui["simFixedPitstopEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+25 w100 h23 +0x200", translate("Lap"))
-		workbenchGui.Add("Edit", "x" . x3 . " yp-1 w50 Limit3 Number vsimFixedPitstopLapEdit").OnEvent("Change", updateSimFixedPitstop)
-		workbenchGui["simFixedPitstopLapEdit"].OnValidate("LoseFocus", validateInteger.Bind(1))
+		workbenchGui.Add("Text", "x" . (x3 + 60) . " yp+1 w20 h23 +0x200", translate("/"))
+
+		workbenchGui.Add("Edit", "x" . (x3 + 83) . " yp-1 w50 Limit3 Number vsimFixedPitstopLapEdit").OnEvent("Change", updateSimFixedPitstop)
+		workbenchGui["simFixedPitstopLapEdit"].OnValidate("LoseFocus", validateLap)
 		workbenchGui.Add("UpDown", "x138 yp-2 w18 Range1-999")
 
 		if kFixedPitstopRefuel {
 			workbenchGui.Add("Text", "x" . x2 . " yp+27 w100 h23 +0x200", translate("Refuel"))
-			workbenchGui.Add("Edit", "x" . x3 . " yp-3 w50 Limit3 Number vsimFixedPitstopRefuelEdit").OnEvent("Change", updateSimFixedPitstop)
+
+			workbenchGui.Add("DropDownList", "x" . x3 . " yp w80 Choose1 VsimFixedPitstopRefuelRequirementsDropDown", collect(["Optional", "Required", "Fixed"], translate)).OnEvent("Change", updateSimFixedPitstop)
+
+			workbenchGui.Add("Edit", "x" . (x3 + 83) . " yp-1 w50 Limit3 Number vsimFixedPitstopRefuelEdit").OnEvent("Change", updateSimFixedPitstop)
 			workbenchGui["simFixedPitstopRefuelEdit"].OnValidate("LoseFocus", validateInteger.Bind(0))
-			workbenchGui.Add("UpDown", "xp yp-2 w18 Range0-999")
-			workbenchGui.Add("Text", "x" . (x3 + 55) . " yp+3 w80 h20", getUnit("Volume", true))
+			workbenchGui.Add("UpDown", "xp yp-2 w18 Range0-999 vsimFixedPitstopRefuelUpDown")
+			workbenchGui.Add("Text", "x" . (x3 + 135) . " yp+3 w80 h20 vsimFixedPitstopRefuelLabel", getUnit("Volume", true))
 		}
 
-		workbenchGui.Add("Text", "x" . x2 . " yp+25 w100 h23 +0x200", translate("Tyres"))
+		workbenchGui.Add("Text", "x" . x2 . " yp+25 w100 h23 +0x200", translate("Tyre Change"))
 
 		theCompound := this.SelectedCompound[true]
 		choices := [translate(normalizeCompound("Dry"))]
@@ -1489,11 +1566,11 @@ class StrategyWorkbench extends ConfigurationItem {
 			chosen := 2
 		}
 
-		workbenchGui.Add("DropDownList", "x" . x3 . " yp-1 w" . w3 . " Choose" . chosen . " VsimFixedPitstopCompoundDropDown", concatenate([translate("No Change")], choices)).OnEvent("Change", updateSimFixedPitstop)
+		workbenchGui.Add("DropDownList", "x" . x3 . " yp-1 w80 Choose" . chosen . " VsimFixedPitstopCompoundDropDown", concatenate(collect(["No change", "Optional", "Required"], translate), choices)).OnEvent("Change", updateSimFixedPitstop)
 
-		workbenchGui.Add("Button", "x" . x4 . " yp+24 w23 h23 Center +0x200 vaddFixedPitstopButton").OnEvent("Click", addSimFixedPitstop)
+		workbenchGui.Add("Button", "x" . (x3 + 135) . " yp+24 w23 h23 Center +0x200 vaddFixedPitstopButton").OnEvent("Click", addSimFixedPitstop)
 		setButtonIcon(workbenchGui["addFixedPitstopButton"], kIconsDirectory . "Plus.ico", 1, "L4 T4 R4 B4")
-		workbenchGui.Add("Button", "x" . x5 . " yp w23 h23 Center +0x200 vdeleteFixedPitstopButton").OnEvent("Click", deleteSimFixedPitstop)
+		workbenchGui.Add("Button", "x" . (x3 + 135 +  24) . " yp w23 h23 Center +0x200 vdeleteFixedPitstopButton").OnEvent("Click", deleteSimFixedPitstop)
 		setButtonIcon(workbenchGui["deleteFixedPitstopButton"], kIconsDirectory . "Minus.ico", 1, "L4 T4 R4 B4")
 
 		workbenchTab.UseTab(4)
@@ -2016,8 +2093,10 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simFixedPitstopEdit"].Enabled := true
 			this.Control["simFixedPitstopLapEdit"].Enabled := true
 
-			if kFixedPitstopRefuel
+			if kFixedPitstopRefuel {
+				this.Control["simFixedPitstopRefuelRequirementsDropDown"].Enabled := true
 				this.Control["simFixedPitstopRefuelEdit"].Enabled := true
+			}
 
 			this.Control["simFixedPitstopCompoundDropDown"].Enabled := true
 		}
@@ -2031,8 +2110,13 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simFixedPitstopEdit"].Enabled := false
 			this.Control["simFixedPitstopLapEdit"].Enabled := false
 
-			if kFixedPitstopRefuel
+			if kFixedPitstopRefuel {
+				this.Control["simFixedPitstopRefuelRequirementsDropDown"].Enabled := false
+				this.Control["simFixedPitstopRefuelRequirementsDropDown"].Choose(0)
+
 				this.Control["simFixedPitstopRefuelEdit"].Enabled := false
+				this.Control["simFixedPitstopRefuelEdit"].Text := ""
+			}
 
 			this.Control["simFixedPitstopCompoundDropDown"].Enabled := false
 
@@ -2040,10 +2124,29 @@ class StrategyWorkbench extends ConfigurationItem {
 			this.Control["simFixedPitstopLapEdit"].Text := ""
 
 			if kFixedPitstopRefuel
-				this.Control["simFixedPitstopRefuelEdit"].Text := ""
 
 			this.Control["simFixedPitstopCompoundDropDown"].Choose(0)
 		}
+
+		if kFixedPitstopRefuel
+			if (this.Control["simFixedPitstopRefuelRequirementsDropDown"].Value = 3) {
+				this.Control["simFixedPitstopRefuelEdit"].Visible := true
+				this.Control["simFixedPitstopRefuelUpDown"].Visible := true
+				this.Control["simFixedPitstopRefuelLabel"].Visible := true
+
+				if !isInteger(this.Control["simFixedPitstopRefuelEdit"].Text)
+					this.Control["simFixedPitstopRefuelEdit"].Text := 0
+			}
+			else {
+				this.Control["simFixedPitstopRefuelEdit"].Visible := false
+				this.Control["simFixedPitstopRefuelUpDown"].Visible := false
+				this.Control["simFixedPitstopRefuelLabel"].Visible := false
+
+				this.Control["simFixedPitstopRefuelEdit"].Text := ""
+			}
+
+		if (Trim(this.Control["simFixedPitstopLapEdit"].Text) = "")
+			this.Control["simFixedPitstopLapEdit"].Text := translate("Any")
 
 		if (this.AvailableDrivers.Length > 0)
 			this.Control["addDriverButton"].Enabled := true
@@ -2733,7 +2836,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			if save {
 				report := this.SelectedDataType
-				
+
 				setSetting("Strategy Workbench", "Chart." . report . ".Type", chartType)
 				setSetting("Strategy Workbench", "Chart." . report . ".X-Axis", xAxis)
 				setSetting("Strategy Workbench", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
@@ -2768,7 +2871,8 @@ class StrategyWorkbench extends ConfigurationItem {
 		local selectedSimCompound := this.Control["simCompoundDropDown"].Text
 		local selectedStrategyCompound := this.Control["strategyCompoundDropDown"].Text
 		local selectedsimFixedPitstopCompound := this.Control["simFixedPitstopCompoundDropDown"].Text
-		local index
+		local selectedsimFixedPitstopCompoundIdx := this.Control["simFixedPitstopCompoundDropDown"].Value
+		local index, compound
 
 		this.Control["tyreSetDropDown"].Delete()
 		this.Control["tyreSetDropDown"].Add(translatedCompounds)
@@ -2777,10 +2881,32 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["strategyCompoundDropDown"].Delete()
 		this.Control["strategyCompoundDropDown"].Add(translatedCompounds)
 		this.Control["simFixedPitstopCompoundDropDown"].Delete()
-		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate([translate("No Change")], translatedCompounds))
+		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate(collect(["No change", "Optional", "Required"], translate), compounds))
 
-		loop this.FixedPitstopsListView.GetCount()
+		if (selectedsimFixedPitstopCompoundIdx <= 3)
+			this.Control["simFixedPitstopCompoundDropDown"].Choose(selectedsimFixedPitstopCompoundIdx)
+		else {
+			row := this.FixedPitstopsListView.GetNext(0)
+			index := inList(translatedCompounds, selectedsimFixedPitstopCompound)
+
+			if (row && !index) {
+				this.Control["simFixedPitstopCompoundDropDown"].Choose(3)
+
+				this.FixedPitstopsListView.Modify(row, kFixedPitstopRefuel ? "Col4" : "Col3"
+													 , this.Control["simFixedPitstopCompoundDropDown"].Text)
+			}
+		}
+
+		loop this.FixedPitstopsListView.GetCount() {
 			this.FixedPitstopsListView.Modify(A_Index, "-Select")
+
+			compound := this.FixedPitstopsListView.GetText(A_Index, kFixedPitstopRefuel ? 4 : 3)
+
+			if !inList(collect(["No change", "Optional", "Required"], translate), compound)
+				if !inList(translatedCompounds, compound)
+					this.FixedPitstopsListView.Modify(A_Index, kFixedPitstopRefuel ? "Col4" : "Col3"
+															 , translate("Required"))
+		}
 
 		index := inList(compounds, this.SelectedCompound[true])
 
@@ -2983,10 +3109,10 @@ class StrategyWorkbench extends ConfigurationItem {
 							if kFixedPitstopRefuel
 								this.FixedPitstopsListView.Add("", pitstop, fixedPitstop.Lap
 															 , fixedPitstop.HasProp("Refuel") ? fixedPitstop.Refuel : 0
-															 , fixedPitstop.Compound ? translate(fixedPitstop.Compound) : translate("-"))
+															 , fixedPitstop.Compound ? translate(fixedPitstop.Compound) : translate("No change"))
 							else
 								this.FixedPitstopsListView.Add("", pitstop, fixedPitstop.Lap
-																 , fixedPitstop.Compound ? translate(fixedPitstop.Compound) : translate("-"))
+																 , fixedPitstop.Compound ? translate(fixedPitstop.Compound) : translate("No change"))
 						}
 
 						this.DriversListView.Delete()

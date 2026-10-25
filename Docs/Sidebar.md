@@ -177,6 +177,7 @@
   - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#introduction)
   - [Rules & Settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings)
   - [Pitstop & Service](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstop--service)
+  - [Pitstops (fixed)](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstops-fixed)
   - [Drivers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#drivers)
   - [Weather](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#weather)
   - [Simulation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#simulation)

@@ -27,7 +27,18 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
     
 # Upcoming release
 
-Not yet planned...
+## 7.3.2.0
+
+#### Date: 10/30/26
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The support for fixed pitstops in strategy development and simulation has been extended. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstops-fixed) for more information.
+  - [Internal] Migrated to AHK 2.1-alpha.37.
 
 # Release history
 

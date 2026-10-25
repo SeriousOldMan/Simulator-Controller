@@ -1893,8 +1893,18 @@ class Strategy extends ConfigurationItem {
 
 			if (refuelRule = "Disallowed")
 				refuelAmount := 0
-			else if (strategy.FixedPitstops.Has(nr) && strategy.FixedPitstops[nr].HasProp("Refuel"))
-				refuelAmount := Min(strategy.FuelCapacity - (remainingFuel - (stintLaps * fuelConsumption)), strategy.FixedPitstops[nr].Refuel)
+			else if (strategy.FixedPitstops.Has(nr) && strategy.FixedPitstops[nr].HasProp("Refuel") && strategy.FixedPitstops[nr].Refuel != "Optional") {
+				refuelAmount := strategy.FixedPitstops[nr].Refuel
+
+				switch refuelAmount, false {
+					case "No", false:
+						refuelAmount := 0
+					case "Required":
+						refuelAmount := Max(strategy.FuelCapacity - (remainingFuel - (stintLaps * fuelConsumption)), 1)
+					default:
+						refuelAmount := Min(strategy.FuelCapacity - (remainingFuel - (stintLaps * fuelConsumption)), refuelAmount)
+				}
+			}
 			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)
 
@@ -3876,13 +3886,18 @@ class Strategy extends ConfigurationItem {
 		local airTemperature := false
 		local trackTemperature := false
 		local targetLap, newTargetLap, pitstopRule, pitstopWindow, avgLapTime, openingLap, closingLap, time, halfLaps, maxTyreLaps
+		local lap
 
 		adjusted := false
 
 		if this.FixedPitstops.Has(pitstopNr) {
-			adjusted := true
+			lap := this.FixedPitstops[pitstopNr].Lap
 
-			return this.FixedPitstops[pitstopNr].Lap
+			if lap {
+				adjusted := true
+
+				return lap
+			}
 		}
 
 		maxTyreLaps := this.tyreCompoundLife(this.TyreCompound[true], this.TyreCompoundColor[true])
@@ -4157,6 +4172,8 @@ class Strategy extends ConfigurationItem {
 		local lastPitstopLap := 0
 		local surplusPitstops := 0
 		local pitstopNr := currentStint
+		local fixedTyres := false
+		local requiredChange := false
 		local pitstops, lastPitstops, ignore
 		local sessionLaps, numPitstops, fuelLaps, canonicalStintLaps, remainingFuel, tyreSetConsumed, maxLaps, overLaps
 		local tyreChange, tyreCompound, tyreCompoundColor, forcedTyreCompound, driverID, driverName, pitstop, lapsDB, candidate
@@ -4309,58 +4326,70 @@ class Strategy extends ConfigurationItem {
 					tyreCompoundColor := false
 				}
 			}
-			else if this.FixedPitstops.Has(pitstopNr) {
-				forcedTyreCompound := true
-				candidate := this.FixedPitstops[pitstopNr].Compound
+			else {
+				if this.FixedPitstops.Has(pitstopNr) {
+					forcedTyreCompound := true
+					candidate := this.FixedPitstops[pitstopNr].Compound
 
-				if candidate {
-					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
-
-					tyreCompoundColor := this.chooseTyreCompoundColor(lastPitstops, pitstopNr, tyreCompound, tyreCompoundColor
-																	, this.TyreSet[true]
-																	, Min(this.calcSessionLaps() - pitstopLap
-																	, Min(this.tyreCompoundLife(tyreCompound, tyreCompoundColor)
-																		, this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]))))
-
-					if !tyreCompoundColor {
+					if (!candidate || (candidate = "No")) {
 						tyreCompound := false
+						tyreCompoundColor := false
 
-						forcedTyreCompound := false
+						fixedTyres := true
+					}
+					else if (candidate = "Required")
+						requiredChange := true
+					else if (candidate != "Optional") {
+						splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
+
+						/*
+						tyreCompoundColor := this.chooseTyreCompoundColor(lastPitstops, pitstopNr, tyreCompound, tyreCompoundColor
+																		, this.TyreSet[true]
+																		, Min(this.calcSessionLaps() - pitstopLap
+																		, Min(this.tyreCompoundLife(tyreCompound, tyreCompoundColor)
+																			, this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]))))
+						*/
+
+						if !tyreCompoundColor {
+							tyreCompound := false
+
+							forcedTyreCompound := false
+							requiredChange := true
+						}
+						else
+							fixedTyres := true
 					}
 				}
-				else {
-					tyreCompound := false
-					tyreCompoundColor := false
-				}
-			}
-			else if !adjustments {
-				lapsDB := this.StrategyManager.LapsDatabase
 
-				this.getWeather((this.Time[true] + (pitstopLap - currentLap) * avgLapTime) / 60, &weather, &airTemperature, &trackTemperature)
+				if !fixedTyres {
+					lapsDB := this.StrategyManager.LapsDatabase
 
-				if tyreSetConsumed
-					candidate := lapsDB.optimalTyreCompound(this.Simulator, this.Car, this.Track
-														  , weather, airTemperature, trackTemperature
-														  , this.availableTyreCompounds())
-				else
-					candidate := false
+					this.getWeather((this.Time[true] + (pitstopLap - currentLap) * avgLapTime) / 60, &weather, &airTemperature, &trackTemperature)
 
-				if candidate
-					splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
-				else {
-					tyreCompound := this.TyreCompound[true]
-					tyreCompoundColor := this.TyreCompoundColor[true]
-				}
+					if tyreSetConsumed
+						candidate := lapsDB.optimalTyreCompound(this.Simulator, this.Car, this.Track
+															  , weather, airTemperature, trackTemperature
+															  , this.availableTyreCompounds())
+					else
+						candidate := false
 
-				if tyreSetConsumed {
-					tyreCompoundColor := this.chooseTyreCompoundColor(lastPitstops, pitstopNr, tyreCompound, tyreCompoundColor
-																	, this.TyreSet[true]
-																	, Min(this.calcSessionLaps() - pitstopLap
-																	, Min(this.tyreCompoundLife(tyreCompound, tyreCompoundColor)
-																		, this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]))))
+					if candidate
+						splitCompound(candidate, &tyreCompound, &tyreCompoundColor)
+					else {
+						tyreCompound := this.TyreCompound[true]
+						tyreCompoundColor := this.TyreCompoundColor[true]
+					}
 
-					if !tyreCompoundColor
-						tyreCompound := false
+					if (tyreSetConsumed && !requiredChange) {
+						tyreCompoundColor := this.chooseTyreCompoundColor(lastPitstops, pitstopNr, tyreCompound, tyreCompoundColor
+																		, this.TyreSet[true]
+																		, Min(this.calcSessionLaps() - pitstopLap
+																		, Min(this.tyreCompoundLife(tyreCompound, tyreCompoundColor)
+																			, this.getMaxFuelLaps(this.FuelCapacity, this.FuelConsumption[true]))))
+
+						if !tyreCompoundColor
+							tyreCompound := false
+					}
 				}
 			}
 

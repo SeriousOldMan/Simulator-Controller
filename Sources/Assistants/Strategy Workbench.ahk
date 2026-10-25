@@ -836,7 +836,7 @@ class StrategyWorkbench extends ConfigurationItem {
 					}
 				}
 
-				if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("No Change"))
+				if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("No"))
 					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(1)
 				else if (workbench.FixedPitstopsListView.GetText(line, 3 + kFixedPitstopRefuel) = translate("Optional"))
 					workbenchGui["simFixedPitstopCompoundDropDown"].Choose(2)
@@ -2883,7 +2883,7 @@ class StrategyWorkbench extends ConfigurationItem {
 		this.Control["strategyCompoundDropDown"].Delete()
 		this.Control["strategyCompoundDropDown"].Add(translatedCompounds)
 		this.Control["simFixedPitstopCompoundDropDown"].Delete()
-		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate(collect(["No Change", "Optional", "Required"], translate), compounds))
+		this.Control["simFixedPitstopCompoundDropDown"].Add(concatenate(collect(["No", "Optional", "Required"], translate), compounds))
 
 		if (selectedsimFixedPitstopCompoundIdx <= 3)
 			this.Control["simFixedPitstopCompoundDropDown"].Choose(selectedsimFixedPitstopCompoundIdx)
@@ -2904,7 +2904,7 @@ class StrategyWorkbench extends ConfigurationItem {
 
 			compound := this.FixedPitstopsListView.GetText(A_Index, kFixedPitstopRefuel ? 4 : 3)
 
-			if !inList(collect(["No Change", "Optional", "Required"], translate), compound)
+			if !inList(collect(["No", "Optional", "Required"], translate), compound)
 				if !inList(translatedCompounds, compound)
 					this.FixedPitstopsListView.Modify(A_Index, kFixedPitstopRefuel ? "Col4" : "Col3"
 															 , translate("Required"))
@@ -4132,9 +4132,12 @@ class StrategyWorkbench extends ConfigurationItem {
 					fixedPitstop.Compound := "Optional"
 				else if (tyreChange = translate("Required"))
 					fixedPitstop.Compound := "Required"
-				else
-					fixedPitstop.Compound := this.TyreCompounds[inList(collect(this.TyreCompounds, translate)
-																	 , this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel))]
+				else {
+					tyreChange := inList(collect(this.TyreCompounds, translate)
+									   , this.FixedPitstopsListView.GetText(A_Index, 3 + kFixedPitstopRefuel))
+
+					fixedPitstop.Compound := this.TyreCompounds[tyreChange]
+				}
 
 				fixedPitstops[Integer(this.FixedPitstopsListView.GetText(A_Index))] := fixedPitstop
 			}

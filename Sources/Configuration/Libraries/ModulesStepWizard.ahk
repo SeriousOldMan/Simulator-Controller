@@ -72,7 +72,7 @@ class SilentAssistant extends NamedPreset {
 		local assistant
 
 		if wizard.isModuleSelected(this.Assistant)
-			if (getMultiMapValue(simulatorConfiguration, "Plugins", this.Assistant, kUndefined) != kUndefined) {
+			if hasMultiMapValue(simulatorConfiguration, "Plugins", this.Assistant) {
 				assistant := Plugin(this.Assistant, simulatorConfiguration)
 
 				if this.iDisabled {
@@ -97,7 +97,7 @@ class PassiveEngineer extends NamedPreset {
 			for ignore, descriptor in getMultiMapValues(definition, "Applications.Simulators") {
 				name := string2Values("|", descriptor)[1]
 
-				if (getMultiMapValue(simulatorConfiguration, "Plugins", name, kUndefined) != kUndefined) {
+				if hasMultiMapValue(simulatorConfiguration, "Plugins", name) {
 					assistant := Plugin(name, simulatorConfiguration)
 
 					assistant.setArgumentValue("openPitstopMFD", "Off")
@@ -146,7 +146,7 @@ class DifferentVoices extends NamedPreset {
 
 				for ignore, assistant in string2Values("|", getMultiMapValue(wizard.Definition, "Setup.Modules", "Modules.Definition.Assistants")) {
 					if wizard.isModuleSelected(assistant)
-						if (getMultiMapValue(simulatorConfiguration, "Plugins", assistant, kUndefined) != kUndefined) {
+						if hasMultiMapValue(simulatorConfiguration, "Plugins", assistant) {
 							assistant := Plugin(assistant, simulatorConfiguration)
 
 							assistant.setArgumentValue("speaker", voices.Pop())
@@ -363,7 +363,7 @@ class TeamServerAlwaysOn extends NamedPreset {
 		local thePlugin
 
 		if (wizard.isModuleSelected("Race Engineer") || wizard.isModuleSelected("Race Strategist"))
-			if (getMultiMapValue(simulatorConfiguration, "Plugins", "Team Server", kUndefined) != kUndefined) {
+			if hasMultiMapValue(simulatorConfiguration, "Plugins", "Team Server") {
 				thePlugin := Plugin("Team Server", simulatorConfiguration)
 
 				thePlugin.setArgumentValue("teamServer", "On")

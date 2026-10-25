@@ -4201,7 +4201,7 @@ class TrackMap {
 						 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 						 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})
 
-			if (getMultiMapValue(trackMap, "Sections", A_Index . ".Name", kUndefined) != kUndefined)
+			if hasMultiMapValue(trackMap, "Sections", A_Index . ".Name")
 				sections[A_Index].Name := getMultiMapValue(trackMap, "Sections", A_Index . ".Name")
 		}
 

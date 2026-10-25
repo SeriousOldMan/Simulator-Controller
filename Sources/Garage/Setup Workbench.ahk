@@ -6102,7 +6102,7 @@ class SetupEngineer extends ConfigurationItem {
 		options := this.Options
 
 		for ignore, instruction in this.Instructions[true]
-			if (getMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction, kUndefined) != kUndefined)
+			if hasMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction)
 				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(configuration, "Setup Engineer Personality", "Instructions." . instruction, false)
 			else
 				options["Setup Engineer.Instructions." . instruction] := getMultiMapValue(this.Templates[getLanguage()], "Instructions", instruction)

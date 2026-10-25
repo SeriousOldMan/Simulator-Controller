@@ -3349,19 +3349,19 @@ class StrategyWorkbench extends ConfigurationItem {
 					settings := SettingsDatabase().loadSettings(simulator, car, track, "*", this.SelectedWeather)
 
 					if (settings.Count > 0) {
-						if (getMultiMapValue(settings, "Session Settings", "Lap.Formation", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Session Settings", "Lap.Formation")
 							this.Control["formationLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.Formation")
 
-						if (getMultiMapValue(settings, "Session Settings", "Lap.PostRace", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Session Settings", "Lap.PostRace")
 							this.Control["postRaceLapCheck"].Value := getMultiMapValue(settings, "Session Settings", "Lap.PostRace")
 
-						if (getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta")
 							this.Control["pitstopDeltaEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Pitstop.Delta")
 
-						if (getMultiMapValue(settings, "Strategy Settings", "Service.Tyres", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Strategy Settings", "Service.Tyres")
 							this.Control["pitstopTyreServiceEdit"].Text := getMultiMapValue(settings, "Strategy Settings", "Service.Tyres")
 
-						if (getMultiMapValue(settings, "Strategy Settings", "Service.Refuel", kUndefined) != kUndefined) {
+						if hasMultiMapValue(settings, "Strategy Settings", "Service.Refuel") {
 							if (getMultiMapValue(settings, "Strategy Settings", "Service.Refuel.Rule", false) = "Fixed") {
 								this.Control["pitstopFuelServiceRuleDropDown"].Choose(1)
 								this.Control["pitstopFuelServiceLabel"].Text := translate("Seconds")
@@ -3374,13 +3374,13 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["pitstopFuelServiceEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Strategy Settings", "Service.Refuel"))
 						}
 
-						if (getMultiMapValue(settings, "Strategy Settings", "Service.Order", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Strategy Settings", "Service.Order")
 							this.Control["pitstopServiceDropDown"].Choose((getMultiMapValue(settings, "Strategy Settings", "Service.Order") = "Simultaneous") ? 1 : 2)
 
-						if (getMultiMapValue(settings, "Strategy Settings", "Fuel.SafetyMargin", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Strategy Settings", "Fuel.SafetyMargin")
 							this.Control["safetyFuelEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.SafetyMargin")), 0)
 
-						if (getMultiMapValue(settings, "Session Settings", "Fuel.Amount", kUndefined) != kUndefined) {
+						if hasMultiMapValue(settings, "Session Settings", "Fuel.Amount") {
 							fuelCapacity := convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.Amount"))
 
 							if (Round(fuelCapacity) = fuelCapacity)
@@ -3390,8 +3390,8 @@ class StrategyWorkbench extends ConfigurationItem {
 							this.Control["simInitialFuelAmountEdit"].Text := this.Control["fuelCapacityEdit"].Text
 						}
 
-						if ((getMultiMapValue(settings, "Session Settings", "Tyre.Compound", kUndefined) != kUndefined)
-						 && (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Color", kUndefined) != kUndefined)) {
+						if (hasMultiMapValue(settings, "Session Settings", "Tyre.Compound")
+						 && hasMultiMapValue(settings, "Session Settings", "Tyre.Compound.Color")) {
 							tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound")
 							tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color")
 
@@ -3399,13 +3399,13 @@ class StrategyWorkbench extends ConfigurationItem {
 																			, compound(tyreCompound, tyreCompoundColor)))
 						}
 
-						if (getMultiMapValue(settings, "Session Settings", "Lap.AvgTime", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Session Settings", "Lap.AvgTime")
 							this.Control["simAvgLapTimeEdit"].Text := displayValue("Float", getMultiMapValue(settings, "Session Settings", "Lap.AvgTime"), 1)
 
-						if (getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption")
 							this.Control["simFuelConsumptionEdit"].Text := displayValue("Float", convertUnit("Volume", getMultiMapValue(settings, "Session Settings", "Fuel.AvgConsumption")))
 
-						if (getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage", kUndefined) != kUndefined)
+						if hasMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage")
 							for tyreCompound, tyreLife in string2Map(";", "->", getMultiMapValue(settings, "Session Settings", "Tyre.Compound.Usage"))
 								loop this.TyreSetListView.GetCount()
 									if (translate(tyreCompound) = this.TyreSetListView.GetText(A_Index, 1))
@@ -4017,7 +4017,7 @@ class StrategyWorkbench extends ConfigurationItem {
 								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RL", 26.5)
 								, getMultiMapValue(settings, "Session Settings", "Tyre.Dry.Pressure.Target.RR", 26.5)]
 			else if (tyreCompound = "Intermediate") {
-				if (getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", kUndefined) != kUndefined)
+				if hasMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL")
 					tyrePressures := [getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FL", 29.0)
 									, getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.FR", 29.0)
 									, getMultiMapValue(settings, "Session Settings", "Tyre.Intermediate.Pressure.Target.RL", 29.0)

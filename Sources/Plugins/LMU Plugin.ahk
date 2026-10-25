@@ -12,6 +12,7 @@
 #Include "..\Framework\Extensions\Math.ahk"
 #Include "..\Database\Libraries\SessionDatabase.ahk"
 #Include "Libraries\SimulatorPlugin.ahk"
+#Include "Libraries\Sector397Plugin.ahk"
 #Include "Libraries\LMURESTProvider.ahk"
 #Include "Libraries\LMUProvider.ahk"
 #Include "RF2 Plugin.ahk"
@@ -39,6 +40,12 @@ class LMUPlugin extends Sector397Plugin {
 
 	iAdjustRefuelAmount := false
 
+	class ChatMode extends Sector397Plugin.ChatMode {
+		handleChatMessage(message) {
+			LMURestProvider.ChatData().send(message)
+		}
+	}
+
 	class LMUProvider extends LMUProvider {
 		iPlugin := false
 
@@ -53,8 +60,16 @@ class LMUPlugin extends Sector397Plugin {
 		}
 	}
 
+	createChatMode() {
+		return LMUPlugin.ChatMode(this)
+	}
+
 	createSimulatorProvider() {
 		return LMUPlugin.LMUProvider(this, this.Car, this.Track)
+	}
+
+	handleChatMessage(message) {
+		LMURestProvider.ChatData().send(message)
 	}
 
 	getPitstopActions(&allActions, &selectActions) {

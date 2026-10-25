@@ -322,7 +322,7 @@ If you're working on more than one issue at a time, it's likely that you'll have
 
 The rules for the recommendations have been compiled from different sources, above all my own experiences. That said, I do not take responsibility for the correctness of all the recommendations, especially when generating recommendations for complex and partly contradictory multi-problem cases. If you find an error in the recommendations, please let me know. I always strive to improve the quality of my software.
 
-## Logbook browser
+## Logbook Browser
 
 The "Setup Workbench" *records* all your important actions in the form of a logbook. The following entries will be made:
 

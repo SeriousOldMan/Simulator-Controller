@@ -754,7 +754,7 @@ class RaceReportViewer extends RaceReportReader {
 			hasData := false
 
 			if !this.Settings.Has("Laps")
-				if (getMultiMapValue(raceData, "Cars", "Car.1.Position", kUndefined) != kUndefined) {
+				if hasMultiMapValue(raceData, "Cars", "Car.1.Position") {
 					drawChartFunction .= ",`n[0"
 
 					loop cars.Length {

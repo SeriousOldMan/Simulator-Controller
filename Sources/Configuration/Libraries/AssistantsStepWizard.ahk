@@ -686,7 +686,7 @@ class AssistantsStepWizard extends ActionsStepWizard {
 					isBinary := false
 				}
 				else {
-					if (getMultiMapValue(pluginLabels, assistant, subAction . ".Increase", kUndefined) != kUndefined)
+					if hasMultiMapValue(pluginLabels, assistant, subAction . ".Increase")
 						this.setAction(count, false, action, [isInformationRequest, "Toggle", "Increase", "Decrease"], label)
 					else
 						this.setAction(count, false, action, [isInformationRequest, "Toggle", false, false], label)

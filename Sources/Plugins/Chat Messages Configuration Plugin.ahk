@@ -26,7 +26,18 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 	createGui(editor, x, y, width, height) {
 		local window := editor.Window
 
-		window.Add("ListView", "x16 y80 w457 h245 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
+		window.SetFont("Norm", "Arial")
+		window.SetFont("Italic", "Arial")
+
+		window.Add("GroupBox", "x16 y80 w457 h45 W:Grow", translate("Speech"))
+
+		window.SetFont("Norm", "Arial")
+
+		window.Add("Text", "x24 yp+17 w80 h23 +0x200", translate("Activation"))
+		window.Add("Edit", "x110 yp w120 h21 W:Grow(0.5) VchatActivationEdit"
+						 , getMultiMapValue(this.Configuration, "Voice Control", "ChatActivation", ""))
+
+		window.Add("ListView", "x16 y135 w457 h190 W:Grow H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr VchatMessagesListView", collect(["#", "Label", "Message"], translate))
 
 		window.Add("Text", "x16 y335 w81 h23 Y:Move +0x200", translate("Button"))
 		window.Add("Text", "x98 y335 w12 h23 Y:Move +0x200", translate("#"))
@@ -56,6 +67,8 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		window.Add("Button", "x450 y530 w23 h23 X:Move Y:Move Disabled VchatMessageUpdateButton")
 		setButtonIcon(window["chatMessageUpdateButton"], kIconsDirectory . "Save.ico", 1, "L4 T4 R4 B4")
 
+		window.Add("Text", "x56 yp+30 w" . (473 - 56 - 40) . " 0x10 W:Grow")
+
 		this.initializeList(editor, window["chatMessagesListView"], window["chatMessageAddButton"], window["chatMessageDeleteButton"], window["chatMessageUpdateButton"])
 	}
 
@@ -76,6 +89,11 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 		local ignore, chatMessage
 
 		super.saveToConfiguration(configuration)
+
+		if (Trim(this.Editor.Window["chatActivationEdit"].Text) != "")
+			setMultiMapValue(configuration, "Voice Control", "ChatActivation", this.Editor.Window["chatActivationEdit"].Text)
+		else
+			removeMultiMapValue(configuration, "Voice Control", "ChatActivation")
 
 		for ignore, chatMessage in this.ItemList
 			setMultiMapValue(configuration, "Chat Messages", ConfigurationItem.descriptor("Button", chatMessage[1]), values2String("|", chatMessage[2], chatMessage[3]))
@@ -120,14 +138,14 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		if ((Trim(this.Control["chatMessageLabelEdit"].Text) = "") || (Trim(this.Control["chatMessageMessageEdit"].Text) = "")) {
 			withBlockedWindows(MsgDlg, translate("Invalid values detected - please correct..."), translate("Error"), 262160)
-			
+
 			return false
 		}
 		else if isNew
 			for ignore, item in this.ItemList
 				if (item[1] = this.Control["chatMessageNumberEdit"].Text) {
 					withBlockedWindows(MsgDlg, translate("A chat message for this button already exists - please use different values..."), translate("Error"), 262160)
-					
+
 					return false
 				}
 
@@ -139,7 +157,7 @@ class ChatMessagesConfigurator extends ConfigurationItemList {
 
 		if (chatMessage && (chatMessage[1] != this.ItemList[this.CurrentItem][1])) {
 			withBlockedWindows(MsgDlg, translate("The button number of an existing chat message may not be changed..."), translate("Error"), 262160)
-			
+
 			return false
 		}
 		else

@@ -819,7 +819,7 @@ class LMURESTProvider {
 						if isNumber(capacity)
 							return capacity
 						else
-							throw "Invalid fuel  capacity value..."
+							throw "Invalid fuel capacity value..."
 					}
 				}
 				catch Any {
@@ -1162,9 +1162,9 @@ class LMURESTProvider {
 			}
 		}
 
-		State[internal := false] {
+		State[info := false] {
 			Get {
-				return this.getState(internal)
+				return this.getState(info)
 			}
 		}
 
@@ -1180,19 +1180,17 @@ class LMURESTProvider {
 			}
 		}
 
-		getState(internal := false) {
+		getState(info := false) {
 			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
 
 			if data {
-				if internal
-					return ((data.Has("status") ? (data["status"] . ", ") : " , ")
-						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : " , ")
-						  . (data.Has("MultiStintState") ? data["MultiStintState"] : ""))
-				else
+				if info
+					return ((data.Has("status") ? (data["status"] . ", ") : "-, ")
+						  . (data.Has("teamVehicleState") ? (data["teamVehicleState"] . ", ") : "-, ")
+						  . (data.Has("MultiStintState") ? data["MultiStintState"] : "-"))
+				else {
 					if (data.Has("teamVehicleState") && (data["teamVehicleState"] = "OTHER TEAMMATE DRIVING"))
 						return "Not Driving"
-					else if (data.Has("status") && (data["status"] = "unavailable"))
-						return "Inactive"
 					else if data.Has("MultiStintState") {
 						switch data["MultiStintState"], false {
 							case "Disabled":
@@ -1204,10 +1202,11 @@ class LMURESTProvider {
 						}
 					}
 					else
-						return "Paused"
+						return "Inactive"
+				}
 			}
 			else
-				return "Inactive"
+				return "No Data"
 		}
 
 		getDuration(session) {
@@ -2116,13 +2115,30 @@ class LMURESTProvider {
 	class GarageData extends LMURESTProvider.RESTData {
 		POSTURL {
 			Get {
-				return "http://localhost:6397/rest/garage/refreshsetups"
+				return "http://localhost:6397/rest/garage/refreshsetups/"
 			}
 		}
 
 		refreshSetups() {
 			try {
 				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, "", false)
+			}
+			catch Any as exception {
+				logError(exception)
+			}
+		}
+	}
+
+	class ChatData extends LMURESTProvider.RESTData {
+		POSTURL {
+			Get {
+				return "http://localhost:6397/rest/chat/"
+			}
+		}
+
+		send(message) {
+			try {
+				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, message, false)
 			}
 			catch Any as exception {
 				logError(exception)

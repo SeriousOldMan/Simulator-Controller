@@ -8944,8 +8944,7 @@ class TeamCenter extends ConfigurationItem {
 										tyreCompoundColor := values2String(",", tyreCompoundColor*)
 									}
 
-									if ((full || !hasServiceData)
-									 && (getMultiMapValue(state, "Pitstop Data", "Service.Lap", kUndefined) != kUndefined)) {
+									if ((full || !hasServiceData) && hasMultiMapValue(state, "Pitstop Data", "Service.Lap")) {
 										hasServiceData := true
 										newData := true
 
@@ -8967,8 +8966,7 @@ class TeamCenter extends ConfigurationItem {
 																	, "Brake.Change", getMultiMapValue(state, "Pitstop Data", "Service.Brake.Change", false)))
 									}
 
-									if ((full || !hasTyreData)
-									 && (getMultiMapValue(state, "Pitstop Data", "Tyre.Compound", kUndefined) != kUndefined)) {
+									if ((full || !hasTyreData) && hasMultiMapValue(state, "Pitstop Data", "Tyre.Compound")) {
 										hasTyreData := true
 										newData := true
 

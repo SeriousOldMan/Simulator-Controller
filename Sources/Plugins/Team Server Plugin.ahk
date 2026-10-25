@@ -389,7 +389,7 @@ class TeamServerPlugin extends ControllerPlugin {
 			else
 				this.iTeamServerEnabled := false
 
-			if (this.StartupSettings && (getMultiMapValue(this.StartupSettings, "Session", "Mode", kUndefined) != kUndefined))
+			if (this.StartupSettings && hasMultiMapValue(this.StartupSettings, "Session", "Mode"))
 				this.iTeamServerEnabled := (getMultiMapValue(this.StartupSettings, "Session", "Mode") = "Team")
 
 			openRaceSettings := this.getArgumentValue("openRaceSettings", false)

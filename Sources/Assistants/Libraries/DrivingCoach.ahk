@@ -421,7 +421,7 @@ class DrivingCoach extends GridRaceAssistant {
 		options := this.Options
 
 		for ignore, instruction in this.Instructions[true]
-			if (getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, kUndefined) != kUndefined)
+			if hasMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction)
 				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(configuration, "Driving Coach Personality", "Instructions." . instruction, false)
 			else
 				options["Driving Coach.Instructions." . instruction] := getMultiMapValue(this.Templates[this.VoiceManager.Language["Original"]], "Instructions", instruction)
@@ -1807,7 +1807,7 @@ class DrivingCoach extends GridRaceAssistant {
 					setMultiMapValue(info, "Lap", "Driver", getMultiMapValue(bestInfo, "Info", "Driver"))
 					setMultiMapValue(info, "Lap", "LapTime", bestSessionLapTime)
 
-					if (getMultiMapValue(bestInfo, "Info", "SectorTimes", kUndefined) != kUndefined)
+					if hasMultiMapValue(bestInfo, "Info", "SectorTimes")
 						setMultiMapValue(info, "Lap", "SectorTimes", getMultiMapValue(bestInfo, "Info", "SectorTimes"))
 
 					sessionDB.writeTelemetryInfo(this.Simulator, this.Car, this.Track, fileName, info)

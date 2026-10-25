@@ -845,9 +845,9 @@ class HybridEngine extends Assert {
 			kb.setFact("List", true)
 			kb.produce()
 
-			this.AssertTrue(kb.getValue("ThreeFound", kUndefined) != kUndefined, "Unexpected list contains result...")
-			this.AssertTrue(kb.getValue("SecondThreeFound", kUndefined) == kUndefined, "Unexpected list contains result...")
-			this.AssertTrue(kb.getValue("FourNotFound", kUndefined) != kUndefined, "Unexpected list contains result...")
+			this.AssertTrue(kb.hasValue("ThreeFound"), "Unexpected list contains result...")
+			this.AssertTrue(!kb.hasValue("SecondThreeFound"), "Unexpected list contains result...")
+			this.AssertTrue(kb.hasValue("FourNotFound"), "Unexpected list contains result...")
 		}
 		catch Any as exception {
 			logError(exception)

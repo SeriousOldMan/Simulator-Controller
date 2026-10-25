@@ -548,12 +548,12 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		widget41.OnEvent("Click", (*) => this.testPushToTalk())
 		setButtonIcon(widget41, kIconsDirectory . "Start.ico", 1)
 		widget23 := window.Add("Edit", "xp+24 yp+1 w64 h21 VpushToTalkEdit Hidden")
-		widget25 := window.Add("Edit", "x" . (x4 + 24) . " yp w" . w4 . " h21 W:Grow VactivationCommandEdit Hidden")
+		widget25 := window.Add("Edit", "x" . (x4 + 24) . " yp w" . w4 . " h21 W:Grow VcontrollerActivationEdit Hidden")
 
 		this.iBottomWidgets := [[window["listenerLabel"], window["listenerDropDown"]]
 							  , [window["pushToTalkLabel"], window["pushToTalkModeDropDown"]
 							   , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
-							   , window["activationCommandEdit"]]]
+							   , window["controllerActivationEdit"]]]
 		this.iOtherWidgets := [[window["windowsSpeakerVolumeLabel"], window["speakerVolumeSlider"]]
 							 , [window["windowsSpeakerPitchLabel"], window["speakerPitchSlider"]]
 							 , [window["windowsSpeakerSpeedLabel"], window["speakerSpeedSlider"]]
@@ -563,7 +563,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							 , [window["listenerLabel"], window["listenerDropDown"]]
 							 , [window["pushToTalkLabel"], window["pushToTalkModeDropDown"]
 							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
-							  , window["activationCommandEdit"]]]
+							  , window["controllerActivationEdit"]]]
 
 		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Service Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
@@ -877,13 +877,15 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 			this.Value["listener"] := getMultiMapValue(configuration, "Voice Control", "Listener", true)
 			this.Value["pushToTalk"] := getMultiMapValue(configuration, "Voice Control", "PushToTalk", false)
 			this.Value["pushToTalkMode"] := getMultiMapValue(configuration, "Voice Control", "PushToTalkMode", "Hold")
-			this.Value["activationCommand"] := getMultiMapValue(configuration, "Voice Control", "ActivationCommand", false)
+			this.Value["controllerActivation"] := getMultiMapValue(configuration, "Voice Control", "ControllerActivation"
+																 , getMultiMapValue(configuration, "Voice Control"
+																								 , "ActivationCommand", false))
 
 			if (this.Value["pushToTalk"] = false)
 				this.Value["pushToTalk"] := ""
 
-			if (this.Value["activationCommand"] = false)
-				this.Value["activationCommand"] := ""
+			if (this.Value["controllerActivation"] = false)
+				this.Value["controllerActivation"] := ""
 
 			if this.Configuration {
 				for ignore, speaker in ["windowsSpeaker", "dotNETSpeaker", "azureSpeaker", "googleSpeaker", "elevenLabsSpeaker", "piperSpeaker"]
@@ -1110,7 +1112,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 		setMultiMapValue(configuration, "Voice Control", "Listener", listener)
 		setMultiMapValue(configuration, "Voice Control", "PushToTalk", (Trim(this.Control["pushToTalkEdit"].Text) = "") ? false : this.Control["pushToTalkEdit"].Text)
 		setMultiMapValue(configuration, "Voice Control", "PushToTalkMode", ["Hold", "Press", "Custom"][this.Control["pushToTalkModeDropDown"].Value])
-		setMultiMapValue(configuration, "Voice Control", "ActivationCommand", (Trim(this.Control["activationCommandEdit"].Text) = "") ? false : this.Control["activationCommandEdit"].Text)
+		setMultiMapValue(configuration, "Voice Control", "ControllerActivation", (Trim(this.Control["controllerActivationEdit"].Text) = "") ? false : this.Control["controllerActivationEdit"].Text)
 
 		setMultiMapValue(configuration, "Voice Control", "Speaker.ClickVolume", this.iSoundProcessingSettings[1])
 		setMultiMapValue(configuration, "Voice Control", "Speaker.NoiseVolume", this.iSoundProcessingSettings[2])
@@ -1245,7 +1247,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 
 		this.Control["pushToTalkEdit"].Text := this.Value["pushToTalk"]
 		this.Control["pushToTalkModeDropDown"].Choose(inList(["Hold", "Press", "Custom"], this.Value["pushToTalkMode"]))
-		this.Control["activationCommandEdit"].Text := this.Value["activationCommand"]
+		this.Control["controllerActivationEdit"].Text := this.Value["controllerActivation"]
 
 		this.updateState()
 	}

@@ -78,6 +78,8 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 	iChatMode := false
 	iPitstopMode := false
 
+	iChatActivation := false
+
 	iRepairSuspensionChosen := true
 	iRepairBodyworkChosen := true
 
@@ -129,10 +131,27 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		updateActions(session) {
 		}
+
+		handleChatMessage(message) {
+			if this.Plugin.activateWindow() {
+				Send("{Enter}")
+				Sleep(100)
+				SendText(message)
+				Sleep(100)
+				Send("{Enter}")
+			}
+		}
 	}
 
 	class ChatAction extends ControllerAction {
+		iMode := false
 		iMessage := ""
+
+		Mode {
+			Get {
+				return this.iMode
+			}
+		}
 
 		Message {
 			Get {
@@ -140,22 +159,15 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			}
 		}
 
-		__New(function, label, message) {
+		__New(mode, function, label, message) {
+			this.iMode := mode
 			this.iMessage := message
 
 			super.__New(function, label)
 		}
 
 		fireAction(function, trigger) {
-			local message := this.Message
-
-			if this.Controller.findPlugin(kACCPlugin).activateWindow() {
-				Send("{Enter}")
-				Sleep(100)
-				Send(message)
-				Sleep(100)
-				Send("{Enter}")
-			}
+			this.Mode.handleChatMessage(this.Message)
 		}
 	}
 
@@ -226,6 +238,12 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 
 		super.loadFromConfiguration(configuration)
 
+		this.iChatActivation := getMultiMapValue(configuration, "Voice Control", "ChatActivation", false)
+
+		if this.iChatActivation
+			if !this.iChatMode
+				this.iChatMode := ACCPlugin.ChatMode(this)
+
 		for descriptor, message in getMultiMapValues(configuration, "Chat Messages") {
 			function := this.Controller.findFunction(descriptor)
 
@@ -235,7 +253,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 				if !this.iChatMode
 					this.iChatMode := ACCPlugin.ChatMode(this)
 
-				this.iChatMode.registerAction(ACCPlugin.ChatAction(function, message[1], message[2]))
+				this.iChatMode.registerAction(ACCPlugin.ChatAction(this.iChatMode, function, message[1], message[2]))
 			}
 			else
 				this.logFunctionNotFound(descriptor)
@@ -275,6 +293,23 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 			Task.startTask(ObjBindMethod(ACCPlugin, "requireCarDatabase"), 1000, kLowPriority)
 
 		super.simulatorStartup(simulator)
+
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
+			this.Controller.connectChat(this, this.iChatActivation)
+	}
+
+	simulatorShutdown(simulator) {
+		super.simulatorShutdown(simulator)
+
+		if ((simulator = this.Simulator[true]) && this.iChatActivation)
+			this.Controller.disconnectChat(this)
+	}
+
+	handleChatMessage(message) {
+		local chatMode := this.findMode(kChatMode)
+
+		if (chatMode && (this.Session >= kSessionOther))
+			chatMode.handleChatMessage(message)
 	}
 
 	driverActive(data, driverForname, driverSurname) {

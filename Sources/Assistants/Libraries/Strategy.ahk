@@ -1904,6 +1904,10 @@ class Strategy extends ConfigurationItem {
 					default:
 						refuelAmount := Min(strategy.FuelCapacity - (remainingFuel - (stintLaps * fuelConsumption)), refuelAmount)
 				}
+
+				stintLaps := strategy.getMaxFuelLaps(remainingFuel - (lastStintLaps * fuelConsumption)
+																   + refuelAmount
+												   , fuelConsumption)
 			}
 			else {
 				refuelAmount := strategy.calcRefuelAmount(stintLaps * fuelConsumption, remainingFuel, remainingSessionLaps, lastStintLaps)

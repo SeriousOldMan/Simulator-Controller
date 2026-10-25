@@ -371,7 +371,7 @@ In very rare cases it might be beneficial to define one or more fixed pitstops b
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%207.JPG)
 
-Enter the number of the pitstop that should be fixed at the specified lap, the amount of fuel to be added and choose whether you want to change tyres at this pitstop.
+Enter the number of the pitstop that should be fixed. You can also specify, that this pitstop should carried out at a specific lap and you can define rules for refueling and/or tyre change.
 
 Important: The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
 

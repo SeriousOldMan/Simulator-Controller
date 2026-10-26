@@ -700,6 +700,26 @@ namespace RF2SHMSpotter {
 
 		int thresholdSpeed = 60;
 
+		long computeTrafficDistance(double driverDistance, double driverAvgSpeed) {
+			long distance = long.MaxValue;
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+			{
+				ref rF2VehicleScoring vehicle = ref scoring.mVehicles[i];
+				
+				if ((vehicle.mIsPlayer != 1) && (vehicle.mInPits == 0))
+				{
+                    long distanceBehind = (long)(((vehicle.mLapDist < driverDistance) ? driverDistance
+																					  : (driverDistance + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+
+					if (distanceBehind < distance)
+						distance = distanceBehind;
+				}
+			}
+			
+			return (long)(distance / (driverAvgSpeed * 1000 / 3600));
+		}
+		
         bool checkAccident(ref rF2VehicleScoring playerScoring)
         {
 			bool accident = false;
@@ -765,7 +785,12 @@ namespace RF2SHMSpotter {
 					if (vehicle.mIsPlayer == 1)
                     {
                         if ((speed < (avgSpeed / 5)) && (GetPlayerTelemetry(vehicle.mID, ref telemetry).mFilteredBrake == 0)) {
-							SendSpotterMessage("rejoinWarning");
+							long seconds = computeTrafficDistance(vehicle.mLapDist, avgSpeed);
+							
+							if (seconds != 0)
+								SendSpotterMessage("rejoinWarning:" + seconds);
+							else
+								SendSpotterMessage("rejoinWarning");
 							
 							return true;
 						}

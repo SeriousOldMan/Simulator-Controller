@@ -650,6 +650,31 @@ namespace PMRUDPSpotter {
 
 		int thresholdSpeed = 60;
 
+        long computeTrafficDistance(ref UDPRaceInfo raceInfo, double driverDistance, double driverAvgSpeed) {
+			long distance = long.MaxValue;
+            var participantStates = receiver.GetAllParticipantStates();
+			var trackLength = raceInfo.LayoutLength;
+
+			for (int i = 0; i < participantStates.Count; ++i)
+			{
+				UDPParticipantRaceState vehicle = participantStates[i];
+				
+				if (vehicle.InPits || vehicle.InPitLane)
+					continue;
+    
+				if (!vehicle.IsPlayer)
+				{
+					long distanceBehind = (long)(((vehicle.LapProgress < driverDistance) ? driverDistance
+																						 : (driverDistance + trackLength)) - vehicle.LapProgress * trackLength);
+
+					if (distanceBehind < distance)
+						distance = distanceBehind;
+				}
+			}
+			
+			return (long)(distance / (driverAvgSpeed * 1000 / 3600));
+		}
+		
         bool checkAccident(ref UDPRaceInfo raceInfo, ref UDPParticipantRaceState playerVehicle, ref UDPVehicleTelemetry playerTelemetry)
         {
 			bool accident = false;
@@ -721,7 +746,12 @@ namespace PMRUDPSpotter {
 					if (vehicle.IsPlayer)
 					{
 						if ((speed < (avgSpeed / 5)) && ((float)playerTelemetry.Input.Brake == 0)) {
-							SendSpotterMessage("rejoinWarning");
+							long seconds = computeTrafficDistance(ref raceInfo, running * trackLength, avgSpeed);
+							
+							if (seconds != 0)
+								SendSpotterMessage("rejoinWarning:" + seconds);
+							else
+								SendSpotterMessage("rejoinWarning");
 							
 							return true;
 						}

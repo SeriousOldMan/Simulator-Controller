@@ -706,15 +706,11 @@ namespace LMUSHMSpotter {
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 			{
 				ref LMUVehicleScoring vehicle = ref scoring.mVehicles[i];
-				
-				if (vehicle.mInPits != 0)
-					continue;
 
-				if (vehicle.mIsPlayer != 1)
+				if ((vehicle.mIsPlayer != 1) && (vehicle.mInPits == 0))
 				{
-                    double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
                     long distanceBehind = (long)(((vehicle.mLapDist < driverDistance) ? driverDistance
-																					 : (driverDistance + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+																					  : (driverDistance + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
 
 					if (distanceBehind < distance)
 						distance = distanceBehind;

@@ -959,7 +959,6 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			pitstopTyreSet := value
 	}
 
-
 	choosePitstopRule(*) {
 		editRaceSettings(&updateState)
 	}
@@ -995,7 +994,7 @@ editRaceSettings(&settingsOrCommand, arguments*) {
 			if compound
 				compound := normalizeCompound(compound)
 
-			settingsGui["tyreSetDropDown"].Choose(inList(collect(gAvailableTyreCompounds, translate), compound))
+			settingsGui["tyreSetDropDown"].Choose(inList(collect(SessionDatabase.getTyreCompounds(gSimulator, gCar, gTrack ? gTrack : "*"), translate), compound))
 			settingsGui["tyreSetLapsEdit"].Text := laps
 			settingsGui["tyreSetCountEdit"].Text := count
 		}

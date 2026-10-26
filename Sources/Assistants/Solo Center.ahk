@@ -1551,7 +1551,7 @@ class SoloCenter extends ConfigurationItem {
 			}
 
 			centerGui["tyreCompoundDropDown"].Delete()
-			centerGui["tyreCompoundDropDown"].Add(concatenate(collect(["No change", "Auto"], translate), compounds))
+			centerGui["tyreCompoundDropDown"].Add(concatenate(collect(["No Change", "Auto"], translate), compounds))
 			centerGui["tyreCompoundDropDown"].Choose(choosen + 2)
 
 			center.updateState()
@@ -1822,7 +1822,7 @@ class SoloCenter extends ConfigurationItem {
 		centerGui.Add("Text", "x" . x . " yp+21 w83 h23 +0x200", translate("Mode"))
 		centerGui.Add("DropDownList", "x" . x1 . " yp w110 Choose2 vrunModeDropDown", collect(["Manual", "Auto"], translate)).OnEvent("Change", updateState)
 
-		choices := collect(["No change", "Auto", normalizeCompound("Dry")], translate)
+		choices := collect(["No Change", "Auto", normalizeCompound("Dry")], translate)
 		chosen := 2
 
 		centerGui.Add("Text", "x" . x . " yp+24 w83 h23 +0x200", translate("Compound"))
@@ -2227,7 +2227,7 @@ class SoloCenter extends ConfigurationItem {
 		translatedCompounds := collect(compounds, translate)
 
 		this.Control["tyreCompoundDropDown"].Delete()
-		this.Control["tyreCompoundDropDown"].Add(concatenate(collect(["No change", "Auto"], translate), translatedCompounds))
+		this.Control["tyreCompoundDropDown"].Add(concatenate(collect(["No Change", "Auto"], translate), translatedCompounds))
 		this.Control["tyreCompoundDropDown"].Choose(2)
 
 		this.Control["compoundDropDown"].Delete()

@@ -859,8 +859,8 @@ class StrategyWorkbench extends ConfigurationItem {
 				if (Trim(workbenchGui["simFixedPitstopEdit"].Text) = "")
 					workbenchGui["simFixedPitstopEdit"].Text := workbenchGui["simFixedPitstopEdit"].Text["Current"]
 
-				if (Trim(workbenchGui["simFixedPitstopLapEdit"].Text) = "")
-					workbenchGui["simFixedPitstopLapEdit"].Text := translate("Any")
+				if ((Trim(workbenchGui["simFixedPitstopLapEdit"].Text) = "") || !workbenchGui["simFixedPitstopLapEdit"].Text)
+					workbenchGui["simFixedPitstopLapEdit"].Text := translate("-")
 
 				if (kFixedPitstopRefuel && (Trim(workbenchGui["simFixedPitstopRefuelEdit"].Text) = ""))
 					workbenchGui["simFixedPitstopRefuelEdit"].Text := workbenchGui["simFixedPitstopRefuelEdit"].Text["Current"]
@@ -904,12 +904,12 @@ class StrategyWorkbench extends ConfigurationItem {
 
 		addSimFixedPitstop(*) {
 			if kFixedPitstopRefuel
-				workbench.FixedPitstopsListView.Add("Vis Select", 1, translate("Any"), translate("Optional"), translate("Optional"))
+				workbench.FixedPitstopsListView.Add("Vis Select", 1, translate("-"), translate("Optional"), translate("Optional"))
 			else
-				workbench.FixedPitstopsListView.Add("Vis Select", 1, translate("Any"), translate("Optional"))
+				workbench.FixedPitstopsListView.Add("Vis Select", 1, translate("-"), translate("Optional"))
 
 			workbenchGui["simFixedPitstopEdit"].Text := 1
-			workbenchGui["simFixedPitstopLapEdit"].Text := translate("Any")
+			workbenchGui["simFixedPitstopLapEdit"].Text := translate("-")
 
 			if kFixedPitstopRefuel {
 				workbenchGui["simFixedPitstopRefuelEdit"].Text := 0
@@ -2147,8 +2147,9 @@ class StrategyWorkbench extends ConfigurationItem {
 				this.Control["simFixedPitstopRefuelEdit"].Text := ""
 			}
 
-		if ((Trim(this.Control["simFixedPitstopLapEdit"].Text) = "") && this.FixedPitstopsListView.GetNext(0))
-			this.Control["simFixedPitstopLapEdit"].Text := translate("Any")
+		if this.FixedPitstopsListView.GetNext(0)
+			if ((Trim(this.Control["simFixedPitstopLapEdit"].Text) = "") || !this.Control["simFixedPitstopLapEdit"].Text)
+				this.Control["simFixedPitstopLapEdit"].Text := translate("-")
 
 		if (this.AvailableDrivers.Length > 0)
 			this.Control["addDriverButton"].Enabled := true
@@ -3112,7 +3113,7 @@ class StrategyWorkbench extends ConfigurationItem {
 							lap := fixedPitstop.Lap
 
 							if !lap
-								lap := translate("Any")
+								lap := translate("-")
 
 							tyreChange := (fixedPitstop.Compound ? translate(fixedPitstop.Compound) : translate("No"))
 
@@ -4106,7 +4107,7 @@ class StrategyWorkbench extends ConfigurationItem {
 			loop this.FixedPitstopsListView.GetCount() {
 				lap := this.FixedPitstopsListView.GetText(A_Index, 2)
 
-				if (lap = translate("Any"))
+				if (lap = translate("-"))
 					lap := false
 
 				fixedPitstop := {Lap: lap}

@@ -3716,13 +3716,16 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 	}
 
-	rejoinWarning(arguments*) {
+	rejoinWarning(traffic := false, arguments*) {
 		local lap := this.KnowledgeBase.getValue("Lap", 0)
 
 		static lastAccident := false
 
 		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
-			this.pushAlert("AccidentRejoin")
+			if (traffic && (traffic > (getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 5))))
+				this.pushAlert("AccidentRejoinTraffic", {seconds: traffic})
+			else
+				this.pushAlert("AccidentRejoin")
 
 			lastAccident := lap
 		}

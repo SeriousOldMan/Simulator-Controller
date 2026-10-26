@@ -288,6 +288,9 @@ AccidentBehindDriver.3=Behind was an accident by %forName% %surName%. This may h
 AccidentRejoin.1=Okay, calm down and watch out if you keep going.
 AccidentRejoin.2=That's bad. Be careful when you rejoin.
 AccidentRejoin.3=Damn, but now watch out for traffic.
+AccidentRejoinTraffic.1=Okay, calm down. Traffic is %seconds% seconds behind.
+AccidentRejoinTraffic.2=That's bad. Traffic is coming up in %seconds% seconds.
+AccidentRejoinTraffic.3=Damn, not good. Get going, but look out for traffic in %seconds% seconds.
 // Flag Warnings //
 YellowFull.1=Full course yellow, full course yellow.
 YellowFull.2=Attention full course yellow.

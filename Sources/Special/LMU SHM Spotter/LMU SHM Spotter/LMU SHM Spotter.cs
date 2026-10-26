@@ -700,7 +700,7 @@ namespace LMUSHMSpotter {
 
 		int thresholdSpeed = 60;
 
-		long computeTrafficDistance(double driverRunning, double driverAvgSpeed) {
+		long computeTrafficDistance(double driverDistance, double driverAvgSpeed) {
 			long distance = long.MaxValue;
 
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
@@ -710,14 +710,11 @@ namespace LMUSHMSpotter {
 				if (vehicle.mInPits != 0)
 					continue;
 
-				double speed = vehicleSpeed(ref vehicle);
-				double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
-				double avgSpeed = getAverageSpeed(running);
-				
 				if (vehicle.mIsPlayer != 1)
 				{
-					long distanceBehind = (long)(((vehicle.mLapDist < driverRunning) ? driverRunning
-																					 : (driverRunning + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
+                    double running = Math.Max(0, Math.Min(1, Math.Abs(vehicle.mLapDist / scoring.mScoringInfo.mLapDist)));
+                    long distanceBehind = (long)(((vehicle.mLapDist < driverDistance) ? driverDistance
+																					 : (driverDistance + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
 
 					if (distanceBehind < distance)
 						distance = distanceBehind;
@@ -792,7 +789,7 @@ namespace LMUSHMSpotter {
 					if (vehicle.mIsPlayer == 1)
                     {
                         if ((speed < (avgSpeed / 5)) && (GetPlayerTelemetry(vehicle.mID, ref telemetry).mFilteredBrake == 0)) {
-							long seconds = computeTrafficDistance(running, avgSpeed);
+							long seconds = computeTrafficDistance(vehicle.mLapDist, avgSpeed);
 							
 							if (seconds != 0)
 								SendSpotterMessage("rejoinWarning:" + seconds);

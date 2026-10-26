@@ -34,6 +34,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Added missing rejoin advice phrase issued by the Spotter for Polish language.
+  - Fixed the "Issue..." menu being unavailable when the Characteristics pane is filled to the max in the "Setup Workbench".
   
 #### Changes
 

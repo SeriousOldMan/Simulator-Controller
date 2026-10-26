@@ -5,7 +5,7 @@ Version=7.3.2.0-dev
 Target=7.3.2.0-release
 Date=10/25/26
 Download=
-Changes=Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish
+Changes=Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench"
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.1.0-release

@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.3.2.0-dev]() (Early build for 7.3.2. Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish.)
+[7.3.2.0-dev]() (Early build for 7.3.2. Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7320) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-732) of this version and all the versions you might have skipped, before installing and using this version.
 

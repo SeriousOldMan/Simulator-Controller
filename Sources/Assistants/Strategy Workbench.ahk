@@ -832,7 +832,7 @@ class StrategyWorkbench extends ConfigurationItem {
 						default:
 							workbenchGui["simFixedPitstopRefuelRequirementsDropDown"].Choose(4)
 
-							workbenchGui["simFixedPitstopRefuelEdit"].Text := refuel
+							workbenchGui["simFixedPitstopRefuelEdit"].Text := Round(refuel)
 					}
 				}
 

@@ -33,10 +33,11 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - None this time...
+  - Added missing rejoin advice phrase issued by the Spotter for Polish language.
   
 #### Changes
 
+  - The Spotter can now also inform you about the exact distance (in seconds) to upcoming traffic after an accident or an off-track.
   - The support for fixed pitstops in strategy development and simulation has been extended. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstops-fixed) for more information.
   - [Internal] Migrated to AHK 2.1-alpha.37.
 

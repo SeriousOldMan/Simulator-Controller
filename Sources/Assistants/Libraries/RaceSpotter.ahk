@@ -3727,8 +3727,8 @@ class RaceSpotter extends GridRaceAssistant {
 		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
 			if (driverRunning && trafficRunning) {
 				lapTime := this.getLapTime(driver)
-				driverTime := Round(this.timeIntoLap(driver, driverRunning, lapTime) / 1000)
-				trafficTime := Round(this.timeIntoLap(driver, trafficRunning, lapTime) / 1000)
+				driverTime := Round(this.getTimeIntoLap(driver, driverRunning, lapTime) / 1000)
+				trafficTime := Round(this.getTimeIntoLap(driver, trafficRunning, lapTime) / 1000)
 
 				if (driverTime > trafficTime)
 					gap := (driverTime - trafficTime)

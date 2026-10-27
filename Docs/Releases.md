@@ -35,6 +35,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Added missing rejoin advice phrase issued by the Spotter for Polish language.
   - Fixed the "Issue..." menu being unavailable when the Characteristics pane is filled to the max in the "Setup Workbench".
+  - Fixed lap time corrections based on track position and track distance.
   
 #### Changes
 

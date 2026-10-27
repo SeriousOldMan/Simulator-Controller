@@ -686,6 +686,47 @@ bool fileExists(std::string name) {
 		return false;
 }
 
+double computeTrafficRunning(const irsdk_header* header, const char* data, const int playerCarIndex,
+							 float* trackPositions, bool* pitLaneStates,
+							 float trackLength, int numStarters,
+							 double driverDistance, double driverAvgSpeed) {
+	long distance = LONG_MAX;
+	double running = 0;
+
+	const char* sessionInfo = irsdk_getSessionInfoStr();
+	char posIdx[10];
+	char carIdx[10];
+	char sessionID[10];
+	
+	itoa(getCurrentSessionID(sessionInfo), sessionID, 10);
+
+	for (int i = 1; i <= numStarters; i++) {
+		itoa(i, posIdx, 10);
+
+		if (getYamlValue(carIdx, sessionInfo, "SessionInfo:Sessions:SessionNum:{%s}ResultsPositions:Position:{%s}CarIdx:", sessionID, posIdx)) {
+			int carIndex = atoi(carIdx);
+
+			if (pitLaneStates && ((bool*)pitLaneStates)[carIndex])
+				continue;
+
+			if (carIndex == playerCarIndex)
+			{
+				float carRunning = trackPositions[carIndex];
+				float carDistance = carRunning * trackLength;
+				long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - carDistance);
+
+				if (distanceBehind < distance) {
+					distance = distanceBehind;
+							
+					running = carRunning;
+				}
+			}
+		}
+	}
+	
+	return running;
+}
+
 bool checkAccident(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
 {
 	bool accident = false;
@@ -805,8 +846,6 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 							continue;
 
 						float avgSpeed = getAverageSpeed(running);
-						
-						
 					
 						if (carIndex == playerCarIndex)
 						{
@@ -817,7 +856,27 @@ bool checkAccident(const irsdk_header* header, const char* data, const int playe
 								brake = *(float*)rawValue;
 							
 							if ((speed < (avgSpeed / 5)) && (brake == 0)) {
-								sendSpotterMessage("rejoinWarning");
+								double trafficRunning = computeTrafficRunning(header, data, playerCarIndex,
+																			  (float*)trackPositions, (bool*)pitLaneStates,
+																			  trackLength, numStarters,
+																			  running * trackLength, avgSpeed);
+							
+								if (trafficRunning != 0) {
+									char message[80] = "rejoinWarning:";
+									char numBuffer[20];
+
+									sprintf_s(numBuffer, 20, "%f", (float)running);
+									strcat_s(message, 80, numBuffer);
+									
+									strcat_s(message, 80, ";");
+
+									sprintf_s(numBuffer, 20, "%f", (float)trafficRunning);
+									strcat_s(message, 80, numBuffer);
+					
+									sendSpotterMessage(message);
+								}
+								else
+									sendSpotterMessage("rejoinWarning");
 								
 								return true;
 							}

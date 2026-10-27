@@ -606,6 +606,32 @@ BOOL fileExists(char* name) {
 		return FALSE;
 }
 
+double computeTrafficRunning(double driverDistance) {
+	int playerIdx = getPlayerIndex();
+	r3e_float32 trackLength = map_buffer->layout_length;
+	long distance = LONG_MAX;
+	double running = 0;
+
+	for (int id = 0; id < map_buffer->num_cars; id++) {
+		if (id != playerIdx) {
+			if (map_buffer->all_drivers_data_1[id].in_pitlane > 0)
+				continue;
+		
+			double carDistance = map_buffer->all_drivers_data_1[id].lap_distance;
+			double carRunning = max(0, min(1, fabs(carDistance / trackLength)));
+			long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - carDistance);
+
+			if (distanceBehind < distance) {
+				distance = distanceBehind;
+						
+				running = carRunning;
+			}
+		}
+	}
+	
+	return running;
+}
+
 BOOL checkAccident() {
 	int accidentsAheadCount = 0;
 	int accidentsBehindCount = 0;
@@ -662,7 +688,24 @@ BOOL checkAccident() {
 		if (id == playerIdx)
 		{
 			if ((speed < (avgSpeed / 5)) && (map_buffer->brake == 0)) {
-				sendSpotterMessage("rejoinWarning");
+				double trafficRunning = computeTrafficRunning(carDistance);
+							
+				if (trafficRunning != 0) {
+					char message[80] = "rejoinWarning:";
+					char numBuffer[20];
+
+					sprintf_s(numBuffer, 20, "%f", (float)running);
+					strcat_s(message, 80, numBuffer);
+					
+					strcat_s(message, 80, ";");
+
+					sprintf_s(numBuffer, 20, "%f", (float)trafficRunning);
+					strcat_s(message, 80, numBuffer);
+					
+					sendSpotterMessage(message);
+				}
+				else
+					sendSpotterMessage("rejoinWarning");
 				
 				return TRUE;
 			}

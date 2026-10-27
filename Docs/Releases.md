@@ -40,6 +40,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Changes
 
   - The Spotter can now also inform you about the exact distance (in seconds) to upcoming traffic after an accident or an off-track.
+    - New settings "Spotter: Minimum gap for approaching vehicles" and "Spotter: Gap correction for approaching vehicles" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#spotter-settings), which can be used to fine-tune the timing of the rejoin warning so that the given gap to approaching cars is as exact as possible.
   - The support for fixed pitstops in strategy development and simulation has been extended. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstops-fixed) for more information.
   - [Internal] Migrated to AHK 2.1-alpha.37.
 

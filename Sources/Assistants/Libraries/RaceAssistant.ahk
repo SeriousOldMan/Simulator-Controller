@@ -4598,20 +4598,24 @@ class GridRaceAssistant extends RaceAssistant {
 			normalizedRunnings.Push(false)
 
 		this.iNormalizedRunnings := normalizedRunnings
-		this.iHasNormalizedRunnings := false
+		this.iHasNormalizedRunnings := true
 	}
 
 	hasNormalizedRunnings() {
 		return this.iHasNormalizedRunnings
 	}
 
+	getNormalizedRunnings() {
+		return this.iNormalizedRunnings
+	}
+
 	setNormalizedRunning(running, normalizedRunning) {
-		local normalizedRunnings := this.iNormalizedRunnings
+		local normalizedRunnings := this.getNormalizedRunnings()
 		local index := Round(Min(running, 1) * normalizedRunnings.Length)
 		local currentRunning
 
 		if index {
-			currentRunning := this.iNormalizedRunnings[index]
+			currentRunning := normalizedRunnings[index]
 
 			normalizedRunning := (currentRunning ? ((currentRunning + normalizedRunning) / 2)
 												 : normalizedRunning)
@@ -4622,17 +4626,17 @@ class GridRaceAssistant extends RaceAssistant {
 								    . " to " . Round(normalizedRunning, 2))
 			*/
 
-			this.iNormalizedRunnings[index] := normalizedRunning
+			normalizedRunnings[index] := normalizedRunning
 		}
 	}
 
 	getNormalizedRunning(running, data := false, variability := 25) {
 		local car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car", false)
 						   : (this.KnowledgeBase ? this.KnowledgeBase.getValue("Driver.Car", false) : false))
-		local normalizedRunnings := this.iNormalizedRunnings
+		local normalizedRunnings := this.getNormalizedRunnings()
 		local normalizedRunning, index
 
-		if (this.iHasNormalizedRunnings && car && running) {
+		if (this.hasNormalizedRunnings() && car && running) {
 			index := Round(Min(running, 1) * normalizedRunnings.Length)
 
 			loop Round(variability / 5) {

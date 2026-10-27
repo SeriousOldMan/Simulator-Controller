@@ -4632,11 +4632,9 @@ class GridRaceAssistant extends RaceAssistant {
 					normalizedRunning := (currentRunning ? ((currentRunning + normalizedRunning) / 2)
 														 : normalizedRunning)
 
-					/*
 					if isDebug()
 						logMessage(kLogDebug, "Set normalized running for " . Round(running, 2)
 											. " to " . Round(normalizedRunning, 2))
-					*/
 
 					normalizedRunnings[index] := normalizedRunning
 				}
@@ -4646,7 +4644,8 @@ class GridRaceAssistant extends RaceAssistant {
 	getNormalizedRunning(running, variability := 25) {
 		local normalizedRunnings := this.getNormalizedRunnings()
 		local length := normalizedRunnings.Length
-		local normalizedRunning, index
+		local normalizedRunning := false
+		local index
 
 		if (this.hasNormalizedRunnings() && (running >= 0) && (running <= 1))
 			try {
@@ -4654,26 +4653,23 @@ class GridRaceAssistant extends RaceAssistant {
 
 				normalizedRunning := normalizedRunnings[index]
 
-				if normalizedRunning
-					return normalizedRunning
+				if !normalizedRunning
+					loop Round(variability / 5) {
+						normalizedRunning := normalizedRunnings[Min(length, index + A_Index)]
 
-				loop Round(variability / 5) {
-					normalizedRunning := normalizedRunnings[Min(length, index + A_Index)]
+						if !normalizedRunning
+							normalizedRunning := normalizedRunnings[Max(1, index - A_Index)]
 
-					if !normalizedRunning
-						normalizedRunning := normalizedRunnings[Max(1, index - A_Index)]
-
-					if normalizedRunning {
-						if isDebug()
-							logMessage(kLogDebug, "Normalized running for " . Round(running, 2)
-												. " is " . Round(normalizedRunning, 2))
-
-						return normalizedRunning
+						if normalizedRunning
+							break
 					}
-				}
 			}
 
-		return false
+		if (isDebug() && normalizedRunning)
+			logMessage(kLogDebug, "Normalized running for " . Round(running, 2)
+								. " is " . Round(normalizedRunning, 2))
+
+		return normalizedRunning
 	}
 
 	setTimeIntoLap(car, running, time, lapTime := false, data := false) {

@@ -3720,15 +3720,26 @@ class RaceSpotter extends GridRaceAssistant {
 		local knowledgeBase := this.KnowledgeBase
 		local lap := knowledgeBase.getValue("Lap", 0)
 		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local debug := isDebug()
 		local lapTime, driverTime, trafficTime
 
 		static lastAccident := false
 
 		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
 			if (driverRunning && trafficRunning) {
+				if debug
+					logMessage(kLogDebug, "Rejoin Running: " . driverRunning . " / " . trafficRunning)
+
 				lapTime := this.getLapTime(driver)
+
+				if debug
+					logMessage(kLogDebug, "Rejoin Lap Time: " . lapTime)
+
 				driverTime := Round(this.getTimeIntoLap(driver, driverRunning, false, lapTime) / 1000)
 				trafficTime := Round(this.getTimeIntoLap(driver, trafficRunning, false, lapTime) / 1000)
+
+				if debug
+					logMessage(kLogDebug, "Rejoin Gap: " . driverTime . " / " . trafficTime)
 
 				if (driverTime > trafficTime)
 					gap := (driverTime - trafficTime)

@@ -3735,8 +3735,8 @@ class RaceSpotter extends GridRaceAssistant {
 				if debug
 					logMessage(kLogDebug, "Rejoin Lap Time: " . lapTime)
 
-				driverTime := Round(this.getTimeIntoLap(driver, driverRunning, false, lapTime) / 1000)
-				trafficTime := Round(this.getTimeIntoLap(driver, trafficRunning, false, lapTime) / 1000)
+				driverTime := this.getTimeIntoLap(driver, driverRunning, false, lapTime)
+				trafficTime := this.getTimeIntoLap(driver, trafficRunning, false, lapTime)
 
 				if debug
 					logMessage(kLogDebug, "Rejoin Gap: " . driverTime . " / " . trafficTime)
@@ -3745,6 +3745,8 @@ class RaceSpotter extends GridRaceAssistant {
 					gap := (driverTime - trafficTime)
 				else
 					gap := (driverTime + lapTime - trafficTime)
+
+				gap := Round(gap / 1000)
 
 				if (gap > getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 5))
 					this.pushAlert("AccidentRejoinTraffic"

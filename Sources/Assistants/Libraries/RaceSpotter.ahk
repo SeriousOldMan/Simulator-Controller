@@ -3716,15 +3716,31 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 	}
 
-	rejoinWarning(traffic := false, arguments*) {
-		local lap := this.KnowledgeBase.getValue("Lap", 0)
+	rejoinWarning(driverRunning := false, trafficRunning := false) {
+		local knowledgeBase := this.KnowledgeBase
+		local lap := knowledgeBase.getValue("Lap", 0)
+		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local lapTime, driverTime, trafficTime
 
 		static lastAccident := false
 
 		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
-			if (traffic && (traffic > getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 5)))
-				this.pushAlert("AccidentRejoinTraffic"
-							 , {seconds: traffic - getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Correction", 5)})
+			if (driverRunning && trafficRunning) {
+				lapTime := this.getLapTime(driver)
+				driverTime := Round(this.timeIntoLap(driver, driverRunning, lapTime) / 1000)
+				trafficTime := Round(this.timeIntoLap(driver, trafficRunning, lapTime) / 1000)
+
+				if (driverTime > trafficTime)
+					gap := (driverTime - trafficTime)
+				else
+					gap := (driverTime + lapTime - trafficTime)
+
+				if (gap > getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 5))
+					this.pushAlert("AccidentRejoinTraffic"
+								 , {seconds: gap - getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Correction", 5)})
+				else
+					this.pushAlert("AccidentRejoin")
+			}
 			else
 				this.pushAlert("AccidentRejoin")
 

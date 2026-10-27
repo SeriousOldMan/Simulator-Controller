@@ -672,12 +672,13 @@ namespace F125UDPSpotter {
 
 		int thresholdSpeed = 60;
 
-        long computeTrafficDistance(double driverDistance, double driverAvgSpeed) {
+        double computeTrafficRunning(double driverDistance, double driverAvgSpeed) {
 			long distance = long.MaxValue;
 			var session = receiver.GetSessionData();
 			var lapData = receiver.GetLapData();
 			var participants = receiver.GetParticipantsData();
-
+			double running = 0;
+			
 			if (session == null || lapData == null || participants == null)
 				return 0;
 
@@ -700,12 +701,15 @@ namespace F125UDPSpotter {
                     long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance
 																				 : (driverDistance + trackLength)) - carDistance);
 
-					if (distanceBehind < distance)
+					if (distanceBehind < distance) {
 						distance = distanceBehind;
+						
+						running = carRunning;
+					}
 				}
 			}
 			
-			return (distance == long.MaxValue) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
+			return running;
 		}
 		
         bool checkAccident()
@@ -790,10 +794,10 @@ namespace F125UDPSpotter {
 					if (i == playerIdx)
                     {
                         if ((speed < (avgSpeed / 5)) && (receiver.GetCarTelemetryData().CarTelemetry[playerIdx].Brake == 0)) {
-							long seconds = computeTrafficDistance(playerRunning * trackLength, avgSpeed);
+							double trafficRunning = computeTrafficRunning(playerRunning * trackLength, avgSpeed);
 							
-							if (seconds != 0)
-								SendSpotterMessage("rejoinWarning:" + seconds);
+							if (trafficRunning != 0)
+								SendSpotterMessage("rejoinWarning:" + carRunning + ";" + trafficRunning);
 							else
 								SendSpotterMessage("rejoinWarning");
 							

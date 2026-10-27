@@ -650,10 +650,11 @@ namespace PMRUDPSpotter {
 
 		int thresholdSpeed = 60;
 
-        long computeTrafficDistance(ref UDPRaceInfo raceInfo, double driverDistance, double driverAvgSpeed) {
+        double computeTrafficRunning(ref UDPRaceInfo raceInfo, double driverDistance, double driverAvgSpeed) {
 			long distance = long.MaxValue;
             var participantStates = receiver.GetAllParticipantStates();
 			var trackLength = raceInfo.LayoutLength;
+			double running = 0;
 
 			for (int i = 0; i < participantStates.Count; ++i)
 			{
@@ -664,15 +665,20 @@ namespace PMRUDPSpotter {
     
 				if (!vehicle.IsPlayer)
 				{
-					long distanceBehind = (long)(((vehicle.LapProgress < driverDistance) ? driverDistance
-																						 : (driverDistance + trackLength)) - vehicle.LapProgress * trackLength);
+					float carRunning = vehicle.LapProgress;
+					float carDistance = carRunning * trackLength;
+					long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance
+																				 : (driverDistance + trackLength)) - carDistance);
 
-					if (distanceBehind < distance)
+					if (distanceBehind < distance) {
 						distance = distanceBehind;
+						
+						running = carRunning;
+					}
 				}
 			}
 			
-			return (distance == long.MaxValue) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
+			return running;
 		}
 		
         bool checkAccident(ref UDPRaceInfo raceInfo, ref UDPParticipantRaceState playerVehicle, ref UDPVehicleTelemetry playerTelemetry)
@@ -746,10 +752,10 @@ namespace PMRUDPSpotter {
 					if (vehicle.IsPlayer)
 					{
 						if ((speed < (avgSpeed / 5)) && ((float)playerTelemetry.Input.Brake == 0)) {
-							long seconds = computeTrafficDistance(ref raceInfo, running * trackLength, avgSpeed);
+							double trafficRunning = computeTrafficRunning(ref raceInfo, running * trackLength, avgSpeed);
 							
-							if (seconds != 0)
-								SendSpotterMessage("rejoinWarning:" + seconds);
+							if (trafficRunning != 0)
+								SendSpotterMessage("rejoinWarning:" + running + ";" + trafficRunning);
 							else
 								SendSpotterMessage("rejoinWarning");
 							

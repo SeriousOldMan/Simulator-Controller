@@ -767,9 +767,10 @@ namespace ACSHMSpotter {
         string semFileName = "";
         int thresholdSpeed = 60;
 
-		long computeTrafficDistance(double driverLapDistance, double driverAvgSpeed) {
+		double computeTrafficRunning(double driverLapDistance, double driverAvgSpeed) {
 			ref AcCarInfo driver = ref cars.cars[0];
 			long distance = long.MaxValue;
+			double running = 0;
 
 			for (int i = 1; i < cars.numVehicles; ++i)
 			{
@@ -780,17 +781,20 @@ namespace ACSHMSpotter {
 
 				if (car.carId != driver.carId)
 				{
-                    double running = Math.Max(0, Math.Min(1, car.splinePosition));
-                    double carLapDistance = running * staticInfo.TrackSPlineLength;
+                    double carRunning = Math.Max(0, Math.Min(1, car.splinePosition));
+                    double carLapDistance = carRunning * staticInfo.TrackSPlineLength;
 					long distanceBehind = (long)(((carLapDistance < driverLapDistance) ? driverLapDistance
 																					   : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
 
-					if (distanceBehind < distance)
+					if (distanceBehind < distance) {
 						distance = distanceBehind;
+						
+						running = carRunning;
+					}
 				}
 			}
 			
-			return (distance == long.MaxValue) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
+			return running;
 		}
 
         bool checkAccident()
@@ -862,10 +866,10 @@ namespace ACSHMSpotter {
 						if (car.carId == driver.carId)
 						{
 							if ((speed < (avgSpeed / 5)) && (physics.Brake == 0)) {
-								long seconds = computeTrafficDistance(driverLapDistance, avgSpeed);
+								double trafficRunning = computeTrafficRunning(driverLapDistance, avgSpeed);
 							
-								if (seconds != 0)
-									SendSpotterMessage("rejoinWarning:" + seconds);
+								if (trafficRunning != 0)
+									SendSpotterMessage("rejoinWarning:" + driver.splinePosition + ";" + trafficRunning);
 								else
 									SendSpotterMessage("rejoinWarning");
 								

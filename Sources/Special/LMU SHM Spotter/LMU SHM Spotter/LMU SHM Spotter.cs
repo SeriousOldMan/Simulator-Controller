@@ -700,8 +700,9 @@ namespace LMUSHMSpotter {
 
 		int thresholdSpeed = 60;
 
-		long computeTrafficDistance(double driverDistance, double driverAvgSpeed) {
+		double computeTrafficRunning(double driverDistance, double driverAvgSpeed) {
 			long distance = long.MaxValue;
+			double running = 0;
 
 			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
 			{
@@ -712,12 +713,15 @@ namespace LMUSHMSpotter {
                     long distanceBehind = (long)(((vehicle.mLapDist < driverDistance) ? driverDistance
 																					  : (driverDistance + scoring.mScoringInfo.mLapDist)) - vehicle.mLapDist);
 
-					if (distanceBehind < distance)
+					if (distanceBehind < distance) {
 						distance = distanceBehind;
+						
+						running = vehicle.mLapDist;
+					}
 				}
 			}
 			
-			return (distance == long.MaxValue) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
+			return (running / scoring.mScoringInfo.mLapDist);
 		}
 		
         bool checkAccident(ref LMUVehicleScoring playerScoring)
@@ -785,10 +789,10 @@ namespace LMUSHMSpotter {
 					if (vehicle.mIsPlayer == 1)
                     {
                         if ((speed < (avgSpeed / 5)) && (GetPlayerTelemetry(vehicle.mID, ref telemetry).mFilteredBrake == 0)) {
-							long seconds = computeTrafficDistance(vehicle.mLapDist, avgSpeed);
+							double trafficRunning = computeTrafficRunning(vehicle.mLapDist, avgSpeed);
 							
-							if (seconds != 0)
-								SendSpotterMessage("rejoinWarning:" + seconds);
+							if (trafficRunning != 0)
+								SendSpotterMessage("rejoinWarning:" + running + ";" + trafficRunning);
 							else
 								SendSpotterMessage("rejoinWarning");
 							

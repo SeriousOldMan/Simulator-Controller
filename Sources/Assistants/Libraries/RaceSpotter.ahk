@@ -3491,7 +3491,7 @@ class RaceSpotter extends GridRaceAssistant {
 	skipAlert(alert) {
 		static nextCarBehind := 0
 
-		if this.pendingAlerts(["AccidentAhead", "AccidentAheadDistance"
+		if this.pendingAlerts(["Rejoin", "AccidentAhead", "AccidentAheadDistance"
 							 , "SlowCarAhead", "SlowCarAheadDistance", "SlowCarAheadSide"], true)
 			return true
 		else {
@@ -3727,8 +3727,8 @@ class RaceSpotter extends GridRaceAssistant {
 		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
 			if (driverRunning && trafficRunning) {
 				lapTime := this.getLapTime(driver)
-				driverTime := Round(this.getTimeIntoLap(driver, driverRunning, lapTime) / 1000)
-				trafficTime := Round(this.getTimeIntoLap(driver, trafficRunning, lapTime) / 1000)
+				driverTime := Round(this.getTimeIntoLap(driver, driverRunning, false, lapTime) / 1000)
+				trafficTime := Round(this.getTimeIntoLap(driver, trafficRunning, false, lapTime) / 1000)
 
 				if (driverTime > trafficTime)
 					gap := (driverTime - trafficTime)

@@ -689,9 +689,7 @@ namespace F125UDPSpotter {
 			{
 				var carLap = lapData.LapDataArr[i];
 				
-				if (carLap.PitStatus != 0)
-					continue;
-				if (carLap.ResultStatus < 2)
+				if ((carLap.PitStatus != 0) || (carLap.ResultStatus < 2))
 					continue;
 
 				float carRunning = (trackLength > 0) ? Math.Max(0, Math.Min(1, Math.Abs(carLap.LapDistance) / trackLength)) : 0;
@@ -707,7 +705,7 @@ namespace F125UDPSpotter {
 				}
 			}
 			
-			return (long)(distance / (driverAvgSpeed * 1000 / 3600));
+			return (distance == long.MaxValue) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
 		}
 		
         bool checkAccident()
@@ -782,9 +780,7 @@ namespace F125UDPSpotter {
                     var carLap = lapData.LapDataArr[i];
 					var carMotion = motion.CarMotion[i];
                     
-					if (carLap.PitStatus != 0)
-                        continue;
-					if (carLap.ResultStatus < 2)
+					if ((carLap.PitStatus != 0) || (carLap.ResultStatus < 2))
 						continue;
 
                     double speed = vehicleSpeed(carMotion);

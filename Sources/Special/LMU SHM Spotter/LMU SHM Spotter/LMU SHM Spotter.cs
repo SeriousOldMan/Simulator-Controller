@@ -717,7 +717,7 @@ namespace LMUSHMSpotter {
 				}
 			}
 			
-			return (long)(distance / (driverAvgSpeed * 1000 / 3600));
+			return (distance == long.MaxValue) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
 		}
 		
         bool checkAccident(ref LMUVehicleScoring playerScoring)

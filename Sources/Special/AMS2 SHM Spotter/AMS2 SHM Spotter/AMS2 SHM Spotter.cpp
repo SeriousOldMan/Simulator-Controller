@@ -561,6 +561,27 @@ bool fileExists(std::string name) {
 		return false;
 }
 
+long computeTrafficDistance(const SharedMemory* sharedData, double driverDistance, double driverAvgSpeed) {
+	long distance = LONG_MAX;
+
+	for (int i = 0; i < sharedData->mNumParticipants; i++) {
+		if (sharedData->mPitModes[i] > PIT_MODE_NONE)
+			continue;
+
+		ParticipantInfo vehicle = sharedData->mParticipantInfo[i];
+				
+		if (sharedData->mViewedParticipantIndex != i) {
+			long distanceBehind = (long)(((vehicle.mCurrentLapDistance < driverDistance) ? driverDistance
+																						 : (driverDistance + sharedData->mTrackLength)) - vehicle.mCurrentLapDistance);
+
+			if (distanceBehind < distance)
+				distance = distanceBehind;
+		}
+	}
+	
+	return (distance == LONG_MAX) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
+}
+
 bool checkAccident(const SharedMemory* sharedData)
 {
 	bool accident = false;
@@ -631,7 +652,12 @@ bool checkAccident(const SharedMemory* sharedData)
 			if (sharedData->mViewedParticipantIndex == i)
 			{
 				if ((speed < (avgSpeed / 5)) && (sharedData->mBrake == 0)) {
-					sendSpotterMessage("rejoinWarning");
+					long seconds = computeTrafficDistance(sharedData, driver.mCurrentLapDistance, avgSpeed);
+							
+					if (seconds != 0)
+						sendSpotterMessage(("rejoinWarning:" + std::to_string(seconds)).c_str());
+					else
+						sendSpotterMessage("rejoinWarning");
 					
 					return true;
 				}

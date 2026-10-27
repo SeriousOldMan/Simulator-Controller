@@ -964,6 +964,24 @@ bool fileExists(std::string name) {
 		return false;
 }
 
+long computeTrafficDistance(double driverDistance, double driverAvgSpeed) {
+	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
+	int driverCar = 0;
+	long distance = LONG_MAX;
+
+	for (int i = 0; i < gf->active_cars; i++) {
+		if (i != driverCar) {
+			float carDistance = getRunning(i) * trackLength;
+			long distanceBehind = (long)(((carDistance < driverDistance) ? driverDistance : (driverDistance + trackLength)) - carDistance);
+
+			if (distanceBehind < distance)
+				distance = distanceBehind;
+		}
+	}
+	
+	return (distance == LONG_MAX) ? 0 : (long)(distance / (driverAvgSpeed * 1000 / 3600));
+}
+
 bool checkAccident() {
 	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
 	bool accident = false;
@@ -1062,7 +1080,12 @@ bool checkAccident() {
 				if (i == carID)
 				{
 					if ((speed < (avgSpeed / 5)) && (pf->brake == 0)) {
-						sendSpotterMessage("rejoinWarning");
+						long seconds = computeTrafficDistance(driverDistance, avgSpeed);
+							
+						if (seconds != 0)
+							sendSpotterMessage("rejoinWarning:" + std::to_string(seconds));
+						else
+							sendSpotterMessage("rejoinWarning");
 						
 						return true;
 					}

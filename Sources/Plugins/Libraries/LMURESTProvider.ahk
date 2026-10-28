@@ -23,6 +23,9 @@ class LMURESTProvider {
 	static kLogRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																   , kUserConfigDirectory, kConfigDirectory))
 										  , "Debug", "LogSimulator", false)
+	static kHTTPTimeout := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																   , kUserConfigDirectory, kConfigDirectory))
+										  , "Simulator.Le Mans Ultimate", "Timeout", 1000)
 
 	static sWheelTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									   , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
@@ -82,7 +85,7 @@ class LMURESTProvider {
 			this.iTrack := track
 		}
 
-		read(url := this.GETURL, update := true) {
+		read(url := this.GETURL, update := true, timeout := LMURESTProvider.kHTTPTimeout) {
 			local data, tickCount
 
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
@@ -91,7 +94,7 @@ class LMURESTProvider {
 				try {
 					tickCount := A_TickCount
 
-					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
+					data := WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
 					if LMURestProvider.kLogRequests
 						logMessage(kLogDebug, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
@@ -117,7 +120,7 @@ class LMURESTProvider {
 			return data
 		}
 
-		write(url := this.POSTURL, data := this.Data) {
+		write(url := this.POSTURL, data := this.Data, timeout := LMURESTProvider.kHTTPTimeout) {
 			local tickCount
 
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
@@ -128,7 +131,7 @@ class LMURESTProvider {
 				try {
 					tickCount := A_TickCount
 
-					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 
 					if LMURestProvider.kLogRequests
 						logMessage(kLogDebug, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
@@ -2121,7 +2124,9 @@ class LMURESTProvider {
 
 		refreshSetups() {
 			try {
-				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, "", false)
+				local timeout := LMURESTProvider.kHTTPTimeout
+
+				WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(this.POSTURL, "", false)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -2138,7 +2143,9 @@ class LMURESTProvider {
 
 		send(message) {
 			try {
-				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, message, false)
+				local timeout := LMURESTProvider.kHTTPTimeout
+
+				WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(this.POSTURL, message, false)
 			}
 			catch Any as exception {
 				logError(exception)

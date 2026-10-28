@@ -5,7 +5,7 @@ Version=7.3.2.0-dev
 Target=7.3.2.0-release
 Date=10/27/26
 Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/uavpDKQm?inline=true
-Changes=Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization
+Changes=Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.1.0-release

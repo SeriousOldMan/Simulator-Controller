@@ -3748,7 +3748,7 @@ class RaceSpotter extends GridRaceAssistant {
 
 				gap := Round(gap / 1000)
 
-				if (gap > getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 5))
+				if (gap > getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 10))
 					this.pushAlert("AccidentRejoinTraffic"
 								 , {seconds: gap - getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Correction", 5)})
 				else

@@ -1,5 +1,29 @@
 # Latest stable release
 
+## 7.3.2.0
+
+#### Date: 10/30/26
+
+#### Fixes
+
+  - Added missing rejoin advice phrase issued by the Spotter for Polish language.
+  - Fixed the "Issue..." menu being unavailable when the Characteristics pane is filled to the max in the "Setup Workbench".
+  - Fixed lap time corrections based on track position and track distance.
+  
+#### Changes
+
+  - The Spotter can now also inform you about the exact distance (in seconds) to upcoming traffic after an accident or an off-track.
+    - New settings "Spotter: Minimum gap for approaching vehicles" and "Spotter: Gap correction for approaching vehicles" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#race-spotter-settings), which can be used to fine-tune the timing of the rejoin warning so that the given gap to approaching cars is as exact as possible.
+  - A new setting has been added to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings), which lets you control the timeout for all HTTP requests against the *Le Mans Ultimate* REST API. Increasing this value may help on slower systems, when encountering premature session ends.
+  - The support for fixed pitstops in strategy development and simulation has been extended. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstops-fixed) for more information.
+  - [Internal] Migrated to AHK 2.1-alpha.37.
+    
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.3.1.0
 
 #### Date: 10/23/26
@@ -24,28 +48,6 @@
   - [Internal] Several plugin arguments (*closePitstopMFD* and *openChat*) have been removed for *Le Mans Ultimate*, which are actually not used anymore.
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731) if you are using the chat system and/or if you are using the local LLM Runtime.
-    
-# Upcoming release
-
-## 7.3.2.0
-
-#### Date: 10/30/26
-
-#### Fixes
-
-  - Added missing rejoin advice phrase issued by the Spotter for Polish language.
-  - Fixed the "Issue..." menu being unavailable when the Characteristics pane is filled to the max in the "Setup Workbench".
-  - Fixed lap time corrections based on track position and track distance.
-  
-#### Changes
-
-  - The Spotter can now also inform you about the exact distance (in seconds) to upcoming traffic after an accident or an off-track.
-    - New settings "Spotter: Minimum gap for approaching vehicles" and "Spotter: Gap correction for approaching vehicles" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#race-spotter-settings), which can be used to fine-tune the timing of the rejoin warning so that the given gap to approaching cars is as exact as possible.
-  - A new setting has been added to the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#simulator-settings), which lets you control the timeout for all HTTP requests against the *Le Mans Ultimate* REST API. Increasing this value may help on slower systems, when encountering premature session ends.
-  - The support for fixed pitstops in strategy development and simulation has been extended. See the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#pitstops-fixed) for more information.
-  - [Internal] Migrated to AHK 2.1-alpha.37.
-
-# Release history
 
 ## 7.3.0.0
 

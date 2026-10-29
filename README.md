@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.3.1.0-release](https://cutt.ly/VyTphUIj) (Changes: Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2, Support of a name for the controller speech activation, Speech support for in-game chat messages, Fixed LMU chat mode, Updated LLM Runtime.)
+[7.3.2.0-release](https://cutt.ly/ryYCP1Gt) (Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7310) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-731) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7320) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-732) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.3.0.0-release](https://cutt.ly/GyEircGl) (Changes: Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Fixed setup recommendation for OpenAI GPT >= 5 in "Setup Workbench", Updated to AHK 2.1.alpha.35, Increased GPT-6 compatibilty with tool calls, Fixed offline installer, Fixed Driving Coach motivation duplicates, New Markdown processor, Fixed documentation links.)
+[7.3.1.0-release](https://cutt.ly/VyTphUIj) (Changes: Spotter warns for bad rejoins, Browser does not load empty logbooks, Browser show # of entries in logbook list, Fixed window size constrain core setting, Fixed chat mode for RF2, Support of a name for the controller speech activation, Speech support for in-game chat messages, Fixed LMU chat mode, Updated LLM Runtime.)
 
-[7.2.8.0-release](https://cutt.ly/4yQRZfx9) (Changes: Switchable X-Axis in Strategy Viewer, Optimized offline installation, Updated to AHK 2.1.alpha.33, Fixed uninstall cleanup, New application settings management, Support for the GPT-6 model family, New car models for "Setup Workbench", Fixed importing settings in "Session Database", Added unblocking to offline installation, Fixed missing lap time information in the telemetry lap selector.)
+[7.3.0.0-release](https://cutt.ly/GyEircGl) (Changes: Fixed driver info for saved telemetry lap data, Support for more USB controller using RawInput, Fixed setup recommendation for OpenAI GPT >= 5 in "Setup Workbench", Updated to AHK 2.1.alpha.35, Increased GPT-6 compatibilty with tool calls, Fixed offline installer, Fixed Driving Coach motivation duplicates, New Markdown processor, Fixed documentation links.)
 
 #### Current development build
 
-[7.3.2.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/uavpDKQm?inline=true) (Early build for 7.3.2. Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts.)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7320) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-732) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

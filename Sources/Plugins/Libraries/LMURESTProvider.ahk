@@ -97,7 +97,7 @@ class LMURESTProvider {
 					data := WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
 					if LMURestProvider.kLogRequests
-						logMessage(kLogDebug, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
+						logMessage(kLogInfo, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 
 					if !isObject(data)
 						data := false
@@ -106,7 +106,10 @@ class LMURESTProvider {
 						this.iData := data
 				}
 				catch Any as exception {
-					logError(exception)
+					if LMURestProvider.kLogRequests
+						logMessage(kLogWarn, "LMU REST GET: " . url . " failed...")
+
+					logError(exception, LMURestProvider.kLogRequests)
 
 					if update
 						this.iData := false
@@ -134,7 +137,7 @@ class LMURESTProvider {
 					WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 
 					if LMURestProvider.kLogRequests
-						logMessage(kLogDebug, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
+						logMessage(kLogInfo, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1159,6 +1162,8 @@ class LMURESTProvider {
 	}
 
 	class SessionData extends LMURESTProvider.RESTData {
+		iStateData := false
+
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/sessions/GetSessionsInfoForEvent"
@@ -1184,7 +1189,13 @@ class LMURESTProvider {
 		}
 
 		getState(info := false) {
-			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+			local data := this.iStateData
+
+			if !data {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				this.iStateData := data
+			}
 
 			if data {
 				if info

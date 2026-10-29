@@ -356,6 +356,8 @@ class LMUProvider extends Sector397Provider {
 		static waitForFinish := false
 		; static waitForDriverSwap := false
 
+		static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
+
 		if !tyreTypes {
 			tyreTypes := ["Soft", "Medium", "Hard", "Wet"]
 
@@ -479,7 +481,7 @@ class LMUProvider extends Sector397Provider {
 				car := "Lamborghini Huracan LMGT3 Evo2"
 
 			if logRequests {
-				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car,Track):" . (A_TickCount - splitTime) . " ms...")
+				logMessage(kLogInfo, "Read LMU session data (" . options . "->Car, Track):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
 			}
@@ -568,8 +570,15 @@ class LMUProvider extends Sector397Provider {
 							setMultiMapValue(data, "Stint Data", "DriverSurname", "-")
 							setMultiMapValue(data, "Stint Data", "DriverNickname", "-")
 						}
-					case "Inactive", "No Data":
+					case "Inactive":
 						setMultiMapValue(data, "Session Data", "Active", false)
+					case "No Data":
+						if lmuApplication.isRunning() {
+							setMultiMapValue(data, "Session Data", "Active", true)
+							setMultiMapValue(data, "Session Data", "Paused", true)
+						}
+						else
+							setMultiMapValue(data, "Session Data", "Active", false)
 					default:
 						throw "Unknown session state detected in LMUProvider.readSessionData..."
 				}
@@ -577,13 +586,12 @@ class LMUProvider extends Sector397Provider {
 				active := getMultiMapValue(data, "Session Data", "Active", false)
 
 				if !active {
-					if (wasActive && (getMultiMapValue(data, "Stint Data", "InPit", false)
-								   || getMultiMapValue(data, "Stint Data", "InPitLane", false)))
-						waitForFinish := (A_TickCount + 5000)
+					if wasActive
+						waitForFinish := 5
 
-					if (waitForFinish && (A_TickCount < waitForFinish)) {
+					if (waitForFinish-- > 0) {
 						if logRequests
-							logMessage(kLogWarn, "Calculated LMU Session State: Waiting for Shutdown...")
+							logMessage(kLogWarn, "Deferred LMU Session State: Waiting for Shutdown...")
 
 						setMultiMapValue(data, "Session Data", "Paused", true)
 						setMultiMapValue(data, "Session Data", "Active", true)
@@ -592,10 +600,11 @@ class LMUProvider extends Sector397Provider {
 						waitForFinish := false
 
 						if (logRequests && !active)
-							logMessage(kLogWarn, "Calculated LMU Session State: Shutdown [" . sessionState . "](" . sessionData.State[true] . ")...")
+							logMessage(kLogWarn, "Deferred LMU Session State: Shutdown [" . sessionState . "](" . sessionData.State[true] . ")...")
 					}
-
 				}
+				else if (logRequests && !wasActive && waitForFinish)
+					logMessage(kLogWarn, "Deferred LMU Session State: Continue [" . sessionState . "](" . sessionData.State[true] . ")...")
 
 				wasActive := active
 

@@ -1897,7 +1897,7 @@ class TelemetryAnalyzer {
 
 					yawRate := smoothValue(yawRates, yawRate)
 					steerAngleRadians := (- (((steerAngle * steerLock) / 2) / steerRatio) / 57.2958)
-					radius := (wheelBaseMeter / steerAngleRadians)
+					radius := ((steerAngleRadians != 0) ? (wheelBaseMeter / steerAngleRadians) : 2147483647)
 					perimeter := (radius * PI * 2)
 					perimeterSpeed := (lastSpeed / 3.6)
 					idealYawRate := smoothValue(idealYawRates, perimeterSpeed / perimeter * 2 * PI)

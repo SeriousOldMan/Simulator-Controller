@@ -9,6 +9,7 @@
   - Added missing rejoin advice phrase issued by the Spotter for Polish language.
   - Fixed the "Issue..." menu being unavailable when the Characteristics pane is filled to the max in the "Setup Workbench".
   - Fixed lap time corrections based on track position and track distance.
+  - Fixed a divide by zero error when analyzing telemetry files in the "Setup Workbench".
   
 #### Changes
 

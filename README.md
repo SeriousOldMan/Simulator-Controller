@@ -34,7 +34,7 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.3.2.0-release](https://cutt.ly/ryYCP1Gt) (Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts.)
+[7.3.2.0-release](https://cutt.ly/ryYCP1Gt) (Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts, Fixed a divide by zero in "Setup Workbench".)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7320) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-732) of this version and all the versions you might have skipped, before installing and using this version.
 

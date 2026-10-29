@@ -109,7 +109,7 @@ class LMURESTProvider {
 					if LMURestProvider.kLogRequests
 						logMessage(kLogWarn, "LMU REST GET: " . url . " failed...")
 
-					logError(exception, LMURestProvider.kLogRequests)
+					logError(exception)
 
 					if update
 						this.iData := false

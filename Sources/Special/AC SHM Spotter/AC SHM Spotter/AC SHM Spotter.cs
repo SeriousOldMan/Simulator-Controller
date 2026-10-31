@@ -767,6 +767,36 @@ namespace ACSHMSpotter {
         string semFileName = "";
         int thresholdSpeed = 60;
 
+		double computeTrafficRunning(double driverLapDistance, double driverAvgSpeed) {
+			ref AcCarInfo driver = ref cars.cars[0];
+			long distance = long.MaxValue;
+			double running = 0;
+
+			for (int i = 1; i < cars.numVehicles; ++i)
+			{
+				ref AcCarInfo car = ref cars.cars[i];
+				
+				if ((car.isCarInPitline + car.isCarInPit > 0) || (car.isConnected == 0))
+					continue;
+
+				if (car.carId != driver.carId)
+				{
+                    double carRunning = Math.Max(0, Math.Min(1, car.splinePosition));
+                    double carLapDistance = carRunning * staticInfo.TrackSPlineLength;
+					long distanceBehind = (long)(((carLapDistance < driverLapDistance) ? driverLapDistance
+																					   : (driverLapDistance + staticInfo.TrackSPlineLength)) - carLapDistance);
+
+					if (distanceBehind < distance) {
+						distance = distanceBehind;
+						
+						running = carRunning;
+					}
+				}
+			}
+			
+			return running;
+		}
+
         bool checkAccident()
         {
 			bool accident = false;
@@ -836,7 +866,12 @@ namespace ACSHMSpotter {
 						if (car.carId == driver.carId)
 						{
 							if ((speed < (avgSpeed / 5)) && (physics.Brake == 0)) {
-								SendSpotterMessage("rejoinWarning");
+								double trafficRunning = computeTrafficRunning(driverLapDistance, avgSpeed);
+							
+								if (trafficRunning != 0)
+									SendSpotterMessage("rejoinWarning:" + driver.splinePosition + ";" + trafficRunning);
+								else
+									SendSpotterMessage("rejoinWarning");
 								
 								return true;
 							}

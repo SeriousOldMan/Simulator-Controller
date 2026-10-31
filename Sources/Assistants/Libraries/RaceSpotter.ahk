@@ -3491,7 +3491,7 @@ class RaceSpotter extends GridRaceAssistant {
 	skipAlert(alert) {
 		static nextCarBehind := 0
 
-		if this.pendingAlerts(["AccidentAhead", "AccidentAheadDistance"
+		if this.pendingAlerts(["Rejoin", "AccidentAhead", "AccidentAheadDistance"
 							 , "SlowCarAhead", "SlowCarAheadDistance", "SlowCarAheadSide"], true)
 			return true
 		else {
@@ -3716,13 +3716,46 @@ class RaceSpotter extends GridRaceAssistant {
 			}
 	}
 
-	rejoinWarning(arguments*) {
-		local lap := this.KnowledgeBase.getValue("Lap", 0)
+	rejoinWarning(driverRunning := false, trafficRunning := false) {
+		local knowledgeBase := this.KnowledgeBase
+		local lap := knowledgeBase.getValue("Lap", 0)
+		local driver := knowledgeBase.getValue("Driver.Car", false)
+		local debug := isDebug()
+		local lapTime, driverTime, trafficTime
 
 		static lastAccident := false
 
 		if (this.Announcements["TacticalAdvices"] && (lap != lastAccident) && this.Speaker[false] && this.Running) {
-			this.pushAlert("AccidentRejoin")
+			if (driverRunning && trafficRunning) {
+				if debug
+					logMessage(kLogDebug, "Rejoin Running: " . driverRunning . " / " . trafficRunning)
+
+				lapTime := this.getLapTime(driver)
+
+				if debug
+					logMessage(kLogDebug, "Rejoin Lap Time: " . lapTime)
+
+				driverTime := this.getTimeIntoLap(driver, driverRunning, false, lapTime)
+				trafficTime := this.getTimeIntoLap(driver, trafficRunning, false, lapTime)
+
+				if debug
+					logMessage(kLogDebug, "Rejoin Gap: " . driverTime . " / " . trafficTime)
+
+				if (driverTime > trafficTime)
+					gap := (driverTime - trafficTime)
+				else
+					gap := (driverTime + lapTime - trafficTime)
+
+				gap := Round(gap / 1000)
+
+				if (gap > getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Threshold", 10))
+					this.pushAlert("AccidentRejoinTraffic"
+								 , {seconds: gap - getMultiMapValue(this.Settings, "Assistant.Spotter", "Rejoin.Traffic.Warning.Correction", 5)})
+				else
+					this.pushAlert("AccidentRejoin")
+			}
+			else
+				this.pushAlert("AccidentRejoin")
 
 			lastAccident := lap
 		}

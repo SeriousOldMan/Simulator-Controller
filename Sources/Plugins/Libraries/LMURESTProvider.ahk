@@ -23,6 +23,9 @@ class LMURESTProvider {
 	static kLogRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																   , kUserConfigDirectory, kConfigDirectory))
 										  , "Debug", "LogSimulator", false)
+	static kHTTPTimeout := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																   , kUserConfigDirectory, kConfigDirectory))
+										  , "Simulator.Le Mans Ultimate", "Timeout", 1000)
 
 	static sWheelTypes := CaseInsenseMap("All", "FL", "FL", "FL", "FR", "FR", "RL", "RL", "RR", "RR"
 									   , "Front Left", "FL", "Front Right", "FR", "Rear Left", "RL", "Rear Right", "RR")
@@ -82,7 +85,7 @@ class LMURESTProvider {
 			this.iTrack := track
 		}
 
-		read(url := this.GETURL, update := true) {
+		read(url := this.GETURL, update := true, timeout := LMURESTProvider.kHTTPTimeout) {
 			local data, tickCount
 
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
@@ -91,10 +94,10 @@ class LMURESTProvider {
 				try {
 					tickCount := A_TickCount
 
-					data := WinHttpRequest({Timeouts: [0, 500, 500, 500]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
+					data := WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).GET(url, "", false, {Encoding: "UTF-8", Content: "application/json"}).JSON
 
 					if LMURestProvider.kLogRequests
-						logMessage(kLogDebug, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
+						logMessage(kLogInfo, "LMU REST GET: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 
 					if !isObject(data)
 						data := false
@@ -103,6 +106,9 @@ class LMURESTProvider {
 						this.iData := data
 				}
 				catch Any as exception {
+					if LMURestProvider.kLogRequests
+						logMessage(kLogWarn, "LMU REST GET: " . url . " failed...")
+
 					logError(exception)
 
 					if update
@@ -117,7 +123,7 @@ class LMURESTProvider {
 			return data
 		}
 
-		write(url := this.POSTURL, data := this.Data) {
+		write(url := this.POSTURL, data := this.Data, timeout := LMURESTProvider.kHTTPTimeout) {
 			local tickCount
 
 			static lmuApplication := Application("Le Mans Ultimate", kSimulatorConfiguration)
@@ -128,10 +134,10 @@ class LMURESTProvider {
 				try {
 					tickCount := A_TickCount
 
-					WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
+					WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(url, data, false, {Object: true, Encoding: "UTF-8"})
 
 					if LMURestProvider.kLogRequests
-						logMessage(kLogDebug, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
+						logMessage(kLogInfo, "LMU REST POST: " . url . " took " . (A_TickCount - tickCount) . " ms...")
 				}
 				catch Any as exception {
 					logError(exception, true)
@@ -1156,6 +1162,8 @@ class LMURESTProvider {
 	}
 
 	class SessionData extends LMURESTProvider.RESTData {
+		iStateData := false
+
 		GETURL {
 			Get {
 				return "http://localhost:6397/rest/sessions/GetSessionsInfoForEvent"
@@ -1181,7 +1189,13 @@ class LMURESTProvider {
 		}
 
 		getState(info := false) {
-			local data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+			local data := this.iStateData
+
+			if !data {
+				data := this.read("http://localhost:6397/rest/sessions/GetGameState", false)
+
+				this.iStateData := data
+			}
 
 			if data {
 				if info
@@ -2121,7 +2135,9 @@ class LMURESTProvider {
 
 		refreshSetups() {
 			try {
-				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, "", false)
+				local timeout := LMURESTProvider.kHTTPTimeout
+
+				WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(this.POSTURL, "", false)
 			}
 			catch Any as exception {
 				logError(exception)
@@ -2138,7 +2154,9 @@ class LMURESTProvider {
 
 		send(message) {
 			try {
-				WinHttpRequest({Timeouts: [0, 500, 500, 500]}).POST(this.POSTURL, message, false)
+				local timeout := LMURESTProvider.kHTTPTimeout
+
+				WinHttpRequest({Timeouts: [0, timeout, timeout, timeout]}).POST(this.POSTURL, message, false)
 			}
 			catch Any as exception {
 				logError(exception)

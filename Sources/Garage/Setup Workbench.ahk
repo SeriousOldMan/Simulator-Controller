@@ -1536,10 +1536,12 @@ class SetupWorkbench extends ConfigurationItem {
 	updateState() {
 		local editorClass := (this.SimulatorDefinition && getMultiMapValue(this.SimulatorDefinition, "Setup", "Editor", false))
 
+		/*
 		if (this.SelectedCharacteristics.Length < kMaxCharacteristics)
 			this.Control["characteristicsButton"].Enabled := true
 		else
 			this.Control["characteristicsButton"].Enabled := false
+		*/
 
 		if editorClass
 			this.Control["editSetupButton"].Enabled := %editorClass%(this).editableSetup(this.SelectedCar["*"])
@@ -2558,67 +2560,69 @@ class SetupWorkbench extends ConfigurationItem {
 
 		characteristicsMenu := Menu()
 
-		characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
-									, SetupWorkbench.LabelsMap)
+		if (this.SelectedCharacteristics.Length < kMaxCharacteristics) {
+			characteristicLabels := toMap(getMultiMapValues(this.Definition, "Workbench.Characteristics.Labels")
+										, SetupWorkbench.LabelsMap)
 
-		menuIndex := 1
+			menuIndex := 1
 
-		groups := getMultiMapValues(this.Definition, "Workbench.Characteristics")
-		translatedGroups := CaseInsenseMap()
+			groups := getMultiMapValues(this.Definition, "Workbench.Characteristics")
+			translatedGroups := CaseInsenseMap()
 
-		for group, definition in groups
-			translatedGroups[characteristicLabels[group]] := group
+			for group, definition in groups
+				translatedGroups[characteristicLabels[group]] := group
 
-		for ignore, group in translatedGroups {
-			definition := groups[group]
+			for ignore, group in translatedGroups {
+				definition := groups[group]
 
-			groupMenu := ("SubMenu" . menuIndex++)
-			groupEmpty := true
+				groupMenu := ("SubMenu" . menuIndex++)
+				groupEmpty := true
 
-			dynamicMenus[groupMenu] := Menu()
+				dynamicMenus[groupMenu] := Menu()
 
-			for ignore, groupOption in string2Values(";", definition) {
-				if InStr(groupOption, ":") {
-					groupOption := string2Values(":", groupOption)
-					optionMenu := ("SubMenu" . menuIndex++)
-					optionEmpty := true
+				for ignore, groupOption in string2Values(";", definition) {
+					if InStr(groupOption, ":") {
+						groupOption := string2Values(":", groupOption)
+						optionMenu := ("SubMenu" . menuIndex++)
+						optionEmpty := true
 
-					dynamicMenus[optionMenu] := Menu()
+						dynamicMenus[optionMenu] := Menu()
 
-					for ignore, option in string2Values(",", groupOption[2]) {
-						characteristic := factPath(group, groupOption[1], option)
+						for ignore, option in string2Values(",", groupOption[2]) {
+							characteristic := factPath(group, groupOption[1], option)
 
-						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-							dynamicMenus[optionMenu].Add(characteristicLabels[option]
-													   , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33, true))
+							if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
+								dynamicMenus[optionMenu].Add(characteristicLabels[option]
+														   , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33, true))
 
-							optionEmpty := false
+								optionEmpty := false
+							}
+						}
+
+						if !optionEmpty {
+							dynamicMenus[groupMenu].Add(characteristicLabels[groupOption[1]], dynamicMenus[optionMenu])
+
+							groupEmpty := false
 						}
 					}
+					else {
+						characteristic := factPath(group, groupOption)
 
-					if !optionEmpty {
-						dynamicMenus[groupMenu].Add(characteristicLabels[groupOption[1]], dynamicMenus[optionMenu])
+						if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
+							dynamicMenus[groupMenu].Add(characteristicLabels[groupOption]
+													  , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33, true))
 
-						groupEmpty := false
+							groupEmpty := false
+						}
 					}
 				}
-				else {
-					characteristic := factPath(group, groupOption)
 
-					if (inList(this.Characteristics, characteristic) && !inList(this.SelectedCharacteristics, characteristic)) {
-						dynamicMenus[groupMenu].Add(characteristicLabels[groupOption]
-												  , ObjBindMethod(this, "addCharacteristic", characteristic, 50, 33, true))
-
-						groupEmpty := false
-					}
-				}
+				if !groupEmpty
+					characteristicsMenu.Add(characteristicLabels[group], dynamicMenus[groupMenu])
 			}
 
-			if !groupEmpty
-				characteristicsMenu.Add(characteristicLabels[group], dynamicMenus[groupMenu])
+			characteristicsMenu.Add()
 		}
-
-		characteristicsMenu.Add()
 
 		label := translate("Analyzer...")
 

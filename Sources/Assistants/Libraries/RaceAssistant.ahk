@@ -4590,68 +4590,86 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	initializeNormalizedRunnings(trackLength := this.TrackLength) {
-		local normalizedRunnings := []
+		local normalizedRunnings
 
-		normalizedRunnings.Capacity := Round(trackLength / 5)
+		if trackLength {
+			normalizedRunnings := []
 
-		loop (Round(trackLength / 5))
-			normalizedRunnings.Push(false)
+			normalizedRunnings.Capacity := Round(trackLength / 5)
 
-		this.iNormalizedRunnings := normalizedRunnings
-		this.iHasNormalizedRunnings := false
+			loop (Round(trackLength / 5))
+				normalizedRunnings.Push(false)
+
+			this.iNormalizedRunnings := normalizedRunnings
+			this.iHasNormalizedRunnings := true
+		}
+		else {
+			this.iNormalizedRunnings := []
+			this.iHasNormalizedRunnings := false
+		}
 	}
 
 	hasNormalizedRunnings() {
 		return this.iHasNormalizedRunnings
 	}
 
+	getNormalizedRunnings() {
+		return this.iNormalizedRunnings
+	}
+
 	setNormalizedRunning(running, normalizedRunning) {
-		local normalizedRunnings := this.iNormalizedRunnings
-		local index := Round(Min(running, 1) * normalizedRunnings.Length)
-		local currentRunning
+		local normalizedRunnings, index, currentRunning
 
-		if index {
-			currentRunning := this.iNormalizedRunnings[index]
+		if (this.hasNormalizedRunnings() && (running >= 0) && (running <= 1)
+										 && (normalizedRunning >= 0) && (normalizedRunning <= 1)) {
+			normalizedRunnings := this.getNormalizedRunnings()
+			index := Round(Min(running, 1) * normalizedRunnings.Length)
 
-			normalizedRunning := (currentRunning ? ((currentRunning + normalizedRunning) / 2)
-												 : normalizedRunning)
+			if index
+				try {
+					currentRunning := normalizedRunnings[index]
 
-			/*
-			if isDebug()
-				logMessage(kLogDebug, "Set normalized running for " . Round(running, 2)
-								    . " to " . Round(normalizedRunning, 2))
-			*/
+					normalizedRunning := (currentRunning ? ((currentRunning + normalizedRunning) / 2)
+														 : normalizedRunning)
 
-			this.iNormalizedRunnings[index] := normalizedRunning
+					if isDebug()
+						logMessage(kLogDebug, "Set normalized running for " . Round(running, 2)
+											. " to " . Round(normalizedRunning, 2))
+
+					normalizedRunnings[index] := normalizedRunning
+				}
 		}
 	}
 
-	getNormalizedRunning(running, data := false, variability := 25) {
-		local car := (data ? getMultiMapValue(data, "Position Data", "Driver.Car", false)
-						   : (this.KnowledgeBase ? this.KnowledgeBase.getValue("Driver.Car", false) : false))
-		local normalizedRunnings := this.iNormalizedRunnings
-		local normalizedRunning, index
+	getNormalizedRunning(running, variability := 25) {
+		local normalizedRunnings := this.getNormalizedRunnings()
+		local length := normalizedRunnings.Length
+		local normalizedRunning := false
+		local index
 
-		if (this.iHasNormalizedRunnings && car && running) {
-			index := Round(Min(running, 1) * normalizedRunnings.Length)
+		if (this.hasNormalizedRunnings() && (running >= 0) && (running <= 1))
+			try {
+				index := Round(Min(running, 1) * length)
 
-			loop Round(variability / 5) {
-				normalizedRunning := normalizedRunnings[index + A_Index + 1]
+				normalizedRunning := normalizedRunnings[index]
 
 				if !normalizedRunning
-					normalizedRunning := normalizedRunnings[index + A_Index - 1]
+					loop Round(variability / 5) {
+						normalizedRunning := normalizedRunnings[Min(length, index + A_Index)]
 
-				if normalizedRunning {
-					if isDebug()
-						logMessage(kLogDebug, "Normalized running for " . Round(running, 2)
-										    . " is " . Round(normalizedRunning, 2))
+						if !normalizedRunning
+							normalizedRunning := normalizedRunnings[Max(1, index - A_Index)]
 
-					return normalizedRunning
-				}
+						if normalizedRunning
+							break
+					}
 			}
-		}
 
-		return false
+		if (isDebug() && normalizedRunning)
+			logMessage(kLogDebug, "Normalized running for " . Round(running, 2)
+								. " is " . Round(normalizedRunning, 2))
+
+		return normalizedRunning
 	}
 
 	setTimeIntoLap(car, running, time, lapTime := false, data := false) {
@@ -4663,7 +4681,7 @@ class GridRaceAssistant extends RaceAssistant {
 	}
 
 	getTimeIntoLap(car, running, data := false, lapTime := false, variability := 25) {
-		local normalizedRunning := this.getNormalizedRunning(running, data, variability)
+		local normalizedRunning := this.getNormalizedRunning(running, variability)
 
 		if !lapTime
 			lapTime := this.getLapTime(car, data)

@@ -45,29 +45,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 	iNextChoiceHotkey := false
 	iAcceptChoiceHotkey := false
 
-	iPSImageSearchArea := false
 	iPitstopOptions := []
 	iPitstopOptionStates := []
-
-	iImageSearch := kUndefined
-
-	Car {
-		Set {
-			if (this.Car != value)
-				this.iImageSearch := kUndefined
-
-			return (super.Car := value)
-		}
-	}
-
-	Track {
-		Set {
-			if (this.Track != value)
-				this.iImageSearch := kUndefined
-
-			return (super.Track := value)
-		}
-	}
 
 	OpenPitstopMFDHotkey {
 		Get {
@@ -153,30 +132,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		local pitMenuState
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
-			if this.iImageSearch {
-				if this.activateWindow() {
-					if this.searchMFDImage("PITSTOP 1", "PITSTOP 2") {
-						this.sendCommand(this.NextOptionHotkey)
+			pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
 
-						return true
-					}
-					else
-						return false
-				}
-				else
-					return false
-			}
-			else {
-				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
-
-				if ((pitMenuState["Selected"] != "Unavailable") || (pitMenuState["Strategy"] != "Unavailable") || (pitMenuState["Refuel"] != "Unavailable")) {
-					this.sendCommand(this.NextOptionHotkey)
-
-					return true
-				}
-				else
-					return false
-			}
+			return (pitMenuState["Selected"] != "Unavailable")
 		}
 		else
 			return false
@@ -186,16 +144,24 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 		local isOpen := false
 		local car, track, settings
 
-		static first := true
 		static reported := false
 
-		if (this.iImageSearch = kUndefined) {
-			car := (this.Car ? this.Car : "*")
-			track := (this.Track ? this.Track : "*")
+		resetPitstopMFD() {
+			local pitMenuState
 
-			settings := SettingsDatabase().loadSettings(this.Simulator[true], car, track, "*", "*")
+			loop 15
+				this.sendCommand(this.PreviousOptionHotkey)
 
-			this.iImageSearch := getMultiMapValue(settings, "Simulator.RaceRoom Racing Experience", "Pitstop.ImageSearch", false)
+			loop 10 {
+				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
+
+				if (pitMenuState["Selected"] = "Unavailable")
+					this.sendCommand(this.NextChoiceHotkey)
+				else
+					return true
+			}
+
+			return false
 		}
 
 		if !this.OpenPitstopMFDHotkey {
@@ -214,18 +180,16 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if this.activateWindow() {
-				if first
-					this.sendCommand(this.OpenPitstopMFDHotkey)
-
-				if this.pitstopMFDIsOpen()
+				if this.pitstopMFDIsOpen() {
 					isOpen := true
+
+					resetPitstopMFD()
+				}
 				else {
 					this.sendCommand(this.OpenPitstopMFDHotkey)
 
-					isOpen := this.pitstopMFDIsOpen()
+					isOpen := resetPitstopMFD()
 				}
-
-				first := false
 
 				return isOpen
 			}
@@ -268,127 +232,63 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if this.activateWindow() {
 			loop 15
-				this.sendCommand(this.NextOptionHotkey)
+				this.sendCommand(this.PreviousOptionHotkey)
 
-			if this.iImageSearch {
-				if this.searchMFDImage("Strategy") {
-					this.iPitstopOptions.Push("Strategy")
-					this.iPitstopOptionStates.Push(true)
-				}
+			pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
 
-				if this.searchMFDImage("Refuel") {
-					this.iPitstopOptions.Push("Refuel")
-					this.iPitstopOptionStates.Push(true)
-				}
-				else if (this.searchMFDImage("No Refuel")) {
-					this.iPitstopOptions.Push("Refuel")
-					this.iPitstopOptionStates.Push(false)
-				}
-
-				if this.searchMFDImage("Front Tyre Change") {
-					this.iPitstopOptions.Push("Change Front Tyres")
-					this.iPitstopOptionStates.Push(true)
-				}
-				else { ; if this.searchMFDImage("No Front Tyre Change") {
-					this.iPitstopOptions.Push("Change Front Tyres")
-					this.iPitstopOptionStates.Push(false)
-				}
-
-				if this.searchMFDImage("Rear Tyre Change") {
-					this.iPitstopOptions.Push("Change Rear Tyres")
-					this.iPitstopOptionStates.Push(true)
-				}
-				else { ; if this.searchMFDImage("No Rear Tyre Change") {
-					this.iPitstopOptions.Push("Change Rear Tyres")
-					this.iPitstopOptionStates.Push(false)
-				}
-
-				if this.searchMFDImage("Bodywork Damage") {
-					this.iPitstopOptions.Push("Repair Bodywork")
-					this.iPitstopOptionStates.Push(this.searchMFDImage("Bodywork Damage Selected") != false)
-				}
-
-				if this.searchMFDImage("Front Damage") {
-					this.iPitstopOptions.Push("Repair Front Aero")
-					this.iPitstopOptionStates.Push(this.searchMFDImage("Front Damage Selected") != false)
-				}
-
-				if this.searchMFDImage("Rear Damage") {
-					this.iPitstopOptions.Push("Repair Rear Aero")
-					this.iPitstopOptionStates.Push(this.searchMFDImage("Rear Damage Selected") != false)
-				}
-
-				if this.searchMFDImage("Suspension Damage") {
-					this.iPitstopOptions.Push("Repair Suspension")
-					this.iPitstopOptionStates.Push(this.searchMFDImage("Suspension Damage Selected") != false)
-				}
-
-				if this.searchMFDImage("PIT REQUEST") {
-					this.iPitstopOptions.Push("Request Pitstop")
-					this.iPitstopOptionStates.Push(true)
-				}
-				else {
-					this.iPitstopOptions.Push("Request Pitstop")
-					this.iPitstopOptionStates.Push(false)
-				}
+			if (pitMenuState["Strategy"] != "Unavailable") {
+				this.iPitstopOptions.Push("Strategy")
+				this.iPitstopOptionStates.Push(pitMenuState["Strategy"])
 			}
-			else {
-				pitMenuState := getMultiMapValues(callSimulator(this.Code), "Pit Menu State")
 
-				if (pitMenuState["Strategy"] != "Unavailable") {
-					this.iPitstopOptions.Push("Strategy")
-					this.iPitstopOptionStates.Push(pitMenuState["Strategy"])
-				}
+			if (pitMenuState["Serve Penalty"] != "Unavailable") {
+				this.iPitstopOptions.Push("Serve Penalty")
+				this.iPitstopOptionStates.Push(pitMenuState["Serve Penalty"])
+			}
 
-				if (pitMenuState["Serve Penalty"] != "Unavailable") {
-					this.iPitstopOptions.Push("Serve Penalty")
-					this.iPitstopOptionStates.Push(pitMenuState["Serve Penalty"])
-				}
+			if (pitMenuState["Driver"] != "Unavailable") {
+				this.iPitstopOptions.Push("Driver")
+				this.iPitstopOptionStates.Push(pitMenuState["Driver"])
+			}
 
-				if (pitMenuState["Driver"] != "Unavailable") {
-					this.iPitstopOptions.Push("Driver")
-					this.iPitstopOptionStates.Push(pitMenuState["Driver"])
-				}
+			if (pitMenuState["Refuel"] != "Unavailable") {
+				this.iPitstopOptions.Push("Refuel")
+				this.iPitstopOptionStates.Push(pitMenuState["Refuel"])
+			}
 
-				if (pitMenuState["Refuel"] != "Unavailable") {
-					this.iPitstopOptions.Push("Refuel")
-					this.iPitstopOptionStates.Push(pitMenuState["Refuel"])
-				}
+			if (pitMenuState["Change Front Tyres"] != "Unavailable") {
+				this.iPitstopOptions.Push("Change Front Tyres")
+				this.iPitstopOptionStates.Push(pitMenuState["Change Front Tyres"])
+			}
 
-				if (pitMenuState["Change Front Tyres"] != "Unavailable") {
-					this.iPitstopOptions.Push("Change Front Tyres")
-					this.iPitstopOptionStates.Push(pitMenuState["Change Front Tyres"])
-				}
+			if (pitMenuState["Change Rear Tyres"] != "Unavailable") {
+				this.iPitstopOptions.Push("Change Rear Tyres")
+				this.iPitstopOptionStates.Push(pitMenuState["Change Rear Tyres"])
+			}
 
-				if (pitMenuState["Change Rear Tyres"] != "Unavailable") {
-					this.iPitstopOptions.Push("Change Rear Tyres")
-					this.iPitstopOptionStates.Push(pitMenuState["Change Rear Tyres"])
-				}
+			if (pitMenuState["Repair Bodywork"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Bodywork")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Bodywork"])
+			}
 
-				if (pitMenuState["Repair Bodywork"] != "Unavailable") {
-					this.iPitstopOptions.Push("Repair Bodywork")
-					this.iPitstopOptionStates.Push(pitMenuState["Repair Bodywork"])
-				}
+			if (pitMenuState["Repair Front Aero"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Front Aero")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Front Aero"])
+			}
 
-				if (pitMenuState["Repair Front Aero"] != "Unavailable") {
-					this.iPitstopOptions.Push("Repair Front Aero")
-					this.iPitstopOptionStates.Push(pitMenuState["Repair Front Aero"])
-				}
+			if (pitMenuState["Repair Rear Aero"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Rear Aero")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Rear Aero"])
+			}
 
-				if (pitMenuState["Repair Rear Aero"] != "Unavailable") {
-					this.iPitstopOptions.Push("Repair Rear Aero")
-					this.iPitstopOptionStates.Push(pitMenuState["Repair Rear Aero"])
-				}
+			if (pitMenuState["Repair Suspension"] != "Unavailable") {
+				this.iPitstopOptions.Push("Repair Suspension")
+				this.iPitstopOptionStates.Push(pitMenuState["Repair Suspension"])
+			}
 
-				if (pitMenuState["Repair Suspension"] != "Unavailable") {
-					this.iPitstopOptions.Push("Repair Suspension")
-					this.iPitstopOptionStates.Push(pitMenuState["Repair Suspension"])
-				}
-
-				if (pitMenuState["Bottom Button"] != "Unavailable") {
-					this.iPitstopOptions.Push("Request Pitstop")
-					this.iPitstopOptionStates.Push(pitMenuState["Bottom Button"])
-				}
+			if (pitMenuState["Bottom Button"] != "Unavailable") {
+				this.iPitstopOptions.Push("Request Pitstop")
+				this.iPitstopOptionStates.Push(pitMenuState["Bottom Button"])
 			}
 		}
 	}
@@ -443,11 +343,8 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 					loop 15
 						this.sendCommand(this.PreviousOptionHotkey)
 
-					index -= 1
-
-					if index
-						loop index
-							this.sendCommand(this.NextOptionHotkey)
+					loop index
+						this.sendCommand(this.NextOptionHotkey)
 
 					return true
 				}
@@ -652,95 +549,6 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if (this.optionAvailable("Repair Rear Aero") && (repairBodywork != this.optionChosen("Repair Rear Aero")))
 				this.toggleActivity("Repair Rear Aero", false, true)
 		}
-	}
-
-	getImageFileNames(imageNames*) {
-		local fileNames := []
-		local ignore, imageName, fileName
-
-		for ignore, imageName in imageNames {
-			imageName := ("R3E\" . imageName)
-			fileName := getFileName(imageName . ".png", kUserScreenImagesDirectory)
-
-			if FileExist(fileName)
-				fileNames.Push(fileName)
-
-			fileName := getFileName(imageName . ".jpg", kUserScreenImagesDirectory)
-
-			if FileExist(fileName)
-				fileNames.Push(fileName)
-
-			fileName := getFileName(imageName . ".png", kScreenImagesDirectory)
-
-			if FileExist(fileName)
-				fileNames.Push(fileName)
-
-			fileName := getFileName(imageName . ".jpg", kScreenImagesDirectory)
-
-			if FileExist(fileName)
-				fileNames.Push(fileName)
-		}
-
-		if (fileNames.Length == 0)
-			throw "Unknown image '" . imageName . "' detected in R3EPlugin.getLabelFileName..."
-		else {
-			if isDebug()
-				showMessage("Labels: " . values2String(", ", imageNames*) . "; Images: " . values2String(", ", fileNames*), "Pitstop MFD Image Search", "Information.ico", 5000)
-
-			return fileNames
-		}
-	}
-
-	searchMFDImage(imageNames*) {
-		local imageName, pitstopImages, curTickCount, imageX, imageY, pitstopImage
-
-		static kSearchAreaLeft := 0
-		static kSearchAreaRight := 400
-
-		loop imageNames.Length {
-			imageName := imageNames[A_Index]
-			pitstopImages := this.getImageFileNames(imageName)
-
-			if this.activateWindow() {
-				curTickCount := A_TickCount
-
-				imageX := kUndefined
-				imageY := kUndefined
-
-				loop pitstopImages.Length {
-					pitstopImage := pitstopImages[A_Index]
-
-					if !this.iPSImageSearchArea {
-						ImageSearch(&imageX, &imageY, 0, 0, A_ScreenWidth, A_ScreenHeight, "*100 " . pitstopImage)
-
-						if isLogLevel(kLogInfo)
-							logMessage(kLogInfo, substituteVariables(translate("Full search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
-
-						if isInteger(imageX)
-							if ((imageName = "PITSTOP 1") || (imageName = "PITSTOP 2"))
-								this.iPSImageSearchArea := [Max(0, imageX - kSearchAreaLeft), 0, Min(imageX + kSearchAreaRight, A_ScreenWidth), A_ScreenHeight]
-					}
-					else {
-						ImageSearch(&imageX, &imageY, this.iPSImageSearchArea[1], this.iPSImageSearchArea[2], this.iPSImageSearchArea[3], this.iPSImageSearchArea[4], "*100 " . pitstopImage)
-
-						if isLogLevel(kLogInfo)
-							logMessage(kLogInfo, substituteVariables(translate("Fast search for '%image%' took %ticks% ms"), {image: imageName, ticks: A_TickCount - curTickCount}))
-					}
-
-					if isInteger(imageX) {
-						if isLogLevel(kLogInfo)
-							logMessage(kLogInfo, substituteVariables(translate("'%image%' found at %x%, %y%"), {image: imageName, x: imageX, y: imageY}))
-
-						return true
-					}
-				}
-			}
-		}
-
-		if isLogLevel(kLogInfo)
-			logMessage(kLogInfo, substituteVariables(translate("'%image%' not found"), {image: imageName}))
-
-		return false
 	}
 
 	prepareSettings(settings, data) {

@@ -1107,24 +1107,6 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
 
 Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
-### Important preparation for the Pitstop MFD handling
-
-Simulator Controller must *understand* the current choices and the available settings in the Pitstop MFD, before any changes can be made automatically. There are two different methods available for this task:
-
-1. The first method does not need any special preparation from your side. It uses information provided by the API of *RaceRoom Racing Experience* This method is used by default from now on and is **strongly** recommended, but you might take a look at the second method below.
-  
-2. [Deprecated] We use event automation here, very similar to the also deprecated method used for [Pitstop MFD control in *Assetto Corsa Competizione*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#important-preparation-for-the-pitstop-mfd-handling). Therefore you also have to create those little pictures, Simulator Controller searches for in order to *understand* the Pitstop MFD state of *RaceRoom Racing Experience*. This method is still available, in case the API of *RaceRoom Racing Experience* will not be available in a future release which was the case in the past.
-
-   The search pictures are located in the *Resources\Screen Images\R3E folder* in the installation folder of Simulator Controller. They have been taken from a Full HD triple screen setup (5760 * 1080) using the English language setting in *RaceRoom Racing Experience*. If you are running a different resolution or, even more important, are using a different language, the search for these pictures will fail. But there is help, since you can provide your own pictures by placing your own ones with identical names in the *Simulator Controller\Screen Images\R3E* folder in your user *Documents* folder. Use the Snipping Tool of Windows to create all the necessary pictures, it will only take a few minutes. While testing your images, you will find information about the images found (or not found) in the "Simulator Controller Logs.txt" file located in the *Logs* folder in your user *Documents* folder. If you set the log level to "Information" in the configuration (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general) on how to do this), you will even get more information in the logs.
-
-   Note: The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
-
-   Second note: The image search algorithm used here is as good as it can be. But unfortunately, the Pitstop MFD in *RaceRoom Racing Experience* has very low contrast differences in several places, other than the Pitstop MFD of *Assetto Corsa Competizione*, Therefore, it is possible from time to time, that the search will yield false positives, which in the end will lead to false values and choices entered into fields of the Pitstop MFD. So please always double check, that everything is correct, before entering the pit lane.
-
-   Last note: On our [Discord server](https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
-
-   If you have come so far in your reading and still want to use the image recognition method, you must do the following: Open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) and insert and check the setting "Pitstop: Image Search" for the *RaceRoom Racing Experience* simulator. And, of course, you have to create all search images.
-
 ## Plugin *AMS2*
 
 This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "ahk_exe AMS2AVX.exe" as the window title.

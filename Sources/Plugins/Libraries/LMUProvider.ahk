@@ -586,10 +586,20 @@ class LMUProvider extends Sector397Provider {
 				active := getMultiMapValue(data, "Session Data", "Active", false)
 
 				if !active {
-					if wasActive
-						waitForFinish := 5
+					if wasActive {
+						if isSet(RaceAssistantPlugin) {
+							if RaceAssistantPlugin.TeamSessionActive
+								waitForFinish := (100000 / RaceAssistantPlugin.CollectorTask.Sleep)
+							else
+								waitForFinish := (20000 / RaceAssistantPlugin.CollectorTask.Sleep)
+						}
+						else
+							waitForFinish := 5
+					}
 
 					if (waitForFinish-- > 0) {
+						setMultiMapValue(data, "Stint Data", "Driving", false)
+
 						if logRequests
 							logMessage(kLogWarn, "Deferred LMU Session State: Waiting for Shutdown...")
 

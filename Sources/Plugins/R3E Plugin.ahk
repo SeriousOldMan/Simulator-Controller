@@ -411,49 +411,29 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 			if inList(kBinaryOptions, activity) {
 				if (!require || this.requirePitstopMFD())
 					if (!select || this.selectPitstopOption(activity))
-						this.dialPitstopOption(activity, "Accept")
+						this.dialPitstopOption(activity, this.optionChosen(activity) ? "Decrease" : "Increase")
 			}
 			else
 				throw "Unsupported activity `"" . activity . "`" detected in R3EPlugin.toggleActivity..."
 		}
 	}
 
-	changeFuelAmount(direction, liters := 5, require := true, select := true, accept := true) {
+	changeFuelAmount(direction, liters := 5, require := true, select := true) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (!require || this.requirePitstopMFD())
-				if (!select || this.selectPitstopOption("Refuel")) {
-					if (accept && this.optionChosen("Refuel"))
-						this.sendCommand(this.AcceptChoiceHotkey)
-
+				if (!select || this.selectPitstopOption("Refuel"))
 					this.dialPitstopOption("Refuel", direction, liters)
-
-					if accept
-						this.sendCommand(this.AcceptChoiceHotkey)
-				}
 		}
 	}
 
-	changeTyreCompound(direction, steps := 1, require := true, accept := true) {
+	changeTyreCompound(direction, steps := 1, require := true) {
 		if (this.OpenPitstopMFDHotkey != "Off") {
 			if (!require || this.requirePitstopMFD()) {
-				if (accept && this.selectPitstopOption("Change Front Tyres") && this.optionChosen("Change Front Tyres"))
-					this.sendCommand(this.AcceptChoiceHotkey)
-
-				if (accept && this.selectPitstopOption("Change Rear Tyres") && this.optionChosen("Change Rear Tyres"))
-					this.sendCommand(this.AcceptChoiceHotkey)
-
 				if this.selectPitstopOption("Change Front Tyres")
 					this.dialPitstopOption("Change Front Tyres", direction, steps)
 
-				if this.selectPitstopOption("Change Rear Tyres") {
+				if this.selectPitstopOption("Change Rear Tyres")
 					this.dialPitstopOption("Change Rear Tyres", direction, steps)
-
-					if accept
-						this.sendCommand(this.AcceptChoiceHotkey)
-				}
-
-				if (accept && this.selectPitstopOption("Change Front Tyres"))
-					this.sendCommand(this.AcceptChoiceHotkey)
 			}
 		}
 	}
@@ -472,7 +452,7 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off"))
 			if this.activateWindow() {
-				loop 10
+				loop 15
 					this.sendCommand(this.NextOptionHotkey)
 
 				this.sendCommand(this.AcceptChoiceHotkey)
@@ -484,14 +464,9 @@ class R3EPlugin extends RaceAssistantSimulatorPlugin {
 
 		if (this.OpenPitstopMFDHotkey && (this.OpenPitstopMFDHotkey != "Off")) {
 			if this.optionAvailable("Refuel") {
-				if this.optionChosen("Refuel")
-					this.sendCommand(this.AcceptChoiceHotkey)
+				this.changeFuelAmount("Decrease", 250, false, true)
 
-				this.changeFuelAmount("Decrease", 250, false, true, false)
-
-				this.changeFuelAmount("Increase", liters + 3, false, false, false)
-
-				this.sendCommand(this.AcceptChoiceHotkey)
+				this.changeFuelAmount("Increase", liters + 3, false, false)
 			}
 		}
 	}

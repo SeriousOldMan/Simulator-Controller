@@ -2899,11 +2899,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				else
 					isInactive := false
 
-				driverActive := this.driverActive(data)
+				driverActive := (this.driverActive(data) && getMultiMapValue(data, "Stint Data", "Driving", true))
 
 				if (session == kSessionPaused) {
 					if (!driverActive && this.DriverWasActive
-									  && this.TeamServer && this.TeamSessionActive
+									  && this.TeamSessionActive
 									  && !this.InPit && !this.Finish
 									  && (this.Simulator.Simulator[true] != "Assetto Corsa Competizione")) {
 						setMultiMapValue(data, "Session Data", "Paused", false)

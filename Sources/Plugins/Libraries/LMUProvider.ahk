@@ -586,7 +586,9 @@ class LMUProvider extends Sector397Provider {
 				active := getMultiMapValue(data, "Session Data", "Active", false)
 
 				if !active {
-					if wasActive {
+					if (GetKeyState("Ctrl") && GetKeyState("Shift"))
+						waitForFinish := 0
+					else if wasActive {
 						if isSet(RaceAssistantPlugin) {
 							if RaceAssistantPlugin.TeamSessionActive
 								waitForFinish := (100000 / RaceAssistantPlugin.CollectorTask.Sleep)

@@ -21,7 +21,23 @@
     
 # Upcoming release
 
-Not yet planned...
+## 7.3.3.0
+
+#### Date: 11/06/26
+
+#### Fixes
+
+  - None this time...
+  
+#### Changes
+
+  - The Pitstop MFD management for *RaceRoom Racing Experience* has been re-implemented. This was necessary to a lot of changes in the recent big "historic" update of *RaceRoom Racing Experience*.
+    - The legacy method using the small search images is no longer supported. All refeferences to this method have been removed from the documentation.
+	- All available pitstop settings as well as their current values are found using an option walk as in *Assetto Corsa Competizione*.
+	- [Important] The new method is still not working, because their is a current bug in the new API of *RaceRoom Racing Experience*. Developers are informed and the new method should work, once this bug has been fixed by the studio.
+  - The session state handover at pitstops in *Le Mans Ultimate* team races has been optimized and is more resilient now against sporadic timeouts in the REST/JSON API of *Le Mans Ultimate*.
+  - Using the Issue Analyzer in "Setup Workbench" will now be logged to the log book as well.
+  - More unnecessary "Issues" entries are filtered in the log book of the "Setup Workbench".
 
 # Release history
 

@@ -166,6 +166,10 @@ class Logbook {
 		superseeds(entry) {
 			return false
 		}
+
+		superfluous() {
+			return false
+		}
 	}
 
 	FileName {
@@ -197,8 +201,13 @@ class Logbook {
 		local lastEntry := false
 
 		entries := collect(entries, (d) {
-					   if (Trim(d) != "")
-						   return Logbook.LogbookEntry.fromDescriptor(Trim(d))
+					   local entry
+
+					   if (Trim(d) != "") {
+						   entry := Logbook.LogbookEntry.fromDescriptor(Trim(d))
+
+						   return (entry.superfluous() ? false : entry)
+					   }
 					   else
 						   return false
 				   })
@@ -318,11 +327,20 @@ class IssuesEntry extends Logbook.LogbookEntry {
 	}
 
 	superseeds(entry) {
-		if isInstance(entry, IssuesEntry)
+		if isInstance(entry, IssuesEntry) {
+			/*
 			return all(entry.Issues, (c1) => exist(this.Issues
 												 , (c2) => (c1.Characteristic = c2.Characteristic)))
+			*/
+
+			return true
+		}
 		else
 			return false
+	}
+
+	superfluous() {
+		return (this.Issues.Length = 0)
 	}
 }
 
@@ -443,6 +461,37 @@ class LapEntry extends Logbook.LogbookEntry {
 	SectorTimes {
 		Get {
 			return this.Property["Sector Times"]
+		}
+	}
+}
+
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+;;; AnalyzerEntry                                                           ;;;
+;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
+
+class AnalyzerEntry extends Logbook.LogbookEntry {
+	HTML {
+		Get {
+			local html := "<table class=`"table-std`">"
+
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Mode:") . "</th><td>" . this.Mode . "</td></tr>")
+
+			if (this.Mode = translate("Telemetry"))
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Telemetry:") . "</th><td>" . this.Telemetry . "</td></tr>")
+
+			return (html . "</table>")
+		}
+	}
+
+	Mode {
+		Get {
+			return this.Property["Mode"]
+		}
+	}
+
+	Telemetry {
+		Get {
+			return this.Property["Telemetry"]
 		}
 	}
 }
@@ -1986,6 +2035,8 @@ class SetupWorkbench extends ConfigurationItem {
 	}
 
 	logLogbook(type, arguments*) {
+		local entry
+
 		switch type, false {
 			case "Selection":
 				FileAppend("###------###------###"
@@ -2016,6 +2067,13 @@ class SetupWorkbench extends ConfigurationItem {
 						 . "Lap=" . arguments[1] . "`n"
 						 . "Lap Time=" . arguments[2] . "`n"
 						 . "Sector Times=" . arguments[3], this.Logbook, "UTF-16")
+			case "Analyzer":
+				entry := ("###------###------###Type=Analyzer`nMode=" . arguments[1])
+
+				if (arguments[1] = translate("Telemetry"))
+					entry .= ("`nTelemetry=" . arguments[2])
+
+				FileAppend(entry, this.Logbook, "UTF-16")
 			case "Notes":
 				FileAppend("###------###------###"
 						 . "Type=Notes`n"
@@ -2108,6 +2166,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 	logLap(name, lapTime, sectorTimes) {
 		this.logLogbook("Lap", name, lapTime, sectorTimes ? values2String(", ", sectorTimes*) : translate("-"))
+	}
+
+	logAnalyzer(mode, telemetry := false) {
+		this.logLogbook("Analyzer", translate(mode), telemetry)
 	}
 
 	loadSimulator(simulator, force := false) {
@@ -2238,7 +2300,12 @@ class SetupWorkbench extends ConfigurationItem {
 			this.Window.Block()
 
 			try {
-				%analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
+				result := %analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
+
+				if (result = "Track")
+					this.logAnalyzer(result)
+				else
+					this.logAnalyzer("Telemetry", result)
 			}
 			finally {
 				this.Window.Unblock()
@@ -2704,9 +2771,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
-
-					this.logLogbook("Issues", values2String("`n", issues*))
 				}
+
+				this.logLogbook("Issues", values2String("`n", issues*))
 			}
 
 			if draw {

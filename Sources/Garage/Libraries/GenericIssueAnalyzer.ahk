@@ -735,8 +735,16 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		else {
 			issues := runAnalyzer(this)
 
-			if issues
-				Task.startTask(ObjBindMethod(this, "createCharacteristics", issues), 100)
+			if issues {
+				Task.startTask(() => this.createCharacteristics(issues.Issues), 500)
+
+				if (issues.Mode = "Telemetry")
+					return issues.Telemetry
+				else
+					return issues.Mode
+			}
+			else
+				return false
 		}
 	}
 
@@ -1048,6 +1056,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 	static activateButton
 	static calibrateButton
 
+	static telemetry
+
 	static steerLockEdit
 	static steerRatioEdit
 	static wheelbaseEdit
@@ -1322,6 +1332,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 				}
 				else
 					telemetries.Push(theAnalyzer.createTelemetry(1, fileName))
+
+				telemetry := values2String(", ", collect(telemetries, (t) => t.Name)*)
 
 				analyzerGui.Block()
 
@@ -1755,6 +1767,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		state := "Prepare"
 		result := false
+
+		telemetry := false
 
 		prepareWidgets := []
 		runWidgets := []
@@ -2221,7 +2235,12 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		analyzerGui.Destroy()
 
-		return ((result == kCancel) ? false : result)
+		if (result == kCancel)
+			return false
+		else if telemetry
+			return {Mode: "Telemetry", Telemetry: telemetry, Issues: result}
+		else
+			return {Mode: "Track", Issues: result}
 	}
 }
 

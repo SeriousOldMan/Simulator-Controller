@@ -489,7 +489,7 @@ class AnalyzerEntry extends Logbook.LogbookEntry {
 				html .= "`n<br><br><table class=`"table-std`">"
 				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
 					   . "<th class=`"th-std`">" . translate("Intensity") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Severity") . "</th></tr>")
+					   . "<th class=`"th-std`">" . translate("Frequency (%)") . "</th></tr>")
 
 				for ignore, issue in îssues {
 					html .= ("<tr><td>" . issue.Characteristic . "</td>")

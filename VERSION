@@ -4,7 +4,7 @@ Type=Development
 Version=7.3.3.0-dev
 Target=7.3.3.0-release
 Date=11/03/26
-Download=
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/E1ExrNTW?inline=true
 Changes=More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]

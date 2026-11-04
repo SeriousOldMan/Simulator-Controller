@@ -330,6 +330,7 @@ The "Setup Workbench" *records* all your important actions in the form of a logb
 - Every change to the issues in the *Characteristics* pane of the main window
 - Loading a setup
 - Saving a setup incl. information about the changed setup settings
+- Every run of the issue analyzer and the collected issues
 - All actions taken by the AI-based Setup Engineer
 - Information about each driven lap (lap time, sector times, ...), if the telemetry system is running
 

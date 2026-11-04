@@ -473,13 +473,34 @@ class AnalyzerEntry extends Logbook.LogbookEntry {
 	HTML {
 		Get {
 			local html := "<table class=`"table-std`">"
+			local îssues := this.Issues.Clone()
+			local ignore, issue
 
 			html .= ("<tr><th class=`"th-std th-left`">" . translate("Mode:") . "</th><td>" . this.Mode . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Intensity") . translate(":") . "</th><td>" . this.Intensity . "</td></tr>")
+			html .= ("<tr><th class=`"th-std th-left`">" . translate("Frequency (%)") . translate(":") . "</th><td>" . this.Frequency . "</td></tr>")
 
 			if (this.Mode = translate("Telemetry"))
 				html .= ("<tr><th class=`"th-std th-left`">" . translate("Telemetry:") . "</th><td>" . this.Telemetry . "</td></tr>")
 
-			return (html . "</table>")
+			html .= "</table>"
+
+			if (îssues.Length > 0) {
+				html .= "`n<br><br><table class=`"table-std`">"
+				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Intensity") . "</th>"
+					   . "<th class=`"th-std`">" . translate("Frequency (%)") . "</th></tr>")
+
+				for ignore, issue in îssues {
+					html .= ("<tr><td>" . issue.Characteristic . "</td>")
+					html .= ("<td>" . issue.Intensity . "</td>")
+					html .= ("<td>" . issue.Frequency . "</td></tr>")
+				}
+
+				return (html . "</table>")
+			}
+
+			return html
 		}
 	}
 
@@ -492,6 +513,35 @@ class AnalyzerEntry extends Logbook.LogbookEntry {
 	Telemetry {
 		Get {
 			return this.Property["Telemetry"]
+		}
+	}
+
+	Intensity {
+		Get {
+			return this.Property["Intensity"]
+		}
+	}
+
+	Frequency {
+		Get {
+			return this.Property["Frequency"]
+		}
+	}
+
+	Issues {
+		Get {
+			local issues := []
+			local ignore, issue
+
+			for ignore, issue in string2Values("`n", this.Payload) {
+				issue := string2Values("=", issue)
+
+				issues.Push({Characteristic: issue[1]
+						   , Intensity: string2Values("/", issue[2])[1]
+						   , Frequency: string2Values("/", issue[2])[2]})
+			}
+
+			return issues
 		}
 	}
 }
@@ -2068,10 +2118,16 @@ class SetupWorkbench extends ConfigurationItem {
 						 . "Lap Time=" . arguments[2] . "`n"
 						 . "Sector Times=" . arguments[3], this.Logbook, "UTF-16")
 			case "Analyzer":
-				entry := ("###------###------###Type=Analyzer`nMode=" . arguments[1])
+				entry := ("###------###------###"
+						. "Type=Analyzer`n"
+						. "Mode=" . arguments[1] . "`n"
+						. "Intensity=" . arguments[2] . "`n"
+						. "Frequency=" . arguments[3])
 
 				if (arguments[1] = translate("Telemetry"))
-					entry .= ("`nTelemetry=" . arguments[2])
+					entry .= ("`nTelemetry=" . arguments[5])
+
+				entry .= ("`n###++++++###++++++###" . arguments[4])
 
 				FileAppend(entry, this.Logbook, "UTF-16")
 			case "Notes":
@@ -2168,8 +2224,68 @@ class SetupWorkbench extends ConfigurationItem {
 		this.logLogbook("Lap", name, lapTime, sectorTimes ? values2String(", ", sectorTimes*) : translate("-"))
 	}
 
-	logAnalyzer(mode, telemetry := false) {
-		this.logLogbook("Analyzer", translate(mode), telemetry)
+	logAnalyzer(mode, issues, importance, frequency, telemetry := false) {
+		local characteristicLabels := toMap(getMultiMapValues(this.Definition
+															, "Workbench.Characteristics.Labels")
+										  , SetupWorkbench.LabelsMap)
+		local logIssues := []
+		local ignore, type, speed, where, characteristic, issue
+		local category, temperature, position
+
+		for ignore, type in ["Oversteer", "Understeer"]
+			for ignore, speed in ["Slow", "Fast"]
+				for ignore, where in ["Entry", "Apex", "Exit"] {
+					characteristic := (type . ".Corner." . where . "." . speed)
+
+					if issues.Has(characteristic)
+						for ignore, issue in issues[characteristic]
+							logIssues.Push(characteristicLabels[characteristic] . "=" . translate(issue.Severity) . "/" . issue.Frequency)
+				}
+
+		for ignore, type in ["Suspension.Bottom.Out"]
+			for ignore, where in ["Front", "Rear"] {
+				characteristic := (type . "." . where)
+
+				if issues.Has(characteristic)
+					for ignore, issue in issues[characteristic]
+						logIssues.Push(characteristicLabels[characteristic] . "=" . translate(issue.Severity) . "/" . issue.Frequency)
+			}
+
+			if issues.Has("Suspension.Sway")
+				for ignore, issue in issues["Suspension.Sway"]
+					logIssues.Push(characteristicLabels[characteristic] . "=" . translate(issue.Severity) . "/" . issue.Frequency)
+
+		for ignore, category in ["Around", "Inner", "Outer"]
+			for ignore, temperature in ["Cold", "Hot"]
+				for ignore, position in ["Front", "Rear"] {
+					characteristic := ("Tyre.Temperatures." . temperature . "." . position . "." . category)
+
+					if issues.Has(characteristic)
+						for ignore, issue in issues[characteristic]
+							logIssues.Push(characteristicLabels[characteristic] . "=" . translate(issue.Severity) . "/" . issue.Frequency)
+				}
+
+		for ignore, category in ["Front", "Rear"]
+			for ignore, temperature in ["Cold", "Hot"] {
+				characteristic := ("Brake.Temperatures." . temperature . "." . category)
+
+				if issues.Has(characteristic)
+					for ignore, issue in issues[characteristic]
+						logIssues.Push(characteristicLabels[characteristic] . "=" . translate(issue.Severity) . "/" . issue.Frequency)
+			}
+
+		for ignore, category in ["Water", "Oil"]
+			for ignore, temperature in ["Cold", "Hot"] {
+				characteristic := ("Engine.Temperatures." . temperature . "." . category)
+
+				if issues.Has(characteristic)
+					for ignore, issue in issues[characteristic]
+						logIssues.Push(characteristicLabels[characteristic] . "=" . translate(issue.Severity) . "/" . issue.Frequency)
+			}
+
+		this.logLogbook("Analyzer", translate(mode), translate(importance), frequency
+								  , values2String("`n", logIssues*)
+								  , telemetry)
 	}
 
 	loadSimulator(simulator, force := false) {
@@ -2302,10 +2418,12 @@ class SetupWorkbench extends ConfigurationItem {
 			try {
 				result := %analyzerClass%(this, this.SelectedSimulator).createCharacteristics()
 
-				if (result = "Track")
-					this.logAnalyzer(result)
-				else
-					this.logAnalyzer("Telemetry", result)
+				if result
+					if (result = "Track")
+						this.logAnalyzer("Track", result.Issues, result.Intensity, result.Frequency)
+					else
+						this.logAnalyzer("Telemetry", result.Issues
+													, result.Intensity, result.Frequency, result.Telemetry)
 			}
 			finally {
 				this.Window.Unblock()

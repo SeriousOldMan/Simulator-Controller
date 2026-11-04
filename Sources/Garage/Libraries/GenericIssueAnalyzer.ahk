@@ -735,16 +735,10 @@ class GenericIssueAnalyzer extends IssueAnalyzer {
 		else {
 			issues := runAnalyzer(this)
 
-			if issues {
-				Task.startTask(() => this.createCharacteristics(issues.Issues), 500)
+			if issues
+				Task.startTask(() => this.createCharacteristics(issues.Selected), 500)
 
-				if (issues.Mode = "Telemetry")
-					return issues.Telemetry
-				else
-					return issues.Mode
-			}
-			else
-				return false
+			return issues
 		}
 	}
 
@@ -1437,6 +1431,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 									 , runAnalyzer("FilterTemperatures"))
 	else if (commandOrAnalyzer == "UpdateSamples")
 		runAnalyzer("UpdateTelemetry", analyzer.Handling, analyzer.Suspension, analyzer.Temperatures)
+	else if (commandOrAnalyzer == "AllHandling")
+		return analyzer.Handling.Clone()
 	else if (commandOrAnalyzer == "FilterHandling") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
@@ -1454,8 +1450,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 						for ignore, issue in issues[where] {
 							severity := issue.Severity
 
-							include := ((issue.Frequency >= applyThresholdSlider.Value)
-									 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
+							if (final = "All")
+								include := true
+							else
+								include := ((issue.Frequency >= applyThresholdSlider.Value)
+										 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 							if (include && final) {
 								include := false
@@ -1484,6 +1483,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		return issues
 	}
+	else if (commandOrAnalyzer == "AllSuspension")
+		return analyzer.Suspension.Clone()
 	else if (commandOrAnalyzer == "FilterSuspension") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
@@ -1500,8 +1501,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 					for ignore, issue in issues[where] {
 						severity := issue.Severity
 
-						include := ((issue.Frequency >= applyThresholdSlider.Value)
-								 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
+						if (final = "All")
+							include := true
+						else
+							include := ((issue.Frequency >= applyThresholdSlider.Value)
+									 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 						if (include && final) {
 							include := false
@@ -1532,8 +1536,11 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			for ignore, issue in issues["Suspension.Sway"] {
 				severity := issue.Severity
 
-				include := ((issue.Frequency >= applyThresholdSlider.Value)
-						 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
+				if (final = "All")
+					include := true
+				else
+					include := ((issue.Frequency >= applyThresholdSlider.Value)
+							 && (inList(["Light", "Medium", "Heavy"], issue.Severity) >= applyThresholdDropDown.Value))
 
 				if (include && final) {
 					include := false
@@ -1561,6 +1568,8 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 
 		return issues
 	}
+	else if (commandOrAnalyzer == "AllTemperatures")
+		return analyzer.Temperatures.Clone()
 	else if (commandOrAnalyzer == "FilterTemperatures") {
 		workbench := analyzer.Workbench
 		characteristicLabels := getMultiMapValues(workbench.Definition, "Workbench.Characteristics.Labels")
@@ -2233,14 +2242,30 @@ runAnalyzer(commandOrAnalyzer := false, arguments*) {
 			analyzer.stopIssueAnalyzer()
 		}
 
-		analyzerGui.Destroy()
+		try {
+			if (result == kCancel)
+				return false
+			else {
+				result := {Issues: combine(runAnalyzer("AllHandling")
+										 , runAnalyzer("AllSuspension")
+										 , runAnalyzer("AllTemperatures"))
+						 , Selected: result
+						 , Intensity: ["Light", "Medium", "Heavy"][applyThresholdDropDown.Value]
+						 , Frequency: applyThresholdSlider.Value}
 
-		if (result == kCancel)
-			return false
-		else if telemetry
-			return {Mode: "Telemetry", Telemetry: telemetry, Issues: result}
-		else
-			return {Mode: "Track", Issues: result}
+				if telemetry {
+					result.Mode := "Telemetry"
+					result.Telemetry := telemetry
+				}
+				else
+					result.Mode := "Track"
+
+				return result
+			}
+		}
+		finally {
+			analyzerGui.Destroy()
+		}
 	}
 }
 

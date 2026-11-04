@@ -67,6 +67,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iFocusedCorners := []
 	iTelemetryFuture := false
 
+	iLineCoaching := false
+
 	iBrakeCoaching := false
 
 	iRaceMotivation := false
@@ -81,6 +83,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTrackTriggerPID := false
 
+	iLineTriggerPID := false
+	iLineTriggerFile := false
+
 	iBrakeTriggerPID := false
 	iBrakeTriggerFile := false
 
@@ -89,6 +94,9 @@ class DrivingCoach extends GridRaceAssistant {
 	iCountdownOne := false
 	iCountdownTwo := false
 	iBrakeHints := CaseInsenseMap()
+
+	iLeftCommand := false
+	iRightCommand := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -272,6 +280,12 @@ class DrivingCoach extends GridRaceAssistant {
 		}
 	}
 
+	LineCoaching {
+		Get {
+			return this.iLineCoaching
+		}
+	}
+
 	BrakeCoaching {
 		Get {
 			return this.iBrakeCoaching
@@ -359,7 +373,8 @@ class DrivingCoach extends GridRaceAssistant {
 		this.loadInstructions(configuration)
 
 		this.updateConfigurationValues({Announcements: {SessionInformation: true, StintInformation: false, HandlingInformation: false}
-									  , OnTrackCoaching: false, BrakeCoaching: false, RaceMotivation: false})
+									  , OnTrackCoaching: false, LineCoaching: false
+									  , BrakeCoaching: false, RaceMotivation: false})
 
 		try {
 			DirCreate(this.Options["Driving Coach.Archive"])
@@ -376,6 +391,7 @@ class DrivingCoach extends GridRaceAssistant {
 			return false
 		})
 		OnExit(ObjBindMethod(this, "shutdownTrackTrigger", true))
+		OnExit(ObjBindMethod(this, "shutdownLineTrigger", true))
 		OnExit(ObjBindMethod(this, "shutdownBrakeTrigger", true))
 
 		Task.startTask(() {
@@ -387,6 +403,8 @@ class DrivingCoach extends GridRaceAssistant {
 				this.iReleaseCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Release", false, false, true, {File: true, Rephrase: false})
 				this.iCountdownOne := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownOne", false, false, true, {File: true, Rephrase: false})
 				this.iCountdownTwo := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownTwo", false, false, true, {File: true, Rephrase: false})
+				this.iLeftCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreLeft", false, false, true, {File: true, Rephrase: false})
+				this.iRightCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreRight", false, false, true, {File: true, Rephrase: false})
 			}
 		}, 10000, kLowPriority)
 	}
@@ -486,6 +504,9 @@ class DrivingCoach extends GridRaceAssistant {
 			this.iFocusedCorners := []
 			this.iTelemetryFuture := false
 		}
+
+		if values.HasProp("LineCoaching")
+			this.iLineCoaching := values.LineCoaching
 
 		if values.HasProp("BrakeCoaching")
 			this.iBrakeCoaching := values.BrakeCoaching
@@ -847,6 +868,18 @@ class DrivingCoach extends GridRaceAssistant {
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 				*/
+			case "LineCoachingStart":
+				this.clearContinuation()
+
+				if !this.CoachingActive
+					this.telemetryCoachingStartRecognized(words, true, "Line")
+				else
+					this.lineCoachingStartRecognized(words)
+
+				/*
+				else
+					this.handleVoiceText("TEXT", values2String(A_Space, words*))
+				*/
 			case "BrakeCoachingStart":
 				this.clearContinuation()
 
@@ -923,23 +956,38 @@ class DrivingCoach extends GridRaceAssistant {
 			setMultiMapValue(state, "Coaching", "Active", true)
 
 			if (auto = "Brake") {
-				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false, RaceMotivation: false})
+				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false
+											  , LineCoaching: false, RaceMotivation: false})
 
 				setMultiMapValue(state, "Coaching", "Brake", "Starting")
 				setMultiMapValue(state, "Coaching", "Track", false)
+				setMultiMapValue(state, "Coaching", "Line", false)
+				setMultiMapValue(state, "Coaching", "Motivation", false)
+			}
+			else if (auto = "Line") {
+				this.updateConfigurationValues({LineCoaching: true, BrakeCoaching: false
+											  , OnTrackCoaching: false, RaceMotivation: false})
+
+				setMultiMapValue(state, "Coaching", "Line", "Starting")
+				setMultiMapValue(state, "Coaching", "Track", false)
+				setMultiMapValue(state, "Coaching", "Brake", false)
 				setMultiMapValue(state, "Coaching", "Motivation", false)
 			}
 			else if (auto = "Track") {
-				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, RaceMotivation: false})
+				this.updateConfigurationValues({OnTrackCoaching: true, LineCoaching: false
+											  , BrakeCoaching: false, RaceMotivation: false})
 
 				setMultiMapValue(state, "Coaching", "Track", "Starting")
+				setMultiMapValue(state, "Coaching", "Line", false)
 				setMultiMapValue(state, "Coaching", "Brake", false)
 				setMultiMapValue(state, "Coaching", "Motivation", false)
 			}
 			else {
-				this.updateConfigurationValues({RaceMotivation: true, OnTrackCoaching: false, BrakeCoaching: false})
+				this.updateConfigurationValues({RaceMotivation: true, OnTrackCoaching: false
+											  , LineCoaching: false, BrakeCoaching: false})
 
 				setMultiMapValue(state, "Coaching", "Motivation", "Starting")
+				setMultiMapValue(state, "Coaching", "Line", false)
 				setMultiMapValue(state, "Coaching", "Brake", false)
 				setMultiMapValue(state, "Coaching", "Track", false)
 			}
@@ -1028,6 +1076,15 @@ class DrivingCoach extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Later", false, false, false, {Noise: false})
 	}
 
+	lineCoachingStartRecognized(words, confirm := true) {
+		if this.startupLineCoaching() {
+			if (confirm && this.Speaker)
+				this.getSpeaker().speakPhrase("Roger")
+		}
+		else if (confirm && this.Speaker)
+			this.getSpeaker().speakPhrase("Later")
+	}
+
 	brakeCoachingStartRecognized(words, confirm := true) {
 		if this.startupBrakeCoaching() {
 			if (confirm && this.Speaker)
@@ -1051,6 +1108,7 @@ class DrivingCoach extends GridRaceAssistant {
 			this.getSpeaker().speakPhrase("Okay", false, false, false, {Noise: false})
 
 		this.shutdownTrackCoaching()
+		this.shutdownLineCoaching()
 		this.shutdownBrakeCoaching()
 		this.shutdownRaceMotivation()
 	}
@@ -1274,24 +1332,39 @@ class DrivingCoach extends GridRaceAssistant {
 			setMultiMapValue(state, "Coaching", "Active", true)
 
 			if (auto = "Brake") {
-				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false, RaceMotivation: false})
+				this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false
+											  , LineCoaching: false, RaceMotivation: false})
 
 				setMultiMapValue(state, "Coaching", "Brake", "Starting")
 				setMultiMapValue(state, "Coaching", "Track", false)
+				setMultiMapValue(state, "Coaching", "Line", false)
 				setMultiMapValue(state, "Coaching", "Motivation", false)
 			}
 			else if (auto = "Track") {
-				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, RaceMotivation: false})
+				this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false
+											  , LineCoaching: false, RaceMotivation: false})
 
 				setMultiMapValue(state, "Coaching", "Track", "Starting")
 				setMultiMapValue(state, "Coaching", "Brake", false)
+				setMultiMapValue(state, "Coaching", "Line", false)
+				setMultiMapValue(state, "Coaching", "Motivation", false)
+			}
+			else if (auto = "Line") {
+				this.updateConfigurationValues({LineCoaching: true, OnTrackCoaching: false
+											  , BrakeCoaching: false, RaceMotivation: false})
+
+				setMultiMapValue(state, "Coaching", "Line", "Starting")
+				setMultiMapValue(state, "Coaching", "Brake", false)
+				setMultiMapValue(state, "Coaching", "Track", false)
 				setMultiMapValue(state, "Coaching", "Motivation", false)
 			}
 			else {
-				this.updateConfigurationValues({RaceMotivation: true, OnTrackCoaching: false, BrakeCoaching: false})
+				this.updateConfigurationValues({RaceMotivation: true, OnTrackCoaching: false
+											  , LineCoaching: false, BrakeCoaching: false})
 
 				setMultiMapValue(state, "Coaching", "Motivation", "Starting")
 				setMultiMapValue(state, "Coaching", "Brake", false)
+				setMultiMapValue(state, "Coaching", "Line", false)
 				setMultiMapValue(state, "Coaching", "Track", false)
 			}
 
@@ -1316,9 +1389,35 @@ class DrivingCoach extends GridRaceAssistant {
 		else
 			this.trackCoachingStartRecognized([], confirm)
 
-		this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, RaceMotivation: false})
+		this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false
+									  , LineCoaching: false, RaceMotivation: false})
 
 		setMultiMapValue(state, "Coaching", "Track", "Starting")
+		setMultiMapValue(state, "Coaching", "Line", false)
+		setMultiMapValue(state, "Coaching", "Brake", false)
+		setMultiMapValue(state, "Coaching", "Motivation", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+	}
+
+	startLineCoaching(confirm := true) {
+		local state
+
+		if !this.CoachingActive {
+			this.telemetryCoachingStartRecognized([], confirm, "Line")
+
+			this.lineCoachingStartRecognized([], false)
+		}
+		else
+			this.lineCoachingStartRecognized([], confirm)
+
+		this.updateConfigurationValues({LineCoaching: true, BrakeCoaching: false
+									  , TrackCoaching: false, RaceMotivation: false})
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		setMultiMapValue(state, "Coaching", "Line", "Starting")
+		setMultiMapValue(state, "Coaching", "Track", false)
 		setMultiMapValue(state, "Coaching", "Brake", false)
 		setMultiMapValue(state, "Coaching", "Motivation", false)
 
@@ -1336,11 +1435,13 @@ class DrivingCoach extends GridRaceAssistant {
 		else
 			this.brakeCoachingStartRecognized([], confirm)
 
-		this.updateConfigurationValues({BrakeCoaching: true, TrackCoaching: false, RaceMotivation: false})
+		this.updateConfigurationValues({BrakeCoaching: true, TrackCoaching: false
+									  , LineCoaching: false, RaceMotivation: false})
 
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Brake", "Starting")
+		setMultiMapValue(state, "Coaching", "Line", false)
 		setMultiMapValue(state, "Coaching", "Track", false)
 		setMultiMapValue(state, "Coaching", "Motivation", false)
 
@@ -1358,12 +1459,14 @@ class DrivingCoach extends GridRaceAssistant {
 		else
 			this.raceMotivationStartRecognized([], confirm)
 
-		this.updateConfigurationValues({RaceMotivation: true, TrackCoaching: false, BrakeCoaching: false})
+		this.updateConfigurationValues({RaceMotivation: true, TrackCoaching: false
+									  , BrakeCoaching: false, LineCoaching: false})
 
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Motivation", "Starting")
 		setMultiMapValue(state, "Coaching", "Track", false)
+		setMultiMapValue(state, "Coaching", "Line", false)
 		setMultiMapValue(state, "Coaching", "Brake", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
@@ -1383,6 +1486,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 			if this.OnTrackCoaching
 				setMultiMapValue(state, "Coaching", "Track", "Starting")
+			else if this.LineCoaching
+				setMultiMapValue(state, "Coaching", "Line", "Starting")
 			else if this.BrakeCoaching
 				setMultiMapValue(state, "Coaching", "Brake", "Starting")
 			else if this.RaceMotivation
@@ -1402,6 +1507,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local state := newMultiMap()
 
 		this.shutdownTrackTrigger()
+		this.shutdownLineTrigger()
 		this.shutdownBrakeTrigger()
 
 		if this.TelemetryCollector
@@ -1420,13 +1526,15 @@ class DrivingCoach extends GridRaceAssistant {
 		if deactivate {
 			this.iCoachingActive := false
 
-			this.updateConfigurationValues({OnTrackCoaching: false, BrakeCoaching: false, RaceMotivation: false})
+			this.updateConfigurationValues({OnTrackCoaching: false, BrakeCoaching: false
+										  , LineCoaching: false, RaceMotivation: false})
 		}
 	}
 
 	startupTrackCoaching() {
 		local state, started
 
+		this.shutdownLineTrigger()
 		this.shutdownBrakeTrigger()
 
 		started := this.startupTrackTrigger()
@@ -1434,6 +1542,7 @@ class DrivingCoach extends GridRaceAssistant {
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Track", started)
+		setMultiMapValue(state, "Coaching", "Line", false)
 		setMultiMapValue(state, "Coaching", "Brake", false)
 		setMultiMapValue(state, "Coaching", "Motivation", false)
 
@@ -1442,7 +1551,8 @@ class DrivingCoach extends GridRaceAssistant {
 		this.iTelemetryFuture := false
 
 		if started
-			this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false, RaceMotivation: false})
+			this.updateConfigurationValues({OnTrackCoaching: true, BrakeCoaching: false
+										  , LineCoaching: false, RaceMotivation: false})
 
 		if isDebug()
 			if started
@@ -1472,10 +1582,60 @@ class DrivingCoach extends GridRaceAssistant {
 		this.updateConfigurationValues({OnTrackCoaching: false})
 	}
 
+	startupLineCoaching() {
+		local state, started
+
+		this.shutdownTrackTrigger()
+		this.shutdownBrakeTrigger()
+
+		started := this.startupLineTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		setMultiMapValue(state, "Coaching", "Line", started)
+		setMultiMapValue(state, "Coaching", "Track", false)
+		setMultiMapValue(state, "Coaching", "Brake", false)
+		setMultiMapValue(state, "Coaching", "Motivation", false)
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		if started
+			this.updateConfigurationValues({LineCoaching: true, OnTrackCoaching: false
+										  , BrakeCoaching: false, RaceMotivation: false})
+
+		if isDebug()
+			if started
+				logMessage(kLogDebug, "Line coaching started...")
+			else
+				logMessage(kLogDebug, "Line coaching NOT started...")
+
+		return started
+	}
+
+	shutdownLineCoaching() {
+		local state
+
+		if isDebug()
+			logMessage(kLogDebug, "Line coaching stopped...")
+
+		this.shutdownLineTrigger()
+
+		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+
+		setMultiMapValue(state, "Coaching", "Line", false)
+
+		removeMultiMapValues(state, "Instructions")
+
+		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
+
+		this.updateConfigurationValues({LineCoaching: false})
+	}
+
 	startupBrakeCoaching() {
 		local state, started
 
 		this.shutdownTrackTrigger()
+		this.shutdownLineTrigger()
 
 		started := this.startupBrakeTrigger()
 
@@ -1483,12 +1643,14 @@ class DrivingCoach extends GridRaceAssistant {
 
 		setMultiMapValue(state, "Coaching", "Brake", started)
 		setMultiMapValue(state, "Coaching", "Track", false)
+		setMultiMapValue(state, "Coaching", "Line", false)
 		setMultiMapValue(state, "Coaching", "Motivation", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
 		if started
-			this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false, RaceMotivation: false})
+			this.updateConfigurationValues({BrakeCoaching: true, OnTrackCoaching: false
+										  , LineCoaching: false, RaceMotivation: false})
 
 		if isDebug()
 			if started
@@ -1523,11 +1685,13 @@ class DrivingCoach extends GridRaceAssistant {
 
 		this.shutdownTrackTrigger()
 		this.shutdownBrakeTrigger()
+		this.shutdownLineTrigger()
 
 		state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
 
 		setMultiMapValue(state, "Coaching", "Motivation", true)
 		setMultiMapValue(state, "Coaching", "Track", false)
+		setMultiMapValue(state, "Coaching", "Line", false)
 		setMultiMapValue(state, "Coaching", "Brake", false)
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
@@ -1563,8 +1727,9 @@ class DrivingCoach extends GridRaceAssistant {
 
 		if (!this.Started && this.TelemetryAnalyzer.TrackMap) {
 			if (this.Speaker[false] && !this.RaceMotivation)
-				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching) ? "CoachingStart"
-																						   : "CoachingReady"
+				this.getSpeaker().speakPhrase((this.OnTrackCoaching || this.BrakeCoaching
+																	|| this.LineCoaching) ? "CoachingStart"
+																						  : "CoachingReady"
 											, false, true, false, {Noise: false, Important: true})
 
 			this.iStarted := true
@@ -1675,6 +1840,8 @@ class DrivingCoach extends GridRaceAssistant {
 		if this.Started {
 			if this.BrakeCoaching
 				this.startupBrakeCoaching()
+			else if this.LineCoaching
+				this.startupLineCoaching()
 			else if this.OnTrackCoaching
 				this.startupTrackCoaching()
 			else if this.RaceMotivation
@@ -1688,6 +1855,16 @@ class DrivingCoach extends GridRaceAssistant {
 
 				if reference
 					this.updateBrakeTrigger(reference)
+			}
+
+			if this.iLineTriggerPID {
+				telemetry := this.getTelemetry(&reference := true)
+
+				if !reference
+					reference := telemetry
+
+				if reference
+					this.updateLineTrigger(reference)
 			}
 		}
 	}
@@ -2254,6 +2431,54 @@ class DrivingCoach extends GridRaceAssistant {
 		return false
 	}
 
+	startupLineTrigger() {
+		return true
+	}
+
+	updateLineTrigger(telemetry, lap?) {
+	}
+
+	shutdownLineTrigger(force := false, arguments*) {
+		local pid := this.iLineTriggerPID
+		local tries
+
+		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
+			return false
+
+		if pid {
+			ProcessClose(pid)
+
+			if (force && ProcessExist(pid)) {
+				Sleep(500)
+
+				tries := 5
+
+				while (tries-- > 0) {
+					pid := ProcessExist(pid)
+
+					if pid {
+						ProcessClose(pid)
+
+						Sleep(500)
+					}
+					else
+						break
+				}
+			}
+
+			loop 5 {
+				if deleteFile(this.iLineTriggerFile)
+					break
+
+				Sleep(100)
+			}
+
+			this.iLineTriggerPID := false
+		}
+
+		return false
+	}
+
 	startupBrakeTrigger() {
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
@@ -2639,6 +2864,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local prepared := this.Prepared
 		local announcements := false
 		local onTrackCoaching := false
+		local lineCoaching := false
 		local brakeCoaching := false
 		local raceMotivation := false
 		local facts
@@ -2666,6 +2892,7 @@ class DrivingCoach extends GridRaceAssistant {
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Practice.Handling", true)}
 
 				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Practice.OnTrackCoaching", false)
+				lineCoaching := getMultiMapValue(settings, "Assistant.Coach", "Practice.LineCoaching", false)
 				brakeCoaching := getMultiMapValue(settings, "Assistant.Coach", "Practice.BrakeCoaching", false)
 				raceMotivation := getMultiMapValue(settings, "Assistant.Coach", "Practice.RaceMotivation", false)
 			}
@@ -2675,6 +2902,7 @@ class DrivingCoach extends GridRaceAssistant {
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Qualification.Handling", false)}
 
 				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Qualification.OnTrackCoaching", false)
+				lineCoaching := getMultiMapValue(settings, "Assistant.Coach", "Qualification.LineCoaching", false)
 				brakeCoaching := getMultiMapValue(settings, "Assistant.Coach", "Qualification.BrakeCoaching", false)
 				raceMotivation := getMultiMapValue(settings, "Assistant.Coach", "Qualification.RaceMotivation", false)
 			}
@@ -2684,6 +2912,7 @@ class DrivingCoach extends GridRaceAssistant {
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Race.Handling", false)}
 
 				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Race.OnTrackCoaching", false)
+				lineCoaching := getMultiMapValue(settings, "Assistant.Coach", "Race.LineCoaching", false)
 				brakeCoaching := getMultiMapValue(settings, "Assistant.Coach", "Race.BrakeCoaching", false)
 				raceMotivation := getMultiMapValue(settings, "Assistant.Coach", "Race.RaceMotivation", false)
 			}
@@ -2693,16 +2922,21 @@ class DrivingCoach extends GridRaceAssistant {
 								, HandlingInformation: getMultiMapValue(settings, "Assistant.Coach", "Data.Time Trial.Handling", false)}
 
 				onTrackCoaching := getMultiMapValue(settings, "Assistant.Coach", "Time Trial.OnTrackCoaching", false)
+				lineCoaching := getMultiMapValue(settings, "Assistant.Coach", "Time Trial.LineCoaching", false)
 				brakeCoaching := getMultiMapValue(settings, "Assistant.Coach", "Time Trial.BrakeCoaching", false)
 				raceMotivation := getMultiMapValue(settings, "Assistant.Coach", "Time Trial.RaceMotivation", false)
 			}
 
 			if announcements
 				this.updateConfigurationValues({Announcements: announcements, OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching
+																			, LineCoaching: lineCoaching || this.LineCoaching
 																			, BrakeCoaching: brakeCoaching || this.BrakeCoaching
 																			, RaceMotivation: raceMotivation || this.RaceMotivation})
 			else
-				this.updateConfigurationValues({OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching, BrakeCoaching: brakeCoaching || this.BrakeCoaching, RaceMotivation: raceMotivation || this.RaceMotivation})
+				this.updateConfigurationValues({OnTrackCoaching: onTrackCoaching || this.OnTrackCoaching
+											  , LineCoaching: lineCoaching || this.LineCoaching
+											  , BrakeCoaching: brakeCoaching || this.BrakeCoaching
+											  , RaceMotivation: raceMotivation || this.RaceMotivation})
 		}
 
 		if this.CoachingActive
@@ -2713,6 +2947,8 @@ class DrivingCoach extends GridRaceAssistant {
 			this.startTelemetryCoaching(true, "Track", false)
 		else if this.BrakeCoaching
 			this.startTelemetryCoaching(true, "Brake", false)
+		else if this.LineCoaching
+			this.startTelemetryCoaching(true, "Line", false)
 
 		return facts
 	}

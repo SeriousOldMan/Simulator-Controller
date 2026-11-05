@@ -83,8 +83,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	iTrackTriggerPID := false
 
-	iLineTriggerPID := false
-	iLineTriggerFile := false
+	iIdealLinePID := false
+	iIdealLine := false
 
 	iBrakeTriggerPID := false
 	iBrakeTriggerFile := false
@@ -95,8 +95,8 @@ class DrivingCoach extends GridRaceAssistant {
 	iCountdownTwo := false
 	iBrakeHints := CaseInsenseMap()
 
-	iLeftCommand := false
-	iRightCommand := false
+	iLeftCommands := false
+	iRightCommands := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -403,8 +403,9 @@ class DrivingCoach extends GridRaceAssistant {
 				this.iReleaseCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Release", false, false, true, {File: true, Rephrase: false})
 				this.iCountdownOne := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownOne", false, false, true, {File: true, Rephrase: false})
 				this.iCountdownTwo := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownTwo", false, false, true, {File: true, Rephrase: false})
-				this.iLeftCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreLeft", false, false, true, {File: true, Rephrase: false})
-				this.iRightCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreRight", false, false, true, {File: true, Rephrase: false})
+
+				this.iLeftCommands := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreLeft", false, false, true, {File: true, All: true, Rephrase: false})
+				this.iRightCommands := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreRight", false, false, true, {File: true, All: true, Rephrase: false})
 			}
 		}, 10000, kLowPriority)
 	}
@@ -1857,14 +1858,14 @@ class DrivingCoach extends GridRaceAssistant {
 					this.updateBrakeTrigger(reference)
 			}
 
-			if this.iLineTriggerPID {
+			if this.iIdealLinePID {
 				telemetry := this.getTelemetry(&reference := true)
 
 				if !reference
 					reference := telemetry
 
 				if reference
-					this.updateLineTrigger(reference)
+					this.updateRaceLine(reference)
 			}
 		}
 	}
@@ -2432,14 +2433,116 @@ class DrivingCoach extends GridRaceAssistant {
 	}
 
 	startupLineTrigger() {
-		return true
+		local simulator := this.Simulator
+		local player := requireSoundPlayer("DCTriggerPlayer.exe")
+		local options := ""
+		local sessionDB, code, data, options, telemetry, reference, workingDirectory
+		local exePath, protocol, pid, arguments
+
+		if (!this.iIdealLinePID && simulator) {
+			this.iIdealLineFile := temporaryFileName("Ideal", "line")
+
+			sessionDB := SessionDatabase()
+
+			code := sessionDB.getSimulatorCode(simulator)
+			data := sessionDB.getTrackData(simulator, this.Track)
+
+			protocol := "SHM"
+			exePath := "..."
+			pid := false
+
+			try {
+				protocol := SimulatorProvider.getProtocol(code, "Coach")
+
+				if protocol {
+					if protocol.HasProp("Arguments")
+						arguments := values2String(A_Space, collect(protocol.Arguments, (a) => ("`"" . a . "`""))*)
+					else
+						arguments := ""
+
+					exePath := protocol.File
+					protocol := protocol.Protocol
+
+					if !FileExist(exePath)
+						throw "File not found..."
+
+					if this.AudioSettings {
+						if kSox
+							SplitPath(kSox, , &workingDirectory)
+						else
+							workingDirectory := A_WorkingDir
+
+						options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+					}
+
+					if data
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . values2String(";", this.iLeftCommands*) . "`" `"" . values2String(";", this.iRightCommands*) . "`"" . options, kBinariesDirectory, "Hide", &pid)
+					else
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . values2String(";", this.iLeftCommands*) . "`" `"" . values2String(";", this.iRightCommands*) . "`"" . options, kBinariesDirectory, "Hide", &pid)
+				}
+			}
+			catch Any as exception {
+				logError(exception, true)
+
+				logMessage(kLogCritical, substituteVariables(translate("Cannot start %simulator% %protocol% Coach (")
+														   , {simulator: code, protocol: protocol})
+									   . exePath . translate(") - please rebuild the applications in the binaries folder (")
+									   . kBinariesDirectory . translate(")"))
+
+				if !kSilentMode
+					showMessage(substituteVariables(translate("Cannot start %simulator% %protocol% Coach (%exePath%) - please check the configuration...")
+												  , {exePath: exePath, simulator: code, protocol: protocol})
+							  , translate("Modular Simulator Controller System"), "Alert.png", 5000, "Center", "Bottom", 800)
+			}
+
+			if pid {
+				this.iIdealLinePID := pid
+
+				telemetry := this.getTelemetry(&reference := true)
+
+				if !reference
+					reference := telemetry
+
+				if reference
+					this.updateIdealLine(reference)
+			}
+		}
+
+		return (this.iIdealLinePID != false)
 	}
 
-	updateLineTrigger(telemetry, lap?) {
+	updateRaceLine(telemetry, lap?) {
+		local lineFile := temporaryFileName("Ideal", "line.tmp")
+		local tries := 3
+		local line := telemetry.Data.Length
+
+		loop telemetry.Data.Length
+			line .= ("`n" . telemetry.getValue(A_Index, "Distance", 0) . ";"
+						  . telemetry.getValue(A_Index, "PosX", 0) . ";"
+						  . telemetry.getValue(A_Index, "PosY", 0))
+
+		try {
+			deleteFile(lineFile)
+
+			FileAppend(line, lineFile)
+
+			while (tries-- > 0)
+				try {
+					FileMove(lineFile, this.iIdealLineFile, 1)
+
+					break
+				}
+				catch Any {
+					Sleep(100)
+				}
+		}
+		catch Any as exception {
+			logError(exception, true)
+		}
 	}
 
 	shutdownLineTrigger(force := false, arguments*) {
-		local pid := this.iLineTriggerPID
+		local pid := this.iIdealLinePID
 		local tries
 
 		if ((arguments.Length > 0) && inList(["Logoff", "Shutdown"], arguments[1]))
@@ -2467,13 +2570,13 @@ class DrivingCoach extends GridRaceAssistant {
 			}
 
 			loop 5 {
-				if deleteFile(this.iLineTriggerFile)
+				if deleteFile(this.iIdealLineFile)
 					break
 
 				Sleep(100)
 			}
 
-			this.iLineTriggerPID := false
+			this.iIdealLinePID := false
 		}
 
 		return false

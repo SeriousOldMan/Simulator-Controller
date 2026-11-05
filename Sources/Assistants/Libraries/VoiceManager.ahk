@@ -203,10 +203,24 @@ class VoiceManager extends ConfigurationItem {
 			}
 		}
 
-		getAllPhrases(phrase) {
+		getAllPhrases(phrase, variables := false, &cache := false) {
 			local phrases := this.Phrases
+			local result := []
+			local caches := []
+			local index, phrase
 
-			return (phrases.Has(phrase) ? phrases[phrase] : [])
+			if phrases.Has(phrase)
+				for index, phrase in phrases[phrase] {
+					result.Push(substituteVariables(phrase, this.VoiceManager.getPhraseVariables(variables))
+
+					if cache
+						caches.Push(cache . "." . A_Index)
+				}
+
+			if cache
+				cache := caches
+
+			return result
 		}
 
 		getPhrase(phrase, variables := false, &cache := false, &index?) {
@@ -423,10 +437,23 @@ class VoiceManager extends ConfigurationItem {
 			return false
 		}
 
-		getAllPhrases(phrase) {
+		getAllPhrases(phrase, variables := false, &cache := false) {
 			local phrases := this.Phrases
+			local result := []
+			local caches := []
+			local index, phrase
 
-			return (phrases.Has(phrase) ? phrases[phrase] : [])
+			if phrases.Has(phrase)
+				for index, phrase in phrases[phrase] {
+					result.Push(substituteVariables(phrase, this.VoiceManager.getPhraseVariables(variables))
+
+					if cache
+						caches.Push(cache . "." . A_Index)
+				}
+
+			cache := caches
+
+			return result
 		}
 
 		getPhrase(phrase, variables := false, &cache := false, &index?) {
@@ -452,10 +479,24 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
-			phrase := this.getPhrase(phrase, variables, &cache)
+			local files
 
-			if phrase
-				return this.speak(phrase, focus, cache, options)
+			if (options && options.HasProp("File") && options.File
+						&& options.HasProp("All") && options.All) {
+				files := []
+				options := options.Clone()
+
+				for index, phrase in this.getAllPhrases(phrase, variables, &cache)
+					files.Push(this.speak(phrase, focus, cache ? cache[index] : false, options))
+
+				return files
+			}
+			else {
+				phrase := this.getPhrase(phrase, variables, &cache)
+
+				if phrase
+					return this.speak(phrase, focus, cache, options)
+			}
 		}
 
 		number2Speech(number, precision := kUndefined) {

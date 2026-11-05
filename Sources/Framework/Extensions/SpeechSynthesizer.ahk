@@ -796,7 +796,7 @@ class SpeechSynthesizer {
 	speak(text, wait := true, cache := false, options := false) {
 		global kSox
 
-		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume, translator
+		local cacheFileName, tempName, temp1Name, temp2Name, callback, volume, translator, noSpeak
 		local overdriveGain, overdriveColor, filterHighpass, filterLowpass, noiseVolume, clickVolume
 
 		static sOverdriveGain, sOverdriveColor, sFilterHighpass, sFilterLowpass, sNoiseVolume, sClickVolume
@@ -812,6 +812,8 @@ class SpeechSynthesizer {
 		if (options && !isInstance(options, Map))
 			options := toMap(options)
 
+		noSpeak := (options && options.Has("File") && options["File"])
+
 		if (Trim(Text) = "")
 			return
 
@@ -825,7 +827,7 @@ class SpeechSynthesizer {
 				cacheFileName := this.cacheFileName(cache)
 
 			if FileExist(cacheFileName) {
-				if (options && options.Has("File") && options["File"])
+				if noSpeak
 					return cacheFileName
 
 				this.wait()
@@ -932,7 +934,7 @@ class SpeechSynthesizer {
 						this.iSpeechSynthesizer.Speak(text, (wait ? 0x0 : 0x1))
 				}
 
-				if (cache && options && options.Has("File") && options["File"])
+				if (cache && noSpeak)
 					return temp2Name
 
 				this.wait()

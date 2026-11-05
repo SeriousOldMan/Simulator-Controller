@@ -37,6 +37,10 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class DrivingCoach extends GridRaceAssistant {
+	static sKeepLeftDirectory := (kTempDirectory . "Driving Coach\Line\Left\")
+	static sKeepRightDirectory := (kTempDirectory . "Driving Coach\Line\Right\")
+	static sIdealDirectory := (kTempDirectory . "Driving Coach\Line\Ideal\")
+
 	iConnector := false
 	iConnectionState := "Active"
 
@@ -94,9 +98,6 @@ class DrivingCoach extends GridRaceAssistant {
 	iCountdownOne := false
 	iCountdownTwo := false
 	iBrakeHints := CaseInsenseMap()
-
-	iLeftCommands := false
-	iRightCommands := false
 
 	class CoachVoiceManager extends RaceAssistant.RaceVoiceManager {
 	}
@@ -398,14 +399,27 @@ class DrivingCoach extends GridRaceAssistant {
 			local speaker := this.VoiceManager.getLocalSpeaker()
 			local ignore, phrase, count
 
-			if speaker {
-				this.iBrakeCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Brake", false, false, true, {File: true, Rephrase: false})
-				this.iReleaseCommand := this.VoiceManager.getLocalSpeaker().speakPhrase("Release", false, false, true, {File: true, Rephrase: false})
-				this.iCountdownOne := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownOne", false, false, true, {File: true, Rephrase: false})
-				this.iCountdownTwo := this.VoiceManager.getLocalSpeaker().speakPhrase("CountdownTwo", false, false, true, {File: true, Rephrase: false})
+			saveWAVFiles(position, files) {
+				DirCreate(kTempDirectory . "Driving Coach\Line\" . position)
 
-				this.iLeftCommands := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreLeft", false, false, true, {File: true, All: true, Rephrase: false})
-				this.iRightCommands := this.VoiceManager.getLocalSpeaker().speakPhrase("MoreRight", false, false, true, {File: true, All: true, Rephrase: false})
+				do(files, (file) {
+					local fileName
+
+					SplitPath(file, &fileName)
+
+					FileMove(file, kTempDirectory . "Driving Coach\Line\" . position . "\" . fileName, 1)
+				})
+			}
+
+			if speaker {
+				this.iBrakeCommand := speaker.speakPhrase("Brake", false, false, true, {File: true, Rephrase: false})
+				this.iReleaseCommand := speaker.speakPhrase("Release", false, false, true, {File: true, Rephrase: false})
+				this.iCountdownOne := speaker.speakPhrase("CountdownOne", false, false, true, {File: true, Rephrase: false})
+				this.iCountdownTwo := speaker.speakPhrase("CountdownTwo", false, false, true, {File: true, Rephrase: false})
+
+				saveWAVFiles("Left", speaker.speakPhrase("HoldLeft", false, false, true, {File: true, All: true, Rephrase: false}))
+				saveWAVFiles("Right", speaker.speakPhrase("HoldRight", false, false, true, {File: true, All: true, Rephrase: false}))
+				saveWAVFiles("Ideal", speaker.speakPhrase("Ideal", false, false, true, {File: true, All: true, Rephrase: false}))
 			}
 		}, 10000, kLowPriority)
 	}
@@ -2476,9 +2490,9 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 
 					if data
-						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . values2String(";", this.iLeftCommands*) . "`" `"" . values2String(";", this.iRightCommands*) . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . DrivingCoach.sKeepLeftDirectory . "`" `"" . DrivingCoach.sIdealDirectory . "`" `"" . DrivingCoach.sKeepRightDirectory . "`"" . options, kBinariesDirectory, "Hide", &pid)
 					else
-						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . values2String(";", this.iLeftCommands*) . "`" `"" . values2String(";", this.iRightCommands*) . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . DrivingCoach.sKeepLeftDirectory . "`" `"" . DrivingCoach.sIdealDirectory . "`" `"" . DrivingCoach.sKeepRightDirectory . "`"" . options, kBinariesDirectory, "Hide", &pid)
 				}
 			}
 			catch Any as exception {

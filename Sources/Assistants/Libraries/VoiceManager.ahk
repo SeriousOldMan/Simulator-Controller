@@ -207,14 +207,14 @@ class VoiceManager extends ConfigurationItem {
 			local phrases := this.Phrases
 			local result := []
 			local caches := []
-			local index, phrase
+			local index, variant
 
 			if phrases.Has(phrase)
-				for index, phrase in phrases[phrase] {
-					result.Push(substituteVariables(phrase, this.VoiceManager.getPhraseVariables(variables))
+				for index, variant in phrases[phrase] {
+					result.Push(substituteVariables(variant, this.VoiceManager.getPhraseVariables(variables)))
 
 					if cache
-						caches.Push(cache . "." . A_Index)
+						caches.Push(((cache == true) ? phrase : cache) . "." . A_Index)
 				}
 
 			if cache
@@ -441,14 +441,14 @@ class VoiceManager extends ConfigurationItem {
 			local phrases := this.Phrases
 			local result := []
 			local caches := []
-			local index, phrase
+			local index, variant
 
 			if phrases.Has(phrase)
-				for index, phrase in phrases[phrase] {
-					result.Push(substituteVariables(phrase, this.VoiceManager.getPhraseVariables(variables))
+				for index, variant in phrases[phrase] {
+					result.Push(substituteVariables(variant, this.VoiceManager.getPhraseVariables(variables)))
 
 					if cache
-						caches.Push(cache . "." . A_Index)
+						caches.Push(((cache == true) ? phrase : cache) . "." . A_Index)
 				}
 
 			cache := caches
@@ -479,15 +479,15 @@ class VoiceManager extends ConfigurationItem {
 		}
 
 		speakPhrase(phrase, variables := false, focus := false, cache := false, options := false) {
-			local files
+			local files, filesCache
 
 			if (options && options.HasProp("File") && options.File
 						&& options.HasProp("All") && options.All) {
 				files := []
 				options := options.Clone()
 
-				for index, phrase in this.getAllPhrases(phrase, variables, &cache)
-					files.Push(this.speak(phrase, focus, cache ? cache[index] : false, options))
+				for index, phrase in this.getAllPhrases(phrase, variables, &filesCache := cache)
+					files.Push(this.speak(phrase, focus, cache ? filesCache[index] : false, options))
 
 				return files
 			}

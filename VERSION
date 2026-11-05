@@ -1,17 +1,17 @@
 [Current]
-Type=Development
+Type=Release
 [Development]
-Version=7.3.3.0-dev
+Version=7.3.3.0-release
 Target=7.3.3.0-release
-Date=11/04/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/E1ExrNTW?inline=true
+Date=11/06/26
+Download=https://cutt.ly/jyInhJK8;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/JjFD31yd?inline=true;https://www.dropbox.com/scl/fi/8egjn2r8q302zac01sm3i/Simulator-Controller-7.3.3.0-update.zip?rlkey=th4ac157zz81241k3mjq6xzp4&st=9brcb0b4&dl=1;http://%master%/Releases/Simulator Controller 7.3.3.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.3.0-update.zip
 Changes=More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management, Fixed Assistants grammars
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
-Version=7.3.2.0-release
-Date=10/30/26
-Download=https://cutt.ly/7yYCPmBg;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/BqYFWuGh?inline=true;https://www.dropbox.com/scl/fi/7p7c52kpuzk3358mwy7br/Simulator-Controller-7.3.2.0-update.zip?rlkey=phmf33xp0u6uqr2zdgjyygd2s&st=n2ck3xzt&dl=1;http://%master%/Releases/Simulator Controller 7.3.2.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.2.0-update.zip
-Changes=Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts
+Version=7.3.3.0-release
+Date=11/06/26
+Download=https://cutt.ly/jyInhJK8;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/JjFD31yd?inline=true;https://www.dropbox.com/scl/fi/8egjn2r8q302zac01sm3i/Simulator-Controller-7.3.3.0-update.zip?rlkey=th4ac157zz81241k3mjq6xzp4&st=9brcb0b4&dl=1;http://%master%/Releases/Simulator Controller 7.3.3.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.3.0-update.zip
+Changes=More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management, Fixed Assistants grammars
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Components]
 Media.6.9.0.Path=Resources

@@ -1,12 +1,12 @@
 [Current]
 Type=Development
 [Development]
-Version=7.3.3.0-dev
-Target=7.3.3.0-release
-Date=11/04/26
-Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/E1ExrNTW?inline=true
-Changes=More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management, Fixed Assistants grammars
-Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
+Version=7.4.0.0-dev
+Target=7.4.0.0-release
+Date=11/05/26
+Download=
+Changes=New line coaching mode
+Components=Media->6.9.0,Configuration->7.4.0,Utilities->7.3.1
 [Release]
 Version=7.3.2.0-release
 Date=10/30/26
@@ -20,6 +20,9 @@ Media.6.9.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl
 Configuration.7.3.1.Path=Resources
 Configuration.7.3.1.Content=Setup
 Configuration.7.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/FjGl_JA9?inline=true;https://www.dropbox.com/scl/fi/vga5tlfal32d0w62hjajg/Configuration-7.3.1.zip?rlkey=klld6dlmayp50r7yfqjedzhsp&st=bnru3dph&dl=1;http://%master%/Components/Configuration 7.3.1.zip
+Configuration.7.4.0.Path=Resources
+Configuration.7.4.0.Content=Setup
+Configuration.7.4.0.Download=
 Utilities.7.3.1.Path=.
 Utilities.7.3.1.Content=Utilities
 Utilities.7.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/mm4glraE?inline=true;https://www.dropbox.com/scl/fi/58jk03kxbk17n135gciij/Utilities-7.3.1.zip?rlkey=apzj9klofhmgjz7z5xxt8rnxs&st=xl5a7ir9&dl=1;http://%master%/Components/Utilities 7.3.1.zip

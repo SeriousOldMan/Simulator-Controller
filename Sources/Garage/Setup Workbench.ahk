@@ -5654,7 +5654,7 @@ class LogbookBrowser {
 					case "Analysis":
 						type := "Engineer: Analysis"
 					case "Recommendations":
-						type := "Engineer: Recommendations"
+						type := "Engineer: Apply"
 					case "Deltas":
 						type := "Recommendations"
 				}

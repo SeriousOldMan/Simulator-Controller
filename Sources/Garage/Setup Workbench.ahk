@@ -2895,7 +2895,9 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 
 			if draw {
-				if knowledgeBase {
+				if (noIssue || !knowledgeBase)
+					this.showSettingsChart(false)
+				else {
 					settings := []
 
 					for ignore, setting in this.Settings {
@@ -2904,12 +2906,9 @@ class SetupWorkbench extends ConfigurationItem {
 						if (isNumber(delta) && (delta != 0))
 							settings.Push(Array(this.getLabel(setting), Round(delta, 2)))
 					}
-				}
 
-				if noIssue
-					this.showSettingsChart(false)
-				else
 					this.showSettingsDeltas(settings)
+				}
 			}
 
 			if update

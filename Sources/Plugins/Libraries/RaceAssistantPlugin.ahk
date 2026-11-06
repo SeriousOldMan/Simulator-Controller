@@ -996,6 +996,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			deleteDirectory(kTempDirectory . "Race Assistant")
 
+			DirCreate(kTempDirectory . "Race Assistant")
+
 			if register
 				controller.registerPlugin(name, this)
 
@@ -2730,10 +2732,15 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local lastLap := this.LastLap
 		local skippedLap := false
 		local inPit := false
+		local debug := isDebug()
 		local telemetryData, standingsData, data, dataLastLap
 		local testData, message, key, value, session, teamServer
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
 		local simulator, car, track, weather, driverActive
+
+		static logSimulator := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																	   , kUserConfigDirectory, kConfigDirectory))
+											  , "Debug", "LogSimulator", false)
 
 		static replayLap := false
 		static replayIndex := false
@@ -2768,7 +2775,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				this.initializeAssistantsState()
 		}
 
-		if isDebug() {
+		if debug {
 			logMessage(kLogInfo, "Collect session data (Initialize):" . (A_TickCount - splitTime) . " ms...")
 
 			splitTime := A_TickCount
@@ -2777,7 +2784,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (this.Simulator && (this.LastLap = 0)) {
 			this.prepareAssistantsSimulation()
 
-			if isDebug() {
+			if debug {
 				logMessage(kLogInfo, "Collect session data (Preparing):" . (A_TickCount - splitTime) . " ms...")
 
 				splitTime := A_TickCount
@@ -2804,7 +2811,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					replayIndex := 1
 
 					if !FileExist(this.ReplayDirectory . "Race Engineer Lap " . replayLap . "." . replayIndex . ".data")
-						if isDebug() {
+						if debug {
 							loop
 								Sleep(1000)
 						}
@@ -2824,23 +2831,16 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				return
 			}
 
-			if isDebug() {
-				deleteFile(kTempDirectory . "Race Assistant.data")
-
-				FileAppend(printMultiMap(data), kTempDirectory . "Race Assistant.data")
-			}
-
 			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
-			if isDebug() {
-				DirCreate(kTempDirectory . "Race Assistant")
-
+			if (debug || logSimulator) {
 				if (dataLastLap != collectorLastLap)
 					collectorLapRunning := 0
 
 				collectorLastLap := dataLastLap
 
-				writeMultiMap(kTempDirectory . "Race Assistant\Lap " . dataLastLap . "." . ++collectorLapRunning . ".data", data)
+				try
+					writeMultiMap(kTempDirectory . "Race Assistant\Lap " . dataLastLap . "." . ++collectorLapRunning . ".data", data)
 
 				logMessage(kLogInfo, "Collect session data (Data Acquisition):" . (A_TickCount - splitTime) . " ms...")
 
@@ -2850,7 +2850,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if (this.runningSession(data) && (lastLap == 0) && (dataLastLap == 1))
 				prepareSessionDatabase(data)
 
-			if (false && isDebug()) {
+			if (false && debug) {
 				testData := getMultiMapValues(data, "Test Data")
 
 				if (testData.Count > 0) {
@@ -2881,7 +2881,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 					}
 				}
 
-				if isDebug() {
+				if debug {
 					logMessage(kLogInfo, "Collect session data (Preparation):" . (A_TickCount - splitTime) . " ms...")
 
 					splitTime := A_TickCount
@@ -2934,7 +2934,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 				this.sDriverWasActive := driverActive
 
-				if isDebug() {
+				if debug {
 					logMessage(kLogInfo, "Collect session data (Update Session):" . (A_TickCount - splitTime) . " ms...")
 
 					splitTime := A_TickCount
@@ -2967,7 +2967,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 				weather := getMultiMapValue(data, "Weather Data", "Weather", "Dry")
 
-				if isDebug() {
+				if debug {
 					logMessage(kLogInfo, "Collect session data (Finalize):" . (A_TickCount - splitTime) . " ms...")
 
 					splitTime := A_TickCount
@@ -2976,7 +2976,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if this.requireRaceAssistants(simulator, car, track, weather) {
 					; Car is on the track
 
-					if isDebug() {
+					if debug {
 						logMessage(kLogInfo, "Collect session data (Require):" . (A_TickCount - splitTime) . " ms...")
 
 						splitTime := A_TickCount
@@ -3143,7 +3143,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 							this.startAssistantsSession(data, skippedLap)
 						}
 
-						if isDebug() {
+						if debug {
 							logMessage(kLogInfo, "Collect session data (Start & Join):" . (A_TickCount - splitTime) . " ms...")
 
 							splitTime := A_TickCount
@@ -3156,7 +3156,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 						else
 							this.updateAssistantsLap(data, telemetryData, standingsData)
 
-						if isDebug() {
+						if debug {
 							logMessage(kLogInfo, "Collect session data (Process):" . (A_TickCount - splitTime) . " ms...")
 
 							splitTime := A_TickCount
@@ -3176,7 +3176,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		else
 			this.updateAssistantsSession(kSessionFinished)
 
-		if isDebug()
+		if debug
 			logMessage(kLogInfo, "Collect session data (Overall):" . (A_TickCount - startTime) . " ms...")
 	}
 }

@@ -199,6 +199,7 @@ class Logbook {
 		local entries := string2Values("###------###------###", FileRead(fileName))
 		local superfluousEntries := []
 		local lastEntry := false
+		local entry
 
 		entries := collect(entries, (d) {
 					   local entry
@@ -221,7 +222,19 @@ class Logbook {
 			lastEntry := entry
 		})
 
-		return Logbook(fileName, choose(entries, (e) => !inList(superfluousEntries, e)))
+		entries := choose(entries, (e) => !inList(superfluousEntries, e))
+
+		loop {
+			if (A_Index > entries.Length)
+				break
+
+			entry := entries[A_Index]
+
+			if (isInstance(entry, IssuesEntry) && (entry.Recommendations.Length > 0))
+				entries.InsertAt(A_Index + 1, IssuesEntry.DeltasEntry(entry))
+		}
+
+		return Logbook(fileName, entries)
 	}
 
 	superfluous() {
@@ -284,10 +297,83 @@ class SelectionEntry extends Logbook.LogbookEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class IssuesEntry extends Logbook.LogbookEntry {
+	class DeltasEntry extends Logbook.LogbookEntry {
+		iIssues := false
+
+		Issues {
+			Get {
+				return this.iIssues
+			}
+		}
+
+		HTML {
+			Get {
+				local window := LogBookBrowser.Instance.Window
+				local settings := collect(this.Recommendations, (r) => Array(r.Label, r.Delta))
+				local before, after, width, height
+
+				before := "
+				(
+					<html>
+						<meta charset='utf-8'>
+						<head>
+							<style>
+								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							</style>
+							%chartScript%
+							<script type="text/javascript">
+								%chartLoad%
+				)"
+
+				before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+													 , chartLoad: getGoogleChartsLoadStatement("drawChart"
+																							 , "corechart", "table", "bar")
+													 , fontColor: window.Theme.TextColor
+													 , headerBackColor: window.Theme.ListBackColor["Header"]
+													 , evenRowBackColor: window.Theme.ListBackColor["EvenRow"]
+													 , oddRowBackColor: window.Theme.ListBackColor["OddRow"]})
+
+				width := (LogBookBrowser.Instance.EntryViewer.getWidth() - 4)
+				height := (LogBookBrowser.Instance.EntryViewer.getHeight() - 4)
+
+				after := "
+				(
+							</script>
+						</head>
+						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
+							<style> table, p, div { color: #%fontColor% } </style>
+							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
+						</body>
+					</html>
+				)"
+
+				after := substituteVariables(after, {fontColor: window.Theme.TextColor
+												   , width: width, height: height
+												   , backColor: window.AltBackColor})
+
+				return (before . SetupWorkbench.Instance.createSettingsDeltasChart(settings) . after)
+			}
+		}
+
+		__New(issues) {
+			this.iIssues := issues
+
+			super.__New("Type=Deltas")
+		}
+
+		Recommendations {
+			Get {
+				return this.Issues.Recommendations
+			}
+		}
+	}
+
 	HTML {
 		Get {
 			local html := ""
-			local îssues := this.Issues.Clone()
+			local îssues := this.Issues
 			local ignore, issue
 
 			if (îssues.Length > 0) {
@@ -314,15 +400,33 @@ class IssuesEntry extends Logbook.LogbookEntry {
 			local issues := []
 			local ignore, issue
 
-			for ignore, issue in string2Values("`n", this.Payload) {
-				issue := string2Values("=", issue)
+			if (Trim(this.Payload) != "")
+				for ignore, issue in string2Values("`n", string2Values("#####################", this.Payload)[1]) {
+					issue := string2Values("=", issue)
 
-				issues.Push({Characteristic: issue[1]
-						   , Importance: string2Values("/", issue[2])[1]
-						   , Severity: string2Values("/", issue[2])[2]})
-			}
+					issues.Push({Characteristic: issue[1]
+							   , Importance: string2Values("/", issue[2])[1]
+							   , Severity: string2Values("/", issue[2])[2]})
+				}
 
 			return issues
+		}
+	}
+
+	Recommendations {
+		Get {
+			local recommendations := []
+			local ignore, recommendation
+
+			try
+				if (Trim(this.Payload) != "")
+					for ignore, recommendation in string2Values("`n", string2Values("#####################", this.Payload)[2]) {
+						recommendation := string2Values("=", recommendation)
+
+						recommendations.Push({Label: recommendation[1], Delta: recommendation[2]})
+					}
+
+			return recommendations
 		}
 	}
 
@@ -1369,7 +1473,7 @@ class SetupWorkbench extends ConfigurationItem {
 														 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
 														 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]})
 
-					width := this.SettingsViewer.getWidth() - 4
+					width := (this.SettingsViewer.getWidth() - 4)
 					height := (this.SettingsViewer.getHeight() - 110 - 4)
 
 					info := getMultiMapValue(this.Definition, "Workbench.Info", "ChangeWarning", "")
@@ -1402,7 +1506,7 @@ class SetupWorkbench extends ConfigurationItem {
 					this.SettingsViewer.document.write(before . content . after)
 				}
 				else {
-					width := this.SettingsViewer.getWidth() - 4
+					width := (this.SettingsViewer.getWidth() - 4)
 					height := (this.SettingsViewer.getHeight() - 4)
 
 					html := ""
@@ -1450,46 +1554,57 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	showSettingsDeltas(settings) {
+	createSettingsDeltasChart(settings) {
 		local drawChartFunction, names, values, ignore, setting, theMax, index, value
+
+		if (settings && (settings.Length > 0)) {
+			drawChartFunction := "function drawChart() {"
+			drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
+
+			if false {
+				names := []
+				values := []
+			}
+			else {
+				names := [translate("Settings")]
+				values := [0.0]
+			}
+
+			for ignore, setting in settings {
+				names.Push(setting[1])
+				values.Push(setting[2])
+			}
+
+			theMax := Max(Abs(maximum(values)), Abs(minimum(values)))
+
+			if (theMax != 0)
+				for index, value in values
+					values[index] := (value / theMax)
+
+			drawChartFunction .= ("`n['" . values2String("', '", names*) . "'],")
+
+			drawChartFunction .= ("`n[" . values2String(",", values*) . "]")
+
+			drawChartFunction .= "`n]);"
+
+			drawChartFunction .= ("`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none', gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, hAxis: {maxValue: 1, minValue: -1, gridlines: {count: 4, color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };")
+
+			drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+
+			return drawChartFunction
+		}
+		else
+			return false
+	}
+
+	showSettingsDeltas(settings) {
+		local drawChartFunction
 
 		this.showSettingsChart(false)
 
 		if settings {
-			if (settings.Length > 0) {
-				drawChartFunction := "function drawChart() {"
-				drawChartFunction .= "`nvar data = google.visualization.arrayToDataTable(["
-
-				if false {
-					names := []
-					values := []
-				}
-				else {
-					names := [translate("Settings")]
-					values := [0.0]
-				}
-
-				for ignore, setting in settings {
-					names.Push(setting[1])
-					values.Push(setting[2])
-				}
-
-				theMax := Max(Abs(maximum(values)), Abs(minimum(values)))
-
-				if (theMax != 0)
-					for index, value in values
-						values[index] := (value / theMax)
-
-				drawChartFunction .= ("`n['" . values2String("', '", names*) . "'],")
-
-				drawChartFunction .= ("`n[" . values2String(",", values*) . "]")
-
-				drawChartFunction .= "`n]);"
-
-				drawChartFunction .= ("`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none', gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, hAxis: {maxValue: 1, minValue: -1, gridlines: {count: 4, color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };")
-
-				drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
-			}
+			if (settings.Length > 0)
+				drawChartFunction := this.createSettingsDeltasChart(settings)
 			else
 				drawChartFunction := [translate("I can't help you with that."), translate("You are on your own this time.")]
 
@@ -2098,7 +2213,9 @@ class SetupWorkbench extends ConfigurationItem {
 				FileAppend("###------###------###"
 						 . "Type=Issues`n"
 						 . "###++++++###++++++###"
-						 . arguments[1], this.Logbook, "UTF-16")
+						 . arguments[1]
+						 . "#####################"
+						 . arguments[2], this.Logbook, "UTF-16")
 			case "Load":
 				FileAppend("###------###------###"
 						 . "Type=Load`n"
@@ -2853,7 +2970,7 @@ class SetupWorkbench extends ConfigurationItem {
 	updateRecommendations(draw := true, update := true) {
 		local knowledgeBase := this.KnowledgeBase
 		local noIssue, ignore, characteristic, widgets, value1, value2, settings
-		local setting, delta
+		local setting, label, delta, deltas
 		local characteristicLabels, ignore, characteristic, issues
 
 		this.Window.Block()
@@ -2863,6 +2980,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 			if knowledgeBase {
 				issues := []
+				deltas := []
 
 				characteristicLabels := toMap(getMultiMapValues(this.Definition
 															  , "Workbench.Characteristics.Labels")
@@ -2889,28 +3007,31 @@ class SetupWorkbench extends ConfigurationItem {
 
 					if this.Debug[kDebugKnowledgeBase]
 						this.dumpKnowledgeBase(this.KnowledgeBase)
-				}
 
-				this.logLogbook("Issues", values2String("`n", issues*))
-			}
-
-			if draw {
-				if knowledgeBase {
 					settings := []
 
 					for ignore, setting in this.Settings {
 						delta := knowledgeBase.getValue(setting . ".Delta", translate("n/a"))
 
-						if (isNumber(delta) && (delta != 0))
-							settings.Push(Array(this.getLabel(setting), Round(delta, 2)))
+						if (isNumber(delta) && (delta != 0)) {
+							label := this.getLabel(setting)
+							delta := Round(delta, 2)
+
+							settings.Push(Array(label, delta))
+
+							deltas.Push(label . "=" . delta)
+						}
 					}
 				}
 
-				if noIssue
+				this.logLogbook("Issues", values2String("`n", issues*), values2String("`n", deltas*))
+			}
+
+			if draw
+				if (noIssue || !knowledgeBase)
 					this.showSettingsChart(false)
 				else
 					this.showSettingsDeltas(settings)
-			}
 
 			if update
 				this.updateState()
@@ -5429,9 +5550,17 @@ class LogbookBrowser {
 		}
 	}
 
+	EntryViewer {
+		Get {
+			return this.Control["htmlViewer"]
+		}
+	}
+
 	__New(setupWorkbench, logbookDirectory) {
 		this.iWorkbench := setupWorkbench
 		this.iLogbookDirectory := logbookDirectory
+
+		LogBookBrowser.Instance := this
 	}
 
 	createGui() {
@@ -5518,8 +5647,20 @@ class LogbookBrowser {
 		this.EntriesListView.Delete()
 
 		if logbook
-			for ignore, entry in logbook.Entries
-				this.EntriesListView.Add("", translate(entry.Type))
+			for ignore, entry in logbook.Entries {
+				type := entry.Type
+
+				switch type, false {
+					case "Analysis":
+						type := "Engineer: Analysis"
+					case "Recommendations":
+						type := "Engineer: Apply"
+					case "Deltas":
+						type := "Recommendations"
+				}
+
+				this.EntriesListView.Add("", translate(type))
+			}
 
 		this.EntriesListView.ModifyCol()
 
@@ -5661,45 +5802,51 @@ class LogbookBrowser {
 			)"
 		}
 		else {
-			width := viewer.getWidth() - 35
+			if (InStr(Trim(content), "<html>") == 1)
+				document := content
+			else {
+				width := viewer.getWidth() - 35
 
-			document := "
-			(
-			<html>
-				<meta charset='utf-8'>
-				<head>
-					<style>
-						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-						%CSS%
-					</style>
-				</head>
-				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'>
-					<div style="width: %width%px; font-family: Arial; font-size: 12px">
-						<p style="font-family: Arial; font-size: 12px; margin: auto">
-							%html%
-						</p>
-					</div>
-				</body>
-			</html>
-			)"
+				document := "
+				(
+				<html>
+					<meta charset='utf-8'>
+					<head>
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+							%CSS%
+						</style>
+					</head>
+					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'>
+						<div style="width: %width%px; font-family: Arial; font-size: 12px">
+							<p style="font-family: Arial; font-size: 12px; margin: auto">
+								%html%
+							</p>
+						</div>
+					</body>
+				</html>
+				)"
+
+				content := StrReplace(content, "%", "\%")
+
+				for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
+					content := StrReplace(content, tag, "")
+
+				document := substituteVariables(document
+											  , {fontColor: this.Window.Theme.TextColor
+											   , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+											   , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+											   , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+											   , CSS: getCSS()
+											   , width: width, height: height, html: content
+											   , backColor: this.Window.AltBackColor})
+			}
 		}
 
-		content := StrReplace(content, "%", "\%")
-
-		for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
-			content := StrReplace(content, tag, "")
-
 		viewer.document.open()
-		viewer.document.write(substituteVariables(document
-												, {fontColor: this.Window.Theme.TextColor
-												 , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-												 , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-												 , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-												 , CSS: getCSS()
-												 , width: width, height: height, html: content
-												 , backColor: this.Window.AltBackColor}))
+		viewer.document.write(document)
 		viewer.document.close()
 	}
 

@@ -328,6 +328,7 @@ The "Setup Workbench" *records* all your important actions in the form of a logb
 
 - Each selection of simulator, car and/or track
 - Every change to the issues in the *Characteristics* pane of the main window
+- The resulting setup recommendation derived for the current issues
 - Loading a setup
 - Saving a setup incl. information about the changed setup settings
 - Every run of the issue analyzer and the collected issues

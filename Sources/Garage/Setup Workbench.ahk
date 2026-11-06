@@ -230,7 +230,7 @@ class Logbook {
 
 			entry := entries[A_Index]
 
-			if isInstance(entry, IssuesEntry)
+			if (isInstance(entry, IssuesEntry) && (entry.Recommendations.Length > 0))
 				entries.InsertAt(A_Index + 1, IssuesEntry.DeltasEntry(entry))
 		}
 
@@ -418,12 +418,13 @@ class IssuesEntry extends Logbook.LogbookEntry {
 			local recommendations := []
 			local ignore, recommendation
 
-			if (Trim(this.Payload) != "")
-				for ignore, recommendation in string2Values("`n", string2Values("#####################", this.Payload)[2]) {
-					recommendation := string2Values("=", recommendation)
+			try
+				if (Trim(this.Payload) != "")
+					for ignore, recommendation in string2Values("`n", string2Values("#####################", this.Payload)[2]) {
+						recommendation := string2Values("=", recommendation)
 
-					recommendations.Push({Label: recommendation[1], Delta: recommendation[2]})
-				}
+						recommendations.Push({Label: recommendation[1], Delta: recommendation[2]})
+					}
 
 			return recommendations
 		}

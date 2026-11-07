@@ -5,7 +5,7 @@ Version=7.3.4.0-dev
 Target=7.3.4.0-release
 Date=11/07/26
 Download=
-Changes=Setup recommendations are noted in the log book, Removed UTF errors from LMU track names
+Changes=Setup recommendations are noted in the log book, Removed UTF errors from LMU track names, Grammar correction for Russian language
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.3.0-release

@@ -848,6 +848,8 @@ class SpeechSynthesizer {
 
 		if translator
 			text := translator.translate(text)
+		else
+			text := this.correctGrammar(text)
 
 		if kSoX {
 			temp1Name := temporaryFileName("temp1", "wav")
@@ -1257,6 +1259,56 @@ class SpeechSynthesizer {
 		catch Any as exception {
 			logError(exception, true)
 		}
+	}
+
+	correctGrammar(text) {
+		local word, count
+
+		static numerals := false
+
+		correctWord(num, word) {
+			local candidate, cases
+
+			for candidate, cases in numerals
+				if (InStr(word, candidate) == 1) {
+					if ((SubStr(num, 0) == 1) && (SubStr(num, -1) != 11))
+						return cases[1]
+					else if (inList([2, 3, 4], SubStr(num, 0)) && !inList([12, 13, 14], SubStr(num, -1)))
+						return cases[2]
+					else
+						return cases[3]
+				}
+
+			return word
+		}
+
+		if (this.Language = "RU") {
+			text := string2Values(A_Space, text)
+
+			if !numerals {
+				numerals := CaseInsenseMap("круг", ["круг", "круга", "кругов"]					; lap
+										 , "секунд", ["секунда", "секунды", "секунд"]			; second
+										 , "минут", ["минута", "минуты", "минут"]				; minute
+										 , "позици", ["позиция", "позиции", "позиций"]			; position
+										 , "пит-стоп", ["пит-стоп", "пит-стопа", "пит-стопов"]	; pitstop
+										 , "литр", ["литр", "литра", "литров"]					; liter
+										 , "метр", ["метр", "метра", "метров"]					; meter
+										 , "машин", ["машина", "машины", "машин"]				; car
+			}
+
+			count := text.Length
+
+			loop count {
+				word := text[A_Index]
+
+				if (isInteger(word) && (A_Index < count))
+					text[A_Index + 1] := correctWord(word, text[A_Index + 1])
+			}
+
+			text := values2String(A_Space, text*)
+		}
+
+		return text
 	}
 
 	isSpeaking() {

@@ -1,11 +1,11 @@
 [Current]
-Type=Release
+Type=Development
 [Development]
-Version=7.3.3.0-release
-Target=7.3.3.0-release
-Date=11/06/26
-Download=https://cutt.ly/jyInhJK8;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/JjFD31yd?inline=true;https://www.dropbox.com/scl/fi/8egjn2r8q302zac01sm3i/Simulator-Controller-7.3.3.0-update.zip?rlkey=th4ac157zz81241k3mjq6xzp4&st=9brcb0b4&dl=1;http://%master%/Releases/Simulator Controller 7.3.3.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.3.0-update.zip
-Changes=More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management, Fixed Assistants grammars
+Version=7.3.4.0-dev
+Target=7.3.4.0-release
+Date=11/07/26
+Download=
+Changes=Added recommendations to logbook, Removed UTF errors from LMU track names
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.3.0-release

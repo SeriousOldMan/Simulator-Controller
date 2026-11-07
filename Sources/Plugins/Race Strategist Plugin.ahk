@@ -9,6 +9,7 @@
 ;;;                         Local Include Section                           ;;;
 ;;;-------------------------------------------------------------------------;;;
 
+#Include "..\Framework\Extensions\Messages.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
 #Include "..\Database\Libraries\LapsDatabase.ahk"
 #Include "..\Assistants\Libraries\RaceReportReader.ahk"
@@ -230,10 +231,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	}
 
 	prepareSession(settings, data) {
+		/*
 		local pid := ProcessExist("Solo Center.exe")
 		local dataFile
-
-		super.prepareSession(settings, data)
 
 		if (pid && !this.LapRunning) {
 			dataFile := (kTempDirectory . "Practice Lap 0.0.data")
@@ -242,9 +242,13 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			messageSend(kFileMessage, "Solo Center", "startSession:" . dataFile, pid)
 		}
+		*/
+
+		super.prepareSession(settings, data)
 	}
 
 	addLap(lap, running, data) {
+		/*
 		local teamServer := this.TeamServer
 		local pid := ProcessExist("Solo Center.exe")
 		local fileName
@@ -256,6 +260,7 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			messageSend(kFileMessage, "Solo Center", "updateLap:" . values2String(";", lap, fileName), pid)
 		}
+		*/
 
 		super.addLap(lap, running, data)
 
@@ -263,11 +268,10 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 	}
 
 	updateLap(lap, running, data) {
+		/*
 		local teamServer := this.TeamServer
 		local pid := ProcessExist("Solo Center.exe")
 		local fileName
-
-		super.updateLap(lap, running, data)
 
 		if (pid && (!teamServer || !teamServer.SessionActive)) {
 			fileName := temporaryFileName("Practice Lap " . lap, "data")
@@ -276,6 +280,9 @@ class RaceStrategistPlugin extends RaceAssistantPlugin {
 
 			messageSend(kFileMessage, "Solo Center", "updateLap:" . values2String(";", lap, fileName, true), pid)
 		}
+		*/
+
+		super.updateLap(lap, running, data)
 
 		this.checkStrategy()
 	}

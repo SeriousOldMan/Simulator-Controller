@@ -12,15 +12,17 @@ Simply start the "Solo Center" **before** starting the session in your simulator
 
 When you start a new session or when you close the window, the "Solo Center" will ask you before any unsaved / unexported data will be overwritten. You can, however, enable "Auto Export", "Auto Save" or even "Auto Clear" in the "Session" menu according to your preferences. "Auto Export" will, as the name suggests, export the telemetry data from valid laps to the session database and "Auto Save" will save the complete session state to the session database. This sessin state can be retrieved later using the "Load session..." command from the "Session" menu.
 
-Do **not** start the "Solo Center" after you have already started your session in the simulator. Although nothing will explode, you will lose your valuable practice data, since it will be sent to the "Solo Center", which most likely will not collect it. Also, do not quit the "Solo Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
+Do **not** start the "Solo Center" after you have already started your session in the simulator. Although nothing will explode, you will lose your valuable data, since it will be sent to the "Solo Center", which most likely will not collect it. Also, do not quit the "Solo Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
 
-Note: If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Solo Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Team Center" to control your race in this case anyway.
+##### Notes
 
-Good to know: The "Solo Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the settings of the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database):
+- As mentioned, the Assistants are responsible to collect and prepare the data and supply it to the "Solo Center". Therefore, if the Assistants have been deactivated, for example by using a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), only rudimentary information will be available in the "Solo Center".
+- If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Solo Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Team Center" to control your race in this case anyway.
+- The "Solo Center" benefits from a high data update frequency of the Race Assistants. Therefore, if your PC is powerful enough, you can lower this value in the settings of the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings):
 
-![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
+  ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%207.JPG)
 
-The default value for the data update frequency is 10 seconds, but you can can try to go as low as 2 seconds, if your PC is powerful enough.
+  The default value for the data update frequency is 3 seconds, but you can go as low as your PC can handle.
 
 ### Saving and loading sessions
 

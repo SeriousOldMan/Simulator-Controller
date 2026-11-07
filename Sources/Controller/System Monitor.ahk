@@ -106,7 +106,7 @@ class SystemMonitorResizer extends Window.Resizer {
 			}
 			catch Any as exception {
 				logError(exception)
-				
+
 				return false
 			}
 		}
@@ -220,12 +220,11 @@ getTableCSS(window, textSize) {
 									  , headerBackColor: window.Theme.TableColor["Header"], frameColor: window.Theme.TableColor["Frame"]})
 }
 
-editSettings(settingsOrCommand, arguments*) {
-	local settingsGui, x, y, row, column, value
+editSettings(infoWidgetsOrCommand, arguments*) {
+	local settingsGui, x, y, row, infcolumn, value
 
 	static infoWidgets := []
 	static result := false
-	static settings := false
 	static widgets := []
 	static cycle := 5
 	static size := 11
@@ -247,16 +246,15 @@ editSettings(settingsOrCommand, arguments*) {
 			dropDown.Value := 1
 	}
 
-	if (settingsOrCommand == kOk)
+	if (infoWidgetsOrCommand == kOk)
 		result := kOk
-	else if (settingsOrCommand == kCancel)
+	else if (infoWidgetsOrCommand == kCancel)
 		result := kCancel
 	else {
-		infoWidgets := getKeys(arguments[1])
-		settings := settingsOrCommand
-		widgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
-		cycle := getMultiMapValue(settings, "System Monitor", "Session Cycle", 30)
-		size := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
+		infoWidgets := getKeys(infoWidgetsOrCommand)
+		widgets := string2Values(",", getSetting("System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+		cycle := getSetting("System Monitor", "Session Cycle", 30)
+		size := getSetting("System Monitor", "Session Size", 11)
 
 		while (widgets.Length < 9)
 			widgets.Push(false)
@@ -303,7 +301,7 @@ editSettings(settingsOrCommand, arguments*) {
 		settingsGui.Add("Button", "x142 yp+10 w80 h23 Default", translate("Ok")).OnEvent("Click", editSettings.Bind(kOk))
 		settingsGui.Add("Button", "x228 yp w80 h23", translate("&Cancel")).OnEvent("Click", editSettings.Bind(kCancel))
 
-		settingsGui.Opt("+Owner" . arguments[2].Hwnd)
+		settingsGui.Opt("+Owner" . arguments[1].Hwnd)
 
 		if getWindowPosition("System Monitor.Settings", &x, &y)
 			settingsGui.Show("x" . x . " y" . y)
@@ -317,8 +315,8 @@ editSettings(settingsOrCommand, arguments*) {
 			if (result == kCancel)
 				return false
 			else if (result == kOk) {
-				setMultiMapValue(settings, "System Monitor", "Session Cycle", [5, 10, 15, 30][settingsGui["cycleDropDown"].Value])
-				setMultiMapValue(settings, "System Monitor", "Session Size", settingsGui["sizeDropDown"].Text)
+				setSetting("System Monitor", "Session Cycle", [5, 10, 15, 30][settingsGui["cycleDropDown"].Value])
+				setSetting("System Monitor", "Session Size", settingsGui["sizeDropDown"].Text)
 
 				loop 3 {
 					row := A_Index
@@ -332,7 +330,7 @@ editSettings(settingsOrCommand, arguments*) {
 					}
 				}
 
-				setMultiMapValue(settings, "System Monitor", "Session Widgets", values2String(",", widgets*))
+				setSetting("System Monitor", "Session Widgets", values2String(",", widgets*))
 
 				return true
 			}
@@ -433,14 +431,10 @@ systemMonitor(command := false, arguments*) {
 		systemMonitorGui.Block()
 
 		try {
-			if editSettings(settings, infoWidgets, systemMonitorGui) {
-				sessionInfoWidgets := string2Values(",", getMultiMapValue(settings, "System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
-				sessionInfoSleep := (getMultiMapValue(settings, "System Monitor", "Session Cycle", 30) * 1000)
-				sessionInfoSize := getMultiMapValue(settings, "System Monitor", "Session Size", 11)
-
-				setSetting("System Monitor", "Session Widgets", values2String(",", sessionInfoWidgets*))
-				setSetting("System Monitor", "Session Cycle", Round(sessionInfoSleep / 1000))
-				setSetting("System Monitor", "Session Size", sessionInfoSize)
+			if editSettings(infoWidgets, systemMonitorGui) {
+				sessionInfoWidgets := string2Values(",", getSetting("System Monitor", "Session Widgets", "Session,Stint,Duration,Conditions,Cycle,Cycle"))
+				sessionInfoSleep := (getSetting("System Monitor", "Session Cycle", 30) * 1000)
+				sessionInfoSize := getSetting("System Monitor", "Session Size", 11)
 
 				nextSessionUpdate := A_TickCount
 			}

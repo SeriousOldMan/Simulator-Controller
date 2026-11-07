@@ -37,10 +37,6 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class DrivingCoach extends GridRaceAssistant {
-	static sKeepLeftDirectory := (kTempDirectory . "Driving Coach\Line\Left\")
-	static sKeepRightDirectory := (kTempDirectory . "Driving Coach\Line\Right\")
-	static sIdealDirectory := (kTempDirectory . "Driving Coach\Line\Ideal\")
-
 	iConnector := false
 	iConnectionState := "Active"
 
@@ -2490,9 +2486,9 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 
 					if data
-						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . DrivingCoach.sKeepLeftDirectory . "`" `"" . DrivingCoach.sIdealDirectory . "`" `"" . DrivingCoach.sKeepRightDirectory . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . (kTempDirectory . "Driving Coach\Line") . "`"" . options, kBinariesDirectory, "Hide", &pid)
 					else
-						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . DrivingCoach.sKeepLeftDirectory . "`" `"" . DrivingCoach.sIdealDirectory . "`" `"" . DrivingCoach.sKeepRightDirectory . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . (kTempDirectory . "Driving Coach\Line") . "`"" . options, kBinariesDirectory, "Hide", &pid)
 				}
 			}
 			catch Any as exception {

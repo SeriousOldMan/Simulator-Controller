@@ -1292,6 +1292,10 @@ namespace RF2SHMCoach {
 				}
 			}
         }
+		
+		void checkLine(ref rF2VehicleScoring playerScoring)
+		{
+        }
 
         int[] hintGroups = new int[256];
         int[] hintPhases = new int[256];
@@ -1351,6 +1355,51 @@ namespace RF2SHMCoach {
                 }
 			} 
 		}
+		
+        string[] leftSounds;
+        string[] rightSounds;
+        string[] idealSounds;
+        float[] running;
+		
+		public void loadSounds(string soundsDirectory)
+		{
+			leftSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Left"));
+			rightSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Right"));
+			idealSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Ideal"));
+		}
+		
+        public void loadLineHints()
+		{
+			if ((hintFile != "") && System.IO.File.Exists(hintFile))
+			{
+				if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
+				{
+                    numCoordinates = 0;
+                    lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
+					
+					bool first = true;
+					int index = 0;
+
+                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
+                    	if (first) {
+							numCoordinates = int.Parse(line);
+						
+							running = new float[numCoordinates];
+							xCoordinates = new float[numCoordinates];
+							yCoordinates = new float[numCoordinates];
+							
+							first = false;
+						}
+						else {
+							var parts = line.Split(new char[] { ';' }, 3);
+
+							running[index] = float.Parse(parts[0]);
+							xCoordinates[index] = float.Parse(parts[1]);
+							yCoordinates[index++] = float.Parse(parts[2]);
+						}
+                }
+			} 
+		}
 
         public void initializeTrigger(string type, string[] args)
         {
@@ -1375,6 +1424,7 @@ namespace RF2SHMCoach {
         string workingDirectory = string.Empty;
         float volume = 0;
 		string hintFile = string.Empty;
+		string hintAudioFiles = string.Empty;
 
         public void initializeTrackHints(string type, string[] args)
         {
@@ -1393,6 +1443,29 @@ namespace RF2SHMCoach {
 
             if (args.Length > 5)
                 workingDirectory = args[5];
+
+            Thread.Sleep(10000);
+        }
+
+        public void initializeLineHints(string type, string[] args)
+        {
+            triggerType = type;
+
+            hintFile = args[1];
+			
+			loadSounds(args[2]);
+
+            if (args.Length > 3)
+                audioDevice = args[3];
+
+            if (args.Length > 4)
+                volume = float.Parse(args[4]);
+
+            if (args.Length > 5)
+                player = args[5];
+
+            if (args.Length > 6)
+                workingDirectory = args[6];
 
             Thread.Sleep(10000);
         }
@@ -1451,7 +1524,7 @@ namespace RF2SHMCoach {
             }
         }
 
-        public void Run(bool positionTrigger, bool trackHints, bool handlingAnalyzer) {
+        public void Run(bool positionTrigger, bool trackHints, bool lineHints, bool handlingAnalyzer) {
             long counter = 0;
 			
 			while (true) {
@@ -1499,6 +1572,14 @@ namespace RF2SHMCoach {
 							loadTrackHints();
 
                             checkCoordinates(ref playerScoring);
+
+                            Thread.Sleep(10);
+                        }
+                        else if (lineHints)
+						{
+							loadLineHints();
+
+                            checkLine(ref playerScoring);
 
                             Thread.Sleep(10);
                         }

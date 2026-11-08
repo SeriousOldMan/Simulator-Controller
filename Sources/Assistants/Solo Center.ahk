@@ -8152,7 +8152,7 @@ class SoloCenter extends ConfigurationItem {
 			if fileName
 				data := readMultiMap(fileName)
 
-			this.Window.DisableRedraw()
+			; this.Window.DisableRedraw()
 
 			try {
 				save := (this.AutoSave && this.SessionActive)
@@ -8232,7 +8232,7 @@ class SoloCenter extends ConfigurationItem {
 				this.updateSessionMenu()
 			}
 			finally {
-				this.Window.EnableRedraw()
+				; this.Window.EnableRedraw()
 
 				if fileName
 					deleteFile(fileName)

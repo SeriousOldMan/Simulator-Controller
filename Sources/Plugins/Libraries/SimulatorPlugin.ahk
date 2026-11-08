@@ -1166,7 +1166,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		pid := ProcessExist("Solo Center.exe")
 
 		if (pid && !RaceAssistantPlugin.LapRunning && (!teamServer || !teamServer.SessionActive)) {
-			dataFile := (kTempDirectory . "Practice Lap 0.0.data")
+			dataFile := (kTempDirectory . "Solo Lap 0.0.data")
 
 			writeMultiMap(dataFile, data)
 
@@ -1202,7 +1202,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local fileName
 
 		if (pid && (!teamServer || !teamServer.SessionActive)) {
-			fileName := temporaryFileName("Practice Lap " . lap, "data")
+			fileName := temporaryFileName("Solo Lap " . lap, "data")
 
 			writeMultiMap(fileName, data)
 
@@ -1216,7 +1216,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local fileName
 
 		if (pid && (!teamServer || !teamServer.SessionActive)) {
-			fileName := temporaryFileName("Practice Lap " . lap, "data")
+			fileName := temporaryFileName("Solo Lap " . lap, "data")
 
 			writeMultiMap(fileName, data)
 

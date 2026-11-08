@@ -4439,6 +4439,7 @@ class RaceSpotter extends GridRaceAssistant {
 		local hasGaps := false
 		local started := (lapNumber > 0)
 		local start := A_TickCount
+		local running := false
 		local sector, sectorDesc, result, valid, gapAhead, gapBehind
 		local simulator, car, track
 
@@ -4460,6 +4461,8 @@ class RaceSpotter extends GridRaceAssistant {
 				lastSector := -1
 				sectorIndex := 1
 			}
+			else
+				running := true
 
 			if !isObject(data)
 				data := readMultiMap(data)
@@ -4485,50 +4488,41 @@ class RaceSpotter extends GridRaceAssistant {
 				newSector := true
 			}
 
-			sectorDesc := (sector . "." . sectorIndex++)
+			if running {
+				sectorDesc := (sector . "." . sectorIndex++)
 
-			if !this.MultiClass
-				hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
+				if !this.MultiClass
+					hasGaps := this.adjustGaps(data, &gapAhead, &gapBehind)
 
-			if isDebug()
-				logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sectorDesc ", " . newSector)
+				if isDebug()
+					logMessage(kLogDebug, "UpdateLap: " . lapNumber . ", " . this.LastLap . " Sector: " . sectorDesc ", " . newSector)
 
-			if (lapNumber = this.LastLap)
-				try {
-					this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
-				}
-				catch Any as exception {
-					logError(exception, true)
-				}
+					try {
+						this.iPositions := this.computePositions(data, hasGaps ? gapAhead : false, hasGaps ? gapBehind : false)
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
+			}
 		}
-		else
-			sectorDesc := "0.0"
 
-		knowledgeBase.setFact("Standings", true)
+		if running
+			knowledgeBase.setFact("Standings", true)
 
 		result := super.updateLap(lapNumber, &data)
 
-		if isDebug()
-			logMessage(kLogWarn, "Update Assistant lap took " . (A_TickCount - start) . " ms...")
-
-		if this.DriverUpdateTime {
-			if (A_TickCount >= this.iNextDriverUpdate) {
-				this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
-
-				this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
-
-				newSector := false
-			}
-			else
-				this.updateDriver(lapNumber, sectorDesc, false, false, this.Positions)
-		}
-		else {
-			this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
-
-			newSector := false
-		}
-
 		if started {
+			if running
+				if (!this.DriverUpdateTime || (A_TickCount >= this.iNextDriverUpdate)) {
+					this.updateDriver(lapNumber, sectorDesc, true, newSector, this.Positions)
+
+					this.iNextDriverUpdate := (A_TickCount + this.DriverUpdateTime)
+
+					newSector := false
+				}
+				else
+					this.updateDriver(lapNumber, sectorDesc, false, false, this.Positions)
+
 			loop knowledgeBase.getValue("Car.Count") {
 				valid := knowledgeBase.getValue("Car." . A_Index . ".Lap.Running.Valid", kUndefined)
 
@@ -4541,6 +4535,9 @@ class RaceSpotter extends GridRaceAssistant {
 					if (this.Announcements["CutWarnings"] && this.hasEnoughData(false))
 						this.cutWarning(lapNumber, sector, wasValid, lastWarnings)
 		}
+
+		if isDebug()
+			logMessage(kLogWarn, "Update Assistant lap took " . (A_TickCount - start) . " ms...")
 
 		simulator := knowledgeBase.getValue("Session.Simulator")
 		car := knowledgeBase.getValue("Session.Car")

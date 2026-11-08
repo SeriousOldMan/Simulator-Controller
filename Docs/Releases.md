@@ -20,7 +20,21 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.3.4.0
+
+#### Date: 11/13/26 (planned)
+
+#### Fixes
+
+  - Fixed a bug in the settings dialog of the "System Monitor", that prevented the correct loading of the last saved settings.
+  - Fixed several potential UTF-related problems in the track names of *Le Mans Ultimate*  
+  
+#### Changes
+
+  - Setup recommendations will now also be written to the logbook of the "Setup Workbench".
+  - Implemented a postprocessor for the several languages (incl. Russian) to handle the singular/plural forms of words like lap, second, minute, etc. related to preceeding numbers.
+  - The "Solo Center" will now receive data even if some or all Assistants have been disabled. The available data will be quite restricted, though, if the Assistants are deactivated.
+  - Multiclass warnings for cars already very close (less than 1 second distance) will no longer be given by the Spotter. Due to the asynchronous processing, this may prevent superfluous warnings for cars that already have passed or have been passed.
 
 # Release history
 

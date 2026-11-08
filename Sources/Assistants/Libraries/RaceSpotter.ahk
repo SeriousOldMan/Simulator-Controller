@@ -1567,18 +1567,20 @@ class RaceSpotter extends GridRaceAssistant {
 		local running := this.DriverCar.Running
 		local avgLapTime := this.DriverCar.AvgLapTime
 		local carsAhead := []
-		local maxRunning, carAhead, count
+		local maxRunning, minRunning, carAhead, count
 
 		static trafficAheadDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Ahead.Delta", 6.0)
 
 		if (avgLapTime > 0) {
-			maxRunning := (running + ((trafficAheadDelta / this.DriverCar.AvgLapTime) * running))
+			maxRunning := (running + ((trafficAheadDelta / avgLapTime) * running))
+			minRunning := (running + ((1 / avgLapTime) * running))
 			count := allCars.Length
 
 			while (++index <= count) {
 				carAhead := allCars[index]
 
-				if ((carAhead.Running <= maxRunning) && !carAhead.InPit && (carAhead.AvgLapTime > 0))
+				if ((carAhead.Running <= maxRunning) && (carAhead.Running >= minRunning)
+				 && !carAhead.InPit && (carAhead.AvgLapTime > 0))
 					carsAhead.Push(carAhead)
 			}
 		}
@@ -1592,17 +1594,19 @@ class RaceSpotter extends GridRaceAssistant {
 		local running := this.DriverCar.Running
 		local avgLapTime := this.DriverCar.AvgLapTime
 		local carsBehind := []
-		local minRunning, carBehind
+		local minRunning, maxRunning, carBehind
 
 		static trafficBehindDelta := getMultiMapValue(this.Settings, "Assistant.Spotter", "Traffic.Behind.Delta", 6.0)
 
 		if (avgLapTime > 0) {
 			minRunning := (running - ((trafficBehindDelta / avgLapTime) * running))
+			maxRunning := (running - ((1 / avgLapTime) * running))
 
 			while (--index > 0) {
 				carBehind := allCars[index]
 
-				if ((carBehind.Running >= minRunning) && !carBehind.InPit && (carBehind.AvgLapTime > 0))
+				if ((carBehind.Running >= minRunning) && (carBehind.Running <= maxRunning)
+				 && !carBehind.InPit && (carBehind.AvgLapTime > 0))
 					carsBehind.Push(carBehind)
 			}
 		}

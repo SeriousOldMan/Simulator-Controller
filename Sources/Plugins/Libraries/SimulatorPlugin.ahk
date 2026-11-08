@@ -1108,7 +1108,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
-		local mixedCompounds, teamServer. pid, dataFile
+		local mixedCompounds, teamServer, pid, dataFile
 
 		static lastSimulator := false
 		static lastCar := false
@@ -1211,7 +1211,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	updateLap(lap, data) {
-		local teamServer := this.TeamServer
+		local teamServer := RaceAssistantPlugin.TeamServer
 		local pid := ProcessExist("Solo Center.exe")
 		local fileName
 

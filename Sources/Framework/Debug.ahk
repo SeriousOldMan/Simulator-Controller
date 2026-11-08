@@ -284,11 +284,11 @@ logError(exception, unexpected := false, report := true) {
 				 , true, unexpected)
 
 		if exception.HasProp("Extra")
-			logMessage(critical ? kLogCritical : kLogDebug, "`What: " . exception.Extra
+			logMessage(critical ? kLogCritical : kLogDebug, "What: " . exception.Extra
 					 , false, unexpected, false)
 
 		if exception.HasProp("Stack")
-			logMessage(critical ? kLogCritical : kLogDebug, "`Stack:`n`n" . exception.Stack
+			logMessage(critical ? kLogCritical : kLogDebug, "Stack:`n`n" . exception.Stack
 					 , false, unexpected, false)
 	}
 	else
@@ -301,6 +301,7 @@ logError(exception, unexpected := false, report := true) {
 			if isObject(exception)
 				withBlockedWindows(MsgDlg, translate(unexpected ? "Unexpected exception encountered in " : "Handled exception encountered in ")
 										 . exception.File . translate(" at line ") . exception.Line . translate(": ") . exception.Message
+										 . (exception.HasProp("Extra") ? ("`n`nWhat: " . exception.Extra) : "")
 										 . (exception.HasProp("Stack") ? ("`n`nStack:`n`n" . exception.Stack) : ""))
 			else
 				withBlockedWindows(MsgDlg, translate(unexpected ? "Unexpected exception encountered: " : "Handled exception encountered: ") . exception)

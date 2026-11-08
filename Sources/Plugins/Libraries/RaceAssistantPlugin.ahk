@@ -1378,19 +1378,31 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			}
 		}
 
-		return activeAssistant
+		return true ; activeAssistant
 	}
 
 	static getSettings(assistant, data) {
-		local key := assistant.Plugin
+		local key := (assistant ? assistant.Plugin : false)
 				   . getMultiMapValue(data, "Session Data", "Simulator") . getMultiMapValue(data, "Session Data", "Car")
 				   . getMultiMapValue(data, "Session Data", "Track") . getMultiMapValue(data, "Weather Data", "WeatherNow")
 		local settings
 
 		if this.Settings.Has(key)
 			return this.Settings[key]
-		else
+		else if assistant
 			return (this.Settings[key] := assistant.prepareSettings(data))
+		else {
+			settings := this.loadSettings(getMultiMapValue(data, "Session Data", "Simulator")
+										, getMultiMapValue(data, "Session Data", "Car")
+										, getMultiMapValue(data, "Session Data", "Track"), data)
+
+			if this.Simulator
+				settings := this.Simulator.prepareSettings(settings, data)
+
+			writeMultiMap(kTempDirectory . "Simulator.settings", settings)
+
+			return settings
+		}
 	}
 
 	static prepareAssistantsSimulation() {
@@ -1401,20 +1413,31 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 	static prepareAssistantsSession(data, telemetryData, standingsData, count) {
 		local first := true
+		local simPrepared := false
 		local ignore, assistant, settings
 
 		for ignore, assistant in this.Assistants
 			if assistant.requireRaceAssistant() {
 				settings := this.getSettings(assistant, data)
 
-				if !this.Simulator.hasPrepared(settings, data, count)
+				if (!simPrepared && !this.Simulator.hasPrepared(settings, data, count)) {
 					this.Simulator.prepareSession(settings, data)
+
+					simPrepared := true
+				}
 
 				if !assistant.hasPrepared(settings, data, count)
 					assistant.prepareSession(settings, data)
 				else
 					first := false
 			}
+
+		if !simPrepared {
+			settings := this.getSettings(false, data)
+
+			if !this.Simulator.hasPrepared(settings, data, count)
+				this.Simulator.prepareSession(settings, data)
+		}
 
 		if first
 			this.startAssistantsLap(count, data, telemetryData, standingsData)
@@ -1502,8 +1525,11 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				}
 			}
 
-			if first
+			if first {
+				settings := this.getSettings(false, data)
+
 				startOther()
+			}
 
 			Task.startTask(() {
 				local usage := readMultiMap(kUserHomeDirectory . "Diagnostics\Usage.stat")
@@ -2205,6 +2231,37 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			raceAssistant.shutdown()
 		}
+	}
+
+	static loadSettings(simulator, car, track, data := false, settings := false) {
+		local settingsDB := SettingsDatabase()
+		local simulatorName := settingsDB.getSimulatorName(simulator)
+		local teamServer := this.TeamServer
+		local teamSession := (teamServer && teamServer.TeamServerEnabled)
+		local dbSettings := settingsDB.loadSettings(simulatorName, car, track
+												  , (teamSession ? "Team" : "Solo")
+												  , (data ? getMultiMapValue(data, "Weather Data", "Weather", "Dry") : "Dry"))
+		local load, section, values, key, value
+
+		if !settings
+			settings := readMultiMap(kUserConfigDirectory . "Race.settings")
+
+		load := getMultiMapValue(kSimulatorConfiguration, "Race Assistant Startup", simulatorName . ".LoadSettings", "Default")
+
+		if (data && ((load = "SettingsDatabase") || (load = "SessionDatabase")))
+			addMultiMapValues(settings, dbSettings)
+		else {
+			addMultiMapValues(dbSettings, settings)
+
+			settings := dbSettings
+		}
+
+		if this.StartupSettings
+			setMultiMapValue(settings, "Assistant", "Assistant.Autonomy"
+									 , getMultiMapValue(this.StartupSettings, "Race Assistant", "Autonomy"
+													  , getMultiMapValue(settings, "Assistant", "Assistant.Autonomy", "Custom")))
+
+		return settings
 	}
 
 	loadSettings(simulator, car, track, data := false, settings := false) {

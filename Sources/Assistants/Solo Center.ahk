@@ -6232,7 +6232,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if save {
 			report := this.SelectedReport
-			
+
 			setSetting("Solo Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
 			setSetting("Solo Center", "Chart." . report . ".X-Axis", xAxis)
 			setSetting("Solo Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
@@ -8152,6 +8152,8 @@ class SoloCenter extends ConfigurationItem {
 			if fileName
 				data := readMultiMap(fileName)
 
+			this.Window.DisableRedraw()
+
 			try {
 				save := (this.AutoSave && this.SessionActive)
 
@@ -8224,6 +8226,8 @@ class SoloCenter extends ConfigurationItem {
 				this.updateSessionMenu()
 			}
 			finally {
+				this.Window.EnableRedraw()
+
 				if fileName
 					deleteFile(fileName)
 			}

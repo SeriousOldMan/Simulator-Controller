@@ -1093,7 +1093,8 @@ class SetupWorkbench extends ConfigurationItem {
 		DirCreate(logbookFolder)
 
 		this.iLogbookDirectory := (normalizeDirectoryPath(logbookFolder) . "\")
-		this.iLogbook := (this.LogbookDirectory . A_Now . ".logbook")
+
+		this.selectLogbook(this.LogbookDirectory . A_Now . ".logbook")
 
 		SetupWorkbench.Instance := this
 
@@ -2197,6 +2198,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 	resetWorkbench() {
 		this.iDefinition := this.iOriginalDefinition.Clone()
+	}
+
+	selectLogbook(fileName) {
+		this.iLogbook := fileName
 	}
 
 	logLogbook(type, arguments*) {
@@ -5422,6 +5427,8 @@ class LogbookBrowser {
 	iLogbooksListView := false
 	iEntriesListView := false
 
+	iListViewManager := false
+
 	iAvailableLogbooks := []
 	iAvailableEntries := []
 
@@ -5526,6 +5533,12 @@ class LogbookBrowser {
 		}
 	}
 
+	ListViewManager {
+		Get {
+			return this.iListViewManager
+		}
+	}
+
 	AvailableLogbooks {
 		Get {
 			return this.iAvailableLogbooks
@@ -5570,6 +5583,22 @@ class LogbookBrowser {
 			this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
 		}
 
+		activateLogbook(listView, line, *) {
+			local logbook := (line ? this.AvailableLogbooks[line] : false)
+
+			this.selectLogbook(logbook)
+
+			if logbook {
+				this.Workbench.selectLogbook(logbook.FileName)
+
+				this.loadLogbooks()
+
+				this.selectLogbook(first(this.AvailableLogbooks, (l) => (l.FileName = logbook.FileName)))
+			}
+
+			this.updateState()
+		}
+
 		selectEntry(listView, line, *) {
 			this.selectEntry(line ? this.SelectedLogbook.Entries[line] : false)
 		}
@@ -5598,6 +5627,9 @@ class LogbookBrowser {
 		this.iLogbooksListView.OnEvent("DoubleClick", selectLogbook)
 		this.iLogbooksListView.OnEvent("ItemSelect", selectLogbook)
 
+		this.iListViewManager := Theme.ListViewManager(this.iLogbooksListView)
+		this.iListViewManager .ShowColors()
+
 		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Actions"], translate))
 		this.iEntriesListView.OnEvent("Click", selectEntry)
 		this.iEntriesListView.OnEvent("DoubleClick", selectEntry)
@@ -5614,7 +5646,10 @@ class LogbookBrowser {
 
 	loadLogbooks() {
 		local logbooks := []
+		local colored := []
 		local name, date, time
+
+		this.LogbooksListView.Delete()
 
 		loop Files, this.LogbookDirectory . "*.logbook", "F" {
 			lBook := Logbook.readLogbook(A_LoopFileFullPath)
@@ -5628,6 +5663,9 @@ class LogbookBrowser {
 				time := FormatTime(name, "HH:mm")
 
 				this.LogbooksListView.Add("", date, time, lBook.Entries.Length)
+
+				if (A_LoopFileFullPath != this.Workbench.Logbook)
+					colored.Push(A_Index)
 			}
 			else
 				deleteFile(A_LoopFileFullPath)
@@ -5637,6 +5675,16 @@ class LogbookBrowser {
 
 		loop 2
 			this.LogbooksListView.ModifyCol(A_Index, "AutoHdr")
+
+		Task.startTask(() {
+			this.ListViewManager.Clear()
+			this.ListViewManager.Initialize()
+
+			do(colored, (row) {
+				loop 3
+					this.ListViewManager.Cell(row, A_Index, , 0x606060)
+			})
+		}, 1000, kLowPriority)
 
 		this.iAvailableLogbooks := logbooks
 	}
@@ -5789,17 +5837,15 @@ class LogbookBrowser {
 				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<style> table, p, div { color: #%fontColor% } </style>
 					<div style="width: %width%px; height: %height%px; text-align: center">
-						<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
-							<br>
-							<br>
-							<br>
-							<br>
-							%html%
-						</p>
 					</div>
 				</body>
 			</html>
 			)"
+
+			document := substituteVariables(document
+										  , {fontColor: this.Window.Theme.TextColor
+										   , width: width, height: height
+										   , backColor: this.Window.AltBackColor})
 		}
 		else {
 			if (InStr(Trim(content), "<html>") == 1)
@@ -5880,12 +5926,13 @@ class LogbookBrowser {
 		if ((!this.SelectedEntry || (this.SelectedEntry != entry)) || force) {
 			this.iSelectedEntry := entry
 
-			for ignore, candidate in this.SelectedLogbook.Entries
-				if (entry = candidate) {
-					this.EntriesListView.Modify(A_Index, "Select Vis")
+			if this.SelectedLogbook
+				for ignore, candidate in this.SelectedLogbook.Entries
+					if (entry = candidate) {
+						this.EntriesListView.Modify(A_Index, "Select Vis")
 
-					break
-				}
+						break
+					}
 
 			this.loadEntry(entry)
 

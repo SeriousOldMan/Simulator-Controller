@@ -1293,8 +1293,168 @@ namespace RF2SHMCoach {
 			}
         }
 		
+		string[] leftSounds;
+        string[] rightSounds;
+        string[] idealSounds;
+        float[] running;
+		
+		const int LEFT = 1;
+		const int RIGHT = 2;
+		const int IDEAL = 3;
+		int lastLineHint = IDEAL;
+		
+		const double lateralDistance = 0.5;
+		
+		int nextLeftSound = 0;
+		int nextRightSound = 0;
+		int nextIdealSound = 0;
+		
+		int checkPosition(ref rF2VehicleScoring playerScoring)
+		{
+			double vectorLength(double x, double y)
+			{
+				return Math.Sqrt((x * x) + (y * y));
+			}
+
+			double vectorAngle(double x, double y)
+			{
+				double scalar = (x * 0) + (y * 1);
+				double length = vectorLength(x, y);
+
+				double angle = (length > 0) ? Math.Acos(scalar / length) * 180 / PI : 0;
+
+				if (x < 0)
+					angle = 360 - angle;
+
+				return angle;
+			}
+			
+			void rotateBy(ref double x, ref double y, double angle)
+			{
+				double sinus = Math.Sin(angle * PI / 180);
+				double cosinus = Math.Cos(angle * PI / 180);
+
+				double newX = (x * cosinus) - (y * sinus);
+				double newY = (x * sinus) + (y * cosinus);
+
+				x = newX;
+				y = newY;
+			}
+			
+			bool findIdealPosition(double running, ref double idealX, ref double idealY) {
+				return false;
+			}
+
+			int checkCarPosition(double running, double angle, double carX, double carY)
+			{
+				double idealX = 0;
+				double idealY = 0;
+				
+				if (findIdealPosition(running, ref idealX, ref idealY)) {
+					double transX = (idealX - carX);
+					double transY = (idealY - carY);
+
+					rotateBy(ref transX, ref transY, angle);
+
+					if (transX > lateralDistance)
+						return (transX < 0) ? RIGHT : LEFT;
+					else
+						return IDEAL;
+				}
+				else
+					return 0;
+			}
+		
+			double lVelocityX = playerScoring.mLocalVel.x;
+			double lVelocityY = playerScoring.mLocalVel.y;
+			double lVelocityZ = playerScoring.mLocalVel.z;
+
+			int carID = 0;
+
+			for (int i = 0; i < scoring.mScoringInfo.mNumVehicles; ++i)
+				if (scoring.mVehicles[i].mIsPlayer != 0)
+				{
+					carID = i;
+
+					break;
+				}
+
+			var ori = playerScoring.mOri;
+
+			double velocityX = ori[RowX].x * lVelocityX + ori[RowX].y * lVelocityY + ori[RowX].z * lVelocityZ;
+			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
+			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+				return checkCarPosition(Math.Max(0, Math.Min(1, Math.Abs(scoring.mVehicles[carID].mLapDist / scoring.mScoringInfo.mLapDist))),
+										vectorAngle(velocityX, velocityZ),
+										playerScoring.mPos.x, (- playerScoring.mPos.z));
+			else
+				return 0;
+        }
+		
 		void checkLine(ref rF2VehicleScoring playerScoring)
 		{
+			void playHint(string sound) {
+				if (audioDevice != "")
+				{
+					if (player != "")
+						playSound(sound, false);
+					else
+						SendTriggerMessage("acousticFeedback:" + sound);
+				}
+				else
+				{
+					if (lastPlayer != null)
+					{
+						lastPlayer.Stop();
+
+						lastPlayer.Dispose();
+					}
+
+					lastPlayer = new System.Media.SoundPlayer(sound);
+
+					lastPlayer.Play();
+				}
+			}
+			
+			string chooseSound(int type) {
+				string sound;
+				
+				switch (type) {
+					case LEFT:
+						sound = leftSounds[nextLeftSound];
+						
+						if (++nextLeftSound > leftSounds.Length)
+							nextLeftSound = 0;
+						
+						break;
+					case RIGHT:
+						sound = rightSounds[nextRightSound];
+						
+						if (++nextRightSound > rightSounds.Length)
+							nextRightSound = 0;
+						
+						break;
+					default:
+						sound = idealSounds[nextIdealSound];
+						
+						if (++nextIdealSound > idealSounds.Length)
+							nextIdealSound = 0;
+						
+						break;
+				}
+				
+				return sound;
+			}
+			
+			int hint = checkPosition(ref playerScoring);
+			
+			if ((hint != 0) && (hint != lastLineHint)) {
+				lastLineHint = hint;
+				
+				playHint(chooseSound(hint));
+			}
         }
 
         int[] hintGroups = new int[256];
@@ -1356,12 +1516,7 @@ namespace RF2SHMCoach {
 			} 
 		}
 		
-        string[] leftSounds;
-        string[] rightSounds;
-        string[] idealSounds;
-        float[] running;
-		
-		public void loadSounds(string soundsDirectory)
+        public void loadSounds(string soundsDirectory)
 		{
 			leftSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Left"));
 			rightSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Right"));

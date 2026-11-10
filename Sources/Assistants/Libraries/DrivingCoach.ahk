@@ -1875,7 +1875,7 @@ class DrivingCoach extends GridRaceAssistant {
 					reference := telemetry
 
 				if reference
-					this.updateRaceLine(reference)
+					this.updateIdealLine(reference)
 			}
 		}
 	}
@@ -2521,15 +2521,23 @@ class DrivingCoach extends GridRaceAssistant {
 		return (this.iIdealLinePID != false)
 	}
 
-	updateRaceLine(telemetry, lap?) {
+	updateIdealLine(telemetry, lap?) {
 		local lineFile := temporaryFileName("Ideal", "line.tmp")
 		local tries := 3
 		local line := telemetry.Data.Length
+		local lastDistance := -1
 
-		loop telemetry.Data.Length
-			line .= ("`n" . telemetry.getValue(A_Index, "Distance", 0) . ";"
-						  . telemetry.getValue(A_Index, "PosX", 0) . ";"
-						  . telemetry.getValue(A_Index, "PosY", 0))
+		loop telemetry.Data.Length {
+			distance := telemetry.getValue(A_Index, "Distance", 0)
+
+			if (distance != lastDistance) {
+				lastDistance := distance
+
+				line .= ("`n" . distance . ";"
+							  . telemetry.getValue(A_Index, "PosX", 0) . ";"
+							  . telemetry.getValue(A_Index, "PosY", 0))
+			}
+		}
 
 		try {
 			deleteFile(lineFile)

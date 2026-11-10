@@ -1296,7 +1296,7 @@ namespace RF2SHMCoach {
 		string[] leftSounds;
         string[] rightSounds;
         string[] idealSounds;
-        float[] running;
+        float[] runnings;
 		
 		const int LEFT = 1;
 		const int RIGHT = 2;
@@ -1304,8 +1304,9 @@ namespace RF2SHMCoach {
 		int lastLineHint = IDEAL;
 		
 		const double lateralDistance = 0.5;
-		
-		int nextLeftSound = 0;
+        double distanceThreshold = 20;
+
+        int nextLeftSound = 0;
 		int nextRightSound = 0;
 		int nextIdealSound = 0;
 		
@@ -1342,6 +1343,28 @@ namespace RF2SHMCoach {
 			}
 			
 			bool findIdealPosition(double running, ref double idealX, ref double idealY) {
+				double delta = int.MaxValue;
+				int deltaIndex = 0;
+
+				for (int i = 0; i < numCoordinates; i++)
+				{
+					double distance = Math.Abs(running - runnings[i]);
+
+					if (distance < distanceThreshold)
+						if (distance < delta)
+						{
+							delta = distance;
+							deltaIndex = i;
+						}
+						else
+						{
+							idealX = xCoordinates[deltaIndex];
+							idealY = yCoordinates[deltaIndex];
+
+							return true;
+						}
+				}
+
 				return false;
 			}
 
@@ -1539,7 +1562,7 @@ namespace RF2SHMCoach {
                     	if (first) {
 							numCoordinates = int.Parse(line);
 						
-							running = new float[numCoordinates];
+							runnings = new float[numCoordinates];
 							xCoordinates = new float[numCoordinates];
 							yCoordinates = new float[numCoordinates];
 							
@@ -1548,7 +1571,7 @@ namespace RF2SHMCoach {
 						else {
 							var parts = line.Split(new char[] { ';' }, 3);
 
-							running[index] = float.Parse(parts[0]);
+							runnings[index] = float.Parse(parts[0]);
 							xCoordinates[index] = float.Parse(parts[1]);
 							yCoordinates[index++] = float.Parse(parts[2]);
 						}

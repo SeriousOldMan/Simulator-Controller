@@ -1281,9 +1281,9 @@ class SpeechSynthesizer {
 
 			for candidate, cases in numerals
 				if (InStr(word, candidate) == 1) {
-					if ((SubStr(num, 0) == 1) && (SubStr(num, -1) != 11))
+					if ((SubStr(num, -1) == 1) && (SubStr(num, -2) != 11))
 						return cases[1]
-					else if (inList([2, 3, 4], SubStr(num, 0)) && !inList([12, 13, 14], SubStr(num, -1)))
+					else if (inList([2, 3, 4], SubStr(num, -1)) && !inList([12, 13, 14], SubStr(num, -2)))
 						return cases[2]
 					else
 						return cases[3]

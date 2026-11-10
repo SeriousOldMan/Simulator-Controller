@@ -5427,7 +5427,7 @@ class LogbookBrowser {
 	iLogbooksListView := false
 	iEntriesListView := false
 
-	iListViewManager := false
+	; iListViewManager := false
 
 	iAvailableLogbooks := []
 	iAvailableEntries := []
@@ -5533,11 +5533,13 @@ class LogbookBrowser {
 		}
 	}
 
+	/*
 	ListViewManager {
 		Get {
 			return this.iListViewManager
 		}
 	}
+	*/
 
 	AvailableLogbooks {
 		Get {
@@ -5580,9 +5582,35 @@ class LogbookBrowser {
 		local browserGui
 
 		selectLogbook(listView, line, *) {
-			this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
+			local newLogbook := false
+			local row := 0
+
+			loop {
+				row := this.LogbooksListView.GetNext(row, "C")
+
+				if !row
+					break
+				else if (this.AvailableLogbooks[row].FileName != this.Workbench.Logbook) {
+					newLogbook := this.AvailableLogbooks[row]
+
+					break
+				}
+			}
+
+			if newLogbook {
+				this.Workbench.selectLogbook(newLogbook.FileName)
+
+				this.loadLogbooks()
+
+				this.selectLogbook(first(this.AvailableLogbooks, (l) => (l.FileName = newLogbook.FileName)))
+
+				this.updateState()
+			}
+			else
+				this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
 		}
 
+		/*
 		activateLogbook(listView, line, *) {
 			local logbook := (line ? this.AvailableLogbooks[line] : false)
 
@@ -5598,6 +5626,7 @@ class LogbookBrowser {
 
 			this.updateState()
 		}
+		*/
 
 		selectEntry(listView, line, *) {
 			this.selectEntry(line ? this.SelectedLogbook.Entries[line] : false)
@@ -5622,13 +5651,13 @@ class LogbookBrowser {
 
 		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "#"], translate))
+		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "#"], translate))
 		this.iLogbooksListView.OnEvent("Click", selectLogbook)
 		this.iLogbooksListView.OnEvent("DoubleClick", selectLogbook)
 		this.iLogbooksListView.OnEvent("ItemSelect", selectLogbook)
 
-		this.iListViewManager := Theme.ListViewManager(this.iLogbooksListView)
-		this.iListViewManager .ShowColors()
+		; this.iListViewManager := Theme.ListViewManager(this.iLogbooksListView)
+		; this.iListViewManager .ShowColors()
 
 		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Actions"], translate))
 		this.iEntriesListView.OnEvent("Click", selectEntry)
@@ -5645,30 +5674,35 @@ class LogbookBrowser {
 	}
 
 	loadLogbooks() {
+		local allLogbooks := []
 		local logbooks := []
-		local colored := []
-		local name, date, time
+		; local colored := []
+		local name, date, time, index, fileName
 
 		this.LogbooksListView.Delete()
 
-		loop Files, this.LogbookDirectory . "*.logbook", "F" {
-			lBook := Logbook.readLogbook(A_LoopFileFullPath)
+		loop Files, this.LogbookDirectory . "*.logbook", "F"
+			allLogbooks.Push(A_LoopFileFullPath)
 
-			if (!lBook.superfluous() || (A_LoopFileFullPath = this.Workbench.Logbook)) {
+		for index, fileName in allLogbooks {
+			lBook := Logbook.readLogbook(fileName)
+
+			if (!lBook.superfluous() || (A_Index = allLogbooks.Length)) {
 				logbooks.Push(lBook)
 
-				SplitPath(A_LoopFileName, , , , &name)
+				SplitPath(fileName, , , , &name)
 
 				date := FormatTime(name, "ShortDate")
 				time := FormatTime(name, "HH:mm")
 
-				this.LogbooksListView.Add("", date, time, lBook.Entries.Length)
+				this.LogbooksListView.Add((fileName = this.Workbench.Logbook) ? "Check" : ""
+										, date, time, lBook.Entries.Length)
 
-				if (A_LoopFileFullPath != this.Workbench.Logbook)
-					colored.Push(A_Index)
+				; if (fileName != this.Workbench.Logbook)
+				;	colored.Push(A_Index)
 			}
 			else
-				deleteFile(A_LoopFileFullPath)
+				deleteFile(fileName)
 		}
 
 		this.LogbooksListView.ModifyCol()
@@ -5676,6 +5710,7 @@ class LogbookBrowser {
 		loop 2
 			this.LogbooksListView.ModifyCol(A_Index, "AutoHdr")
 
+		/*
 		Task.startTask(() {
 			this.ListViewManager.Clear()
 			this.ListViewManager.Initialize()
@@ -5685,6 +5720,7 @@ class LogbookBrowser {
 					this.ListViewManager.Cell(row, A_Index, , 0x606060)
 			})
 		}, 1000, kLowPriority)
+		*/
 
 		this.iAvailableLogbooks := logbooks
 	}

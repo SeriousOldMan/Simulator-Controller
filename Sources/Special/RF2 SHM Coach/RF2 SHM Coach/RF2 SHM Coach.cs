@@ -1368,7 +1368,7 @@ namespace RF2SHMCoach {
 				return false;
 			}
 
-			int checkCarPosition(double distance, double angle, double carX, double carY)
+			int checkCarPosition(double distance, double angle, double carX, double carY, ref double gap)
 			{
 				double idealX = 0;
 				double idealY = 0;
@@ -1378,8 +1378,10 @@ namespace RF2SHMCoach {
 					double transY = (idealY - carY);
 
 					rotateBy(ref transX, ref transY, angle);
+					
+					gap = Math.Abs(transX);
 
-					if (Math.Abs(transX) > lateralDistance)
+					if (gap > lateralDistance)
 						return (transX < 0) ? RIGHT : LEFT;
 					else
 						return IDEAL;
@@ -1408,9 +1410,12 @@ namespace RF2SHMCoach {
 			double velocityY = ori[RowY].x * lVelocityX + ori[RowY].y * lVelocityY + ori[RowY].z * lVelocityZ;
 			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
-			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+				double gap = 0;
+				
 				return checkCarPosition(scoring.mVehicles[carID].mLapDist, vectorAngle(velocityX, velocityZ),
-										playerScoring.mPos.x, (- playerScoring.mPos.z));
+										playerScoring.mPos.x, (- playerScoring.mPos.z), ref gap);
+			}
 			else
 				return 0;
         }

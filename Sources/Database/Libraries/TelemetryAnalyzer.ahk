@@ -1572,6 +1572,52 @@ class TelemetryAnalyzer {
 			return false
 	}
 
+	getSectionCoordinateDistance(section, &x, &y, &distance, offset := 0, threshold := 25) {
+		local trackMap := this.TrackMap
+		local absOffset := Abs(offset)
+		local points, index, nextX, nextY
+
+		if trackMap {
+			distance := 0
+
+			points := getMultiMapValue(trackMap, "Map", "Points")
+
+			x := section.X
+			y := section.Y
+			index := section.Index
+
+			loop {
+				nextX := getMultiMapValue(trackMap, "Points", index . ".X")
+				nextY := getMultiMapValue(trackMap, "Points", index . ".Y")
+
+				distance += Sqrt(((nextX - x) ** 2) + ((nextY - y) ** 2))
+
+				x := nextX
+				y := nextY
+
+				if ((absOffset - distance) <= threshold)
+					break
+
+				if (offset < 0) {
+					if (index = 1)
+						index := points
+					else
+						index -= 1
+				}
+				else {
+					if (index = points)
+						index := 1
+					else
+						index += 1
+				}
+			}
+
+			return true
+		}
+		else
+			return false
+	}
+
 	findTrackRange(telemetry, posX, posY, distance, &startIndex, &endIndex) {
 		local pIndex, pDistance, sDistance, eDistance, data, length
 

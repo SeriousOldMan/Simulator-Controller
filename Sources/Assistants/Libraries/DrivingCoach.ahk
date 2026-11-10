@@ -1534,12 +1534,11 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		if deactivate {
-			this.iCoachingActive := false
+		this.iCoachingActive := false
 
+		if deactivate
 			this.updateConfigurationValues({OnTrackCoaching: false, BrakeCoaching: false
 										  , LineCoaching: false, RaceMotivation: false})
-		}
 	}
 
 	startupTrackCoaching() {
@@ -2523,26 +2522,80 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateIdealLine(telemetry, lap?) {
 		local lineFile := temporaryFileName("Ideal", "line.tmp")
+		local startDistance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Before.Distance", 100))
+		local stopDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.After.Distance", 50))
+		local simulator := this.Simulator
+		local analyzer := this.TelemetryAnalyzer
+		local ranges := []
+		local start := false
 		local tries := 3
-		local line := telemetry.Data.Length
 		local lastDistance := -1
+		local coordinates := []
+		local sections, ignore, section, x, y, distance, idealLine
+
+		includeCoordinate(distance) {
+			local ignore, range, from, to
+
+			if ranges {
+				for ignore, range in ranges {
+					from := range[1]
+					to := range[2]
+
+					if ((from < to) && (distance >= from) && (distance <= to))
+						return true
+					else if ((from > to) && (distance >= from) || (distance <= to))
+						return true
+				}
+
+				return false
+			}
+			else
+				return true
+		}
+
+		if (simulator && analyzer) {
+			sections := analyzer.TrackSections
+
+			if (sections && (sections.Length > 0))
+				for ignore, section in sections
+					if section.Active
+						if (section.Type = "Corner") {
+							if analyzer.getSectionCoordinateDistance(section, &x, &y, &distance, startDistance)
+								start := distance
+						}
+						else if (section.Type = "Straight")
+							if (start && analyzer.getSectionCoordinateDistance(section, &x, &y, &distance, stopDistance)) {
+								ranges.Push(Array(start, distance))
+
+								start := false
+							}
+		}
+
+		if (ranges.Length = 0)
+			ranges := false
 
 		loop telemetry.Data.Length {
 			distance := telemetry.getValue(A_Index, "Distance", 0)
 
-			if (distance != lastDistance) {
+			if ((distance != lastDistance) && includeCoordinate(distance)) {
 				lastDistance := distance
 
-				line .= ("`n" . distance . ";"
-							  . telemetry.getValue(A_Index, "PosX", 0) . ";"
-							  . telemetry.getValue(A_Index, "PosY", 0))
+				coordinates.Push(Array(distance
+									 , telemetry.getValue(A_Index, "PosX", 0)
+									 , telemetry.getValue(A_Index, "PosY", 0)))
 			}
 		}
+
+		idealLine := coordinates.Length
+
+		do(coordinates, (c) {
+			idealLine .= ("`n" . values2String(";", c*))
+		})
 
 		try {
 			deleteFile(lineFile)
 
-			FileAppend(line, lineFile)
+			FileAppend(idealLine, lineFile)
 
 			while (tries-- > 0)
 				try {

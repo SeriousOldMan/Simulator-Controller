@@ -2450,7 +2450,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local exePath, protocol, pid, arguments
 
 		if (!this.iIdealLinePID && simulator) {
-			this.iIdealLineFile := temporaryFileName("Ideal", "line")
+			this.iIdealLineFile := (isDebug() ? (kTempDirectory . "Ideal.line") : temporaryFileName("Ideal", "line"))
 
 			sessionDB := SessionDatabase()
 

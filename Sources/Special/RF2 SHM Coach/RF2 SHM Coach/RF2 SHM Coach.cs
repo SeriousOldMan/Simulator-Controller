@@ -1296,7 +1296,7 @@ namespace RF2SHMCoach {
 		string[] leftSounds;
         string[] rightSounds;
         string[] idealSounds;
-        float[] runnings;
+        float[] distances;
 		
 		const int LEFT = 1;
 		const int RIGHT = 2;
@@ -1342,24 +1342,24 @@ namespace RF2SHMCoach {
 				y = newY;
 			}
 			
-			bool findIdealPosition(double running, ref double idealX, ref double idealY) {
-				double delta = int.MaxValue;
-				int deltaIndex = 0;
+			bool findIdealPosition(double distance, ref double idealX, ref double idealY) {
+				double bestDistance = int.MaxValue;
+				int bestDistanceIndex = 0;
 
 				for (int i = 0; i < numCoordinates; i++)
 				{
-					double distance = Math.Abs(running - runnings[i]);
+					double curDistance = Math.Abs(distance - distances[i]);
 
-					if (distance < distanceThreshold)
-						if (distance < delta)
+					if (curDistance < distanceThreshold)
+						if (curDistance < bestDistance)
 						{
-							delta = distance;
-							deltaIndex = i;
+							bestDistance = curDistance;
+							bestDistanceIndex = i;
 						}
 						else
 						{
-							idealX = xCoordinates[deltaIndex];
-							idealY = yCoordinates[deltaIndex];
+							idealX = xCoordinates[bestDistanceIndex];
+							idealY = yCoordinates[bestDistanceIndex];
 
 							return true;
 						}
@@ -1368,12 +1368,12 @@ namespace RF2SHMCoach {
 				return false;
 			}
 
-			int checkCarPosition(double running, double angle, double carX, double carY)
+			int checkCarPosition(double distance, double angle, double carX, double carY)
 			{
 				double idealX = 0;
 				double idealY = 0;
 				
-				if (findIdealPosition(running, ref idealX, ref idealY)) {
+				if (findIdealPosition(distance, ref idealX, ref idealY)) {
 					double transX = (idealX - carX);
 					double transY = (idealY - carY);
 
@@ -1409,8 +1409,7 @@ namespace RF2SHMCoach {
 			double velocityZ = (ori[RowZ].x * lVelocityX + ori[RowZ].y * lVelocityY + ori[RowZ].z * lVelocityZ) * -1;
 
 			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0))
-				return checkCarPosition(Math.Max(0, Math.Min(1, Math.Abs(scoring.mVehicles[carID].mLapDist / scoring.mScoringInfo.mLapDist))),
-										vectorAngle(velocityX, velocityZ),
+				return checkCarPosition(scoring.mVehicles[carID].mLapDist, vectorAngle(velocityX, velocityZ),
 										playerScoring.mPos.x, (- playerScoring.mPos.z));
 			else
 				return 0;
@@ -1448,21 +1447,21 @@ namespace RF2SHMCoach {
 					case LEFT:
 						sound = leftSounds[nextLeftSound];
 						
-						if (++nextLeftSound > leftSounds.Length)
+						if (++nextLeftSound >= leftSounds.Length)
 							nextLeftSound = 0;
 						
 						break;
 					case RIGHT:
 						sound = rightSounds[nextRightSound];
 						
-						if (++nextRightSound > rightSounds.Length)
+						if (++nextRightSound >= rightSounds.Length)
 							nextRightSound = 0;
 						
 						break;
 					default:
 						sound = idealSounds[nextIdealSound];
 						
-						if (++nextIdealSound > idealSounds.Length)
+						if (++nextIdealSound >= idealSounds.Length)
 							nextIdealSound = 0;
 						
 						break;
@@ -1477,6 +1476,9 @@ namespace RF2SHMCoach {
 				lastLineHint = hint;
 				
 				playHint(chooseSound(hint));
+
+				if (hint == IDEAL)
+					Thread.Sleep(2000);
 			}
         }
 
@@ -1562,7 +1564,7 @@ namespace RF2SHMCoach {
                     	if (first) {
 							numCoordinates = int.Parse(line);
 						
-							runnings = new float[numCoordinates];
+							distances = new float[numCoordinates];
 							xCoordinates = new float[numCoordinates];
 							yCoordinates = new float[numCoordinates];
 							
@@ -1571,7 +1573,7 @@ namespace RF2SHMCoach {
 						else {
 							var parts = line.Split(new char[] { ';' }, 3);
 
-							runnings[index] = float.Parse(parts[0]);
+							distances[index] = float.Parse(parts[0]);
 							xCoordinates[index] = float.Parse(parts[1]);
 							yCoordinates[index++] = float.Parse(parts[2]);
 						}

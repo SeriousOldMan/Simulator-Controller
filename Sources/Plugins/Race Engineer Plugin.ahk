@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\Framework\Extensions\Task.ahk"
+#Include "..\Framework\Extensions\Messages.ahk"
 #Include "Libraries\RaceAssistantPlugin.ahk"
 #Include "..\Database\Libraries\TyresDatabase.ahk"
 

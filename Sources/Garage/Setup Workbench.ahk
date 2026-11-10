@@ -1093,7 +1093,8 @@ class SetupWorkbench extends ConfigurationItem {
 		DirCreate(logbookFolder)
 
 		this.iLogbookDirectory := (normalizeDirectoryPath(logbookFolder) . "\")
-		this.iLogbook := (this.LogbookDirectory . A_Now . ".logbook")
+
+		this.selectLogbook(this.LogbookDirectory . A_Now . ".logbook")
 
 		SetupWorkbench.Instance := this
 
@@ -2197,6 +2198,10 @@ class SetupWorkbench extends ConfigurationItem {
 
 	resetWorkbench() {
 		this.iDefinition := this.iOriginalDefinition.Clone()
+	}
+
+	selectLogbook(fileName) {
+		this.iLogbook := fileName
 	}
 
 	logLogbook(type, arguments*) {
@@ -5422,6 +5427,8 @@ class LogbookBrowser {
 	iLogbooksListView := false
 	iEntriesListView := false
 
+	; iListViewManager := false
+
 	iAvailableLogbooks := []
 	iAvailableEntries := []
 
@@ -5526,6 +5533,14 @@ class LogbookBrowser {
 		}
 	}
 
+	/*
+	ListViewManager {
+		Get {
+			return this.iListViewManager
+		}
+	}
+	*/
+
 	AvailableLogbooks {
 		Get {
 			return this.iAvailableLogbooks
@@ -5567,8 +5582,51 @@ class LogbookBrowser {
 		local browserGui
 
 		selectLogbook(listView, line, *) {
-			this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
+			local newLogbook := false
+			local row := 0
+
+			loop {
+				row := this.LogbooksListView.GetNext(row, "C")
+
+				if !row
+					break
+				else if (this.AvailableLogbooks[row].FileName != this.Workbench.Logbook) {
+					newLogbook := this.AvailableLogbooks[row]
+
+					break
+				}
+			}
+
+			if newLogbook {
+				this.Workbench.selectLogbook(newLogbook.FileName)
+
+				this.loadLogbooks()
+
+				this.selectLogbook(first(this.AvailableLogbooks, (l) => (l.FileName = newLogbook.FileName)))
+
+				this.updateState()
+			}
+			else
+				this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
 		}
+
+		/*
+		activateLogbook(listView, line, *) {
+			local logbook := (line ? this.AvailableLogbooks[line] : false)
+
+			this.selectLogbook(logbook)
+
+			if logbook {
+				this.Workbench.selectLogbook(logbook.FileName)
+
+				this.loadLogbooks()
+
+				this.selectLogbook(first(this.AvailableLogbooks, (l) => (l.FileName = logbook.FileName)))
+			}
+
+			this.updateState()
+		}
+		*/
 
 		selectEntry(listView, line, *) {
 			this.selectEntry(line ? this.SelectedLogbook.Entries[line] : false)
@@ -5593,10 +5651,13 @@ class LogbookBrowser {
 
 		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "#"], translate))
+		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "#"], translate))
 		this.iLogbooksListView.OnEvent("Click", selectLogbook)
 		this.iLogbooksListView.OnEvent("DoubleClick", selectLogbook)
 		this.iLogbooksListView.OnEvent("ItemSelect", selectLogbook)
+
+		; this.iListViewManager := Theme.ListViewManager(this.iLogbooksListView)
+		; this.iListViewManager .ShowColors()
 
 		this.iEntriesListView := browserGui.Add("ListView", "x16 yp+325 w130 h140 H:Grow -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Actions"], translate))
 		this.iEntriesListView.OnEvent("Click", selectEntry)
@@ -5613,30 +5674,53 @@ class LogbookBrowser {
 	}
 
 	loadLogbooks() {
+		local allLogbooks := []
 		local logbooks := []
-		local name, date, time
+		; local colored := []
+		local name, date, time, index, fileName
 
-		loop Files, this.LogbookDirectory . "*.logbook", "F" {
-			lBook := Logbook.readLogbook(A_LoopFileFullPath)
+		this.LogbooksListView.Delete()
 
-			if (!lBook.superfluous() || (A_LoopFileFullPath = this.Workbench.Logbook)) {
+		loop Files, this.LogbookDirectory . "*.logbook", "F"
+			allLogbooks.Push(A_LoopFileFullPath)
+
+		for index, fileName in allLogbooks {
+			lBook := Logbook.readLogbook(fileName)
+
+			if (!lBook.superfluous() || (A_Index = allLogbooks.Length)) {
 				logbooks.Push(lBook)
 
-				SplitPath(A_LoopFileName, , , , &name)
+				SplitPath(fileName, , , , &name)
 
 				date := FormatTime(name, "ShortDate")
 				time := FormatTime(name, "HH:mm")
 
-				this.LogbooksListView.Add("", date, time, lBook.Entries.Length)
+				this.LogbooksListView.Add((fileName = this.Workbench.Logbook) ? "Check" : ""
+										, date, time, lBook.Entries.Length)
+
+				; if (fileName != this.Workbench.Logbook)
+				;	colored.Push(A_Index)
 			}
 			else
-				deleteFile(A_LoopFileFullPath)
+				deleteFile(fileName)
 		}
 
 		this.LogbooksListView.ModifyCol()
 
 		loop 2
 			this.LogbooksListView.ModifyCol(A_Index, "AutoHdr")
+
+		/*
+		Task.startTask(() {
+			this.ListViewManager.Clear()
+			this.ListViewManager.Initialize()
+
+			do(colored, (row) {
+				loop 3
+					this.ListViewManager.Cell(row, A_Index, , 0x606060)
+			})
+		}, 1000, kLowPriority)
+		*/
 
 		this.iAvailableLogbooks := logbooks
 	}
@@ -5789,17 +5873,15 @@ class LogbookBrowser {
 				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
 					<style> table, p, div { color: #%fontColor% } </style>
 					<div style="width: %width%px; height: %height%px; text-align: center">
-						<p style="font-family: Arial; font-size: 16px; height: %height%px; margin: auto">
-							<br>
-							<br>
-							<br>
-							<br>
-							%html%
-						</p>
 					</div>
 				</body>
 			</html>
 			)"
+
+			document := substituteVariables(document
+										  , {fontColor: this.Window.Theme.TextColor
+										   , width: width, height: height
+										   , backColor: this.Window.AltBackColor})
 		}
 		else {
 			if (InStr(Trim(content), "<html>") == 1)
@@ -5880,12 +5962,13 @@ class LogbookBrowser {
 		if ((!this.SelectedEntry || (this.SelectedEntry != entry)) || force) {
 			this.iSelectedEntry := entry
 
-			for ignore, candidate in this.SelectedLogbook.Entries
-				if (entry = candidate) {
-					this.EntriesListView.Modify(A_Index, "Select Vis")
+			if this.SelectedLogbook
+				for ignore, candidate in this.SelectedLogbook.Entries
+					if (entry = candidate) {
+						this.EntriesListView.Modify(A_Index, "Select Vis")
 
-					break
-				}
+						break
+					}
 
 			this.loadEntry(entry)
 

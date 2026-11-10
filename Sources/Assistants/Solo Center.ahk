@@ -6232,7 +6232,7 @@ class SoloCenter extends ConfigurationItem {
 
 		if save {
 			report := this.SelectedReport
-			
+
 			setSetting("Solo Center", "Chart." . report . ".Type", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
 			setSetting("Solo Center", "Chart." . report . ".X-Axis", xAxis)
 			setSetting("Solo Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))
@@ -8147,10 +8147,12 @@ class SoloCenter extends ConfigurationItem {
 	startSession(data, wait := false) {
 		startSessionAsync() {
 			local fileName := (isObject(data) ? false : data)
-			local restart, save, msgResult, simulator, car, track, trackLength
+			local restart, save, msgResult, session, simulator, car, track, trackLength
 
 			if fileName
 				data := readMultiMap(fileName)
+
+			; this.Window.DisableRedraw()
 
 			try {
 				save := (this.AutoSave && this.SessionActive)
@@ -8191,14 +8193,20 @@ class SoloCenter extends ConfigurationItem {
 					this.clearSession(true)
 				}
 
+				session := getMultiMapValue(data, "Session Data", "Session", "Practice")
 				simulator := SessionDatabase.getSimulatorName(getMultiMapValue(data, "Session Data", "Simulator", "Unknown"))
 				car := getMultiMapValue(data, "Session Data", "Car", "Unknown")
 				track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 				trackLength := getMultiMapValue(data, "Track Data", "Length", 0)
 
-				this.initializeSession(getMultiMapValue(data, "Session Data", "Session", "Practice"), false)
+				if (this.HasData || (this.Session != session)
+								 || (this.Simulator != simulator) || (this.Car != car) || (this.Track != track)) {
+					this.initializeSession(session, false)
 
-				restart := this.initializeSimulator(simulator, car, track)
+					restart := this.initializeSimulator(simulator, car, track)
+				}
+				else
+					restart := false
 
 				this.analyzeTelemetry()
 
@@ -8224,6 +8232,8 @@ class SoloCenter extends ConfigurationItem {
 				this.updateSessionMenu()
 			}
 			finally {
+				; this.Window.EnableRedraw()
+
 				if fileName
 					deleteFile(fileName)
 			}

@@ -46,7 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-None for the moment...
+[7.3.4.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/YegWoghU?inline=true) (Early build for 7.3.4. Changes: Setup recommendations are noted in the log book, Removed UTF errors from LMU track names, Grammar correction for Russian language, Fixed settings in "System Monitor", Rework of "Solo Center" startup, Optimized Spotter Multiclass warnings, Select active session in logbook.)
+
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7340) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-734) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

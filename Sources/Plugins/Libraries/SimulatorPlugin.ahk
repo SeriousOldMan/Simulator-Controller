@@ -10,6 +10,7 @@
 ;;;-------------------------------------------------------------------------;;;
 
 #Include "..\..\Framework\Extensions\Task.ahk"
+#Include "..\..\Framework\Extensions\Messages.ahk"
 #Include "..\..\Database\Libraries\SessionDatabase.ahk"
 #Include "..\..\Database\Libraries\SettingsDatabase.ahk"
 #Include "SimulatorProvider.ahk"
@@ -1107,7 +1108,7 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 		local track := getMultiMapValue(data, "Session Data", "Track", "Unknown")
 		local tyreCompound := getMultiMapValue(settings, "Session Setup", "Tyre.Compound", "Dry")
 		local tyreCompoundColor := getMultiMapValue(settings, "Session Setup", "Tyre.Compound.Color", "Black")
-		local mixedCompounds
+		local mixedCompounds, teamServer, pid, dataFile
 
 		static lastSimulator := false
 		static lastCar := false
@@ -1160,6 +1161,17 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 			this.CurrentTyreCompounds := compound(tyreCompound, tyreCompoundColor)
 
 		this.updateTyreCompound(data)
+
+		teamServer := RaceAssistantPlugin.TeamServer
+		pid := ProcessExist("Solo Center.exe")
+
+		if (pid && !RaceAssistantPlugin.LapRunning && (!teamServer || !teamServer.SessionActive)) {
+			dataFile := (kTempDirectory . "Solo Lap 0.0.data")
+
+			writeMultiMap(dataFile, data)
+
+			messageSend(kFileMessage, "Solo Center", "startSession:" . dataFile, pid)
+		}
 	}
 
 	startSession(settings, data) {
@@ -1185,9 +1197,31 @@ class RaceAssistantSimulatorPlugin extends SimulatorPlugin {
 	}
 
 	addLap(lap, data) {
+		local teamServer := RaceAssistantPlugin.TeamServer
+		local pid := ProcessExist("Solo Center.exe")
+		local fileName
+
+		if (pid && (!teamServer || !teamServer.SessionActive)) {
+			fileName := temporaryFileName("Solo Lap " . lap, "data")
+
+			writeMultiMap(fileName, data)
+
+			messageSend(kFileMessage, "Solo Center", "updateLap:" . values2String(";", lap, fileName), pid)
+		}
 	}
 
 	updateLap(lap, data) {
+		local teamServer := RaceAssistantPlugin.TeamServer
+		local pid := ProcessExist("Solo Center.exe")
+		local fileName
+
+		if (pid && (!teamServer || !teamServer.SessionActive)) {
+			fileName := temporaryFileName("Solo Lap " . lap, "data")
+
+			writeMultiMap(fileName, data)
+
+			messageSend(kFileMessage, "Solo Center", "updateLap:" . values2String(";", lap, fileName, true), pid)
+		}
 	}
 
 	recommendPitstop() {

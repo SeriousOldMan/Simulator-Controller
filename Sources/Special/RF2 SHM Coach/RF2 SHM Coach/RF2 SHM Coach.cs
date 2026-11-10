@@ -1379,7 +1379,7 @@ namespace RF2SHMCoach {
 
 					rotateBy(ref transX, ref transY, angle);
 
-					if (transX > lateralDistance)
+					if (Math.Abs(transX) > lateralDistance)
 						return (transX < 0) ? RIGHT : LEFT;
 					else
 						return IDEAL;

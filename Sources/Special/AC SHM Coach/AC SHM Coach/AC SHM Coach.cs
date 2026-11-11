@@ -1332,6 +1332,196 @@ namespace ACSHMCoach {
 				}
 			}
         }
+		
+		string[] leftSounds;
+        string[] rightSounds;
+        string[] idealSounds;
+        float[] distances;
+		
+		const int LEFT = 1;
+		const int RIGHT = 2;
+		const int IDEAL = 3;
+		int lastLineHint = IDEAL;
+		
+		double lateralThreshold = 0.5;
+        double distanceThreshold = 20;
+
+        int nextLeftSound = 0;
+		int nextRightSound = 0;
+		int nextIdealSound = 0;
+		
+		int checkPosition()
+		{
+			double vectorLength(double x, double y)
+			{
+				return Math.Sqrt((x * x) + (y * y));
+			}
+
+			double vectorAngle(double x, double y)
+			{
+				double scalar = (x * 0) + (y * 1);
+				double length = vectorLength(x, y);
+
+				double angle = (length > 0) ? Math.Acos(scalar / length) * 180 / PI : 0;
+
+				if (x < 0)
+					angle = 360 - angle;
+
+				return angle;
+			}
+			
+			void rotateBy(ref double x, ref double y, double angle)
+			{
+				double sinus = Math.Sin(angle * PI / 180);
+				double cosinus = Math.Cos(angle * PI / 180);
+
+				double newX = (x * cosinus) - (y * sinus);
+				double newY = (x * sinus) + (y * cosinus);
+
+				x = newX;
+				y = newY;
+			}
+			
+			bool findIdealPosition(double distance, ref double idealX, ref double idealY) {
+				double bestDistance = int.MaxValue;
+				int bestDistanceIndex = 0;
+
+				for (int i = 0; i < numCoordinates; i++)
+				{
+					double curDistance = Math.Abs(distance - distances[i]);
+
+					if (curDistance < distanceThreshold)
+						if (curDistance < bestDistance)
+						{
+							bestDistance = curDistance;
+							bestDistanceIndex = i;
+						}
+						else
+						{
+							idealX = xCoordinates[bestDistanceIndex];
+							idealY = yCoordinates[bestDistanceIndex];
+
+							return true;
+						}
+				}
+
+				return false;
+			}
+
+			int checkCarPosition(double distance, double angle, double carX, double carY, ref double gap)
+			{
+				double idealX = 0;
+				double idealY = 0;
+				
+				if (findIdealPosition(distance, ref idealX, ref idealY)) {
+					double transX = (idealX - carX);
+					double transY = (idealY - carY);
+
+					rotateBy(ref transX, ref transY, angle);
+					
+					gap = Math.Abs(transX);
+
+					if (gap > lateralThreshold)
+						return (transX < 0) ? RIGHT : LEFT;
+					else
+						return IDEAL;
+				}
+				else
+					return 0;
+			}
+			
+			double velocityX = physics.LocalVelocity[0];
+			double velocityY = physics.LocalVelocity[2];
+			double velocityZ = physics.LocalVelocity[1];
+
+			if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+				int carID = 0;
+				ref AcCarInfo driver = ref cars.cars[carID];
+				
+				// double angle = vectorAngle(velocityX, velocityY);
+				float playerRotation = physics.Heading;
+				if (playerRotation < 0)
+				{
+					playerRotation = (float)(2 * Math.PI) + playerRotation;
+				}
+				double angle = 360 * ((2 * Math.PI) - playerRotation) / (2 * Math.PI);
+
+				double gap = 0;
+				
+				return checkCarPosition(Math.Max(0, Math.Min(1, driver.splinePosition)) * staticInfo.TrackSPlineLength,
+										angle, driver.worldPosition.x, driver.worldPosition.z, ref gap);
+			}
+			else
+				return 0;
+        }
+		
+		void checkLine()
+		{
+			void playHint(string sound) {
+				if (audioDevice != "")
+				{
+					if (player != "")
+						playSound(sound, false);
+					else
+						SendTriggerMessage("acousticFeedback:" + sound);
+				}
+				else
+				{
+					if (lastPlayer != null)
+					{
+						lastPlayer.Stop();
+
+						lastPlayer.Dispose();
+					}
+
+					lastPlayer = new System.Media.SoundPlayer(sound);
+
+					lastPlayer.Play();
+				}
+			}
+			
+			string chooseSound(int type) {
+				string sound;
+				
+				switch (type) {
+					case LEFT:
+						sound = leftSounds[nextLeftSound];
+						
+						if (++nextLeftSound >= leftSounds.Length)
+							nextLeftSound = 0;
+						
+						break;
+					case RIGHT:
+						sound = rightSounds[nextRightSound];
+						
+						if (++nextRightSound >= rightSounds.Length)
+							nextRightSound = 0;
+						
+						break;
+					default:
+						sound = idealSounds[nextIdealSound];
+						
+						if (++nextIdealSound >= idealSounds.Length)
+							nextIdealSound = 0;
+						
+						break;
+				}
+				
+				return sound;
+			}
+			
+			int hint = checkPosition();
+			
+			if ((hint != 0) && (hint != lastLineHint)) {
+				lastLineHint = hint;
+				
+				playHint(chooseSound(hint));
+
+				if (hint == IDEAL)
+					Thread.Sleep(2000);
+			}
+        }
+
 
         public void initializeTrigger(string type, string[] args)
         {
@@ -1406,6 +1596,46 @@ namespace ACSHMCoach {
                 }
             }
         }
+		
+        public void loadSounds(string soundsDirectory)
+		{
+			leftSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Left"));
+			rightSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Right"));
+			idealSounds = Directory.GetFiles(Path.Combine(soundsDirectory, "Ideal"));
+		}
+		
+        public void loadLineHints()
+		{
+			if ((hintFile != "") && System.IO.File.Exists(hintFile))
+			{
+				if (numCoordinates == 0 || (System.IO.File.GetLastWriteTime(hintFile) > lastHintsUpdate))
+				{
+                    numCoordinates = 0;
+                    lastHintsUpdate = System.IO.File.GetLastWriteTime(hintFile);
+					
+					bool first = true;
+					int index = 0;
+
+                    foreach (var line in System.IO.File.ReadAllLines(hintFile))
+                    	if (first) {
+							numCoordinates = int.Parse(line);
+						
+							distances = new float[numCoordinates];
+							xCoordinates = new float[numCoordinates];
+							yCoordinates = new float[numCoordinates];
+							
+							first = false;
+						}
+						else {
+							var parts = line.Split(new char[] { ';' }, 3);
+
+							distances[index] = float.Parse(parts[0]);
+							xCoordinates[index] = float.Parse(parts[1]);
+							yCoordinates[index++] = float.Parse(parts[2]);
+						}
+                }
+			} 
+		}
 
         string soundsDirectory = "";
         string audioDevice = string.Empty;
@@ -1431,6 +1661,31 @@ namespace ACSHMCoach {
 
             if (args.Length > 5)
                 workingDirectory = args[5];
+        }
+
+        public void initializeLineHints(string type, string[] args)
+        {
+            triggerType = type;
+
+            hintFile = args[1];
+			
+			loadSounds(args[2]);
+			
+			lateralThreshold = float.Parse(args[3]);
+
+            if (args.Length > 4)
+                audioDevice = args[4];
+
+            if (args.Length > 5)
+                volume = float.Parse(args[5]);
+
+            if (args.Length > 6)
+                player = args[6];
+
+            if (args.Length > 7)
+                workingDirectory = args[7];
+
+            Thread.Sleep(10000);
         }
 
         public void initializeAnalyzer(bool calibrateTelemetry, string[] args)
@@ -1487,7 +1742,7 @@ namespace ACSHMCoach {
             }
         }
 
-        public void Run(bool positionTrigger, bool trackHints, bool handlingAnalyzer)
+        public void Run(bool positionTrigger, bool trackHints, bool lineHints, bool handlingAnalyzer)
 		{
 			long counter = 0;
 			
@@ -1526,6 +1781,14 @@ namespace ACSHMCoach {
 
                     Thread.Sleep(10);
                 }
+				else if (lineHints)
+				{
+					loadLineHints();
+
+					checkLine();
+
+					Thread.Sleep(10);
+				}
             }
 
 			Close();

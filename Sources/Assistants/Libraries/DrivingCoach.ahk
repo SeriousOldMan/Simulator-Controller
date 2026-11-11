@@ -2523,8 +2523,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateIdealLine(telemetry, lap?) {
 		local lineFile := temporaryFileName("Ideal", "line.tmp")
-		local startDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Before.Distance", 100))
-		local stopDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.After.Distance", 20))
+		local startDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Distance.Start", 100))
+		local stopDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Distance.Stop", 20))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local ranges := []

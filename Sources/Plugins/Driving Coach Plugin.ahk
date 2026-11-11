@@ -232,56 +232,56 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 
 		deleteFile(kTempDirectory . "Driving Coach\Coaching.state")
 
-		PeriodicTask(() {
-			local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
-			local active := getMultiMapValue(state, "Coaching", "Active", false)
-			local track := (active && getMultiMapValue(state, "Coaching", "Track", false))
-			local line := (active && getMultiMapValue(state, "Coaching", "Line", false))
-			local brake := (active && getMultiMapValue(state, "Coaching", "Brake", false))
-			local motivation := (active && getMultiMapValue(state, "Coaching", "Motivation", false))
-
-			if (active != this.TelemetryCoachingActive) {
-				this.iTelemetryCoachingActive := active
-
-				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
-				this.updateLineCoachingTrayLabel(translate("Line Coaching"), brake)
-				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
-				this.updateRaceMotivationTrayLabel(translate("Race Motivation"), motivation)
-
-				this.updateActions(kSessionUnknown)
-			}
-
-			if (track != this.TrackCoachingActive) {
-				this.iTrackCoachingActive := track
-
-				this.updateActions(kSessionUnknown)
-			}
-
-			if (line != this.LineCoachingActive) {
-				this.iLineCoachingActive := line
-
-				this.updateActions(kSessionUnknown)
-			}
-
-			if (brake != this.BrakeCoachingActive) {
-				this.iBrakeCoachingActive := brake
-
-				this.updateActions(kSessionUnknown)
-			}
-
-			if (motivation != this.RaceMotivationActive) {
-				this.iRaceMotivationActive := motivation
-
-				this.updateActions(kSessionUnknown)
-			}
-		}, 5000, kLowPriority).start()
-
 		Task.startTask(() {
 			if this.Controller.Started {
+				this.updateRaceMotivationTrayLabel(translate("Race Motivation"), false)
 				this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), false)
 				this.updateLineCoachingTrayLabel(translate("Line Coaching"), false)
 				this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), false)
-				this.updateRaceMotivationTrayLabel(translate("Race Motivation"), false)
+
+				PeriodicTask(() {
+					local state := readMultiMap(kTempDirectory . "Driving Coach\Coaching.state")
+					local active := getMultiMapValue(state, "Coaching", "Active", false)
+					local track := (active && getMultiMapValue(state, "Coaching", "Track", false))
+					local line := (active && getMultiMapValue(state, "Coaching", "Line", false))
+					local brake := (active && getMultiMapValue(state, "Coaching", "Brake", false))
+					local motivation := (active && getMultiMapValue(state, "Coaching", "Motivation", false))
+
+					if (active != this.TelemetryCoachingActive) {
+						this.iTelemetryCoachingActive := active
+
+						this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
+						this.updateLineCoachingTrayLabel(translate("Line Coaching"), brake)
+						this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
+						this.updateRaceMotivationTrayLabel(translate("Race Motivation"), motivation)
+
+						this.updateActions(kSessionUnknown)
+					}
+
+					if (track != this.TrackCoachingActive) {
+						this.iTrackCoachingActive := track
+
+						this.updateActions(kSessionUnknown)
+					}
+
+					if (line != this.LineCoachingActive) {
+						this.iLineCoachingActive := line
+
+						this.updateActions(kSessionUnknown)
+					}
+
+					if (brake != this.BrakeCoachingActive) {
+						this.iBrakeCoachingActive := brake
+
+						this.updateActions(kSessionUnknown)
+					}
+
+					if (motivation != this.RaceMotivationActive) {
+						this.iRaceMotivationActive := motivation
+
+						this.updateActions(kSessionUnknown)
+					}
+				}, 5000, kLowPriority).start()
 			}
 			else
 				return Task.CurrentTask
@@ -561,7 +561,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
-			A_TrayMenu.Insert("1&")
 			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
 
 			hasTrayMenu := true
@@ -586,7 +585,6 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
-			A_TrayMenu.Insert("1&")
 			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
 
 			hasTrayMenu := true
@@ -611,6 +609,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 		label := StrReplace(StrReplace(label, "`n", A_Space), "`r", "")
 
 		if !hasTrayMenu {
+			A_TrayMenu.Insert("1&")
 			A_TrayMenu.Insert("1&", label, toggleTelemetryCoaching)
 
 			hasTrayMenu := true

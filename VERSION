@@ -3,9 +3,9 @@ Type=Development
 [Development]
 Version=7.4.0.0-dev
 Target=7.4.0.0-release
-Date=11/10/26
+Date=11/11/26
 Download=
-Changes=New line coaching mode
+Changes=New ideal line coaching mode
 Components=Media->6.9.0,Configuration->7.4.0,Utilities->7.3.1
 [Release]
 Version=7.3.3.0-release

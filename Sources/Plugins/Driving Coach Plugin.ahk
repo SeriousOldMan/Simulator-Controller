@@ -250,35 +250,34 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 					if (active != this.TelemetryCoachingActive) {
 						this.iTelemetryCoachingActive := active
 
-						this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
-						this.updateLineCoachingTrayLabel(translate("Line Coaching"), line)
-						this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
-						this.updateRaceMotivationTrayLabel(translate("Race Motivation"), motivation)
-
 						this.updateActions(kSessionUnknown)
 					}
 
 					if (track != this.TrackCoachingActive) {
 						this.iTrackCoachingActive := track
 
+						this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
 						this.updateActions(kSessionUnknown)
 					}
 
 					if (line != this.LineCoachingActive) {
 						this.iLineCoachingActive := line
 
+						this.updateLineCoachingTrayLabel(translate("Line Coaching"), line)
 						this.updateActions(kSessionUnknown)
 					}
 
 					if (brake != this.BrakeCoachingActive) {
 						this.iBrakeCoachingActive := brake
 
+						this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
 						this.updateActions(kSessionUnknown)
 					}
 
 					if (motivation != this.RaceMotivationActive) {
 						this.iRaceMotivationActive := motivation
 
+						this.updateRaceMotivationTrayLabel(translate("Race Motivation"), motivation)
 						this.updateActions(kSessionUnknown)
 					}
 				}, 5000, kLowPriority).start()

@@ -2444,6 +2444,7 @@ class DrivingCoach extends GridRaceAssistant {
 	startupLineTrigger() {
 		local simulator := this.Simulator
 		local player := requireSoundPlayer("DCTriggerPlayer.exe")
+		local threshold := getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Threshold", 0.5)
 		local options := ""
 		local sessionDB, code, data, options, telemetry, reference, workingDirectory
 		local exePath, protocol, pid, arguments
@@ -2485,9 +2486,9 @@ class DrivingCoach extends GridRaceAssistant {
 					}
 
 					if data
-						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . (kTempDirectory . "Driving Coach\Line") . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . data . "`" `"" . this.iIdealLineFile . "`" `"" . (kTempDirectory . "Driving Coach\Line") . "`" " . threshold . options, kBinariesDirectory, "Hide", &pid)
 					else
-						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . (kTempDirectory . "Driving Coach\Line") . "`"" . options, kBinariesDirectory, "Hide", &pid)
+						Run("`"" . exePath . "`" " . arguments . " -LineHints `"" . this.iIdealLineFile . "`" `"" . (kTempDirectory . "Driving Coach\Line") . "`" " . threshold . options, kBinariesDirectory, "Hide", &pid)
 				}
 			}
 			catch Any as exception {
@@ -2523,7 +2524,7 @@ class DrivingCoach extends GridRaceAssistant {
 	updateIdealLine(telemetry, lap?) {
 		local lineFile := temporaryFileName("Ideal", "line.tmp")
 		local startDistance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Before.Distance", 100))
-		local stopDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.After.Distance", 50))
+		local stopDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.After.Distance", 20))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
 		local ranges := []
@@ -2560,7 +2561,7 @@ class DrivingCoach extends GridRaceAssistant {
 				for ignore, section in sections
 					if section.Active
 						if (section.Type = "Corner") {
-							if analyzer.getSectionCoordinateDistance(section, &x, &y, &distance, startDistance)
+							if (!start && analyzer.getSectionCoordinateDistance(section, &x, &y, &distance, startDistance))
 								start := distance
 						}
 						else if (section.Type = "Straight")

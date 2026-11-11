@@ -1303,7 +1303,7 @@ namespace RF2SHMCoach {
 		const int IDEAL = 3;
 		int lastLineHint = IDEAL;
 		
-		const double lateralDistance = 0.5;
+		double lateralThreshold = 0.5;
         double distanceThreshold = 20;
 
         int nextLeftSound = 0;
@@ -1381,7 +1381,7 @@ namespace RF2SHMCoach {
 					
 					gap = Math.Abs(transX);
 
-					if (gap > lateralDistance)
+					if (gap > lateralThreshold)
 						return (transX < 0) ? RIGHT : LEFT;
 					else
 						return IDEAL;
@@ -1639,18 +1639,20 @@ namespace RF2SHMCoach {
             hintFile = args[1];
 			
 			loadSounds(args[2]);
-
-            if (args.Length > 3)
-                audioDevice = args[3];
+			
+			lateralThreshold = float.Parse(args[3]);
 
             if (args.Length > 4)
-                volume = float.Parse(args[4]);
+                audioDevice = args[4];
 
             if (args.Length > 5)
-                player = args[5];
+                volume = float.Parse(args[5]);
 
             if (args.Length > 6)
-                workingDirectory = args[6];
+                player = args[6];
+
+            if (args.Length > 7)
+                workingDirectory = args[7];
 
             Thread.Sleep(10000);
         }

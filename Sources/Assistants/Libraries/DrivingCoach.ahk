@@ -2523,7 +2523,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 	updateIdealLine(telemetry, lap?) {
 		local lineFile := temporaryFileName("Ideal", "line.tmp")
-		local startDistance := - Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Before.Distance", 100))
+		local startDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.Before.Distance", 100))
 		local stopDistance := Abs(getMultiMapValue(this.Settings, "Assistant.Coach", "Coaching.Line.After.Distance", 20))
 		local simulator := this.Simulator
 		local analyzer := this.TelemetryAnalyzer
@@ -2544,7 +2544,7 @@ class DrivingCoach extends GridRaceAssistant {
 
 					if ((from < to) && (distance >= from) && (distance <= to))
 						return true
-					else if ((from > to) && (distance >= from) || (distance <= to))
+					else if ((from > to) && ((distance >= from) || (distance <= to)))
 						return true
 				}
 
@@ -2554,26 +2554,50 @@ class DrivingCoach extends GridRaceAssistant {
 				return true
 		}
 
+		if isDebug()
+			logMessage(kLogDebug, "Computing ideal line: " . [kTrue, kFalse][!!simulator] . "; " . [kTrue, kFalse][!!analyzer])
+
 		if (simulator && analyzer) {
 			sections := analyzer.TrackSections
 
-			if (sections && (sections.Length > 0))
+			if (sections && (sections.Length > 0)) {
+				if isDebug()
+					logMessage(kLogDebug, "Computing ideal line: Found sections")
+
 				for ignore, section in sections
 					if section.Active
 						if (section.Type = "Corner") {
-							if (!start && analyzer.getSectionCoordinateDistance(section, &x, &y, &distance, startDistance))
+							if (!start && analyzer.getSectionDistance(section, &distance)) {
+								distance -= startDistance
+
+								if (distance < 0)
+									distance += this.TrackLength
+
 								start := distance
+							}
 						}
 						else if (section.Type = "Straight")
-							if (start && analyzer.getSectionCoordinateDistance(section, &x, &y, &distance, stopDistance)) {
+							if (start && analyzer.getSectionDistance(section, &distance)) {
+								distance += stopDistance
+
+								if (distance > this.TrackLength)
+									distance -= this.TrackLength
+
 								ranges.Push(Array(start, distance))
 
 								start := false
 							}
+			}
 		}
 
-		if (ranges.Length = 0)
+		if (ranges.Length = 0) {
 			ranges := false
+
+			if isDebug()
+				logMessage(kLogDebug, "Ideal line sections: None")
+		}
+		else if isDebug()
+			logMessage(kLogDebug, "Ideal line sections: " . values2string("; ", collect(ranges, (r) => (r[1] . "->" . r[2]))*))
 
 		loop telemetry.Data.Length {
 			distance := telemetry.getValue(A_Index, "Distance", 0)

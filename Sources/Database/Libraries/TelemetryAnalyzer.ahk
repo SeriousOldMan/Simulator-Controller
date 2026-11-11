@@ -1572,47 +1572,32 @@ class TelemetryAnalyzer {
 			return false
 	}
 
-	getSectionCoordinateDistance(section, &x, &y, &distance, offset := 0, threshold := 25) {
+	getSectionDistance(section, &distance, threshold := 25) {
 		local trackMap := this.TrackMap
-		local absOffset := Abs(offset)
-		local points, index, nextX, nextY
+		local sectionX := section.X
+		local sectionY := section.Y
+		local x, y, nextX, nextY
 
 		if trackMap {
 			distance := 0
 
-			points := getMultiMapValue(trackMap, "Map", "Points")
+			x := getMultiMapValue(trackMap, "Points", "1.X")
+			y := getMultiMapValue(trackMap, "Points", "1.Y")
 
-			x := section.X
-			y := section.Y
-			index := section.Index
-
-			loop {
-				nextX := getMultiMapValue(trackMap, "Points", index . ".X")
-				nextY := getMultiMapValue(trackMap, "Points", index . ".Y")
+			loop getMultiMapValue(trackMap, "Map", "Points") {
+				nextX := getMultiMapValue(trackMap, "Points", A_Index . ".X")
+				nextY := getMultiMapValue(trackMap, "Points", A_Index . ".Y")
 
 				distance += Sqrt(((nextX - x) ** 2) + ((nextY - y) ** 2))
 
 				x := nextX
 				y := nextY
 
-				if ((absOffset - distance) <= threshold)
-					break
-
-				if (offset < 0) {
-					if (index = 1)
-						index := points
-					else
-						index -= 1
-				}
-				else {
-					if (index = points)
-						index := 1
-					else
-						index += 1
-				}
+				if (Sqrt(((sectionX - x) ** 2) + ((sectionY - y) ** 2)) <= threshold)
+					return true
 			}
 
-			return true
+			return false
 		}
 		else
 			return false

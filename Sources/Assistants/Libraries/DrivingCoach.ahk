@@ -1417,11 +1417,10 @@ class DrivingCoach extends GridRaceAssistant {
 
 		writeMultiMap(kTempDirectory . "Driving Coach\Coaching.state", state)
 
-		if deactivate {
-			this.iCoachingActive := false
+		this.iCoachingActive := false
 
+		if deactivate
 			this.updateConfigurationValues({OnTrackCoaching: false, BrakeCoaching: false, RaceMotivation: false})
-		}
 	}
 
 	startupTrackCoaching() {

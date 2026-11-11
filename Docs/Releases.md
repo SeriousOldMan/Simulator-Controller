@@ -27,7 +27,8 @@
 #### Fixes
 
   - Fixed a bug in the settings dialog of the "System Monitor", that prevented the correct loading of the last saved settings.
-  - Fixed several potential UTF-related problems in the track names of *Le Mans Ultimate*.  
+  - Fixed several potential UTF-related problems in the track names of *Le Mans Ultimate*.
+  - Fixed a bug for the Driving Coach that prevented the Coach from telling you that he is available for coaching when a session restarts.
   
 #### Changes
 

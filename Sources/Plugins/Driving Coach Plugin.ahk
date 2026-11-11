@@ -251,7 +251,7 @@ class DrivingCoachPlugin extends RaceAssistantPlugin {
 						this.iTelemetryCoachingActive := active
 
 						this.updateTrackCoachingTrayLabel(translate("On-track Coaching"), track)
-						this.updateLineCoachingTrayLabel(translate("Line Coaching"), brake)
+						this.updateLineCoachingTrayLabel(translate("Line Coaching"), line)
 						this.updateBrakeCoachingTrayLabel(translate("Brake Coaching"), brake)
 						this.updateRaceMotivationTrayLabel(translate("Race Motivation"), motivation)
 

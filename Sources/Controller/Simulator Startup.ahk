@@ -2170,7 +2170,7 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 				profile["Mode"] := "Solo"
 
 			if !profile["Units"]
-				profile["Units"] := translate("Standard")
+				profile["Units"] := allUnits()[1]
 
 			for ignore, assistant in kRaceAssistants
 				profile[assistant] := getMultiMapValue(settings, "Profiles", name . "." . assistant, "Default")

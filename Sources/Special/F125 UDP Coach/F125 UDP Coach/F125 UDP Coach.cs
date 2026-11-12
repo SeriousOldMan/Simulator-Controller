@@ -1405,7 +1405,7 @@ namespace F125UDPCoach {
 				if (audioDevice != "")
 				{
 					if (player != "")
-						playSound(sound, false);
+						playSound(sound, true);
 					else
 						SendTriggerMessage("acousticFeedback:" + sound);
 				}
@@ -1418,9 +1418,9 @@ namespace F125UDPCoach {
 						lastPlayer.Dispose();
 					}
 
-					lastPlayer = new System.Media.SoundPlayer(sound);
+                    lastPlayer = new System.Media.SoundPlayer(sound);
 
-					lastPlayer.Play();
+                    lastPlayer.PlaySync();
 				}
 			}
 			

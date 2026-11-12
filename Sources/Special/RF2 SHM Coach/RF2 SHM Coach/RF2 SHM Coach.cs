@@ -1426,7 +1426,7 @@ namespace RF2SHMCoach {
 				if (audioDevice != "")
 				{
 					if (player != "")
-						playSound(sound, false);
+						playSound(sound, true);
 					else
 						SendTriggerMessage("acousticFeedback:" + sound);
 				}
@@ -1441,7 +1441,7 @@ namespace RF2SHMCoach {
 
 					lastPlayer = new System.Media.SoundPlayer(sound);
 
-					lastPlayer.Play();
+					lastPlayer.PlaySync();
 				}
 			}
 			

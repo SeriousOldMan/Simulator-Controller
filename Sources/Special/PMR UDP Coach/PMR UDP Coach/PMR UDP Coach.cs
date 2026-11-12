@@ -404,7 +404,7 @@ namespace PMRUDPCoach {
 				if (audioDevice != "")
 				{
 					if (player != "")
-						playSound(wavFile, false);
+						playSound(wavFile, true);
 					else
 						SendAnalyzerMessage("acousticFeedback:" + wavFile);
 				}
@@ -418,7 +418,7 @@ namespace PMRUDPCoach {
 
                     lastPlayer = new System.Media.SoundPlayer(wavFile);
 
-                    lastPlayer.Play();
+                    lastPlayer.PlaySync();
                 }
 			
             return true;

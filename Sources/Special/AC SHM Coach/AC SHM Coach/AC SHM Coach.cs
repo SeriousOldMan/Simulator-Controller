@@ -1461,7 +1461,7 @@ namespace ACSHMCoach {
 				if (audioDevice != "")
 				{
 					if (player != "")
-						playSound(sound, false);
+						playSound(sound, true);
 					else
 						SendTriggerMessage("acousticFeedback:" + sound);
 				}
@@ -1476,7 +1476,9 @@ namespace ACSHMCoach {
 
 					lastPlayer = new System.Media.SoundPlayer(sound);
 
-					lastPlayer.Play();
+					lastPlayer.PlaySync();
+
+					Thread.Sleep(2000);
 				}
 			}
 			

@@ -36,25 +36,31 @@ namespace PMRUDPCoach {
             {
                 coach.initializeTrigger("Trigger", args, 4);
 
-                coach.Run(true, false, false);
+                coach.Run(true, false, false, false);
             }
             else if (args.Length > 3 && args[3] == "-Calibrate")
             {
                 coach.initializeAnalyzer(true, args, 4);
 
-                coach.Run(false, false, true);
+                coach.Run(false, false, false, true);
             }
             else if (args.Length > 3 && args[3] == "-Analyze")
             {
                 coach.initializeAnalyzer(false, args, 4);
 
-                coach.Run(false, false, true);
+                coach.Run(false, false, false, true);
             }
             else if (args.Length > 3 && args[3] == "-TrackHints")
             {
                 coach.initializeTrackHints("TrackHints", args, 4);
 
-                coach.Run(false, true, false);
+                coach.Run(false, true, false, false);
+            }
+            else if (args.Length > 3 && args[3] == "-LineHints")
+            {
+                coach.initializeLineHints("LineHints", args, 4);
+
+                coach.Run(false, false, true, false);
             }
         }
     }

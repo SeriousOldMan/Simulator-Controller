@@ -333,10 +333,7 @@ bool checkPositions() {
 
 	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
 		float angle = vectorAngle(velocityX, velocityY);
-
 		int carID = gf->playerCarID;
-
-		int index = 0;
 
 		for (int i = 0; i < gf->activeCars; i++)
 			if (gf->carID[i] == carID) {

@@ -411,7 +411,7 @@ If this mode is active, Aiden will not only give you instructions for the corner
 1. On-track coaching will also work in restricted mode, i.e. without a GPT connection (see below), but the instructions given to the driver will be quite simple.
 2. You can either use corner by corner coaching or brake point coaching (see below).
 3. On-track coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
-4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control many details of this coaching mode.
+4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control many details of this coaching mode.
 
    - *Distance before Corner*
      
@@ -459,6 +459,49 @@ If this mode is active, Aiden will not only give you instructions for the corner
 	 
    Please note, that all these settings can be defined per car and even per track or weather conditions.
 
+### Practicing the ideal line
+
+Beside the general instructions for upcoming corners, the Driving Coach can give you very specific instructions regarding the ideal line or perfect braking (see next section). The coaching mode for the ideal line by asking the Coach to tell you hw to position the car. Example:
+
+**Aiden:** Hold left
+
+**Aiden:** More left
+
+**Aiden:** Okay, good
+
+**Aiden:** Keep right
+
+**Aiden:** That's it
+
+The following video gives you a good demonstration of this:
+
+[![](*)](*)
+
+##### Notes
+
+1. This works also in restricted mode, i.e. without a GPT connection (see below).
+2. Line coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+3. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control how precise you have to match the ideal line and where on the track you will get these instructions.
+
+Coaching.Line.Threshold=Coach: Deviation from Ideal Line
+Coaching.Line.Corner.Offset==Coach: Start Ideal Line coaching before the start of the Corner
+Coaching.Line.Straight.Offset==Coach: Stop Ideal Line coaching after the start of the Straight
+
+   - *Deviation from Ideal Line*
+     
+	 Defines a threshold for your misplacement from the ideal line at which the Coach will tell you where to go. Default is 0.5 meters.
+   
+   - *Start Ideal Line coaching before the start of the Corner*
+   
+     Defines the distance before a corner section where the Coach starts telling you about the ideal line. Default is 100 meters.
+   
+   - *Stop Ideal Line coaching after the start of the Straight*
+   
+     The number of meters after the start of the straight section, where the Coach stops telling you how to position the car. Default is 20 meters.
+	 
+   Please note, that all these settings can be defined per car and even per track.
+5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own driving style over and over again.
+
 ### Practicing braking points
 
 Another coaching mode can be enabled by asking the Coach to tell you where to brake. In this coaching mode, the Coach will focus on braking only. He will tell you in advance of a braking zone how to brake and then will give you a countdown to the braking point before yelling out "Brake". Example:
@@ -482,9 +525,8 @@ The following video gives you a good demonstration of this:
 ##### Notes
 
 1. This works also in restricted mode, i.e. without a GPT connection (see below).
-2. You can either use corner by corner coaching as described above or brake point coaching.
-3. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
-4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
+2. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+3. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
 
    - *Time before Braking Point*
      
@@ -546,7 +588,7 @@ Good to know: Always the telemetry data of the fastest lap of the session will b
 Normally you will only use the telemetry-based coaching during practice sessions. And maybe you want to have the Coach on your side in each practice session. Always having to ask the Coach to come along can become boring with time. As always with Simulator Controller, there are several methods to do this:
 
 1. Actions (e.g. "TrackCoaching", "BrakeCoaching", etc.) can be bound to buttons on your steering wheel or Button Box.
-2. Also, corresponding functions are available for "On-track Coaching", "Brake Coaching" and "Race Motivation" in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start the coaching mode, once telemetry data is available.
+2. Also, corresponding functions are available for "On-track Coaching", "Line Coaching", "Brake Coaching" and "Race Motivation" in a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This will not only start the collection of telemetry data, but will also start the coaching mode, once telemetry data is available.
 3. Or you use the tray menu of the "Simulator Controller" process to activate a coaching mode.
 4. Lastly, and more as an expert example, it is possible to automate almost anything by using the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster).
 

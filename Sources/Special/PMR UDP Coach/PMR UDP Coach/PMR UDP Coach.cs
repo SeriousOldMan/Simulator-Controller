@@ -1256,6 +1256,8 @@ namespace PMRUDPCoach {
 		int nextRightSound = 0;
 		int nextIdealSound = 0;
 		
+		long nextLineUpdate = 0;
+		
 		int checkPosition(ref UDPParticipantRaceState playerVehicle,
 						  ref UDPVehicleTelemetry playerTelemetry)
 		{
@@ -1411,13 +1413,22 @@ namespace PMRUDPCoach {
 			
 			int hint = checkPosition(ref playerVehicle, ref playerTelemetry);
 			
-			if ((hint != 0) && (hint != lastLineHint)) {
+			if (hint != 0) {
+				if (hint == IDEAL) {
+					if (lastLineHint == IDEAL)
+						return;
+				}
+				else if ((lastLineHint != IDEAL) && (Environment.TickCount < nextLineUpdate))
+					return;
+				
 				lastLineHint = hint;
 				
 				playHint(chooseSound(hint));
 
 				if (hint == IDEAL)
 					Thread.Sleep(2000);
+				else
+					nextLineUpdate = Environment.TickCount + 1000;
 			}
         }
 

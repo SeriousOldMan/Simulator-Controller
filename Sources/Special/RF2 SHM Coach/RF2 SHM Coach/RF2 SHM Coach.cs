@@ -551,7 +551,7 @@ namespace RF2SHMCoach {
 					{
 						cd.Usos = slip * 57.2989 * 1;
 
-						if ((soundsDirectory != "") && Environment.TickCount > (lastSound + 300))
+						if ((soundsDirectory != "") && (Environment.TickCount > (lastSound + 300)))
 							if (triggerUSOSBeep(soundsDirectory, audioDevice, cd.Usos))
 								lastSound = Environment.TickCount;
 
@@ -1310,6 +1310,8 @@ namespace RF2SHMCoach {
 		int nextRightSound = 0;
 		int nextIdealSound = 0;
 		
+		long nextLineUpdate = 0;
+		
 		int checkPosition(ref rF2VehicleScoring playerScoring)
 		{
 			double vectorLength(double x, double y)
@@ -1477,13 +1479,22 @@ namespace RF2SHMCoach {
 			
 			int hint = checkPosition(ref playerScoring);
 			
-			if ((hint != 0) && (hint != lastLineHint)) {
+			if (hint != 0) {
+				if (hint == IDEAL) {
+					if (lastLineHint == IDEAL)
+						return;
+				}
+				else if ((lastLineHint != IDEAL) && (Environment.TickCount < nextLineUpdate))
+					return;
+				
 				lastLineHint = hint;
 				
 				playHint(chooseSound(hint));
 
 				if (hint == IDEAL)
 					Thread.Sleep(2000);
+				else
+					nextLineUpdate = Environment.TickCount + 1000;
 			}
         }
 

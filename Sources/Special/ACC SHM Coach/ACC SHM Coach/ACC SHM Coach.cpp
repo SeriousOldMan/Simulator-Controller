@@ -190,6 +190,14 @@ void rotateBy(float* x, float* y, float angle) {
 	*y = newY;
 }
 
+long getTickCount() {
+	// Get current time in milliseconds since epoch
+	auto now = std::chrono::high_resolution_clock::now();
+	auto duration = now.time_since_epoch();
+	
+	return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+}
+
 string player = "";
 string workingDirectory = "";
 string audioDevice = "";
@@ -291,10 +299,7 @@ struct SuspensionDeflections
 		RearLeft(suspensionDeflectionRL * 1000.0),
 		RearRight(suspensionDeflectionRR * 1000.0)
 	{
-		// Get current time in milliseconds since epoch
-		auto now = std::chrono::high_resolution_clock::now();
-		auto duration = now.time_since_epoch();
-		TimeMS = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+		TimeMS = getTickCount();
 	}
 };
 
@@ -1150,6 +1155,8 @@ int nextLeftSound = 0;
 int nextRightSound = 0;
 int nextIdealSound = 0;
 
+long nextLineUpdate = 0;
+
 bool findIdealPosition(float x, float y, float* idealX, float* idealY) {
 	float bestDistance = INT_MAX;
 	int bestDistanceIndex = 0;
@@ -1278,13 +1285,22 @@ void checkLine()
 {	
 	int hint = checkPosition();
 	
-	if ((hint != 0) && (hint != lastLineHint)) {
+	if (hint != 0) {
+		if (hint == IDEAL) {
+			if (lastLineHint == IDEAL)
+				return;
+		}
+		else if ((lastLineHint != IDEAL) && (getTickCount() < nextLineUpdate))
+			return;
+		
 		lastLineHint = hint;
 		
 		playHint(chooseSound(hint));
 
 		if (hint == IDEAL)
 			Sleep(2000);
+		else
+			nextLineUpdate = getTickCount() + 1000;
 	}
 }
 

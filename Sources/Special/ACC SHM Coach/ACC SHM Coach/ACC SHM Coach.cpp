@@ -1271,13 +1271,13 @@ void playHint(string sound) {
 	if (audioDevice != "")
 	{
 		if (player != "")
-			playSound(sound, false);
+			playSound(sound, true);
 		else
 			sendTriggerMessage("acousticFeedback:" + sound);
 	}
 	else {
-		PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
-		PlaySoundA(sound.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+		PlaySoundA(NULL, NULL, SND_FILENAME);
+		PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
 	}
 }
 
@@ -1446,9 +1446,9 @@ int listFiles(const char* directory, const char* subDirectory, string* fileNames
 		do
 		{
 			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-				fileNames[index] = string(ffd.cFileName);
+				fileNames[index++] = string((fullPath / string(subDirectory) / ffd.cFileName).string());
 		}
-		while ((FindNextFileA(hFind, &ffd) != 0) && (++index < maxFiles));
+		while ((FindNextFileA(hFind, &ffd) != 0) && (index < maxFiles));
 
 		FindClose(hFind);
 	}

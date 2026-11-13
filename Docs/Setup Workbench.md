@@ -339,9 +339,11 @@ You can open a browser for all recent logbook entries by clicking on the small b
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Logbook%20Browser.jpg)
 
-In the upper left list, you can select the session you want to inspect. The last one will always be the one created for the current run of "Setup Workbench". If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area.
+In the upper left list, you can select the session you want to inspect. The last one will be the one created for the current run of "Setup Workbench". If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. As an alternative, you can double-click on a session and a full report for all entries will be shown in the right area.
 
 Normally, the active session (the one where new entries will be added) is the last one, which has been created for the current run of "Setup Workbench". But you can make a previous session active by checking it in the list. New entries will now be added there and you can take notes for that session (see below). This is helpful, if you want to continue your work on a setup after a break, for example.
+
+Good to know: Sessions are labeled with the date and time, when the "Setup Workbench" has been started. But you can change the name of a session by clicking in the session list like you will renamed a file in the File Explorer of Windows.
 
 If you have selected the active session, you can add your own notes to the logbook by clicking on the "Notes..." button. This will open a window, where you can enter your notes. Text formatting using the [Markdown](https://www.markdownguide.org/) language incl. most extensions is supported.
 

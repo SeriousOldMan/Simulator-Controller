@@ -5682,7 +5682,7 @@ class LogbookBrowser {
 			else {
 				this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
 
-				if (!found && line)
+				if (!found && line && !this.LogbooksListView.GetNext(0, "C"))
 					listView.Modify(line, "Check")
 			}
 		}

@@ -1,11 +1,11 @@
 [Current]
-Type=Release
+Type=Development
 [Development]
-Version=7.3.4.0-release
-Target=7.3.4.0-release
+Version=7.3.5.0-dev
+Target=7.3.5.0-release
 Date=11/13/26
-Download=https://cutt.ly/AyPb69tQ;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/3lfsNMN1?inline=true;https://www.dropbox.com/scl/fi/86vsjieaeoj6ar1x2zsnj/Simulator-Controller-7.3.4.0-update.zip?rlkey=kqmg1ofvse2fbj1kt7k7gkv8y&st=8pxrro7j&dl=1;http://%master%/Releases/Simulator Controller 7.3.4.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.4.0-update.zip
-Changes=Setup recommendations are noted in the log book, Removed UTF errors from LMU track names, Grammar correction for Russian language, Fixed settings in "System Monitor", Rework of "Solo Center" startup, Optimized Spotter Multiclass warnings, Select active session in logbook, Fixed coaching restart for session restarts, Fixed unit selection in startup profiles
+Download=
+Changes=Migrated to AHK 2.1-alpha.38, Editable session names in logbook, Full session view in logbook
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.4.0-release

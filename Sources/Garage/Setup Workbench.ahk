@@ -129,7 +129,7 @@ class Logbook {
 			}
 		}
 
-		HTML {
+		HTML[type, id] {
 			Get {
 				throw "Virtual property LogbookEntry.HTML must be implemented in a subclass..."
 			}
@@ -253,15 +253,21 @@ class Logbook {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SelectionEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
-			local html := "<table class=`"table-std`">"
+			local html := ""
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td>" . this.Simulator . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td>" . this.Car . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td>" . this.Track . "</td></tr>")
+			if (type = "Body") {
+				html .= "<table class=`"table-std`">"
 
-			return (html . "</table>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Simulator") . "</th><td>" . this.Simulator . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Car") . "</th><td>" . this.Car . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Track") . "</th><td>" . this.Track . "</td></tr>")
+
+				html .= "</table>"
+			}
+
+			return html
 		}
 	}
 
@@ -306,54 +312,60 @@ class IssuesEntry extends Logbook.LogbookEntry {
 			}
 		}
 
-		HTML {
+		HTML[type, id] {
 			Get {
 				local window := LogBookBrowser.Instance.Window
 				local settings := collect(this.Recommendations, (r) => Array(r.Label, r.Delta))
-				local before, after, width, height
+				local head, body, width, height, chartFunction
 
-				before := "
-				(
-					<html>
-						<meta charset='utf-8'>
-						<head>
-							<style>
-								.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-								.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-								.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-							</style>
-							%chartScript%
-							<script type="text/javascript">
-								%chartLoad%
-				)"
+				if (type = "Head") {
+					head := "
+					(
+						<style>
+							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						</style>
+						%chartScript%
+						<script type="text/javascript">
+							%chartLoad%
+							%chartFunction%
+						</script>
+					)"
 
-				before := substituteVariables(before, {chartScript: getGoogleChartsScriptTag()
+					chartFunction := SetupWorkbench.Instance.createSettingsDeltasChart(settings, id)
+
+					chartFunction := StrReplace(chartFunction, "%", "\%")
+
+					head := substituteVariables(head, {chartScript: getGoogleChartsScriptTag()
 													 , chartLoad: getGoogleChartsLoadStatement("drawChart"
-																							 , "corechart", "table", "bar")
+																						   , "corechart", "table", "bar")
 													 , fontColor: window.Theme.TextColor
 													 , headerBackColor: window.Theme.ListBackColor["Header"]
 													 , evenRowBackColor: window.Theme.ListBackColor["EvenRow"]
-													 , oddRowBackColor: window.Theme.ListBackColor["OddRow"]})
+													 , oddRowBackColor: window.Theme.ListBackColor["OddRow"]
+													 , chartFunction: chartFunction})
+					return head
+				}
+				else if (type = "Body") {
+					width := (LogBookBrowser.Instance.EntryViewer.getWidth() - 30)
+					height := (LogBookBrowser.Instance.EntryViewer.getHeight() - 30)
 
-				width := (LogBookBrowser.Instance.EntryViewer.getWidth() - 4)
-				height := (LogBookBrowser.Instance.EntryViewer.getHeight() - 4)
+					body := "
+					(
+						<style> table, p, div { color: #%fontColor% } </style>
+						<div id="chart_%id%" style="width: %width%px; height: %height%px"></div>
+					)"
 
-				after := "
-				(
-							</script>
-						</head>
-						<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='0' topmargin='0' rightmargin='0' bottommargin='0'>
-							<style> table, p, div { color: #%fontColor% } </style>
-							<div id="chart_id" style="width: %width%px; height: %height%px"></div>
-						</body>
-					</html>
-				)"
+					body := substituteVariables(body, {fontColor: window.Theme.TextColor
+													 , width: width, height: height
+													 , backColor: window.AltBackColor
+													 , id: id})
 
-				after := substituteVariables(after, {fontColor: window.Theme.TextColor
-												   , width: width, height: height
-												   , backColor: window.AltBackColor})
-
-				return (before . SetupWorkbench.Instance.createSettingsDeltasChart(settings) . after)
+					return body
+				}
+				else
+					return ""
 			}
 		}
 
@@ -370,25 +382,28 @@ class IssuesEntry extends Logbook.LogbookEntry {
 		}
 	}
 
-	HTML {
+	HTML[type, *] {
 		Get {
 			local html := ""
-			local îssues := this.Issues
-			local ignore, issue
+			local îssues, ignore, issue
 
-			if (îssues.Length > 0) {
-				html .= "<table class=`"table-std`">"
-				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Importance") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Severity") . "</th></tr>")
+			if (type = "Body") {
+				îssues := this.Issues
 
-				for ignore, issue in îssues {
-					html .= ("<tr><td>" . issue.Characteristic . "</td>")
-					html .= ("<td>" . issue.Importance . "</td>")
-					html .= ("<td>" . issue.Severity . "</td></tr>")
+				if (îssues.Length > 0) {
+					html .= "<table class=`"table-std`">"
+					html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Importance") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Severity") . "</th></tr>")
+
+					for ignore, issue in îssues {
+						html .= ("<tr><td>" . issue.Characteristic . "</td>")
+						html .= ("<td>" . issue.Importance . "</td>")
+						html .= ("<td>" . issue.Severity . "</td></tr>")
+					}
+
+					html .= "</table>"
 				}
-
-				return (html . "</table>")
 			}
 
 			return html
@@ -453,14 +468,20 @@ class IssuesEntry extends Logbook.LogbookEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SetupEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
-			local html := "<table class=`"table-std`">"
+			local html := ""
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Setup:") . "</th><td>" . this.Setup . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("File:") . "</th><td>" . this.FileName . "</td></tr>")
+			if (type = "Body") {
+				html .= "<table class=`"table-std`">"
 
-			return (html . "</table>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Setup:") . "</th><td>" . this.Setup . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("File:") . "</th><td>" . this.FileName . "</td></tr>")
+
+				html .= "</table>"
+			}
+
+			return html
 		}
 	}
 
@@ -489,28 +510,31 @@ class LoadEntry extends SetupEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class SaveEntry extends SetupEntry {
-	HTML {
+	HTML[type, arguments*] {
 		Get {
-			local html := super.HTML
-			local settings := this.Settings.Clone()
-			local lastCategory := false
-			local ignore, setting
+			local html := super.HTML[type, arguments*]
+			local settings, lastCategory, ignore, setting
 
-			if (settings.Length > 0) {
-				html .= "<br><br><table class=`"table-std`">"
-				html .= ("<tr><th class=`"th-std`">" . translate("Category") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Setting") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Value") . "</th></tr>")
+			if (type = "Body") {
+				settings := this.Settings.Clone()
+				lastCategory := false
 
-				for ignore, setting in bubbleSort(&settings, (s1, s2) => strGreater(s1.Category, s2.Category)) {
-					html .= ("<tr><td>" . ((setting.Category != lastCategory) ? setting.Category : "") . "</td>")
-					html .= ("<td>" . setting.Setting . "</td>")
-					html .= ("<td>" . setting.Value . "</td></tr>")
+				if (settings.Length > 0) {
+					html .= "<br><br><table class=`"table-std`">"
+					html .= ("<tr><th class=`"th-std`">" . translate("Category") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Setting") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Value") . "</th></tr>")
 
-					lastCategory := setting.Category
+					for ignore, setting in bubbleSort(&settings, (s1, s2) => strGreater(s1.Category, s2.Category)) {
+						html .= ("<tr><td>" . ((setting.Category != lastCategory) ? setting.Category : "") . "</td>")
+						html .= ("<td>" . setting.Setting . "</td>")
+						html .= ("<td>" . setting.Value . "</td></tr>")
+
+						lastCategory := setting.Category
+					}
+
+					html .= "</table>"
 				}
-
-				return (html . "</table>")
 			}
 
 			return html
@@ -538,15 +562,21 @@ class SaveEntry extends SetupEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class LapEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
-			local html := "<table class=`"table-std`">"
+			local html := ""
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Sector Times:") . "</th><td>" . this.SectorTimes . "</td></tr>")
+			if (type = "Body") {
+				html .= "<table class=`"table-std`">"
 
-			return (html . "</table>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Sector Times:") . "</th><td>" . this.SectorTimes . "</td></tr>")
+
+				html .= "</table>"
+			}
+
+			return html
 		}
 	}
 
@@ -574,34 +604,38 @@ class LapEntry extends Logbook.LogbookEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AnalyzerEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
-			local html := "<table class=`"table-std`">"
-			local îssues := this.Issues.Clone()
-			local ignore, issue
+			local html := ""
+			local îssues, ignore, issue
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Mode:") . "</th><td>" . this.Mode . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Intensity") . translate(":") . "</th><td>" . this.Intensity . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Frequency (%)") . translate(":") . "</th><td>" . this.Frequency . "</td></tr>")
+			if (type = "Body") {
+				html .= "<table class=`"table-std`">"
+				îssues := this.Issues.Clone()
 
-			if (this.Mode = translate("Telemetry"))
-				html .= ("<tr><th class=`"th-std th-left`">" . translate("Telemetry:") . "</th><td>" . this.Telemetry . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Mode:") . "</th><td>" . this.Mode . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Intensity") . translate(":") . "</th><td>" . this.Intensity . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Frequency (%)") . translate(":") . "</th><td>" . this.Frequency . "</td></tr>")
 
-			html .= "</table>"
+				if (this.Mode = translate("Telemetry"))
+					html .= ("<tr><th class=`"th-std th-left`">" . translate("Telemetry:") . "</th><td>" . this.Telemetry . "</td></tr>")
 
-			if (îssues.Length > 0) {
-				html .= "`n<br><br><table class=`"table-std`">"
-				html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Intensity") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Frequency (%)") . "</th></tr>")
+				html .= "</table>"
 
-				for ignore, issue in îssues {
-					html .= ("<tr><td>" . issue.Characteristic . "</td>")
-					html .= ("<td>" . issue.Intensity . "</td>")
-					html .= ("<td>" . issue.Frequency . "</td></tr>")
+				if (îssues.Length > 0) {
+					html .= "`n<br><br><table class=`"table-std`">"
+					html .= ("<tr><th class=`"th-std`">" . translate("Characteristic") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Intensity") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Frequency (%)") . "</th></tr>")
+
+					for ignore, issue in îssues {
+						html .= ("<tr><td>" . issue.Characteristic . "</td>")
+						html .= ("<td>" . issue.Intensity . "</td>")
+						html .= ("<td>" . issue.Frequency . "</td></tr>")
+					}
+
+					html .= "</table>"
 				}
-
-				return (html . "</table>")
 			}
 
 			return html
@@ -655,14 +689,20 @@ class AnalyzerEntry extends Logbook.LogbookEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class AnalysisEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
-			local html := "<table class=`"table-std`">"
+			local html := ""
 
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
-			html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+			if (type = "Body") {
+				html .= "<table class=`"table-std`">"
 
-			return (html . "</table><br><br>" . this.Payload)
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap:") . "</th><td>" . this.Lap . "</td></tr>")
+				html .= ("<tr><th class=`"th-std th-left`">" . translate("Lap Time:") . "</th><td>" . this.LapTime . "</td></tr>")
+
+				html .= ("</table><br><br>" . this.Payload)
+			}
+
+			return html
 		}
 	}
 
@@ -684,23 +724,26 @@ class AnalysisEntry extends Logbook.LogbookEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class RecommendationsEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
 			local html := ""
-			local settings := this.Settings.Clone()
-			local ignore, setting
+			local settings, ignore, setting
 
-			if (settings.Length > 0) {
-				html .= "<table class=`"table-std`">"
-				html .= ("<th class=`"th-std`">" . translate("Setting") . "</th>"
-					   . "<th class=`"th-std`">" . translate("Increment") . "</th></tr>")
+			if (type = "Body") {
+				settings := this.Settings.Clone()
 
-				for ignore, setting in settings {
-					html .= ("<td>" . setting.Setting . "</td>")
-					html .= ("<td>" . setting.Increment . "</td></tr>")
+				if (settings.Length > 0) {
+					html .= "<table class=`"table-std`">"
+					html .= ("<th class=`"th-std`">" . translate("Setting") . "</th>"
+						   . "<th class=`"th-std`">" . translate("Increment") . "</th></tr>")
+
+					for ignore, setting in settings {
+						html .= ("<td>" . setting.Setting . "</td>")
+						html .= ("<td>" . setting.Increment . "</td></tr>")
+					}
+
+					html .= "</table>"
 				}
-
-				return (html . "</table>")
 			}
 
 			return html
@@ -728,9 +771,9 @@ class RecommendationsEntry extends Logbook.LogbookEntry {
 ;;;- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -;;;
 
 class NotesEntry extends Logbook.LogbookEntry {
-	HTML {
+	HTML[type, *] {
 		Get {
-			return markdown2HTML(this.Notes)
+			return ((type = "Body") ? markdown2HTML(this.Notes) : "")
 		}
 	}
 
@@ -770,6 +813,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 	iLogbookDirectory := false
 	iLogbook := false
+	iOriginalLogbook := false
 
 	iCharacteristics := []
 	iSettings := []
@@ -911,9 +955,9 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	Logbook {
+	Logbook[type := false] {
 		Get {
-			return this.iLogbook
+			return ((type = "Original") ? this.iOriginalLogbook : this.iLogbook)
 		}
 	}
 
@@ -1094,7 +1138,9 @@ class SetupWorkbench extends ConfigurationItem {
 
 		this.iLogbookDirectory := (normalizeDirectoryPath(logbookFolder) . "\")
 
-		this.selectLogbook(this.LogbookDirectory . A_Now . ".logbook")
+		this.iOriginalLogbook := (this.LogbookDirectory . A_Now . ".logbook")
+
+		this.selectLogbook(this.iOriginalLogbook)
 
 		SetupWorkbench.Instance := this
 
@@ -1555,7 +1601,7 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	createSettingsDeltasChart(settings) {
+	createSettingsDeltasChart(settings, id := "id") {
 		local drawChartFunction, names, values, ignore, setting, theMax, index, value
 
 		if (settings && (settings.Length > 0)) {
@@ -1590,7 +1636,7 @@ class SetupWorkbench extends ConfigurationItem {
 
 			drawChartFunction .= ("`nvar options = { legend: { textStyle: { color: '" . this.Window.Theme.TextColor . "'} }, bar: { groupWidth: " . (settings.Length * 16) . " }, vAxis: { textPosition: 'none', baseline: 'none', gridlines: { count: 0 }, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'} }, hAxis: {maxValue: 1, minValue: -1, gridlines: {count: 4, color: '" . this.Window.Theme.GridColor . "'}, textStyle: { color: '" . this.Window.Theme.TextColor["Grid"] . "'}}, bars: 'horizontal', backgroundColor: '" . this.Window.AltBackColor . "', chartArea: { left: '5%', top: '5%', right: '40%', bottom: '5%' } };")
 
-			drawChartFunction .= "`nvar chart = new google.visualization.BarChart(document.getElementById('chart_id')); chart.draw(data, options); }"
+			drawChartFunction .= ("`nvar chart = new google.visualization.BarChart(document.getElementById('chart_" . id . "')); chart.draw(data, options); }")
 
 			return drawChartFunction
 		}
@@ -2202,6 +2248,29 @@ class SetupWorkbench extends ConfigurationItem {
 
 	selectLogbook(fileName) {
 		this.iLogbook := fileName
+	}
+
+	renameLogbook(fileName, newName) {
+		local directory, extension
+
+		SplitPath(fileName, , &directory, &extension)
+
+		newName := (directory . "\" . normalizeFileName(newName) . "." . extension)
+
+		try {
+			FileMove(fileName, newName, 1)
+
+			if (fileName = this.Logbook["Original"])
+				this.iOriginalLogbook := newName
+
+			if (fileName = this.Logbook)
+				this.selectLogbook(newName)
+
+			return newName
+		}
+		catch Any {
+			return fileName
+		}
 	}
 
 	logLogbook(type, arguments*) {
@@ -5435,7 +5504,8 @@ class LogbookBrowser {
 	iSelectedLogbook := false
 	iSelectedEntry := false
 
-	iContent := false
+	iHead := false
+	iBody := false
 
 	iResult := false
 
@@ -5583,6 +5653,7 @@ class LogbookBrowser {
 
 		selectLogbook(listView, line, *) {
 			local newLogbook := false
+			local found := false
 			local row := 0
 
 			loop {
@@ -5592,6 +5663,8 @@ class LogbookBrowser {
 					break
 				else if (this.AvailableLogbooks[row].FileName != this.Workbench.Logbook) {
 					newLogbook := this.AvailableLogbooks[row]
+
+					found := true
 
 					break
 				}
@@ -5606,8 +5679,45 @@ class LogbookBrowser {
 
 				this.updateState()
 			}
+			else {
+				this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
+
+				if (!found && line)
+					listView.Modify(line, "Check")
+			}
+		}
+
+		renameLogbook(listView, line, *) {
+			local logbook := false
+			local newFileName
+
+			if line
+				logbook := this.AvailableLogbooks[line]
+
+			if logbook {
+				newFileName := this.Workbench.renameLogbook(logbook.FileName, listView.GetText(line))
+
+				this.loadLogbooks()
+
+				this.selectLogbook(first(this.AvailableLogbooks, (l) => (l.FileName = newFileName)))
+
+				this.updateState()
+			}
 			else
 				this.selectLogbook(line ? this.AvailableLogbooks[line] : false)
+		}
+
+		showLogbook(listView, line, *) {
+			local logbook := false
+
+			if line
+				logbook := this.AvailableLogbooks[line]
+
+			if logbook {
+				this.showLogbook(logbook)
+
+				this.updateState()
+			}
 		}
 
 		/*
@@ -5651,10 +5761,11 @@ class LogbookBrowser {
 
 		browserGui.Add("Text", "x8 yp+30 w480 0x10 W:Grow")
 
-		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Date", "Time", "#"], translate))
+		this.iLogbooksListView := browserGui.Add("ListView", "x16 yp+10 w130 h320 Section Checked -Multi -LV0x10 AltSubmit NoSort NoSortHdr -ReadOnly", collect(["Session", "#"], translate))
 		this.iLogbooksListView.OnEvent("Click", selectLogbook)
-		this.iLogbooksListView.OnEvent("DoubleClick", selectLogbook)
+		this.iLogbooksListView.OnEvent("DoubleClick", showLogbook)
 		this.iLogbooksListView.OnEvent("ItemSelect", selectLogbook)
+		this.iLogbooksListView.OnEvent("ItemEdit", renameLogbook)
 
 		; this.iListViewManager := Theme.ListViewManager(this.iLogbooksListView)
 		; this.iListViewManager .ShowColors()
@@ -5674,29 +5785,42 @@ class LogbookBrowser {
 	}
 
 	loadLogbooks() {
-		local allLogbooks := []
+		local namedLogbooks := []
+		local unnamedLogbooks := []
 		local logbooks := []
 		; local colored := []
-		local name, date, time, index, fileName
+		local selected := false
+		local name, index, fileName
 
 		this.LogbooksListView.Delete()
 
-		loop Files, this.LogbookDirectory . "*.logbook", "F"
-			allLogbooks.Push(A_LoopFileFullPath)
+		loop Files, this.LogbookDirectory . "*.logbook", "F" {
+			SplitPath(A_LoopFileFullPath, , , , &name)
 
-		for index, fileName in allLogbooks {
+			if !isTime(name)
+				namedLogbooks.Push(A_LoopFileFullPath)
+			else
+				unnamedLogbooks.Push(A_LoopFileFullPath)
+		}
+
+		for index, fileName in concatenate(namedLogbooks, unnamedLogbooks) {
 			lBook := Logbook.readLogbook(fileName)
 
-			if (!lBook.superfluous() || (A_Index = allLogbooks.Length)) {
+			if (!lBook.superfluous() || (fileName = this.Workbench.Logbook["Original"])) {
 				logbooks.Push(lBook)
 
 				SplitPath(fileName, , , , &name)
 
-				date := FormatTime(name, "ShortDate")
-				time := FormatTime(name, "HH:mm")
+				if isTime(name)
+					name := (FormatTime(name, "ShortDate") . A_Space . FormatTime(name, "HH:mm"))
 
-				this.LogbooksListView.Add((fileName = this.Workbench.Logbook) ? "Check" : ""
-										, date, time, lBook.Entries.Length)
+				if (fileName = this.Workbench.Logbook) {
+					this.LogbooksListView.Add("Check", name, lBook.Entries.Length)
+
+					selected := index
+				}
+				else
+					this.LogbooksListView.Add("", name, lBook.Entries.Length)
 
 				; if (fileName != this.Workbench.Logbook)
 				;	colored.Push(A_Index)
@@ -5755,14 +5879,14 @@ class LogbookBrowser {
 	}
 
 	loadEntry(entry) {
-		this.showEntry(entry ? entry.HTML : "")
+		this.showEntry(entry ? entry.HTML["Head", 1] : "", entry ? entry.HTML["Body", 1] : "")
 	}
 
-	showEntry(content) {
+	showEntry(head, body) {
 		local viewer := this.Control["htmlViewer"]
-		local height := (viewer.getHeight() - 4)
 		local html := ""
-		local document, height, ignore, tag
+		local height := (viewer.getHeight() - 20)
+		local document, width, ignore, tag
 
 		getCSS() {
 			local script
@@ -5859,10 +5983,11 @@ class LogbookBrowser {
 											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
 		}
 
-		this.iContent := content
+		this.iHead := head
+		this.iBody := body
 
-		if !content {
-			width := viewer.getWidth() - 10
+		if (!head && !body) {
+			width := (viewer.getWidth() - 20)
 
 			document := "
 			(
@@ -5884,47 +6009,47 @@ class LogbookBrowser {
 										   , backColor: this.Window.AltBackColor})
 		}
 		else {
-			if (InStr(Trim(content), "<html>") == 1)
-				document := content
-			else {
-				width := viewer.getWidth() - 35
+			width := (viewer.getWidth() - 20)
 
-				document := "
-				(
-				<html>
-					<meta charset='utf-8'>
-					<head>
-						<style>
-							.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
-							.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
-							.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
-							%CSS%
-						</style>
-					</head>
-					<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'>
-						<div style="width: %width%px; font-family: Arial; font-size: 12px">
-							<p style="font-family: Arial; font-size: 12px; margin: auto">
-								%html%
-							</p>
-						</div>
-					</body>
-				</html>
-				)"
+			document := "
+			(
+			<html>
+				<meta charset='utf-8'>
+				<head>
+					<style>
+						.headerStyle { height: 25; font-size: 11px; font-weight: 500; background-color: #%headerBackColor%; }
+						.rowStyle { font-size: 11px; color: #%fontColor%; background-color: #%evenRowBackColor%; }
+						.oddRowStyle { font-size: 11px; color: #%fontColor%; background-color: #%oddRowBackColor%; }
+						%CSS%
+					</style>
+					%head%
+				</head>
+				<body style='background-color: #%backColor%' style='overflow: auto' leftmargin='5' topmargin='5' rightmargin='5' bottommargin='5'>
+					<div style="width: %width%px; height: %height%px; font-family: Arial; font-size: 12px">
+						<p style="font-family: Arial; font-size: 12px; margin: auto">
+							%body%
+						</p>
+					</div>
+				</body>
+			</html>
+			)"
 
-				content := StrReplace(content, "%", "\%")
+			head := StrReplace(head, "%", "\%")
+			body := StrReplace(body, "%", "\%")
 
-				for ignore, tag in ["<html>", "</html>", "<body>", "</body>"]
-					content := StrReplace(content, tag, "")
-
-				document := substituteVariables(document
-											  , {fontColor: this.Window.Theme.TextColor
-											   , headerBackColor: this.Window.Theme.ListBackColor["Header"]
-											   , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
-											   , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
-											   , CSS: getCSS()
-											   , width: width, height: height, html: content
-											   , backColor: this.Window.AltBackColor})
+			for ignore, tag in ["<html>", "</html>", "<body>", "</body>"] {
+				head := StrReplace(head, tag, "")
+				body := StrReplace(body, tag, "")
 			}
+
+			document := substituteVariables(document
+										  , {fontColor: this.Window.Theme.TextColor
+										   , headerBackColor: this.Window.Theme.ListBackColor["Header"]
+										   , evenRowBackColor: this.Window.Theme.ListBackColor["EvenRow"]
+										   , oddRowBackColor: this.Window.Theme.ListBackColor["OddRow"]
+										   , CSS: getCSS()
+										   , width: width, height: height, head: head, body: body
+										   , backColor: this.Window.AltBackColor})
 		}
 
 		viewer.document.open()
@@ -5940,7 +6065,7 @@ class LogbookBrowser {
 
 			for ignore, candidate in this.AvailableLogbooks
 				if (logbook = candidate) {
-					this.LogbooksListView.Modify(A_Index, "Select Vis")
+					this.LogbooksListView.Modify(A_Index, "Select Vis Col2", logbook.Entries.Length)
 
 					break
 				}
@@ -5954,6 +6079,47 @@ class LogbookBrowser {
 
 			this.updateState()
 		}
+	}
+
+	showLogbook(logbook) {
+		local head := ""
+		local body := ""
+		local index, entry, type, html
+
+		this.selectEntry(false)
+
+		for index, entry in logbook.Entries {
+			type := entry.Type
+
+			switch type, false {
+				case "Analysis":
+					type := "Engineer: Analysis"
+				case "Recommendations":
+					type := "Engineer: Apply"
+				case "Deltas":
+					type := "Recommendations"
+			}
+
+			html := entry.HTML["Head", index]
+
+			if (html != "") {
+				if (head = "")
+					head .= "`n"
+
+				head .= html
+			}
+
+			html := entry.HTML["Body", index]
+
+			if (html != "") {
+				if (body = "")
+					body .= "`n"
+
+				body .= ("<h3>" . translate(type) . "</h3>" . html)
+			}
+		}
+
+		this.showEntry(head, body)
 	}
 
 	selectEntry(entry, force := false) {
@@ -6000,7 +6166,7 @@ class LogbookBrowser {
 	}
 
 	windowResized() {
-		this.showEntry(this.iContent)
+		this.showEntry(this.iHead, this.iBody)
 	}
 
 	browseLogbooks(fileName) {

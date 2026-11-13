@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <stdexcept>
 #include <future>
+#include <filesystem>
 
 // for timeBeginPeriod
 #pragma comment(lib, "Winmm")
@@ -279,6 +280,39 @@ inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
 }
 
+#define PI 3.14159265
+
+float vectorAngle(float x, float y) {
+	float scalar = (x * 0) + (y * 1);
+	float length = vectorLength(x, y);
+
+	float angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
+
+	if (x < 0)
+		angle = 360 - angle;
+
+	return angle;
+}
+
+void rotateBy(float* x, float* y, float angle) {
+	float sinus = sin(angle * PI / 180);
+	float cosinus = cos(angle * PI / 180);
+
+	float newX = (*x * cosinus) - (*y * sinus);
+	float newY = (*x * sinus) + (*y * cosinus);
+
+	*x = newX;
+	*y = newY;
+}
+
+long getTickCount() {
+	// Get current time in milliseconds since epoch
+	auto now = std::chrono::high_resolution_clock::now();
+	auto duration = now.time_since_epoch();
+	
+	return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+}
+
 std::string player = "";
 std::string workingDirectory = "";
 std::string audioDevice = "";
@@ -376,10 +410,7 @@ struct SuspensionDeflections
 		  RearLeft(suspensionDeflectionRL * 1000.0),
 		  RearRight(suspensionDeflectionRR * 1000.0)
 	{
-		// Get current time in milliseconds since epoch
-		auto now = std::chrono::high_resolution_clock::now();
-		auto duration = now.time_since_epoch();
-		TimeMS = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+		TimeMS = getTickCount();
 	}
 };
 
@@ -1320,6 +1351,182 @@ void loadTrackCoordinates(char* fileName) {
 	hasTrackCoordinates = true;
 }
 
+std::string leftSounds[16];
+std::string rightSounds[16];
+std::string idealSounds[16];
+
+int numLeftSounds = 0;
+int numRightSounds = 0;
+int numIdealSounds = 0;
+
+int numCoordinates = 0;
+float* xCoordinates = new float[256];
+float* yCoordinates = new float[256];
+float* distances = new float[256];
+
+const int LEFT = 1;
+const int RIGHT = 2;
+const int IDEAL = 3;
+int lastLineHint = IDEAL;
+
+double lateralThreshold = 0.5;
+double distanceThreshold = 20;
+
+int nextLeftSound = 0;
+int nextRightSound = 0;
+int nextIdealSound = 0;
+
+long nextLineUpdate = 0;
+
+bool findIdealPosition(float distance, float x, float y, float* idealX, float* idealY) {
+	float bestDistance = INT_MAX;
+	int bestDistanceIndex = 0;
+
+	for (int i = 0; i < numCoordinates; i++)
+	{
+		float curDistance = abs(distance - distances[i]);
+
+		if (curDistance < distanceThreshold)
+			if (curDistance < bestDistance)
+			{
+				bestDistance = curDistance;
+				bestDistanceIndex = i;
+			}
+			else
+			{
+				*idealX = xCoordinates[bestDistanceIndex];
+				*idealY = yCoordinates[bestDistanceIndex];
+
+				return true;
+			}
+	}
+
+	return false;
+}
+
+int checkCarPosition(float distance, float angle, float carX, float carY, float* gap)
+{
+	float idealX = 0;
+	float idealY = 0;
+	
+	if (findIdealPosition(distance, carX, carY, &idealX, &idealY)) {
+		float transX = (idealX - carX);
+		float transY = (idealY - carY);
+
+		rotateBy(&transX, &transY, angle);
+		
+		*gap = abs(transX);
+
+		if (*gap > lateralThreshold)
+			return (transX < 0) ? RIGHT : LEFT;
+		else
+			return IDEAL;
+	}
+	else
+		return 0;
+}
+
+int checkPosition(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
+{
+	char buffer[60];
+	char* trackPositions;
+	float playerRunning = 0;
+	
+	if (getRawDataValue(trackPositions, header, data, "CarIdxLapDistPct"))
+		playerRunning = ((float*)trackPositions)[playerCarIndex];
+	
+	getDataValue(buffer, header, data, "VelocityX");
+	float velocityX = atof(buffer);
+
+	getDataValue(buffer, header, data, "VelocityY");
+	float velocityY = atof(buffer);
+
+	getDataValue(buffer, header, data, "VelocityZ");
+	float velocityZ = atof(buffer);
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		float coordinateX;
+		float coordinateY;
+		float gap = 0;
+
+		if (getCarCoordinates(header, data, playerCarIndex, coordinateX, coordinateY))
+			return checkCarPosition(playerRunning * trackLength,
+									vectorAngle(velocityX, velocityZ),
+									coordinateX, coordinateY, &gap);
+		else
+			return 0;
+	}
+	else
+		return 0;
+}
+
+std::string chooseSound(int type) {
+	std::string sound;
+	
+	switch (type) {
+		case LEFT:
+			sound = leftSounds[nextLeftSound];
+			
+			if (++nextLeftSound >= numLeftSounds)
+				nextLeftSound = 0;
+			
+			break;
+		case RIGHT:
+			sound = rightSounds[nextRightSound];
+			
+			if (++nextRightSound >= numRightSounds)
+				nextRightSound = 0;
+			
+			break;
+		default:
+			sound = idealSounds[nextIdealSound];
+			
+			if (++nextIdealSound >= numIdealSounds)
+				nextIdealSound = 0;
+			
+			break;
+	}
+	
+	return sound;
+}
+
+void playHint(std::string sound) {
+	if (audioDevice != "")
+	{
+		if (player != "")
+			playSound(sound, true);
+		else
+			sendTriggerMessage(("acousticFeedback:" + sound).c_str());
+	}
+	else {
+		PlaySoundA(NULL, NULL, SND_FILENAME);
+		PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
+	}
+}
+
+void checkLine(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)
+{	
+	int hint = checkPosition(header, data, playerCarIndex, trackLength);
+	
+	if (hint != 0) {
+		if (hint == IDEAL) {
+			if (lastLineHint == IDEAL)
+				return;
+		}
+		else if ((lastLineHint != IDEAL) && (getTickCount() < nextLineUpdate))
+			return;
+		
+		lastLineHint = hint;
+		
+		playHint(chooseSound(hint));
+
+		if (hint == IDEAL)
+			Sleep(2000);
+		else
+			nextLineUpdate = getTickCount() + 1000;
+	}
+}
+
 const int Start = 0;
 const int Intro = 1;
 const int Ready = 2;
@@ -1328,10 +1535,6 @@ const int Brake = 4;
 const int Release = 5;
 
 int tIndices[256];
-float xCoordinates[256];
-float yCoordinates[256];
-float trackDistances[60];
-int numCoordinates = 0;
 time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
@@ -1380,7 +1583,7 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 
 			if (strcmp(triggerType, "Trigger") == 0) {
 				for (int i = 0; i < numCoordinates; i++) {
-					float cDistance = abs(trackDistances[i] - running);
+					float cDistance = abs(distances[i] - running);
 
 					if (i == 0)
 						distance = cDistance;
@@ -1474,6 +1677,80 @@ void checkCoordinates(const irsdk_header* header, const char* data, float trackL
 #define stat _stat
 #endif
 
+int listFiles(const char* directory, const char* subDirectory, std::string* fileNames, int maxFiles) {
+	std::filesystem::path fullPath = std::string(directory);
+	
+	int index = 0;
+	
+	WIN32_FIND_DATAA ffd;
+	HANDLE hFind = FindFirstFileA((fullPath / std::string(subDirectory) / "*").string().c_str(), &ffd);
+
+	if (INVALID_HANDLE_VALUE != hFind) {
+		do
+		{
+			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+				fileNames[index++] = std::string((fullPath / std::string(subDirectory) / ffd.cFileName).string());
+		}
+		while ((FindNextFileA(hFind, &ffd) != 0) && (index < maxFiles));
+
+		FindClose(hFind);
+	}
+	
+	return index;
+}
+		
+void loadSounds(char* soundsDirectory)
+{
+	numLeftSounds = listFiles(soundsDirectory, "Left", leftSounds, 16);
+	numRightSounds = listFiles(soundsDirectory, "Right", rightSounds, 16);
+	numIdealSounds = listFiles(soundsDirectory, "Ideal", idealSounds, 16);
+}
+
+void loadLineHints()
+{
+	if ((hintFile != "") && fileExists(hintFile))
+	{
+		struct stat result;
+		time_t mod_time = 0;
+
+		if (stat(hintFile.c_str(), &result) == 0)
+			mod_time = result.st_mtime;
+
+		if (numCoordinates == 0 || (mod_time > lastHintsUpdate))
+		{
+			numCoordinates = 0;
+			lastHintsUpdate = mod_time;
+
+			std::ifstream infile(hintFile);
+			std::string line;
+			bool first = true;
+			int index = 0;
+
+			while (std::getline(infile, line))
+				if (first) {
+					numCoordinates = atoi(line.c_str());
+		
+					delete[] distances;
+					delete[] xCoordinates;
+					delete[] yCoordinates;
+					
+					distances = new float[numCoordinates];
+					xCoordinates = new float[numCoordinates];
+					yCoordinates = new float[numCoordinates];
+					
+					first = false;
+				}
+				else {
+					auto parts = splitString(line, ";", 3);
+
+					distances[index] = (float)atof(parts[0].c_str());
+					xCoordinates[index] = (float)atof(parts[1].c_str());
+					yCoordinates[index++] = (float)atof(parts[2].c_str());
+				}
+		}
+	} 
+}
+
 void loadTrackHints()
 {
 	if ((hintFile != "") && fileExists(hintFile))
@@ -1534,6 +1811,7 @@ int main(int argc, char* argv[])
 	bool handlingAnalyzer = false;
 	bool positionTrigger = false;
 	bool trackHints = false;
+	bool lineHints = false;
 	const char* soundsDirectory = "";
 
 	if (argc > 1) {
@@ -1565,7 +1843,7 @@ int main(int argc, char* argv[])
 					}
 				}
 
-				trackDistances[numCoordinates] = ((float)candidate) / 1000.0;
+				distances[numCoordinates] = ((float)candidate) / 1000.0;
 
 				if (++numCoordinates > 255)
 					break;
@@ -1595,6 +1873,32 @@ int main(int argc, char* argv[])
 
 			if (argc > 7)
 				workingDirectory = argv[7];
+		}
+
+		if (lineHints) {
+			triggerType = "LineHints";
+
+			loadTrackCoordinates(argv[2]);
+
+			hintFile = argv[3];
+			
+			loadSounds(argv[4]);
+			
+			lateralThreshold = atof(argv[5]);
+
+            if (argc > 6)
+                audioDevice = argv[6];
+
+			if (argc > 7)
+				volume = atof(argv[7]);
+
+			if (argc > 8)
+				player = argv[8];
+
+			if (argc > 9)
+				workingDirectory = argv[9];
+
+            Sleep(10000);
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1710,6 +2014,13 @@ int main(int argc, char* argv[])
 						loadTrackHints();
 
 						checkCoordinates(pHeader, g_data, trackLength);
+
+						Sleep(10);
+					}
+					else if (lineHints) {
+						loadLineHints();
+
+						checkLine(pHeader, g_data, playerCarIndex, trackLength);
 
 						Sleep(10);
 					}

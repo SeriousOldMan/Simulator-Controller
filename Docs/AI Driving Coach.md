@@ -483,10 +483,6 @@ The following video gives you a good demonstration of this:
 2. Line coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
 3. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control how precise you have to match the ideal line and where on the track you will get these instructions.
 
-Coaching.Line.Threshold=Coach: Deviation from Ideal Line
-Coaching.Line.Corner.Offset==Coach: Start Ideal Line coaching before the start of the Corner
-Coaching.Line.Straight.Offset==Coach: Stop Ideal Line coaching after the start of the Straight
-
    - *Deviation from Ideal Line*
      
 	 Defines a threshold for your misplacement from the ideal line at which the Coach will tell you where to go. Default is 0.5 meters.
@@ -500,7 +496,8 @@ Coaching.Line.Straight.Offset==Coach: Stop Ideal Line coaching after the start o
      The number of meters after the start of the straight section, where the Coach stops telling you how to position the car. Default is 20 meters.
 	 
    Please note, that all these settings can be defined per car and even per track.
-5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own driving style over and over again.
+4. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own driving style over and over again.
+5. Although this coaching mode functions technically the same way in *iRacing* as it does in all other simulators, the limitations of the *iRacing* API — specifically regarding the vehicle's position on the track — render it virtually useless.
 
 ### Practicing braking points
 

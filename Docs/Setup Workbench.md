@@ -339,9 +339,9 @@ You can open a browser for all recent logbook entries by clicking on the small b
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Logbook%20Browser.jpg)
 
-In the upper left list, you can select the session you want to inspect. The last one will be the one created for the current run of "Setup Workbench". If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the entries here for more details, which will be show in the right area. As an alternative, you can double-click on a session and a full report for all entries will be shown in the right area.
+In the upper left list, you can select the session you want to inspect. The last one will be the one created for the current run of "Setup Workbench". If you have selected a session, all recorded actions will be shown in the lower list. Click on one of the actions here for more details, which will be show in the right area. As an alternative, you can double-click on a session and a full report for all actions will be shown in the right area.
 
-Normally, the active session (the one where new entries will be added) is the last one, which has been created for the current run of "Setup Workbench". But you can make a previous session active by checking it in the list. New entries will now be added there and you can take notes for that session (see below). This is helpful, if you want to continue your work on a setup after a break, for example.
+Normally, the active session (the one where new actions will be added) is the last one, which has been created for the current run of "Setup Workbench". But you can make a previous session active by checking it in the list. New actions will now be added there and you can take notes for that session (see below). This is helpful, if you want to continue your work on a setup after a break, for example.
 
 Good to know: Sessions are labeled with the date and time, when the "Setup Workbench" has been started. But you can change the name of a session by clicking in the session list like you will renamed a file in the File Explorer of Windows.
 

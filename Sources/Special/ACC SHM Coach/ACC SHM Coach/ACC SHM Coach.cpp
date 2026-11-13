@@ -1225,9 +1225,6 @@ int checkPosition()
 				break;
 			}
 
-		float coordinateX = gf->carCoordinates[carID][0];
-		float coordinateY = gf->carCoordinates[carID][2];
-		float coordinateZ = gf->carCoordinates[carID][1];
 		float gap = 0;
 		
 		return checkCarPosition(vectorAngle(velocityX, velocityZ),

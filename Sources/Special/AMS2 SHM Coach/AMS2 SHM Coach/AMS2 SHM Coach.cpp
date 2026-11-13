@@ -1059,9 +1059,9 @@ void writeTelemetry(const SharedMemory* sharedData, bool calibrate) {
 	}
 }
 
-string leftSounds[16];
-string rightSounds[16];
-string idealSounds[16];
+std::string leftSounds[16];
+std::string rightSounds[16];
+std::string idealSounds[16];
 
 int numLeftSounds = 0;
 int numRightSounds = 0;
@@ -1144,7 +1144,7 @@ int checkPosition(const SharedMemory* sharedData)
 		int carID = sharedData->mViewedParticipantIndex;
 		float gap = 0;
 		
-		return checkCarPosition(sharedData->mParticipantInfo[carID],
+		return checkCarPosition(sharedData->mParticipantInfo[carID].mCurrentLapDistance,
 								vectorAngle(velocityX, velocityZ),
 								sharedData->mParticipantInfo[carID].mWorldPosition[VEC_X],
 								-sharedData->mParticipantInfo[carID].mWorldPosition[VEC_Z], &gap);
@@ -1153,8 +1153,8 @@ int checkPosition(const SharedMemory* sharedData)
 		return 0;
 }
 
-string chooseSound(int type) {
-	string sound;
+std::string chooseSound(int type) {
+	std::string sound;
 	
 	switch (type) {
 		case LEFT:
@@ -1183,13 +1183,13 @@ string chooseSound(int type) {
 	return sound;
 }
 
-void playHint(string sound) {
+void playHint(std::string sound) {
 	if (audioDevice != "")
 	{
 		if (player != "")
 			playSound(sound, true);
 		else
-			sendTriggerMessage("acousticFeedback:" + sound);
+			sendTriggerMessage(("acousticFeedback:" + sound).c_str());
 	}
 	else {
 		PlaySoundA(NULL, NULL, SND_FILENAME);
@@ -1342,19 +1342,19 @@ void checkCoordinates(const SharedMemory* sharedData) {
 #define stat _stat
 #endif
 
-int listFiles(const char* directory, const char* subDirectory, string* fileNames, int maxFiles) {
-	std::filesystem::path fullPath = string(directory);
+int listFiles(const char* directory, const char* subDirectory, std::string* fileNames, int maxFiles) {
+	std::filesystem::path fullPath = std::string(directory);
 	
 	int index = 0;
 	
 	WIN32_FIND_DATAA ffd;
-	HANDLE hFind = FindFirstFileA((fullPath / string(subDirectory) / "*").string().c_str(), &ffd);
+	HANDLE hFind = FindFirstFileA((fullPath / std::string(subDirectory) / "*").string().c_str(), &ffd);
 
 	if (INVALID_HANDLE_VALUE != hFind) {
 		do
 		{
 			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-				fileNames[index++] = string((fullPath / string(subDirectory) / ffd.cFileName).string());
+				fileNames[index++] = std::string((fullPath / std::string(subDirectory) / ffd.cFileName).string());
 		}
 		while ((FindNextFileA(hFind, &ffd) != 0) && (index < maxFiles));
 
@@ -1387,7 +1387,7 @@ void loadLineHints()
 			lastHintsUpdate = mod_time;
 
 			std::ifstream infile(hintFile);
-			string line;
+			std::string line;
 			bool first = true;
 			int index = 0;
 

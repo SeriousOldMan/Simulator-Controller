@@ -18,6 +18,7 @@
 #include <numeric>
 #include <chrono>
 #include <stdexcept>
+#include <filesystem>
 
 #pragma comment( lib, "winmm.lib" )
 
@@ -142,6 +143,39 @@ std::vector<std::string> splitString(const std::string& s, const std::string& de
 
 inline float vectorLength(float x, float y) {
 	return sqrt((x * x) + (y * y));
+}
+
+#define PI 3.14159265
+
+float vectorAngle(float x, float y) {
+	float scalar = (x * 0) + (y * 1);
+	float length = vectorLength(x, y);
+
+	float angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
+
+	if (x < 0)
+		angle = 360 - angle;
+
+	return angle;
+}
+
+void rotateBy(float* x, float* y, float angle) {
+	float sinus = sin(angle * PI / 180);
+	float cosinus = cos(angle * PI / 180);
+
+	float newX = (*x * cosinus) - (*y * sinus);
+	float newY = (*x * sinus) + (*y * cosinus);
+
+	*x = newX;
+	*y = newY;
+}
+
+long getTickCount() {
+	// Get current time in milliseconds since epoch
+	auto now = std::chrono::high_resolution_clock::now();
+	auto duration = now.time_since_epoch();
+
+	return std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 }
 
 string player = "";
@@ -1080,6 +1114,177 @@ void writeTelemetry(bool calibrate) {
 	}
 }
 
+string leftSounds[16];
+string rightSounds[16];
+string idealSounds[16];
+
+int numLeftSounds = 0;
+int numRightSounds = 0;
+int numIdealSounds = 0;
+
+int numCoordinates = 0;
+float* xCoordinates = new float[256];
+float* yCoordinates = new float[256];
+float* distances = new float[256];
+
+const int LEFT = 1;
+const int RIGHT = 2;
+const int IDEAL = 3;
+int lastLineHint = IDEAL;
+
+double lateralThreshold = 0.5;
+double distanceThreshold = 20;
+
+int nextLeftSound = 0;
+int nextRightSound = 0;
+int nextIdealSound = 0;
+
+long nextLineUpdate = 0;
+
+bool findIdealPosition(float x, float y, float* idealX, float* idealY) {
+	float bestDistance = INT_MAX;
+	int bestDistanceIndex = 0;
+
+	for (int i = 0; i < numCoordinates; i++)
+	{
+		float curDistance = vectorLength(xCoordinates[i] - x, yCoordinates[i] - y);
+
+		if (curDistance < distanceThreshold)
+			if (curDistance < bestDistance)
+			{
+				bestDistance = curDistance;
+				bestDistanceIndex = i;
+			}
+			else
+			{
+				*idealX = xCoordinates[bestDistanceIndex];
+				*idealY = yCoordinates[bestDistanceIndex];
+
+				return true;
+			}
+	}
+
+	return false;
+}
+
+int checkCarPosition(float angle, float carX, float carY, float* gap)
+{
+	float idealX = 0;
+	float idealY = 0;
+
+	if (findIdealPosition(carX, carY, &idealX, &idealY)) {
+		float transX = (idealX - carX);
+		float transY = (idealY - carY);
+
+		rotateBy(&transX, &transY, angle);
+
+		*gap = abs(transX);
+
+		if (*gap > lateralThreshold)
+			return (transX < 0) ? RIGHT : LEFT;
+		else
+			return IDEAL;
+	}
+	else
+		return 0;
+}
+
+int checkPosition()
+{
+	SPageFilePhysics* pf = (SPageFilePhysics*)m_physics.mapFileBuffer;
+	SPageFileGraphicEvo* gf = (SPageFileGraphicEvo*)m_graphics.mapFileBuffer;
+
+	float velocityX = pf->velocity[0];
+	float velocityY = pf->velocity[2];
+	float velocityZ = pf->velocity[1];
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		float angle = vectorAngle(velocityX, velocityY);
+		int carID = 0;
+
+		for (int i = 0; i < gf->active_cars; i++)
+			if ((gf->car_ids[i][0] == gf->player_car_id_a) && (gf->car_ids[i][1] == gf->player_car_id_b)) {
+				carID = i;
+
+				break;
+			}
+
+		float gap = 0;
+
+		return checkCarPosition(vectorAngle(velocityX, velocityZ),
+								gf->car_coordinates[carID][0], gf->car_coordinates[carID][2], &gap);
+	}
+	else
+		return 0;
+}
+
+string chooseSound(int type) {
+	string sound;
+
+	switch (type) {
+	case LEFT:
+		sound = leftSounds[nextLeftSound];
+
+		if (++nextLeftSound >= numLeftSounds)
+			nextLeftSound = 0;
+
+		break;
+	case RIGHT:
+		sound = rightSounds[nextRightSound];
+
+		if (++nextRightSound >= numRightSounds)
+			nextRightSound = 0;
+
+		break;
+	default:
+		sound = idealSounds[nextIdealSound];
+
+		if (++nextIdealSound >= numIdealSounds)
+			nextIdealSound = 0;
+
+		break;
+	}
+
+	return sound;
+}
+
+void playHint(string sound) {
+	if (audioDevice != "")
+	{
+		if (player != "")
+			playSound(sound, true);
+		else
+			sendTriggerMessage("acousticFeedback:" + sound);
+	}
+	else {
+		PlaySoundA(NULL, NULL, SND_FILENAME);
+		PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
+	}
+}
+
+void checkLine()
+{
+	int hint = checkPosition();
+
+	if (hint != 0) {
+		if (hint == IDEAL) {
+			if (lastLineHint == IDEAL)
+				return;
+		}
+		else if ((lastLineHint != IDEAL) && (getTickCount() < nextLineUpdate))
+			return;
+
+		lastLineHint = hint;
+
+		playHint(chooseSound(hint));
+
+		if (hint == IDEAL)
+			Sleep(2000);
+		else
+			nextLineUpdate = getTickCount() + 1000;
+	}
+}
+
 const int Start = 0;
 const int Intro = 1;
 const int Ready = 2;
@@ -1088,9 +1293,6 @@ const int Brake = 4;
 const int Release = 5;
 
 int tIndices[256];
-float xCoordinates[256];
-float yCoordinates[256];
-int numCoordinates = 0;
 time_t nextUpdate = 0;
 const char* triggerType = "Trigger";
 
@@ -1213,6 +1415,79 @@ void checkCoordinates() {
 #define stat _stat
 #endif
 
+int listFiles(const char* directory, const char* subDirectory, string* fileNames, int maxFiles) {
+	std::filesystem::path fullPath = string(directory);
+
+	int index = 0;
+
+	WIN32_FIND_DATAA ffd;
+	HANDLE hFind = FindFirstFileA((fullPath / string(subDirectory) / "*").string().c_str(), &ffd);
+
+	if (INVALID_HANDLE_VALUE != hFind) {
+		do
+		{
+			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+				fileNames[index++] = string((fullPath / string(subDirectory) / ffd.cFileName).string());
+		} while ((FindNextFileA(hFind, &ffd) != 0) && (index < maxFiles));
+
+		FindClose(hFind);
+	}
+
+	return index;
+}
+
+void loadSounds(char* soundsDirectory)
+{
+	numLeftSounds = listFiles(soundsDirectory, "Left", leftSounds, 16);
+	numRightSounds = listFiles(soundsDirectory, "Right", rightSounds, 16);
+	numIdealSounds = listFiles(soundsDirectory, "Ideal", idealSounds, 16);
+}
+
+void loadLineHints()
+{
+	if ((hintFile != "") && fileExists(hintFile))
+	{
+		struct stat result;
+		time_t mod_time = 0;
+
+		if (stat(hintFile.c_str(), &result) == 0)
+			mod_time = result.st_mtime;
+
+		if (numCoordinates == 0 || (mod_time > lastHintsUpdate))
+		{
+			numCoordinates = 0;
+			lastHintsUpdate = mod_time;
+
+			std::ifstream infile(hintFile);
+			string line;
+			bool first = true;
+			int index = 0;
+
+			while (std::getline(infile, line))
+				if (first) {
+					numCoordinates = atoi(line.c_str());
+
+					delete[] distances;
+					delete[] xCoordinates;
+					delete[] yCoordinates;
+
+					distances = new float[numCoordinates];
+					xCoordinates = new float[numCoordinates];
+					yCoordinates = new float[numCoordinates];
+
+					first = false;
+				}
+				else {
+					auto parts = splitString(line, ";", 3);
+
+					distances[index] = (float)atof(parts[0].c_str());
+					xCoordinates[index] = (float)atof(parts[1].c_str());
+					yCoordinates[index++] = (float)atof(parts[2].c_str());
+				}
+		}
+	}
+}
+
 void loadTrackHints()
 {
 	if ((hintFile != "") && fileExists(hintFile))
@@ -1269,6 +1544,7 @@ int main(int argc, char* argv[])
 	
 	bool positionTrigger = false;
 	bool trackHints = false;
+	bool lineHints = false;
 	bool handlingCalibrator = false;
 	bool handlingAnalyzer = false;
 	const char* soundsDirectory = "";
@@ -1307,6 +1583,32 @@ int main(int argc, char* argv[])
 
 			if (argc > 6)
 				workingDirectory = argv[6];
+		}
+
+		lineHints = (strcmp(argv[1], "-LineHints") == 0);
+
+		if (lineHints) {
+			triggerType = "LineHints";
+
+			hintFile = argv[2];
+
+			loadSounds(argv[3]);
+
+			lateralThreshold = atof(argv[4]);
+
+			if (argc > 5)
+				audioDevice = argv[5];
+
+			if (argc > 6)
+				volume = atof(argv[6]);
+
+			if (argc > 7)
+				player = argv[7];
+
+			if (argc > 8)
+				workingDirectory = argv[8];
+
+			Sleep(10000);
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);

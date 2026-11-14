@@ -92,6 +92,8 @@ Information=informazioni sulla sessione, informazioni sul turno, informazioni su
 
 	[(CanYou) dammi {raccomandazioni, suggerimenti, una guida, istruzioni} {mentre guido, per ogni curva}, {Per favore dimmi, Dimmi} {davanti, per} ogni curva quello che {posso, dovrebbe} cambiare, (CanYou) allenami {in pista, mentre guido}]
 	
+	[(CanYou) dirmi come posizionare l'auto, {Dimmi, Per favore dimmi} come posizionare l'auto, (CanWe) esercitarci sulla {traiettoria ideale, traiettoria}, Lavoriamo sulla {traiettoria ideale, traiettoria}]
+	
 	[(CanYou) dirmi dove sono i punti di frenata, {Per favore dimmi, Dimmi} dove frenare, (CanWe) esercitarci {sulla frenata, sui punti di frenata}]
 	
 	[(CanYou) aiutarmi a rimanere concentrato, (CanYou) motivarmi se necessario, Ti prego di aiutarmi a mantenere la concentrazione]

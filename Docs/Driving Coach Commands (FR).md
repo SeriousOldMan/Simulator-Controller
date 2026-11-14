@@ -92,6 +92,8 @@ Information=informations sur la session, informations sur le relais, information
 
 	[(CanYou) me donner {des recommandations, des conseils, un guide, des instructions} {pendant que je conduis, en conduisant, à chaque virage}, {S'il vous plaît dites-moi, Dites-moi} {avant, pour} chaque coin ce que je {peut, devrais} changer, (CanYou) {m'entraîner sur la piste, me coacher pendant que je conduis, me coacher en conduisant}]
 	
+	[(CanYou) m'indiquer comment positionner la voiture, {Dis-moi, Indique-moi} comment positionner la voiture, (CanWe) s'entraîner sur la {trajectoire idéale, trajectoire}, Travaillons sur la {trajectoire idéale, trajectoire}]
+	
 	[(CanYou) me dire où se trouvent les points de freinage, {Veuillez me dire, Dites-moi} où freiner, (CanWe) pratiquer {le freinage, les points de freinage}]
 	
 	[(CanYou) m'aider à rester concentré, (CanYou) me motiver si nécessaire, S'il vous plaît aidez-moi à maintenir ma concentration]

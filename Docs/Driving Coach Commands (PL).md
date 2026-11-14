@@ -91,6 +91,8 @@ Information=informacje o sesji, informacje o stincie, informacje o prowadzeniu
 	[(CanWe) skupmy się na {zakręcie, zakręcie numer} (Number), {Proszę spójrz, Zobacz} bliżej {zakręt, zakręt numer} (Number), Gdzie mogę się poprawić w {zakręcie, zakręcie numer} (Number)]
 
 	[(CanYou) dawaj mi {wskazówki, porady} podczas jazdy, {Proszę mów, Mów} mi przed każdym {zakrętem}, (CanYou) coachuj mnie na torze]
+	
+	[(CanYou) powiedzieć mi jak ustawić samochód, {Proszę, Powiedz mi} jak ustawić samochód, (CanWe) poćwiczyć {optymalną linię jazdy, linię jazdy}, Popracujmy nad {optymalną linią jazdy, linią jazdy}]
 
 	[(CanYou) pokaż punkty hamowania, {Proszę powiedz, Powiedz} gdzie hamować, (CanWe) poćwiczyć hamowanie]
 	

@@ -82,6 +82,8 @@ Information=Session Information, Stint Information, Information zum Fahrverhalte
 
 	[(KannstDu) (Mir) {Anweisungen, Anweisungen für jede Kurve} {geben, geben während ich fahre}, (GibMir) {Anweisungen, Anweisungen für jede Kurve}, {Bitte sag, Sag} (Mir) {vor jeder Kurve, für jede Kurve} {wie ich mich verbessern kann, was ich ändern muss}]
 	
+	[(KannstDu) mir sagen wo ich den Wagen positionieren soll, {Bitte sag, Sag} (Mir) wie ich den Wagen positionieren soll, (KoennenWir) die {Ideallinie, Linie} {üben, trainieren}, Lass uns die {Ideallinie, Linie} {üben, trainieren}]
+	
 	[(KannstDu) (Mir) sagen wo die Bremspunkte sind, (GibMir) Anweisungen für die Bremspunkte, (KoennenWir) die Bremspunkte trainieren]
 
 	[(KannstDu) (Mir) helfen mich zu fokussieren, (KannstDu) mich motivieren falls nötig, {Bitte hilf, Hilf} (Mir) meinen Fokus zu {behalten, behalten bitte}]

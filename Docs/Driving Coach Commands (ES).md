@@ -92,6 +92,8 @@ Information=Información de la sesión, Información de la Stint, Información d
 
 	[(CanYou) darme {recomendaciones, consejos, una guía, instrucciones} {mientras conduzco, para cada curva}, {Por favor dime, Dime} {antes de, para} cada curva lo que {puedo, debería} cambiar, (CanYou) entrenarme {en la pista, mientras conduzco}]
 	
+	[(CanYou) decirme cómo posicionar el coche, {Por favor dime, Dime} cómo posicionar el coche, (CanWe) practicar la {trayectoria ideal, trayectoria}, Trabajemos en la {trayectoria ideal, trayectoria}]
+	
 	[(CanYou) decirme dónde están los puntos de frenado, {Por favor dime, Dime} dónde frenar, (CanWe) practicar {frenado, puntos de frenado}]
 	
 	[(CanYou) darme a mantenerme concentrado, (CanYou) motivarme si es necesario, Por favor ayúdame a mantener la concentración]

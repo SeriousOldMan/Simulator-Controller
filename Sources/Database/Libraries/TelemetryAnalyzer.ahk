@@ -1794,7 +1794,7 @@ class TelemetryAnalyzer {
 			loop getMultiMapValue(trackMap, "Sections", "Count") {
 				sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 							 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
-							 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active")
+							 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active", true)
 							 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
 							 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 							 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})

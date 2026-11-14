@@ -3,9 +3,9 @@ Type=Development
 [Development]
 Version=7.3.5.0-dev
 Target=7.3.5.0-release
-Date=11/13/26
+Date=11/14/26
 Download=
-Changes=Migrated to AHK 2.1-alpha.38, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU
+Changes=Migrated to AHK 2.1-alpha.38, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU, Fixed active state of track sections
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.4.0-release

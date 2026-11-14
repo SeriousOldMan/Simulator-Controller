@@ -2095,6 +2095,12 @@ class DrivingCoach extends GridRaceAssistant {
 					reference := lastLap
 		}
 
+		if isDebug() {
+			logMessage(kLogDebug, "Telemetry:MODE=" . mode)
+			logMessage(kLogDebug, "Telemetry:LAP=" . (theLap ? theLap.Name : kFalse))
+			logMessage(kLogDebug, "Telemetry:REFERENCE=" . (reference ? reference.Name : kFalse))
+		}
+
 		return theLap
 	}
 

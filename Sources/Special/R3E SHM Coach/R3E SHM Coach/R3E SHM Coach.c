@@ -171,6 +171,41 @@ inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
 	return sqrt((x * x) + (y * y));
 }
 
+#define PI 3.14159265
+
+r3e_float32 vectorAngle(r3e_float64 x, r3e_float64 y) {
+	r3e_float64 scalar = (x * 0) + (y * 1);
+	r3e_float64 length = vectorLength(x, y);
+
+	r3e_float64 angle = (length > 0) ? acos(scalar / length) * 180 / PI : 0;
+
+	if (x < 0)
+		angle = 360 - angle;
+
+	return (r3e_float32)angle;
+}
+
+void rotateBy(r3e_float32* x, r3e_float32* y, r3e_float64 angle) {
+	r3e_float32 sinus = (r3e_float32)sin(angle * PI / 180);
+	r3e_float32 cosinus = (r3e_float32)cos(angle * PI / 180);
+
+	r3e_float32 newX = (*x * cosinus) - (*y * sinus);
+	r3e_float32 newY = (*x * sinus) + (*y * cosinus);
+
+	*x = newX;
+	*y = newY;
+}
+
+long getTickCount() {
+	FILETIME ft;
+	ULARGE_INTEGER uli;
+
+	GetSystemTimeAsFileTime(&ft);
+	uli.LowPart = ft.dwLowDateTime;
+	uli.HighPart = ft.dwHighDateTime;
+	
+	return (long)((uli.QuadPart / 10000) - 116444736000000000LL);
+}
 
 char* player = "";
 char* workingDirectory = "";
@@ -300,9 +335,7 @@ SuspensionDeflections* SuspensionDeflections_Create(
 	double suspensionDeflectionRR)
 {
 	SuspensionDeflections* deflections;
-	FILETIME ft;
-	ULARGE_INTEGER uli;
-
+	
 	deflections = (SuspensionDeflections*)malloc(sizeof(SuspensionDeflections));
 	if (!deflections) return NULL;
 
@@ -312,11 +345,7 @@ SuspensionDeflections* SuspensionDeflections_Create(
 	deflections->rearLeft = suspensionDeflectionRL * 1000.0;
 	deflections->rearRight = suspensionDeflectionRR * 1000.0;
 
-	/* Get current time in milliseconds */
-	GetSystemTimeAsFileTime(&ft);
-	uli.LowPart = ft.dwLowDateTime;
-	uli.HighPart = ft.dwHighDateTime;
-	deflections->timeMS = (long)((uli.QuadPart / 10000) - 116444736000000000LL);
+	deflections->timeMS = getTickCount();
 
 	return deflections;
 }
@@ -1612,6 +1641,182 @@ void writeTelemetry(BOOL calibrate) {
 	}
 }
 
+char* leftSounds[16];
+char* rightSounds[16];
+char* idealSounds[16];
+
+int numLeftSounds = 0;
+int numRightSounds = 0;
+int numIdealSounds = 0;
+
+int numCoordinates = 0;
+float* xCoordinates;
+float* yCoordinates;
+float* distances;
+
+#define LEFT 1
+#define RIGHT 2
+#define IDEAL 3
+
+int lastLineHint = IDEAL;
+
+double lateralThreshold = 0.5;
+double distanceThreshold = 20;
+
+int nextLeftSound = 0;
+int nextRightSound = 0;
+int nextIdealSound = 0;
+
+long nextLineUpdate = 0;
+
+BOOL findIdealPosition(float distance, float* idealX, float* idealY) {
+	float bestDistance = 99999;
+	int bestDistanceIndex = 0;
+
+	for (int i = 0; i < numCoordinates; i++)
+	{
+		float curDistance = (float)fabs(distance - distances[i]);
+
+		if (curDistance < distanceThreshold)
+			if (curDistance < bestDistance)
+			{
+				bestDistance = curDistance;
+				bestDistanceIndex = i;
+			}
+			else
+			{
+				*idealX = xCoordinates[bestDistanceIndex];
+				*idealY = yCoordinates[bestDistanceIndex];
+
+				return TRUE;
+			}
+	}
+
+	return FALSE;
+}
+
+int checkCarPosition(float distance, float angle, float carX, float carY, float* gap)
+{
+	float idealX = 0;
+	float idealY = 0;
+	
+	if (findIdealPosition(distance, &idealX, &idealY)) {
+		float transX = (idealX - carX);
+		float transY = (idealY - carY);
+
+		rotateBy(&transX, &transY, angle);
+		
+		*gap = (float)fabs(transX);
+
+		if (*gap > lateralThreshold)
+			return (transX < 0) ? RIGHT : LEFT;
+		else
+			return IDEAL;
+	}
+	else
+		return 0;
+}
+
+int checkPosition(int playerID)
+{	
+	r3e_float64 velocityX = map_buffer->player.velocity.x;
+	r3e_float64 velocityY = map_buffer->player.velocity.z;
+	r3e_float64 velocityZ = map_buffer->player.velocity.y;
+
+	if ((velocityX != 0) || (velocityY != 0) || (velocityZ != 0)) {
+		int index = 0;
+
+		for (int id = 0; id < map_buffer->num_cars; id++)
+			if (map_buffer->all_drivers_data_1[id].driver_info.user_id == playerID) {
+				index = id;
+
+				break;
+			}
+
+		float gap = 0;
+
+		return checkCarPosition(map_buffer->all_drivers_data_1[index].lap_distance,
+								vectorAngle(velocityX, velocityZ),
+								map_buffer->all_drivers_data_1[index].position.x,
+								- map_buffer->all_drivers_data_1[index].position.z, &gap);
+	}
+	else
+		return 0;
+}
+
+char* chooseSound(int type) {
+	char* sound;
+	
+	switch (type) {
+		case LEFT:
+			sound = leftSounds[nextLeftSound];
+			
+			if (++nextLeftSound >= numLeftSounds)
+				nextLeftSound = 0;
+			
+			break;
+		case RIGHT:
+			sound = rightSounds[nextRightSound];
+			
+			if (++nextRightSound >= numRightSounds)
+				nextRightSound = 0;
+			
+			break;
+		default:
+			sound = idealSounds[nextIdealSound];
+			
+			if (++nextIdealSound >= numIdealSounds)
+				nextIdealSound = 0;
+			
+			break;
+	}
+	
+	return sound;
+}
+
+void playHint(char* sound) {
+	if (strcmp(audioDevice, "") != 0)
+	{
+		if (strcmp(player, "") == 0) {
+			char buffer[512] = "";
+			
+			strcat_s(buffer, 512, "acousticFeedback:");
+			strcat_s(buffer, 512, sound);
+
+			sendTriggerMessage(buffer);
+		}
+		else
+			playSound(sound, TRUE);
+	}
+	else {
+		PlaySoundA(NULL, NULL, SND_FILENAME);
+		PlaySoundA(sound, NULL, SND_FILENAME);
+	}
+}
+
+void checkLine(int playerID)
+{	
+	int hint = checkPosition(playerID);
+	
+	if (hint != 0) {
+		if (hint == IDEAL) {
+			if (lastLineHint == IDEAL)
+				return;
+		}
+		else if ((lastLineHint != IDEAL) && (getTickCount() < nextLineUpdate))
+			return;
+		
+		lastLineHint = hint;
+		
+		playHint(chooseSound(hint));
+
+		if (hint == IDEAL)
+			Sleep(2000);
+		else
+			nextLineUpdate = getTickCount() + 1000;
+	}
+}
+
 #define Start 0
 #define Intro 1
 #define Ready 2
@@ -1620,9 +1825,6 @@ void writeTelemetry(BOOL calibrate) {
 #define Release 5
 
 int tIndices[256];
-float xCoordinates[256];
-float yCoordinates[256];
-int numCoordinates = 0;
 time_t nextUpdate = 0;
 char* triggerType = "Trigger";
 
@@ -1746,6 +1948,133 @@ void checkCoordinates(int playerID) {
 #define stat _stat
 #endif
 
+void pathCombine(char* destination, const char* path1, const char* path2)
+{
+    if (path1 == NULL && path2 == NULL) {
+        strcpy_s(destination, MAX_PATH, "");;
+    }
+    else if (path2 == NULL || strlen(path2) == 0) {
+        strcpy_s(destination, MAX_PATH, path1);
+    }
+    else if (path1 == NULL || strlen(path1) == 0) {
+        strcpy_s(destination, MAX_PATH, path2);
+    } 
+    else {
+        char directory_separator[] = "\\";
+        const char *last_char = path1;
+		
+        while (*last_char != '\0')
+            last_char++;        
+        
+		int append_directory_separator = 0;
+        
+		if (strcmp(last_char, directory_separator) != 0) {
+            append_directory_separator = 1;
+        }
+		
+        strcpy_s(destination, MAX_PATH, path1);
+        
+		if(append_directory_separator)
+            strcat_s(destination, MAX_PATH, directory_separator);
+        
+		strcat_s(destination, MAX_PATH, path2);
+    }
+}
+
+int listFiles(char* directory, char* subDirectory, char** fileNames, int maxFiles) {
+	char fullPath[MAX_PATH] = "";
+	char partialPath[MAX_PATH] = "";
+	char filePath[MAX_PATH] = "";
+	
+	pathCombine(partialPath, directory, subDirectory);
+	pathCombine(fullPath, partialPath, "*");
+	
+	int index = 0;
+	
+	WIN32_FIND_DATAA ffd;
+	HANDLE hFind = FindFirstFileA(fullPath, &ffd);
+
+	if (INVALID_HANDLE_VALUE != hFind) {
+		do
+		{
+			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				pathCombine(filePath, partialPath, ffd.cFileName);
+				
+				fileNames[index] = (char*)malloc(strlen(ffd.cFileName) + 1);
+				
+				strcpy_s(fileNames[index++], MAX_PATH, ffd.cFileName);
+			}
+		}
+		while ((FindNextFileA(hFind, &ffd) != 0) && (index < maxFiles));
+
+		FindClose(hFind);
+	}
+	
+	return index;
+}
+		
+void loadSounds(char* soundsDirectory)
+{
+	numLeftSounds = listFiles(soundsDirectory, "Left", leftSounds, 16);
+	numRightSounds = listFiles(soundsDirectory, "Right", rightSounds, 16);
+	numIdealSounds = listFiles(soundsDirectory, "Ideal", idealSounds, 16);
+}
+
+void loadLineHints()
+{
+	if ((strcmp(hintFile, "") != 0) && fileExists(hintFile))
+	{
+		struct stat result;
+		time_t mod_time = 0;
+
+		if (stat(hintFile, &result) == 0)
+			mod_time = result.st_mtime;
+
+		if (numCoordinates == 0 || (mod_time > lastHintsUpdate))
+		{
+			numCoordinates = 0;
+			lastHintsUpdate = mod_time;
+
+			FILE* file = fopen(hintFile, "r");
+			BOOL first = TRUE;
+			int index = 0;
+			char line[512];
+			char distancePart[256];
+			char xPart[256];
+			char yPart[256];
+			
+			char* parts[3] = { distancePart, xPart, yPart };
+			
+			if (file != NULL) {
+				while (fgets(line, sizeof(line), file)) {					
+					if (first) {
+						numCoordinates = atoi(line);
+			
+						free(distances);
+						free(xCoordinates);
+						free(yCoordinates);
+						
+						distances = (float*)malloc(numCoordinates * sizeof(float));
+						xCoordinates = (float*)malloc(numCoordinates * sizeof(float));
+						yCoordinates = (float*)malloc(numCoordinates * sizeof(float));
+						
+						first = FALSE;
+					}
+					else {
+						splitString(line, ";", 3, parts);
+
+						distances[index] = (float)atof(parts[0]);
+						xCoordinates[index] = (float)atof(parts[1]);
+						yCoordinates[index++] = (float)atof(parts[2]);
+					}
+				}
+
+				fclose(file);
+			}
+		}
+	} 
+}
+
 void loadTrackHints()
 {
 	if ((strcmp(hintFile, "") != 0) && fileExists(hintFile))
@@ -1817,7 +2146,12 @@ int main(int argc, char* argv[])
 	BOOL handlingAnalyzer = FALSE;
 	BOOL positionTrigger = FALSE;
 	BOOL trackHints = FALSE;
+	BOOL lineHints = FALSE;
 	char* soundsDirectory = "";
+	
+	xCoordinates = (float*)malloc(256 * sizeof(float));
+	yCoordinates = (float*)malloc(256 * sizeof(float));
+	distances = (float*)malloc(256 * sizeof(float));
 
 	if (argc > 1) {
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
@@ -1853,6 +2187,30 @@ int main(int argc, char* argv[])
 
 			if (argc > 6)
 				workingDirectory = argv[6];
+		}
+
+		if (lineHints) {
+			triggerType = "LineHints";
+
+			hintFile = argv[2];
+			
+			loadSounds(argv[3]);
+			
+			lateralThreshold = atof(argv[4]);
+
+            if (argc > 5)
+                audioDevice = argv[5];
+
+			if (argc > 6)
+				volume = (float)atof(argv[6]);
+
+			if (argc > 7)
+				player = argv[7];
+
+			if (argc > 8)
+				workingDirectory = argv[8];
+
+            Sleep(10000);
 		}
 
 		handlingCalibrator = (strcmp(argv[1], "-Calibrate") == 0);
@@ -1942,6 +2300,13 @@ int main(int argc, char* argv[])
 				loadTrackHints();
 
 				checkCoordinates(playerID);
+
+				Sleep(10);
+			}
+			else if (lineHints) {
+				loadLineHints();
+
+				checkLine(playerID);
 
 				Sleep(10);
 			}

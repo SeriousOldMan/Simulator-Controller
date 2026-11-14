@@ -1729,7 +1729,7 @@ class RaceStrategist extends GridRaceAssistant {
 		local split, class, speaker, continuation, only, driver, goodPace
 
 		try {
-			if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0) && isInteger(position) && this.Speaker) {
+			if ((this.Session = kSessionRace) && this.hasEnoughData(false) && (position != 0) && isInteger(position) && this.Speaker[false]) {
 				speaker := this.getSpeaker()
 
 				speaker.beginTalk()

@@ -2000,9 +2000,7 @@ int listFiles(char* directory, char* subDirectory, char** fileNames, int maxFile
 			if (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 				pathCombine(filePath, partialPath, ffd.cFileName);
 				
-				fileNames[index] = (char*)malloc(strlen(ffd.cFileName) + 1);
-				
-				strcpy_s(fileNames[index++], MAX_PATH, ffd.cFileName);
+				strcpy_s(fileNames[index++], MAX_PATH, filePath);
 			}
 		}
 		while ((FindNextFileA(hFind, &ffd) != 0) && (index < maxFiles));
@@ -2153,6 +2151,12 @@ int main(int argc, char* argv[])
 	yCoordinates = (float*)malloc(256 * sizeof(float));
 	distances = (float*)malloc(256 * sizeof(float));
 
+	for (int i = 0; i < 16; i++) {
+		leftSounds[i] = (char*)malloc(MAX_PATH);
+		rightSounds[i] = (char*)malloc(MAX_PATH);
+		idealSounds[i] = (char*)malloc(MAX_PATH);
+	}
+
 	if (argc > 1) {
 		positionTrigger = (strcmp(argv[1], "-Trigger") == 0);
 
@@ -2188,6 +2192,8 @@ int main(int argc, char* argv[])
 			if (argc > 6)
 				workingDirectory = argv[6];
 		}
+
+		lineHints = (strcmp(argv[1], "-LineHints") == 0);
 
 		if (lineHints) {
 			triggerType = "LineHints";

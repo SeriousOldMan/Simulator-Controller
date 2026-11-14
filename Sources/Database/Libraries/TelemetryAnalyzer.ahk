@@ -1578,6 +1578,9 @@ class TelemetryAnalyzer {
 		local sectionY := section.Y
 		local x, y, nextX, nextY
 
+		if isDebug()
+			logMessage(kLogDebug, "Getting distance into track for section " . section.Nr)
+
 		if trackMap {
 			distance := 0
 
@@ -1593,14 +1596,25 @@ class TelemetryAnalyzer {
 				x := nextX
 				y := nextY
 
-				if (Sqrt(((sectionX - x) ** 2) + ((sectionY - y) ** 2)) <= threshold)
+				if (Sqrt(((sectionX - x) ** 2) + ((sectionY - y) ** 2)) <= threshold) {
+					if isDebug()
+						logMessage(kLogDebug, "Distance into track is " . Round(distance, 1) . " for section " . section.Nr)
+
 					return true
+				}
 			}
+
+			if isDebug()
+				logMessage(kLogDebug, "Distance into track not found for section " . section.Nr)
 
 			return false
 		}
-		else
+		else {
+			if isDebug()
+				logMessage(kLogDebug, "Distance into track not possible because no track map is available")
+
 			return false
+		}
 	}
 
 	findTrackRange(telemetry, posX, posY, distance, &startIndex, &endIndex) {
@@ -1825,7 +1839,7 @@ class TelemetryAnalyzer {
 			loop getMultiMapValue(trackMap, "Sections", "Count") {
 				sections.Push({Nr: getMultiMapValue(trackMap, "Sections", A_Index . ".Nr")
 							 , Type: getMultiMapValue(trackMap, "Sections", A_Index . ".Type")
-							 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active")
+							 , Active: getMultiMapValue(trackMap, "Sections", A_Index . ".Active", true)
 							 , Index: getMultiMapValue(trackMap, "Sections", A_Index . ".Index")
 							 , X: getMultiMapValue(trackMap, "Sections", A_Index . ".X")
 							 , Y: getMultiMapValue(trackMap, "Sections", A_Index . ".Y")})

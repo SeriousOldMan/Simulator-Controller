@@ -1857,23 +1857,16 @@ class DrivingCoach extends GridRaceAssistant {
 			else if this.RaceMotivation
 				this.startupRaceMotivation()
 
-			if this.iBrakeTriggerPID {
+			if (this.iBrakeTriggerPID || this.iIdealLinePID) {
 				telemetry := this.getTelemetry(&reference := true)
 
 				if !reference
 					reference := telemetry
 
-				if reference
+				if (this.iBrakeTriggerPID && reference)
 					this.updateBrakeTrigger(reference)
-			}
 
-			if this.iIdealLinePID {
-				telemetry := this.getTelemetry(&reference := true)
-
-				if !reference
-					reference := telemetry
-
-				if reference
+				if (this.iIdealLinePID && reference)
 					this.updateIdealLine(reference)
 			}
 		}
@@ -2560,12 +2553,15 @@ class DrivingCoach extends GridRaceAssistant {
 		if (simulator && analyzer) {
 			sections := analyzer.TrackSections
 
-			if (sections && (sections.Length > 0)) {
+			if (sections && (collect(sections, (s) => s.Active).Length > 0)) {
 				if isDebug()
-					logMessage(kLogDebug, "Computing ideal line: Found sections")
+					logMessage(kLogDebug, "Computing ideal line: Found " . collect(sections, (s) => s.Active).Length . " sections...")
 
-				for ignore, section in sections
-					if section.Active
+				do(sections, (section) {
+					if isDebug()
+						logMessage(kLogDebug, "Section " . section.Nr . " / " . section.Active . " is " . section.Type)
+
+					if section.Active {
 						if (section.Type = "Corner") {
 							if (!start && analyzer.getSectionDistance(section, &distance)) {
 								distance -= startDistance
@@ -2587,6 +2583,8 @@ class DrivingCoach extends GridRaceAssistant {
 
 								start := false
 							}
+					}
+				})
 			}
 		}
 

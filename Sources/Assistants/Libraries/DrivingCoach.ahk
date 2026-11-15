@@ -847,6 +847,8 @@ class DrivingCoach extends GridRaceAssistant {
 				else
 					this.handleVoiceText("TEXT", values2String(A_Space, words*))
 				*/
+			case "LineCoachingStart":
+				super.handleVoiceCommand("?", words)
 			case "BrakeCoachingStart":
 				this.clearContinuation()
 

@@ -201,7 +201,7 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 | Tactical Advices (4) (12)       | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
 | General Session Information (5) | Yes           | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
 
-##### Notes
+###### Notes
 
 (1) Due to the way the data acquisition for *Assetto Corsa* works, it is possible that alerts for cars on your side will be given for the wrong side from time to time. I am working on a heuristic to prevent that.
 

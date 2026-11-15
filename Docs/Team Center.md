@@ -28,7 +28,9 @@ This version of the "Team Center" does not display any reports, only the most im
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2025.JPG)
 
-Good to know: Since the *Lite* version does not display live reports or no reports at all, this version also consumes a lot less resources and is therefore also a good alternative for middle-class PCs.
+> ###### Good to know
+>
+> Since the *Lite* version does not display live reports or no reports at all, this version also consumes a lot less resources and is therefore also a good alternative for middle-class PCs.
 
 IMPORTANT: This simplified interface use the Team Server credentials as configured for the driver in the ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) of the "Race Settings" application. There is no option to load a previous session stored in the "Session Database", and so on. Therefore, the Lite mode can only be used while participating as a driver in a team race.
 
@@ -150,7 +152,7 @@ Beside all that, you can request several context specific data, which will be sh
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking on a free space in the output area.
 
-##### Notes
+###### Notes
 
 - The report shown in the output area will be updated live, whenever new data arrives on the Team Server. A special case is the report for the lap details. If the chosen report is for the last lap, the report will automatically switch to the next lap, when this lap has been finished.
 
@@ -166,13 +168,15 @@ While you are in an active session, lap telemetry data will be collected lap by 
 
 Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
 
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Team\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+> ###### Good to know
+>
+> The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Team\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
 
 #### Choosing the telemetry provider
 
 The telemetry system supports two different sources of telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You have to choose, which telemetry provider to use when enabling the "Telemetry" option in the "Session" menu. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
 
-##### Notes
+###### Notes
 
 1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
 2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
@@ -184,7 +188,9 @@ The telemetry system supports two different sources of telemetry data. One, whic
    - Telemetry data, which has been *imported* this way will not become part of the current session.
    *Imported* telemetry data can be removed by using the *Delete* button. This will not remove it from its original location.
 
-Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+> ###### Good to know
+>
+> If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 
 ### Strategy Handling
 
@@ -220,7 +226,9 @@ You then may choose the settings for the upcoming strategy simulation using the 
 
 After you dialed the options, you can select "Adjust Strategy (Simulation)" from the "Strategy" menu, to create a new strategy baseed on a simulation. The resulting strategy summary will be displayed in the output area. Please note, that when you are typically late into the race, any pitstop rules of the base strategy might be ignored, when conflicting with the current race situation, so please double check, whether the resulting strategy is in accordance with the rules.
 
-Good to know: The Team Center will keep track of all already used tyre sets and will consider this, when running a strategy simulation. However, this only covers tyre set usage in the current session. If there are tyre sets that already have been used in a previous session, for example in a qualifying run, this information is not available.
+> ###### Good to know
+> 
+> The Team Center will keep track of all already used tyre sets and will consider this, when running a strategy simulation. However, this only covers tyre set usage in the current session. If there are tyre sets that already have been used in a previous session, for example in a qualifying run, this information is not available.
 
 IMPORTANT: Once you have created a new strategy, the stint plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
 
@@ -244,7 +252,9 @@ You can run as many strategy simulations, with or without traffic anaylsis as yo
 
 IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will reflect the latest strategy, when it comes to the next pitstop.
 
-Good to know: When you fail to create a better strategy using the simulation tools, you can go back to the strategy, that is associated with the current session in the Team Server by holding down the Control key and choosing the "Load current Race Strategy" from the "Strategy" menu.
+> ###### Good to know
+>
+> When you fail to create a better strategy using the simulation tools, you can go back to the strategy, that is associated with the current session in the Team Server by holding down the Control key and choosing the "Load current Race Strategy" from the "Strategy" menu.
 
 ### Session & stint planning
 
@@ -288,7 +298,9 @@ Especially before selecting the tyre pressures, you might want to analyze the da
 
 Some simulators provide the possibility to change tyres individually and even select different tyre compounds for each wheel or for each axle. Although this is not done automatically based on the strategy or other settings at the time of this writing, you can choose individual settings before sending the pitstop plan to the Engineer. Although its own understanding is quite limited yet, he will accept your choices and will send the individual compound settings to the simulator. Depending on the support for individual tyre compounds and tyre changes, only one or up to all tyre menus are enabled. Disabled tyre menus will be initialized according to the capabilities of the given simulator.
 
-Good to know: When holding down the Control key while choosing the tyre compound for one wheel, the compounds for the other wheels will be changed as well.
+> ###### Good to know
+>
+> When holding down the Control key while choosing the tyre compound for one wheel, the compounds for the other wheels will be changed as well.
 
 Additionaly, some simulators manage a number of available tyre sets for each compound, and this number may differ between different events or sessions. When initializing a pitstop, the next unused tyre set number for the given compound will be automatically calculated in most cases and will be entered in the "Tyre Set" field (you can enable or disable the automatic tyre set selection in the "Pitstop" menu). Always double check the value here, or you might end up with worn tyres on the wheels. Please note, that *Assetto Corsa Competizione* provide a kind of automatic selection, which only works reliable, when using the same compound as in the last stint. Set "Tyre Set" to **Auto** in this case.
 

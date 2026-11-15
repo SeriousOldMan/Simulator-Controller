@@ -212,7 +212,9 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
-Good to know: Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally. Jona will also communicate with you regarding all pitstop related questions.
+> ###### Good to know
+>
+> Even if Jona is muted, you can interact with the Engineer, for example to plan and prepare a pitstop. If a chain of conversation is initiated by you, the driver, Jona will react normally. Jona will also communicate with you regarding all pitstop related questions.
 
 ## Racing with Jona
 
@@ -339,15 +341,12 @@ The following table shows, which simulator supports which damage types:
 | Project Motor Racing (2)   | -        | -          | -      |
 | F1 25 (3)                  | Yes      | No         | Yes    |
 
-##### Notes
+###### Notes
 
 (1) Supported but not reported in the data API.
-
-(2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
-
-(3) No support for pitstop handling for *F1 25* at the time of this writing.
-
-(4) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
+<br>(2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
+<br>(3) No support for pitstop handling for *F1 25* at the time of this writing.
+<br>(4) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
 
 The choice in the "Change Tyres" dropdown menu tells Jona, how to decide, wether a given tyre should be changed at the next pitstop. *Wear*, which is the default, will change a tyre, when the expected tyre wear at the end of the next stint will exceed the maximum tyre as defined by the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". The choice *Laps* will ask Jona to change tyres depending on the number of driven laps at the end of the next stint as defined for the current compound in the strategy or the race rules (see above) or by the [setting "Pitstop: Tyre Compound Usage"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings).
 
@@ -359,7 +358,9 @@ If you open the settings tool, it will load the *Race.settings* file located in 
 
 If "Load from Database" has been configured for the settings of all Race Assistants in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer), all settings configured in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) will take precedence over the choices you make in "Race Settings" tool. And both will be superceded by the overarching choices in the [startup profiles](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles).
 
-Good to know: When the *Race.settings* file is changed while Jona or any other Assistant is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualifying or even Race sessions. Please note, that only the driver who has control of the car can do this in a team session.
+> ###### Good to know
+>
+> When the *Race.settings* file is changed while Jona or any other Assistant is already active, the updated settings will be imported into the active session. This is useful during Practice, Qualifying or even Race sessions. Please note, that only the driver who has control of the car can do this in a team session.
 
 Beside the session respectively race specific settings described in the previous sections, the general behavior of the AI Race Engineer can be customized using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer).
 
@@ -401,23 +402,19 @@ Please note, that the range of supported pitstop services depends on the specifi
 | Project Motor Racing (5)   | -      | -               | -                 | -              | -           | -          |
 | F1 25 (6)                  | -      | -               | -                 | -              | -           | -          |
 
-##### Notes
+###### Notes
 
 (1) Depending on the [setting "Pitstop: Change Tyres"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings), the Engineer will always change *All* four tyres or will decide based on wear or driven laps individually for each tyre, whether it need to be changed. Manual changes are possible additionally, of course.
+<br>(2) The Engineer will always choose the same tyre compound for all four tyres, but manual adjustments are possible. Using the *Reasoning* booster with a LLM can make this decision more intelligent. See the documentation chapter about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.
+<br>(3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section above about the pitstop settings.
+<br>(4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
+<br>(5) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
+<br>(6) No support for pitstop handling for *F1 25* at the time of this writing.
+<br>(7) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
 
-(2) The Engineer will always choose the same tyre compound for all four tyres, but manual adjustments are possible. Using the *Reasoning* booster with a LLM can make this decision more intelligent. See the documentation chapter about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.
-
-(3) See the [table](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-pitstop) in the section above about the pitstop settings.
-
-(4) The Engineer will not activate fast repairs, but manual adjustments are possible, of course.
-
-(5) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
-
-(6) No support for pitstop handling for *F1 25* at the time of this writing.
-
-(7) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
-
-Good to know: If Jona has planned the pitstop based on a request from Cato, the AI Race Engineer, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
+> ###### Good to know
+>
+> If Jona has planned the pitstop based on a request from Cato, the AI Race Strategist, the lap in which you should come to the pit is already known. In this case, the preparation phase does not have to be triggered explicitly, since the preparation for the pitstop takes place automatically when you start the selected lap.
 
 #### Performing a pitstop
 
@@ -426,33 +423,32 @@ Once a pitstop is prepared, you are free to enter the pit at any time. If the pi
 - When you are running low on fuel, and a pitstop has been prepared, Jona will call you to the pit in time.
 - When the pitstop has been planned and prepared due to an upcoming weather change, Jona will call you to the pit, when the grip level for the current tyre compounds is to bad to continue.
 
-Some final notes: If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, to say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and already prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode may be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
-
-| Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Brakes  | Repairs |
-| -------------------------- | ---- | ------------- | -------- | -------------- | ------- | ------- |
-| Assetto Corsa              | No   | No            | -        | No             | No      | No      |
-| Assetto Corsa EVO (4)      | -    | -             | -        | -              | -       | -       |
-| Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | Yes (1) | Yes (1) |
-| Automobilista 2            | No   | No            | -        | No             | No      | No      |
-| iRacing                    | Yes  | Yes           | -        | Yes            | No      | No      |
-| Projects CARS 2            | No   | No            | -        | No             | No      | No      |
-| RaceRoom Racing Experience | No   | No            | -        | No             | No      | No      |
-| rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     | Yes     |
-| Le Mans Ultimate           | Yes  | Yes           | -        | Yes            | No      | Yes     |
-| Project Motor Racing (2)   | -    | -             | -        | -              | -       | -       |
-| F1 25 (3)                  | -    | -             | -        | -              | -       | -       |
-
-##### Notes
-
-(1) Change is detected only, if triggered by a controller action using a Button Box or a Stream Deck and alike.
-
-(2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
-
-(3) No support for pitstop handling for *F1 25* at the time of this writing.
-
-(4) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
-
-It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
+> ###### Important
+>
+> If you ever perform a pitstop, which has not been planned and prepared by Jona, Jona will be very confused, to say the least. You can do this, but please double check the recommendations of Jona for each subsequent pitstop, especially the chosen tyre set, if you don't want to end up with worn out tyres for your last stint. Also be very careful, when using the "Pitstop" mode on your Button Box to change the pitstop settings. Jona will not know about your changes, and might overwrite them during the pitstop preparation. There is one notable exception, if Jona has planned and already prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode may be recognized and taken into account by Jona. If you change pitstop settings using the pitstop menu in the simulation directly, it depends on the data integration support of the given simulator, whether this change is recognized by Jona or not. Please see the following table:
+>
+> | Simulator                  | Fuel | Tyre Compound | Tyre Set | Tyre Pressures | Brakes  | Repairs |
+> | -------------------------- | ---- | ------------- | -------- | -------------- | ------- | ------- |
+> | Assetto Corsa              | No   | No            | -        | No             | No      | No      |
+> | Assetto Corsa EVO (4)      | -    | -             | -        | -              | -       | -       |
+> | Assetto Corsa Competizione | Yes  | No            | Yes      | Yes            | Yes (1) | Yes (1) |
+> | Automobilista 2            | No   | No            | -        | No             | No      | No      |
+> | iRacing                    | Yes  | Yes           | -        | Yes            | No      | No      |
+> | Projects CARS 2            | No   | No            | -        | No             | No      | No      |
+> | RaceRoom Racing Experience | No   | No            | -        | No             | No      | No      |
+> | rFactor 2                  | Yes  | Yes           | -        | Yes            | Yes     | Yes     |
+> | Le Mans Ultimate           | Yes  | Yes           | -        | Yes            | No      | Yes     |
+> | Project Motor Racing (2)   | -    | -             | -        | -              | -       | -       |
+> | F1 25 (3)                  | -    | -             | -        | -              | -       | -       |
+>
+> ###### Notes
+>
+> (1) Change is detected only, if triggered by a controller action using a Button Box or a Stream Deck and alike.
+> <br>(2) No support for pitstop handling for *Project Motor Racing* at the time of this writing.
+> <br>(3) No support for pitstop handling for *F1 25* at the time of this writing.
+> <br>(4) No support for pitstop handling for *Assetto Corsa EVO* at the time of this writing.
+>
+> It is no problem to change the settings marked above with "No" in a case of urgency, but be aware that this might lead to wrong subsequent recommendations by Jona, since the knowledge is not in sync with the reality.
 
 #### *Assetto Corsa* and *Assetto Corsa EVO*
 
@@ -526,10 +522,14 @@ The following statistical models are currently implemented:
 	   
 	     The default value for both settings is 30% max. wear difference, but this can be changed for every car / track combination as with every setting in the "Session Database".
 	   
-	     Good to know: If you don't want all this, set the max. difference for both settings to 100%.
+	     > ###### Good to know
+		 >
+		 > If you don't want all this, set the max. difference for both settings to 100%.
 	   - Last, but not least, if the setting "Pitstop: Choose Compound Mixture" is enabled in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) (disabled by default), Jona will try to choose the best possible tyre compound mixture for the next stint, either by the specified number of usable laps or by the expected tyre wear for the chosen compound mixture (see above).
 	 
-	 Good to know: If you want to use the wear data from the community database beside your own data collected in your past sessions for any tyre wear related decisions, enable the setting "Data: Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings).
+	 > ###### Good to know
+	 >
+	 > If you want to use the wear data from the community database beside your own data collected in your past sessions for any tyre wear related decisions, enable the setting "Data: Use tyre wear data from community" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#data-settings).
 
   3. Tyre pressure development
   
@@ -561,7 +561,7 @@ The following statistical models are currently implemented:
      | Project Motor Racing       | No                      | No                   | No     |
      | F1 25                      | Yes                     | No                   | Yes    |
 	 
-	 Notes:
+	 ###### Notes
 	 
 	 (1) It looks like the damage is reported by the corresponding API as an accumulated value for all different damage types. The damage will be reported by the Race Engineer as a damage to the Bodywork and only Bodywork repair will therefore automatically recommended for a pitstop. Select the other repair categories manually as needed.
 	 
@@ -717,7 +717,9 @@ At this time, Jona can handle three important states in its knowledge base.
   
 You can trigger the first two states, as long as logical for the given situation, by setting the facts *Pitstop.Plan* or *Pitstop.Prepare* to *true* in the knowledge base. The rule network will do the rest. An undertaken pitstop must be triggered by setting *Pitstop.Lap* to the lap number, where the driver pitted. All this is handled by the *RaceEngineer* class already, so there is no need to do this at the knowledge base level. But it is important to know, that these states exist, in order to undertstand Jonas reactions to your requests. For example, Jona first wants to plan a pitstop before you enter the pit, which is quite logical, right? 
 
-Good to know: Jona will not send the choices for the upcoming pitstop to the simulator, when the car is currently in the pitlane. This will prevent in most cases problems with the pit limiter, if the driver is curretly serving a penalty. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
+> ###### Good to know
+>
+> Jona will not send the choices for the upcoming pitstop to the simulator, when the car is currently in the pitlane. This will prevent in most cases problems with the pit limiter, if the driver is curretly serving a penalty. Since the processing is inherently asynchronous, there is still a chance that the pit limiter will be disengaged, if a pitstop is prepared while serving a penalty at the same time, but the chance for such a problem is reduced quite a lot.
 
 ### Jonas Memory
 

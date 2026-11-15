@@ -162,7 +162,9 @@ You also have to download a LLM. Make sure the model is in GGUF file format. You
 
 Once you have selected and downloaded a model, enter the full path to the model file into the "Model" field and your done. And you can specify, how many layers of the model would be executed on your graphics card, which of course requires that the GPU can provide the amount of memory to the model. This might need some try and errors, until you find a suitable configuration, which also allows you to still run your favorite simulator. Additional settings are available for experts in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#llm-settings). Be sure what you are doing when changing them. Normally, you only want to change the "Threads" setting, when you encounter heavy stutter, when the LLM Runtime is using the CPU. As a general rule of thumb, set the number of threads to (number of cores / 2) for a CPU with more than 8 cores and to (number of cores / 4) for a CPU with less than 8 cores, if you encounter stutter.
 
-Good to know: The LLM Runtime supports tool/function calling which is required to trigger actions in the [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster) or even use a LLM for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster). But not every LLM can handle tool calls, therefore check the model card on the the [Hugging Face website](https://huggingface.co/). It is normally mentioned there, whether a given model supports tool calling. In general, you will need models with at least 13B parameters and a decent quantization.
+> ###### Good to know
+>
+> The LLM Runtime supports tool/function calling which is required to trigger actions in the [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster) or even use a LLM for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster). But not every LLM can handle tool calls, therefore check the model card on the the [Hugging Face website](https://huggingface.co/). It is normally mentioned there, whether a given model supports tool calling. In general, you will need models with at least 13B parameters and a decent quantization.
 
 Please be aware, that running a large language model locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
@@ -344,7 +346,9 @@ Here is a recording of a training session, since no words can really adequately 
 
 [![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
 
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Driving Coach\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+> ###### Good to know
+>
+> The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Driving Coach\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
 
 DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4.1, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4.1 mini, the most cost-efficient model of OpenAI, or the Gemini 2 Flash models from Google and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
@@ -362,7 +366,9 @@ Please note, that you do not have to set sections for each corner, only for thos
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
-Good to know: If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point. 
+> ###### Good to know
+>
+> If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point. 
 
 ### Coaching on the track
 
@@ -374,7 +380,9 @@ Important: If you want to use a reference lap from the community database, you m
 
 Please note, that the recommendations of Aiden might not be trustworthy, if no reference lap is available. Therefore, unless you have loaded a reference lap from the session database, take all recomendations for the first lap after Aiden has told you that telemetry data is available with a grain of salt.
 
-Good to know: There is also a [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) available in the "Session Database", which instructs the Coach to automatically write the fastest lap of the current session to the session database, if it is faster as any lap already stored in the database.
+> ###### Good to know
+>
+> There is also a [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) available in the "Session Database", which instructs the Coach to automatically write the fastest lap of the current session to the session database, if it is faster as any lap already stored in the database.
 
 If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explanations as in the example conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". However, sometimes Aiden will be late, espeutcially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup Profile, for example.
 
@@ -406,7 +414,7 @@ with *X* the number of the corner you want to practice. This command can be issu
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
-##### Notes
+###### Notes
 
 1. On-track coaching will also work in restricted mode, i.e. without a GPT connection (see below), but the instructions given to the driver will be quite simple.
 2. You can either use corner by corner coaching or brake point coaching (see below).
@@ -479,7 +487,7 @@ The following video gives you a good demonstration of this:
 
 [![](https://img.youtube.com/vi/ADI3DvOu_bw/0.jpg)](https://youtu.be/ADI3DvOu_bw)
 
-##### Notes
+###### Notes
 
 1. This works also in restricted mode, i.e. without a GPT connection (see below).
 2. You can either use corner by corner coaching as described above or brake point coaching.
@@ -539,7 +547,9 @@ But of course, you can go even shorter:
 	Tell me in which sector I am losing time compared to the other cars.
 	Please reply in one very short sentence. Don't call me by name.
 	
-Good to know: Always the telemetry data of the fastest lap of the session will be used as referencewhen using this mode, indepependent of what has been configured elsewhere.
+> ###### Important
+>
+> Always the telemetry data of the fastest lap of the session will be used as reference when using this mode, independent of what has been configured elsewhere.
 
 ### Automatic activation of coaching mode
 

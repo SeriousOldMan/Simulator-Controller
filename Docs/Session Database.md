@@ -105,7 +105,9 @@ Sections can be disabled by either the section menu or by deselecting the sectio
 
 It is possible to open the track map in an external, zoomable window, which makes editing sections of very long tracks like the Nordschleife much more easy. To open this window click on the small button to the right of the "Edit" drop down menu. Beside using the control in the upper left corner of the window to control the zoom factor, you can use the mouse wheel to zoom and out. Furthermore, the track map can be moved with the mouse by holding down the middle mouse button.
 
-Good to know: Once in a while zooming and scrolling can get out of sync and the track map disappears. In this case click on the small button with the "Recycle" icon and the map will be reset to the top left corner.
+> ###### Good to know
+>
+> Once in a while zooming and scrolling can get out of sync and the track map disappears. In this case click on the small button with the "Recycle" icon and the map will be reset to the top left corner.
 
 ##### Editing Track Automations
 
@@ -113,7 +115,9 @@ With the second editor you can define automatic actions for specific locations a
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
-Good to know: The currently selection of the track editor will be remembered for the next run of "Session Database".
+> ###### Good to know
+>
+> The currently selection of the track editor will be remembered for the next run of "Session Database".
 
 #### Sessions
 
@@ -123,7 +127,9 @@ All practice and race sessions, which have been stored in the database are shown
 
 You can use the buttons below the list to rename or delete a session. You will have to use the "Solo Center" or the "Team Center" to create a session and store it in the database. Once you have selected a session in the list above, you can decide whether you want to synchronize the session with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below). Sharing of sessions with the community is not possible, for obvious reasons.
 
-Good to know: Sessions can be opened in the corresponding *Center* by double-clicking them.
+> ###### Good to know
+>
+> Sessions can be opened in the corresponding *Center* by double-clicking them.
 
 #### Telemetries
 
@@ -171,7 +177,9 @@ For very long tracks like the Nordschleife, it can be necessary to focus on part
 
 Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation). When in "Edit" mode, you can either save the edited track sections by clicking on the "Save" button, or you can hold down the Control key and click on the "Cancel" button to discard all changes. Lastly, beside adding all sections by yourself, you can use the "Scan" button to create sections based on the currently selected lap telemetry data. But check the sections after they have been created, because the scanning method may have taken some wrong decisions.
 
-Good to know: Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data. For example, set the start marker for a corner a few meters before the start of the braking zone.
+> ###### Good to know
+>
+> Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data. For example, set the start marker for a corner a few meters before the start of the braking zone.
 
 The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
 
@@ -212,19 +220,19 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   | SUSPDEFL_RL (5)| No            | The used travel of the rear left shock absorber in mm. |
   | SUSPDEFL_RR (5)| No            | The used travel of the rear right shock absorber in mm. |
   
-  Notes:
+  ###### Notes
   
-  (1) The sequence of the columns in the CSV file is not important.<br>
-  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.<br>
-  (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.<br>
-  (4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
-  (5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2* and *Project CARS 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
+  (1) The sequence of the columns in the CSV file is not important.
+  <br>(2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.
+  <br>(3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
+  <br>(4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
+  <br>(5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2* and *Project CARS 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
 
-Good to know:
-
-1. You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
-2. The yaw rate information is only used, when using telemetry data to create handling issues in the "Setup Workbench". Not all importer can extract this information from the available data. Currently, the *iRacing* IBT importer and also the CSV file importer support importing the yaw rate.
-3. When importing lap telemetry data directly in the "Telemetries" tab of "Session Database", everything said above applies as well.
+> ###### Good to know
+>
+> 1. You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
+> 2. The yaw rate information is only used, when using telemetry data to create handling issues in the "Setup Workbench". Not all importer can extract this information from the available data. Currently, the *iRacing* IBT importer and also the CSV file importer support importing the yaw rate.
+> 3. When importing lap telemetry data directly in the "Telemetries" tab of "Session Database", everything said above applies as well.
 
 ###### Special notes for *Assetto Corsa Competizione*
 
@@ -234,7 +242,9 @@ To get high precision samples with a resolution of at least 20 Hz, the telemetry
 
 This special track spline is cached together with track map and used for all later telemetry collection, thereby saving one lap. If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
 
-Good to know: a drawback of using the created track spline is that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
+> ###### Good to know
+>
+> A drawback of using the created track spline is that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
 
 #### Strategies
 
@@ -246,7 +256,9 @@ You can use the buttons below the list to upload, download, rename or delete a s
 
 When sharing strategies with the community, but also for yourself, use the *Notes* field to mention everything worth to know about the strategies.
 
-Good to know: Strategies can be opened in the "Strategy Workbench" by double-clicking them.
+> ###### Good to know
+>
+> Strategies can be opened in the "Strategy Workbench" by double-clicking them.
 
 ##### Naming conventions
 

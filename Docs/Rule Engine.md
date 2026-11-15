@@ -144,10 +144,12 @@ The "|" seperates the first element (or elements, if separated by a ",") of the 
 
 	[?firstElement | ?moreElements]
 	
-Good to know: The following two expressions are equivalent.
-
-	[1, 2, 3]
-	[1, 2, 3 | []]
+> ###### Good to know
+>
+> The following two expressions are equivalent.
+>
+>	[1, 2, 3]
+>	<br>[1, 2, 3 | []]
 
 ##### Compounds
 

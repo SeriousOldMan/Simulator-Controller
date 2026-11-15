@@ -2078,7 +2078,9 @@ Now let's have a look at each oject:
 
 As mentioned above the "Session State.json" file will be periodically updated with the data update frequency configured in the "Session Database". The information may then be used by external tools, for example *SimHub* with the supplied plugin for Simulator Controller. Or you can even read the file in *Lua* scripts when creating a script for some custom behavior, for example as action for a custom voice command.
 
-Good to know: You can find a complete example "Session State.json" file in the *Resources\Templates* folder which is located in the program installation folder.
+> ###### Good to know
+>
+> You can find a complete example "Session State.json" file in the *Resources\Templates* folder which is located in the program installation folder.
 
 ### SimHub Plugin
 

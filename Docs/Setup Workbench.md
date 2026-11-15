@@ -14,7 +14,9 @@ Before we dive into the workflow of the "Setup Workbench", let's have a look at 
 
 You can identify a special folder in the first field. The "Setup Workbench" will create a file in this folder for each session where all actions you take will be logged in the form of a logbook. You can view all the recent logbook entries with the [Logbook Browser](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) by clicking on the small button with the book icon directly beside the settings button.
 
-Good to know: If you do not configure a logbook folder, the logbook will be written to the *Simulator Controller\Temp\Setup Workbench\Logbook* folder in your user *Documents* folder. But as the path suggests, it may be lost, once the *Temp* folder is cleaned up.
+> ###### Good to know
+>
+> If you do not configure a logbook folder, the logbook will be written to the *Simulator Controller\Temp\Setup Workbench\Logbook* folder in your user *Documents* folder. But as the path suggests, it may be lost, if the *Temp* folder is cleaned up.
 
 In the lower area, you can configure a GPT service provider if you want to use the AI-based Setup Engineer. This part is optional and is described in detail further down below.
 
@@ -54,11 +56,13 @@ Let's start withe first tab "Handling":
 	 
 	 For *Le Mans Ultimate* and *rFactor 2* the values for "Steering Lock" and "Steering Ratio" are also taken from the meta data. These values are the defaults used in a fresh setup created by the simulator. If you have chosen different values, if that is possible at all for the current car, use thse values.
 	 
-	 Good to know: What the calculation really needs is the range in degrees how much the steering wheels can turn from full left to full right. This range is calculated by
-	 
-		Steering Range = Steering Lock / Steering Ratio
-     
-	 Therefore, if you have this value and not the other ones, you can derive them by using the above simple relationship. For example, it can be found in the extended setup screen of *Automobilista 2*.
+	 > ###### Good to know
+	 >
+	 > What the calculation really needs is the range in degrees how much the steering wheels can turn from full left to full right. This range is calculated by
+	 >
+	 >     Steering Range = Steering Lock / Steering Ratio
+     >
+	 > Therefore, if you have this value and not the other ones, you can derive them by using the above simple relationship. For example, it can be found in the extended setup screen of *Automobilista 2*.
 
   2. The second line of entry fields allow you to enter the wheel base and the track width of the car you want to analyze. Although the underlying computation using the [Ackermann steering equations](https://www.racecar-engineering.com/articles/tech-explained-ackermann-steering-geometry/) require those values to get a precise result, it will be absolutely okay to use the defaults of 270 cm wheelbase and 150 cm track width for GT-like cars. You might not get the exact slip angles, but you can compensate for that using the threshold sliders anyway.
 
@@ -79,7 +83,9 @@ Let's start withe first tab "Handling":
 
   5. Finally, you can enable a short feedback sound, which varies in frequency and volume depending on over-/understeer events and their intensity. Lower tones indicate oversteering while higher tones indicate understeering.
 
-Good to know: Handling issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the frequency of the reported issues may be slightly different.
+> ###### Good to know
+>
+> Handling issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the frequency of the reported issues may be slightly different.
 
 ##### Suspension
 
@@ -105,7 +111,9 @@ Suspension analysis may not be available for all simulators, depending on the da
 
 As you can see, it can need some time to find good settings for a given car. The track does not play a role here and also the suspension settings in the setup do not play a role, cause the detection is based on acceleration and not on absolute suspension travel. So you can reuse the settings (as well as all other settings of the issue analyzer), once you have dialed them in.
 
-Good to know: Suspension issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the severity and frequency of the detected issues may be slightly different compared to a real-time analysis.
+> ###### Good to know
+>
+> Suspension issues can also be analyzed, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files) into the issue analyzer. But due to differences in sample rates, the severity and frequency of the detected issues may be slightly different compared to a real-time analysis.
 
 ##### Temperatures
 
@@ -115,13 +123,17 @@ On the third tab "Temperatures" you can specify several thresholds for tyre, bra
 
 The *Ideal* temperatures are the values you want to target in average over the course of a complete lap. Going over "Max" or going under "Min" will increase the severity of any created temperature related issues. And, last but not least, when the difference between inner and outer tyre temperatures of a given tyre exceeds the given "Max OI Difference" value, a corresponding issue will be generated as well.
 
-Good to know: Temperature analysis is not available, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files).
+> ###### Good to know
+>
+> Temperature analysis is not available, when [loading a pre-recorded telemetry file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#analyzing-handling-issues-based-on-saved-lep-telemetry-files).
 
 ##### Running the issue analyzer
 
 It is recommended to choose a car before entering the analyzer mode, since then some of the settings for the issue analyzer will be initialized with car specific data, depending on the chosen simulator. Also, all settings you have chosen will be saved for the selected car / track combination and will be re-used the next time you will use the analyzer.
 
-Good to know: If you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far. You can even use the issue analyzer for "All" cars and the selected settings will be used as defaults as well. This may or may not be useful. You have been warned.
+> ###### Good to know
+>
+> If you change a setting while track is set to "All", this setting will be used as a default for all tracks, for which no settings have been selected so far. You can even use the issue analyzer for "All" cars and the selected settings will be used as defaults as well. This may or may not be useful. You have been warned.
 
 Once you have dialed your settings, you can click on "Start".
 
@@ -185,7 +197,9 @@ Another valuable tool to improve your lap times is the integrated Telemetry View
 
 As long as the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background while you are driving. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison.
 
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Setup Workbench\Telemetry* folder which is located in your user *Documents* folder. When you import laps from the session database, they will be stored in *Simulator Controller\Temp\Setup Workbench\Telemetry\Imported*.
+> ###### Good to know
+>
+> The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Setup Workbench\Telemetry* folder which is located in your user *Documents* folder. When you import laps from the session database, they will be stored in *Simulator Controller\Temp\Setup Workbench\Telemetry\Imported*.
 
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
@@ -209,7 +223,7 @@ Specialized graphs for suspension movement (deflection), velocity, acceleration 
 
 The Telemetry Viewer supports two different sources for telemetry data. One, which is the default, is integrated into Simulator Controller and will provide telemetry data after a learning phase of two to three laps. The other one uses a connection to ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), a tool developed by @winzarten. You can choose, which telemetry provider to use by clicking on the button with the "Connect" icon in the upper right corner of the Telemetry Viewer window. If you choose "Second Monitor" here, make sure that this application is running while you are out on the track.
 
-##### Notes
+###### Notes
 
 1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
 2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
@@ -222,7 +236,9 @@ The Telemetry Viewer supports two different sources for telemetry data. One, whi
    - Telemetry data, which has been *imported* this way will not become part of the current session.
    *Imported* telemetry data can be removed by using the *delete* button. This will not remove it from its original location.
 
-Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+> ###### Good to know
+>
+> If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 
 ### Setup Engineer
 
@@ -257,7 +273,9 @@ If you have changed an instruction, you can revert it to the original instructio
 
 The Setup Engineer works on numerical telemetry data. Therefore it is necessary to run a few laps and collect telemetry data using the integrated telemetry system (see above). You must have choosen a specific car and also a specific track before using the Setup Engineer and the recorded telemetry data must originate from this combination, of course. Otherwise the results would be more tha questionable.
 
-Good to know: It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database. Telemetry files from other locations than the session database may not be detected correctly or will lack information like the lap time.
+> ###### Good to know
+>
+> It is also possible to use laps recorded in other sessions by loading them into the telemetry viewer from the session database. Telemetry files from other locations than the session database may not be detected correctly or will lack information like the lap time.
 
 #### Creating a lap analysis
 
@@ -343,7 +361,9 @@ In the upper left list, you can select the session you want to inspect. The last
 
 Normally, the active session (the one where new actions will be added) is the last one, which has been created for the current run of "Setup Workbench". But you can make a previous session active by checking it in the list. New actions will now be added there and you can take notes for that session (see below). This is helpful, if you want to continue your work on a setup after a break, for example.
 
-Good to know: Sessions are labeled with the date and time, when the "Setup Workbench" has been started. But you can change the name of a session by clicking in the session list like you will renamed a file in the File Explorer of Windows.
+> ###### Good to know
+>
+> Sessions are labeled with the date and time, when the "Setup Workbench" has been started. But you can change the name of a session by clicking in the session list like you will rename a file in the File Explorer of Windows.
 
 If you have selected the active session, you can add your own notes to the logbook by clicking on the "Notes..." button. This will open a window, where you can enter your notes. Text formatting using the [Markdown](https://www.markdownguide.org/) language incl. most extensions is supported.
 
@@ -477,14 +497,16 @@ Here is a much longer example for the "Porsche 992 GT3 Cup" which follows a very
 				 Damper.Rebound.Fast.Rear.Left, Damper.Rebound.Fast.Rear.Right,
 				 Differential.Preload, AntiRollBar.Rear]))
 
-Good to know: It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*. So the above declaration can be made much shorter:
-
-	[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 992 GT3 Cup",
-				[Electronics.TC, Aero.Splitter.Front,
-				 Spring.*.*.*, Bumpstop.*.*.*, Damper.*.*.*.*,
-				 Differential.Preload, AntiRollBar.Rear]))
-
-But make sure, that you do not match unwanted settings by accident, of course.
+> ###### Good to know
+>
+> It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*. So the above declaration can be made much shorter:
+>
+>	[?Initialize] => (Prove: removeSettings("Assetto Corsa Competizione", "Porsche 992 GT3 Cup",
+>				[Electronics.TC, Aero.Splitter.Front,
+>				 Spring.*.*.*, Bumpstop.*.*.*, Damper.*.*.*.*,
+>				 Differential.Preload, AntiRollBar.Rear]))
+>
+> But make sure, that you do not match unwanted settings by accident, of course.
 
 Beside the rules, which influence the way, the "Setup Workbench" analyses your handling problems, a so called definition file describe the car settings, their units and value ranges in more detail for the Setup Editor. These files are located in the *Resources\Garage\Definitions\Cars* folder in the program directory or in the *Simulator Controller\Garage\Definitions\Cars* folder which is located in your user *Documents* folder. These files must implement the following naming scheme:
 
@@ -543,7 +565,9 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	  *increment* defaults to **1**, *minValue* and *maxValue* to reasonably large values.
 	
-	  Good to know: The special case, where *increment* is **1** and *minValue* is an integer, this handler will be identical in behavior to the second variant of *ClicksHandler*.
+	  > ###### Good to know
+	  >
+	  > The special case, where *increment* is **1** and *minValue* is an integer, this handler will be identical in behavior to the second variant of *ClicksHandler*.
 	  
 	- The second variant maps a range of values starting with *minValue* to a defined list of specified values (*value1*, *value2*, ...) in the underlying simulator specific setup file. For technical reasons, there must be more than two values in this list.
 
@@ -682,7 +706,9 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 		[?Speed.Corner.Fast.Correction != 0] =>
 			(Prove: changeSetting(Aero.Diffusor.Height, -1, ?Speed.Corner.Fast.Correction))
 
-Good to know: It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
+> ###### Good to know
+>
+> It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
 
 Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have an extensive understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
 

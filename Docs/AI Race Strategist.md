@@ -118,7 +118,9 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
-Good to know: Even if Cato is muted, you can interact with the Strategist, for example to ask for a undercut simulation. If a chain of conversation is initiated by you, the driver, Cato will react normally. The Strategist will also communicate normally with regards to all strategy related topics, if a strategy is active for the current race.
+> ###### Good to know
+>
+> Even if Cato is muted, you can interact with the Strategist, for example to ask for a undercut simulation. If a chain of conversation is initiated by you, the driver, Cato will react normally. The Strategist will also communicate normally with regards to all strategy related topics, if a strategy is active for the current race.
 
 ## Racing with Cato
 
@@ -247,7 +249,9 @@ It is possible to enable a dynamic traffic simulation method, which uses a proba
 
 Please note, that if you are running a race with Team Server support, a new strategy can be also created and activated using the [strategy support of "Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#strategy-handling), which gives you much more control over various aspects of the new strategy.
 
-Good to know: The settings of the *Optimizer* will also be stored in the original strategy and the same settings will be used for all subsequent recalculations based on this particular strategy. This will be in general exactly what you want. But be aware, that the time needed (and therefore also the CPU consumption) to create a new strategy during a race will be the same as for the original strategy.
+> ###### Good to know
+>
+> The settings of the *Optimizer* will also be stored in the original strategy and the same settings will be used for all subsequent recalculations based on this particular strategy. This will be in general exactly what you want. But be aware, that the time needed (and therefore also the CPU consumption) to create a new strategy during a race will be the same as for the original strategy.
 
 It is also possible to enable automatic revision of the current strategy in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy). You can specify that an automatic revision will occur after each couple of laps as well as after an unplanned pitstop. Cato will inform you whenever a better strategy has been identified and will give you as much information as possible about the differences between the currently active and the new strategy. You then can decide, that it should be activated for the rest of the session. Whether you can use this without sacrificing performance or introducing lags, depends on your PC configuration (see next advice). Please note, that with the current release, automatic revision will only bring up strategies which are to be considered better in terms of final number of laps or race time. This means that the strategist **not** automatically suggests a *slower* strategy, which may be necessary, for example, due to the onset of rain. The reason for this is the large number of edge cases in these situations. However, you can manually request a new strategy via voice command or controller action to override the current, probably *better* strategy.
 

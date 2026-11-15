@@ -121,7 +121,7 @@ You can control which services will be available by the Engineer during the diff
 | Damage warning during Time Trial         | Boolean | False                           | No  | If enabled (*True*), the Engineer will issue damage warnings during time trial sessions. |
 | Pressure warning during Time Trial       | Boolean | True                            | No  | If enabled (*True*), the Engineer will issue pressure loss warnings during time trial sessions. |
 
-##### Notes
+###### Notes
 
 (1) The default for *iRacing* is *Change*, since the simulator does not provide correct tyre pressure information while driving. This will lead to setup pressure values, which are way off, when tyres are changed at the pitstop. Therefore it might be better to manage tyre pressures manually. *Change* is also the default for *Automobilista 2*, *Project CARS 2* and *RaceRoom Racing Experience*, because these simulators do not support pressure adjustments during a pitstop.
 
@@ -274,7 +274,7 @@ The settings in this section are used by the Engineer to decide on the details o
 | Tyre Service Duration                    | Integer | 30                              | Yes | Amount of time (in seconds) needed for swapping all four tyres. |
 | Brake Service Duration                   | Integer | 50                              | No  | Amount of time (in seconds) needed to change all brake pads. |
 
-##### Notes
+###### Notes
 
 (1) Wear data is not available for all simulators. At the time of this writing, *Assetto Corsa*, *Assetto Corsa Competizione* and *Project Motor Racing* do not provide this information in the API. For *iRacing*, the information is available in the API, but not for all cars.
 

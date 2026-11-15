@@ -375,7 +375,9 @@ Enter the number of the pitstop that should be fixed. You can also specify, that
 
 Important: The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
 
-Good to know: When a strategy, that originally was created using fixed pitstops, is adjusted in the "Team Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
+> ###### Good to know
+>
+> When a strategy that originally was created using fixed pitstops, is adjusted in the "Team Center" or is revised by the Strategist, the fixed pitstops will not be taken into account. There is a reason, why the strategy needs a revison, isn't it?
 
 ### Drivers
 
@@ -455,6 +457,8 @@ The values in this tab and also the document display on the right side of the ta
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%204.JPG)
 
-Good to know: The document shown on the right side can be printed using the right mouse button context menu.
+> ###### Good to know
+>
+> The document shown on the right side can be printed using the right mouse button context menu.
 
 Note: Exported strategies will be saved in the file "Race.strategy", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. There can only be one currently active strategey. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) for information, how Cato uses such a predefined strategy during a race.

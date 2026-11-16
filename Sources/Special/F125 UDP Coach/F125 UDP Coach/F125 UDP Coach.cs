@@ -151,13 +151,15 @@ namespace F125UDPCoach {
         }
 
         void playSound(string wavFile, bool wait = true) {
+			string device = (audioDevice != "") ? ("\"" + audioDevice + "\"") : "";
+			
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = player,
                     WorkingDirectory = workingDirectory,
-                    Arguments = $"\"{wavFile}\" -t waveaudio \"{audioDevice}\" vol {volume}",
+                    Arguments = $"\"{wavFile}\" -t waveaudio {device} vol {volume}",
                     UseShellExecute = false,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
@@ -417,8 +419,8 @@ namespace F125UDPCoach {
             else
                 return false;
 
-            if (wavFile != "")
-                if (audioDevice != "")
+            if ((wavFile != "") && (!string.Equals(audioDevice, "null", StringComparison.OrdinalIgnoreCase)))
+				if ((audioDevice != "") || (volume != 1.0f))
                 {
                     if (player != "")
                         playSound(wavFile, false);
@@ -1256,26 +1258,27 @@ namespace F125UDPCoach {
                             lastGroup = hintGroups[bestHint];
                             lastPhase = hintPhases[bestHint];
 
-                            if (audioDevice != "")
-                            {
-                                if (player != "")
-                                    playSound(hintSounds[bestHint], false);
-                                else
-                                    SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
-                            }
-                            else
-                            {
-                                if (lastPlayer != null)
-                                {
-                                    lastPlayer.Stop();
+                            if (!string.Equals(audioDevice, "null", StringComparison.OrdinalIgnoreCase))
+								if ((audioDevice != "") || (volume != 1.0f))
+								{
+									if (player != "")
+										playSound(hintSounds[bestHint], false);
+									else
+										SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
+								}
+								else
+								{
+									if (lastPlayer != null)
+									{
+										lastPlayer.Stop();
 
-                                    lastPlayer.Dispose();
-                                }
+										lastPlayer.Dispose();
+									}
 
-                                lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
+									lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
 
-                                lastPlayer.Play();
-                            }
+									lastPlayer.Play();
+								}
                         }
                     }
                 }
@@ -1362,7 +1365,7 @@ namespace F125UDPCoach {
         string audioDevice = string.Empty;
         string player = string.Empty;
         string workingDirectory = string.Empty;
-        float volume = 0;
+        float volume = 1.0f;
         string hintFile = string.Empty;
 
         public void initializeTrackHints(string type, string[] args, int index)

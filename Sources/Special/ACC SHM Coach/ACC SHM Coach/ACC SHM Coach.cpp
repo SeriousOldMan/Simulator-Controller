@@ -405,8 +405,8 @@ bool triggerUSOSBeep(string soundsDirectory, string audioDevice, float usos) {
 	else if (usos > understeerLightThreshold)
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
-	if (wavFile != "") {
-		if (audioDevice != "") {
+	if ((wavFile != "") && (audioDevice != "null")) {
+		if ((audioDevice != "") || (volume != 1)) {
 			if (player != "")
 				playSound(wavFile, false);
 			else
@@ -1206,21 +1206,22 @@ void checkCoordinates() {
 						lastGroup = group;
 						lastPhase = phase;
 
-						if (audioDevice != "")
-						{
-							if (player != "")
-								playSound(hintSounds[bestHint], false);
-							else
-								sendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
+						if (audioDevice != "null")
+							if ((audioDevice != "") || (volume != 1))
+							{
+								if (player != "")
+									playSound(hintSounds[bestHint], false);
+								else
+									sendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
 
-							nextUpdate = time(NULL) + 1;
-						}
-						else {
-							char* sound = (char*)hintSounds[bestHint].c_str();
+								nextUpdate = time(NULL) + 1;
+							}
+							else {
+								char* sound = (char*)hintSounds[bestHint].c_str();
 
-							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
-							PlaySoundA(sound, NULL, SND_FILENAME | SND_ASYNC);
-						}
+								PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+								PlaySoundA(sound, NULL, SND_FILENAME | SND_ASYNC);
+							}
 					}
 				}
 			}

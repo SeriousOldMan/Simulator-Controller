@@ -406,7 +406,9 @@ On the right side, you will see the simulator specific content of the setup file
 
 Using the checkboxes on the left side of each setting, you can control which modifications will be included in the modified setup and which are not. The changes will also be reflected in the internal format at the right, but this is more for documentary purposes. Once you have reviewed, chosen and possibly corrected some of the modifications, you can press the "Save..." button to save everything to a new setup file. Or you can use the "Reset" button to start over again.
 
-Note: The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corsa EVO*, *Le Mans Ultimate* and *rFactor 2*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes) down below.
+> ###### Important
+>
+> The *Setup Editor* is currently only available for *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corsa EVO*, *Le Mans Ultimate* and *rFactor 2*. More simulators might be supported with future releases. Please see the [notes section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#notes-3) down below.
 
 ## Comparing Car Setups
 
@@ -828,9 +830,10 @@ As you can see, the approach is quite simple, since the structure of the JSON-ba
 ## Notes
 
   1. Only *Assetto Corsa*, *Assetto Corsa Competizione*, *Assetto Corrsa EVO*, *Le Mans Ultimate* and *rFactor 2* are supported at the moment, when it comes to editing, comparing and saving setup files. For *rFactor 2* only a few cars are supported in the standard distribution of Simulator Controller, but you can define your own cars as described above. Other simulators might follow with future releases, but a first investigation has shown that setup file handling and - even more important - setup file format is rather cryptic and undocumented in other simulators.
-  2. The implementations for *Assetto Corsa Competizione* provides a generic car model and detailed car specifications for all currently available cars. More cars will be added when additional DLCs become availabble.
+  2. The implementations for *Assetto Corsa Competizione* provides a generic car model and detailed car specifications for all currently available cars.
   3. The implementation for *Assetto Corsa* currently provides a generic car model and many detailed car models at the moment. More detailed car models will be added over time. If you don't find your favorite car, please feel free to implement the car definition and rules files (takes a couple of minutes, see the description in the previous section). I will be happy to add your car to the package as a community contribution.
   4. The same is true for *Assetto Corsa EVO*, espcially because the support for this simulator has just been added at the time of this writing.
   5. The implementation for *Le Mans Ultimate* currently provides a generic car model and detailed car models for all cars from the simulator including all current extensions. Working with *Le Mans Ultimate* setup is a bit different than for the other simulators, since setups are not stored car specific, but only track specific. So be sure to include the car model name in the name of the setup file to help identifying the correct setup later on.
   6. As said, not many cars are available for *rFactor 2* but you may define your own car meta data. Once done and tested, I will be happy to add your car to the package as a community contribution. The comments for *Le Mans Ultimate* apply here as well.
-  7. Last but not least, specifications for specific car models are missing completely for all other simulators, only a generic car is supported here, although all cars you have used so far for the given simulator, will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 
+  7. Although no support for car setups is available for *Automobilista 2*, at least a specification for the available setup settings for all cars are known to the "Setup Workbench". Therefore, you will get at least relevant setup recommendations.
+  8. For all other simulators, specifications for specific car models are missing completely and only a generic car is supported here, although all cars you have used so far for the given simulator will be available in the car selection menu. Nevertheless, only those settings, which are actually available in a given simulator, are used by "Setup Workbench". 

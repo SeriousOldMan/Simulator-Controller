@@ -188,6 +188,9 @@ playSound(player, wavFile, settings := false, options := false) {
 	if settings {
 		audioDevice := settings.AudioDevice
 		volume := settings.Volume
+
+		if (audioDevice = "")
+			audioDevice := false
 	}
 	else {
 		audioDevice := false

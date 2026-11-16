@@ -46,7 +46,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.3.5.0-dev]() (Early build for 7.3.5. Changes: Migrated to AHK 2.1-alpha.39, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU, Fixed active state of track sections, Suppress Strategist race review when muted, Fixed wrong number of tyre laps in "System Monitor", Fixed wrong number of tyre laps in SimHub plugin, Added setting value to chart in logbook, Fixed zoom factor in Telemetry Viewer, Updated documentation.)
+[7.3.5.0-dev](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Tau3mYWq?inline=true) (Early build for 7.3.5. Changes: Migrated to AHK 2.1-alpha.39, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU, Fixed active state of track sections, Suppress Strategist race review when muted, Fixed wrong number of tyre laps in "System Monitor", Fixed wrong number of tyre laps in SimHub plugin, Added setting value to chart in logbook, Fixed zoom factor in Telemetry Viewer, Updated documentation.)
 
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7350) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-735) of this version and all the versions you might have skipped, before installing and using this version.
 

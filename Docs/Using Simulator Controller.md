@@ -54,9 +54,11 @@ As said, by default the first name that has been found will be used for all thes
 
 Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can manage all this in the lower section of the profile dialog.
 
-- **Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
+> ###### Important
+>
+> Transfer of information about critical errors and also statistical usage information is enabled by default.
 
-#### Notes
+###### Notes
 
 - If you want to know what diagnostics data is being collected, you can inspect the files in [Documents]\Simulator Controller\Diagnostics. All files can be opened with a text editor.
 - No personal data will ever be transferred, with one exception: Theoretically, your IP address is part of the transferred data, but it will never be used.
@@ -150,7 +152,9 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 Beside manually enabling and disabling functions when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
 
-Important: These menus are not working correctly, if scaling has been actived for the current monitor.
+> ###### Important
+>
+> These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask me why...
 
 ### Startup Profiles
 
@@ -162,7 +166,9 @@ In this editor you create as many different startup profiles as you want. Only o
 
 If you want to create a startup profile, click on the button with the small "+" and give this profile a unique name. You may also use the copy button to create a copy of an already existing profile, but make sure that you change the name afterwards, so that all profile names are unique. And you can also export and import profiles to share them with your team mates, for example, using the corresponding buttons. Also take care here that all your profile names are unique before leaving the dialog.
 
-Good to know: If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
+> ###### Good to know
+>
+> If you hold down the Control key when clicking on the "Download" button, only the currently selected profile will be exported, otherwise all your profiles will be in the export file.
 
 You can choose whether a profile will start a solo or a team session and you can decide whether you want to run the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), ["Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center) or ["Team Center Lite"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#normal-vs-simple-user-interface) (a simplified version of "Team Center") automatically during startup. Please note, that running the "Team Center" is only useful in a team session.
 
@@ -180,7 +186,9 @@ And you can choose furthermore which Assistants will be available and whether th
 | Muted    | "Muted" means, that the Assistant is fully active, including voice capabilities. But the Assistant will not contact the driver pro-actively, for example, to inform about an upcoming weather change. The Assistant will, however, react to voice commands and will allow full voice interaction, as long as the dialog is started by the driver.<br><br>Note: A "muted" Assistant can be fully or partially unmuted using a voice command. This is described in the individual documentation for each Assistant. |
 | Active   | This is the normal operation mode of the Assistant with all voice capabilities enabled. |
 
-Note: Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active *Push-To-Talk* button, this configuration is not necessary.
+> ###### Good to know
+>
+> Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active *Push-To-Talk* button, this configuration is not necessary.
 
 Additionally, you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) by the Assistants, if required. "Default" is available here as well.
 
@@ -229,7 +237,7 @@ The checkbox for each function has three states - selected, deselected and indet
 
 Finally, if you are ready to start, choose the profile you want to start with and close the startup profiles editor. Then click again on the green triangle to start Simulator Controller with the selected profile. As a shortcut, you can hold down the Control key while saving and closing the startup profiles editor, which will trigger the startup process automatically.
 
-#### Notes
+###### Notes
 
 1. If you want "Simulator Startup" to use a specific startup profile independent from what is chosen in the configuration of the startup profiles, you can run "Simulator Startup.exe" with the "-Startup [Profile]" option, where *[Profile]* is the name of the profile you want to use (possibly enclosed in quotes). This is especially helpful together with the "-NoLaunchPad" option, when running "Simulator Startup" from a Stream Deck, for example.
 
@@ -271,7 +279,11 @@ In many cases all drivers in a given team want to share the same configuration. 
 
    You can prepare any number of exports from your session database you want to share with your team mates.
    
-   - These exports can include settings for the Assistants and other applications of Simulator Controller from the [settings page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings). Hint: Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included.
+   - These exports can include settings for the Assistants and other applications of Simulator Controller from the [settings page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings).
+ 
+     > ###### Good to know
+	 >
+	 > Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included.
    - You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database".
    
    Put all the export files into the folder of the team package.
@@ -294,7 +306,9 @@ Translators can be configured directly for the corresponding [plugins of the Ass
 
 The list of supported translator languages can be extended. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#machine-translation) for more information.
 
-Important: Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
+> ###### Important
+>
+> Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
 
 #### Talking with your *crew*
 
@@ -306,7 +320,9 @@ Before version 5.5.8 of Simulator Controller, it was necessary to press the *Pus
 
 You have to press the configured *Push-To-Talk* button twice like double-clicking a mouse button to activate a special listener, which only accepts the activation phrases. The last button press of the double-press must be held down as long as you speak, if you have configured the "Hold & Talk" method as described below.
 
-Good to know: You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings).
+> ###### Good to know
+>
+> You can alter the speed for the two clicks or presses (Windows default is 500 ms) in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings).
 
 As said, this way to initiate an activation command is *only* required for the voice recognition services that are run locally (part of the Windows operating system) together with the Driving Coach. When using Azure or Google voice recognition, for example, you can simply push the *Push-To-Talk* button once and issue a normal command or an activation command as you like. The double-press method is supported everywhere as well, though, to keep things consistent.
 
@@ -345,7 +361,9 @@ Please don't forget to press the *Push-To-Talk* button at the end of your speech
 	
 Both, the AI Race Engineer and the AI Race Strategist will start up and will listen to your commands (Jona will be a german personality, while Cato will use English to talk with you). Please note, that if you configured [*Push-To-Talk*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) in the configuration, you need to hold the respective button, while talking. Since no simulation will be running during your test, the functionality of Jona und Cato will be quite restricted, but you may switch between those Assistants using the activation phrase and you may ask some questions like "Is rain ahead?" or "Wird es regnen?". You may also start the AI Race Spotter here, but this will be of no big use, since the Spotter does not answer many questions.
 
-Good to know: When you start the test mode, the Assistants will use the values from the current configuration, i.e. language, configured voices, and so on. Normally, the configured Assistant Boosters will not be activated, since this won't add any value, when testing the *Push-To-Talk* functionality. If you hold down the Control key when clicking the "Play" button, however, all configured Assistant Boosters will be started up as well.
+> ###### Good to know
+>
+> When you start the test mode, the Assistants will use the values from the current configuration, i.e. language, configured voices, and so on. Normally, the configured Assistant Boosters will not be activated, since this won't add any value, when testing the *Push-To-Talk* functionality. If you hold down the Control key when clicking the "Play" button, however, all configured Assistant Boosters will be started up as well.
 
 *Important*: When using the voice test, depending on the chosen recognizer, it might necessary to use the double-press for activation commands (see [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#activation-commands-vs-normal-commands)). If there is only *one* dialog partner configured, this will be activated for listen mode by default. In this situation, no activation command is necesssary.
 
@@ -363,7 +381,9 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 
 If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
 
-Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask me why...
+> ###### Important
+>
+> These menus may not be working correctly, if scaling has been actived for the current monitor. Don't ask me why...
 
 #### Non-standard voice configurations
 
@@ -480,7 +500,9 @@ Additionally, relative and absolute volume control is supported in the audio rou
 
 This routing will send the speech of the Spotter to the headset with a somewhat reduced volume level, whereas the Engineer and Strategist will talk through the loadspeaker and since you have a headset mounted their volume is increased to be still be understandable.
 
-Good to know: You can mute a given sound completely by supplying "null" as the given audio device or setting the volume to **0**, of course. This can be very helpful, if the *Conversation* or *Reasoning* sounds are not wanted, for example.
+> ###### Good to know
+>
+> You can mute a given sound completely by supplying "null" as the given audio device or setting the volume to **0**, of course. This can be very helpful, if the *Conversation* or *Reasoning* sounds are not wanted, for example.
 
 As you might expect, you can configure voice input as well. There are some additional things to consider, though, as you can see in the example below.
 
@@ -511,7 +533,9 @@ All other input routes are typically set to the same input device, normally the 
 
 A final note here: Make sure, that all your audio devices are named differently, even when they belong to the same type of equipment, for example a headset. Otherwise you will have unwanted effects. Example: Name the speakers of your headset "HeadsetSpeaker" and the microphone of your headset "HeadsetMic" in your Windows sound settings. Doing this you can activate them seperately.
 
-Good to know: Unlike most other configuration settings, changes to the audio routes are reflected in all running programs after a few seconds.
+> ###### Good to know
+>
+> Unlike most other configuration settings, changes to the audio routes are reflected in all running programs after a few seconds.
 
 #### Activating audio routes by simulator and active session
 
@@ -526,6 +550,8 @@ To create such a specific set of audio routes, precede the settings with "[Outpu
 	Race
 	Time Trial
 	
+###### Notes
+
 (1) Active, when the simulator is running, but no session has been started (yet).
 	
 You can use an asterisk ("*") for the simulation and also for the session type, which then acts as a wildcard. If no match for the current simulator and session type is found, the default "[Output]" or "[Input]" settings are used. If they are also not configured, the current devices of Windows are used. Examples:
@@ -539,7 +565,9 @@ You can use an asterisk ("*") for the simulation and also for the session type, 
 
 Please note, that specifying a simulator is more specific than specifying a session, so "[Output.Assetto Corsa.\*]" takes precedence over "[Output.\*.Race]". Specifying both the simulator and the session will be the most specific, of course, whereas using the "\*" for both will be the most unspecific.
 
-Important: Using audio routes is only possible, if *NirCmd* has been installed.
+> ###### Important
+>
+> Using audio routes is only possible, if *NirCmd* has been installed.
 
 ### Keyboard shortcuts & modifiers
 
@@ -659,7 +687,9 @@ The "System Monitor" is divided into several pages of information:
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%205.JPG)
 
-Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problems will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued. Also it is possible that state information is not updated anymore, when central backgroud processes, first and formost "Simulator Controller.exe" have been terminated manually.
+> ###### Good to know
+>
+> The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problems will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued. Also it is possible that state information is not updated anymore, when central backgroud processes, first and formost "Simulator Controller.exe" have been terminated manually.
 
 ## And now it's time
 

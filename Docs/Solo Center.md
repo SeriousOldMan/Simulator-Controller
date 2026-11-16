@@ -14,7 +14,7 @@ When you start a new session or when you close the window, the "Solo Center" wil
 
 Do **not** start the "Solo Center" after you have already started your session in the simulator. Although nothing will explode, you will lose your valuable data, since it will be sent to the "Solo Center", which most likely will not collect it. Also, do not quit the "Solo Center" **before** quiting the session in your simulator. You will also end up with an inconsistent data constellation. Nothing really harmful, since in the end all data is treated with statistical weights and averages, but if possible, do avoid it.
 
-##### Notes
+###### Notes
 
 - As mentioned, the Assistants are responsible to collect and prepare the data and supply it to the "Solo Center". Therefore, if the Assistants have been deactivated, for example by using a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), only rudimentary information will be available in the "Solo Center".
 - If you are [running a team session](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#running-a-team-session), the "Solo Center" cannot be used (it will simply ignore the running session), since all data duties are handled by the Team Server in this case. But you may want to use the "Team Center" to control your race in this case anyway.
@@ -30,9 +30,10 @@ The "Solo Center" allows you to save the complete session data for later inspect
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2011.JPG)
 
-IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
-
-The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
+> ###### Good to know
+>
+> - The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
+> - The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 
 #### Difference between saving a session and exporting data
 
@@ -99,7 +100,7 @@ Last but not least, using the small button with the cog wheel icon, you can choo
 	 
 All these report documents are HTML-based and can be saved or printed using the context menu when right-clicking on a free space in the output area.
 
-##### Notes
+###### Notes
 
 - The report shown in the output area will be updated live, whenever new data arrives. A special case is the report for the lap details. If the chosen report is for the last lap, the report will automatically switch to the next lap, when this lap has been finished.
 
@@ -113,9 +114,10 @@ A valuable tool to improve your lap times is the integrated Telemetry Viewer, wh
 
 While you are in an active session and the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison. Additionally, you can enable telemetry collection without opening the Telemetry Viewer with holding down the Control key while choosing the "Telemetry..." command from the "Session" menu, so that the command line in the menu is checked.
 
-Note: You can use the "Auto Telemetry" setting, so that telemetry collection is automatically started whenever a new session is started. The Telemetry Viewer window is not opened in this case.
-
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Solo\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+> ###### Good to know
+>
+> - You can use the "Auto Telemetry" setting, so that telemetry collection is automatically started whenever a new session is started. The Telemetry Viewer window is not opened in this case.
+> - The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Solo\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
 
 #### Choosing the telemetry provider
 
@@ -123,9 +125,11 @@ The Telemetry Viewer supports two different sources of telemetry data. One, whic
 
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
-Important: Sessions that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
+> ###### Important
+>
+> Sessions that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
 
-##### Notes
+###### Notes
 
 1. Depending on the telemetry provider it can take a few laps before the first telemetry data gets recorded.
 2. The internal telemetry provider uses a special method for *Assetto Corsa Competizione*, which unfortunately does not supply the distance of the car into the track in the shared memory API (it is available in the UDP interface, though, but this interface does not provide telemetry data). Because of that, the track layout must be learned, before telemetry data can be correlated to the track position. Be sure to drive clean during the first laps.
@@ -138,7 +142,9 @@ Important: Sessions that are saved with telemetry data will NOT be synchronized 
    - Telemetry data, which has been *imported* this way will not become part of the current session.
    *Imported* telemetry data can be removed by using the *Delete* button. This will not remove it from its original location.
 
-Good to know: If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
+> ###### Good to know
+>
+> If you use the "Open..." button in the dialog, which let's you browse the available telemetry data, you can import telemetry data from ["Second Monitor"](https://gitlab.com/winzarten/SecondMonitor), as long as it has been saved as JSON file, which can be activated in the settings of "Second Monitor".
 
 ### Managing tyres and planning practice stints
 

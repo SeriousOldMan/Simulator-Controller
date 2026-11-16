@@ -2,11 +2,14 @@
 
 The Race Assistants collect data from your practice and race sessions (qualifying sessions are not supported by default, since they quite often use special setups which will only be in the perfect window during the first few laps) and saves them together with the associated tyre choice and start pressures, air and asphalt temperature and other environmental conditions in a local database. The Assistants also keep track of lap times, tyre wear, brake wear and many other data points from the telemetry information of the car and store these in the database as well. And you can add many other interesting stuff to the database manually, like car setups, strategies, and so on.
 
-Important: "Session Database" displays some graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Session Database" once using administrator privileges.
+> ###### Good to know
+>
+> "Session Database" displays some graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Session Database" once using administrator privileges.
 
-Note: The database is stored in the *Simulator Controller\Database* folder, which is located in your users *Documents* folder. Your own data files will be located in the *User* subfolder, whereas the consolidated data will end up in the *Community* subfolder.
-
-*Very Important*: As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines mentioned [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings), so that the Assistants have a correct understanding of your initial car and tyre setup. This is important to get a correct setup for an upcoming pitstop by the Race Engineer, but it is even more important when building the databse, so that you do not end up with compromised data. Depending on your configuration, the Engineer will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since the Engineer will store the corrected values in the database, as long as your initial setup values are known.
+> ###### Good to know
+>
+> - The database is stored in the *Simulator Controller\Database* folder, which is located in your users *Documents* folder. Your own data files will be located in the *User* subfolder, whereas the consolidated data will end up in the *Community* subfolder.
+> - As long as we can't get the actual car setup information from the different simulation games via APIs, you **really** have to follow the guidelines mentioned [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings), so that the Assistants have a correct understanding of your initial car and tyre setup. This is important to get a correct setup for an upcoming pitstop by the Race Engineer, but it is even more important when building the databse, so that you do not end up with compromised data. Depending on your configuration, the Engineer will ask you at the end of the session, if you were happy with your setup and if you want to include the setup information in the database. Please only answer "Yes" here, if you are sure, that the setup information has been transferred correctly to Jona, as described above. Please note, that you still may have had a too low or too high hot tyre pressure during your session, because your initial setup was wrong in the first place. This is no problem, since the Engineer will store the corrected values in the database, as long as your initial setup values are known.
 
 ### Using the Solo Center
 
@@ -30,11 +33,11 @@ Last, but not least, you can write some notes in the field in the upper right co
 
 With the dropdown menu above the list of available data you can choose whether only your own setups (=> "User") will be included in the database search or that also the data of other users of Simulator Controller might be considered (=> "User & Community"). Please see the information at the end of this chapter, how to share data with the community.
 
-Important:
-
-  1. If you change the scope using the dropdown menu mentioned above, this will affect only the behavior and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
-  2. Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you have run a session with a specific car on a specific track. It is not necessary to save any setup information by the Assistants, simply running one lap is enough.
-  3. If you hold down the Control key when clicking on a specific database topic, for example "Sessions", will open the documentation for this topic. Alternatively you can use the small button with a "Book" icon in the upper right area of the main window to open the documentation of the currently selected topic.
+> ###### Important
+>
+> - If you change the scope using the dropdown menu mentioned above, this will affect only the behavior and scope during the current run of the "Session Database" tool. If you want to alter the scope permanently, so that it will also influence the retrieved values by other applications such as the Race Assistants, hold the Control key down while choosing a different scope from the dropdown menu.
+> - Simulator Controller knows nothing about the available cars and tracks of any simulator. This info will only get available when you have run a session with a specific car on a specific track. It is not necessary to save any setup information by the Assistants, simply running one lap is enough.
+> - If you hold down the Control key when clicking on a specific database topic, for example "Sessions", will open the documentation for this topic. Alternatively you can use the small button with a "Book" icon in the upper right area of the main window to open the documentation of the currently selected topic.
 
 Following you will find an overview about the different database topics:
 
@@ -75,7 +78,9 @@ Below you find the order, in which the different combinations will be loaded. As
 | All      | Specific | Specific | Specific |
 | Specific | Specific | Specific | Specific |
 
-Important note: Some values underly a transformation between internal and external representations. For example, lap times are stored in a millisecond format in many places, **0** for tyre sets means "Auto" and so on. Therefore, when entering a new settings value, take a look at the supplied default value, and understand its meaning. And use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings. Additionally, you may find entries in the list of available settings for which no corresponding field in the "Race Settings" tool exist. These settings are for internal calculations in most cases, for example the correction factor for temperature based tyre pressure calculations. Be careful, when entering values for these settings, you may get funny results. The default values are generally the best choice here.
+> ###### Good to know
+>
+> Some values underly a transformation between internal and external representations. For example, lap times are stored in a millisecond format in many places, **0** for tyre sets means "Auto" and so on. Therefore, when entering a new settings value, take a look at the supplied default value, and understand its meaning. And use the "Test..." button to open the "Race Settings" tool to check the resulting values for the current selected car / track / weather combination, after you have entered or changed any settings. Additionally, you may find entries in the list of available settings for which no corresponding field in the "Race Settings" tool exist. These settings are for internal calculations in most cases, for example the correction factor for temperature based tyre pressure calculations. Be careful, when entering values for these settings, you may get funny results. The default values are generally the best choice here.
 
 The default values for all these settings may not only be used to initialize the race settings for an upcoming session, but they may also be used in the "Strategy Workbench" to provide values for many [settings for strategy simulation & planning](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench#rules--settings).
 
@@ -105,7 +110,9 @@ Sections can be disabled by either the section menu or by deselecting the sectio
 
 It is possible to open the track map in an external, zoomable window, which makes editing sections of very long tracks like the Nordschleife much more easy. To open this window click on the small button to the right of the "Edit" drop down menu. Beside using the control in the upper left corner of the window to control the zoom factor, you can use the mouse wheel to zoom and out. Furthermore, the track map can be moved with the mouse by holding down the middle mouse button.
 
-Good to know: Once in a while zooming and scrolling can get out of sync and the track map disappears. In this case click on the small button with the "Recycle" icon and the map will be reset to the top left corner.
+> ###### Good to know
+>
+> Once in a while zooming and scrolling can get out of sync and the track map disappears. In this case click on the small button with the "Recycle" icon and the map will be reset to the top left corner.
 
 ##### Editing Track Automations
 
@@ -113,7 +120,9 @@ With the second editor you can define automatic actions for specific locations a
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2013.jpg)
 
-Good to know: The currently selection of the track editor will be remembered for the next run of "Session Database".
+> ###### Good to know
+>
+> The currently selection of the track editor will be remembered for the next run of "Session Database".
 
 #### Sessions
 
@@ -123,11 +132,13 @@ All practice and race sessions, which have been stored in the database are shown
 
 You can use the buttons below the list to rename or delete a session. You will have to use the "Solo Center" or the "Team Center" to create a session and store it in the database. Once you have selected a session in the list above, you can decide whether you want to synchronize the session with any of the [connected Team Servers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#database-configuration) (see below). Sharing of sessions with the community is not possible, for obvious reasons.
 
-Good to know: Sessions can be opened in the corresponding *Center* by double-clicking them.
+> ###### Good to know
+>
+> Sessions can be opened in the corresponding *Center* by double-clicking them.
 
 #### Telemetries
 
-Telemetry data for individual laps can be stored in the session database, for example to use them as reference for future comparisons. Note: Lap telemetry data can be recorded in the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), for example, and can then be stored in the session database.
+Telemetry data for individual laps can be stored in the session database, for example to use them as reference for future comparisons. Lap telemetry data can be recorded in the ["Solo Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Solo-Center), for example, and can then be stored in the session database.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2019.jpg)
 
@@ -163,7 +174,9 @@ If you you want to combine your channels into separate groups in the telemetry g
 
 If available, a map for the current track can be opened with the "Map..." button. You can click on a location of the track map and the corresponding data points will be highlighted in the telemetry graph. It is also possible to click on a data point in the graph and the corresponding location will be selected in the track map. When clicking on a point in the graph, an additional window will be opened as long as track sections have been defined for the given track, which displays a performance summary of the given section.
 
-Important: This functionality may not be available when using *WebView2* as the HTML viewer.
+> ###### Important
+>
+> This functionality may not be available when using *WebView2* as the HTML viewer.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Telemetry%20Browser%20Track%20Map.jpg)
 
@@ -171,7 +184,9 @@ For very long tracks like the Nordschleife, it can be necessary to focus on part
 
 Also, you can edit the track sections by clicking on the "Edit" button in the right corner of the window. This enables you to edit the sections as described above for the [sections editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#track--automation). When in "Edit" mode, you can either save the edited track sections by clicking on the "Save" button, or you can hold down the Control key and click on the "Cancel" button to discard all changes. Lastly, beside adding all sections by yourself, you can use the "Scan" button to create sections based on the currently selected lap telemetry data. But check the sections after they have been created, because the scanning method may have taken some wrong decisions.
 
-Good to know: Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data. For example, set the start marker for a corner a few meters before the start of the braking zone.
+> ###### Good to know
+>
+> Beside the dark gray dot which marks the start/finish line, a second gray dot may be present, which marks the currently selected track position. This is very helpful when creating sections based on driver inputs from the telemetry data. For example, set the start marker for a corner a few meters before the start of the braking zone.
 
 The Telemetry Viewer is available in the following applications to collect lap telemetry data, where additional documentation is available:
 
@@ -212,19 +227,19 @@ If you use the "Open..." button in the dialog, which let's you browse the availa
   | SUSPDEFL_RL (5)| No            | The used travel of the rear left shock absorber in mm. |
   | SUSPDEFL_RR (5)| No            | The used travel of the rear right shock absorber in mm. |
   
-  Notes:
+  ###### Notes
   
-  (1) The sequence of the columns in the CSV file is not important.<br>
-  (2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.<br>
-  (3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.<br>
-  (4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
-  (5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2* and *Project CARS 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
+  (1) The sequence of the columns in the CSV file is not important.
+  <br>(2) CSV files that are missing some of the required columns can be imported as well, but the result may not be usable by other parts of Simulator Controller, for example the Driving Coach.
+  <br>(3) Not used and not required for *iRacing*. Instead a valid track map must exist for *iRacing* and the "DISTANCE" values are mapped to track locations using the information of the track map.
+  <br>(4) Optional and used only when creating handling issues in the "Setup Workbench" based on saved telemetry data.
+  <br>(5) If the *used* travel is not available in the data, but the *remaining* travel is (as for *Automobilista 2* and *Project CARS 2*, for example), it would be good enough for all telemetry-based computations to import the data with a reversed sign.
 
-Good to know:
-
-1. You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
-2. The yaw rate information is only used, when using telemetry data to create handling issues in the "Setup Workbench". Not all importer can extract this information from the available data. Currently, the *iRacing* IBT importer and also the CSV file importer support importing the yaw rate.
-3. When importing lap telemetry data directly in the "Telemetries" tab of "Session Database", everything said above applies as well.
+> ###### Good to know
+>
+> - You can check whether the imported telemetry data is fully usable (especially the track coordinates) by opening the track map from the Telemetry Viewer window and click on any location on the track. If the corresponding location in the telemetry graph is selected, the positions are correct. Also check, whether the "Time" shows the correct timing information, since this is required by the Driving Coach.
+> - The yaw rate information is only used, when using telemetry data to create handling issues in the "Setup Workbench". Not all importer can extract this information from the available data. Currently, the *iRacing* IBT importer and also the CSV file importer support importing the yaw rate.
+> - When importing lap telemetry data directly in the "Telemetries" tab of "Session Database", everything said above applies as well.
 
 ###### Special notes for *Assetto Corsa Competizione*
 
@@ -234,11 +249,13 @@ To get high precision samples with a resolution of at least 20 Hz, the telemetry
 
 This special track spline is cached together with track map and used for all later telemetry collection, thereby saving one lap. If you encounter a problem while collecting telemetry data in *Assetto Corsa Competizione*, delete and re-create the track map.
 
-Good to know: a drawback of using the created track spline is that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
+> ###### Good to know
+>
+> A drawback of using the created track spline is that telemetry data can be reliably compared to each other only within one single session. The Telemetry Viewer provides the possibility to shift lap data *horizontally*, but there also may be subtle differences in track position between sessions. Be aware of that when comparing lap telemetry data of different sessions.
 
 #### Strategies
 
-This tab shows you a list of race stratagies, which are stored in the database. Note: Race strategies can be created and stored in the session database using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
+This tab shows you a list of race strategies, which can be created and stored in the session database using the ["Strategy Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Strategy-Workbench).
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2015.jpg)
 
@@ -246,7 +263,9 @@ You can use the buttons below the list to upload, download, rename or delete a s
 
 When sharing strategies with the community, but also for yourself, use the *Notes* field to mention everything worth to know about the strategies.
 
-Good to know: Strategies can be opened in the "Strategy Workbench" by double-clicking them.
+> ###### Good to know
+>
+> Strategies can be opened in the "Strategy Workbench" by double-clicking them.
 
 ##### Naming conventions
 
@@ -284,11 +303,11 @@ Here you will get a recommendation for initial cold tyre pressures, if a matchin
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%207.jpg)
 
-Notes:
+###### Notes
 
-  1. If you choose a specific driver in the "Driver" menu, only the tyre pressures of this driver are shown, if available.
-  2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
-  3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
+1. If you choose a specific driver in the "Driver" menu, only the tyre pressures of this driver are shown, if available.
+2. If the "Session Database" tool has been [started by the "Race Settings" tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#tab-session), you can transfer the current tyre pressure and compound information to the *Race Settings* by pressing the "Load" button.
+3. You can configure using the settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) the session types, from which tyre pressure data will be collected and stored into the database by the Race Engineer. Default is to collect tyre pressure data during practice and race sessions.
   
 If this information is provided by the simulator API information about typical tyre wear for each wheel in the currently selected conditions and using the currently selected tyre compound may be displayed in the lower part. The number of laps per tyre will be available as well depending on the the [setting "Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". By the way, here also applies that only the tyre wear of this driver are shown, if you choose a specific driver in the "Driver" menu.
 
@@ -386,9 +405,10 @@ You can also set the synchronization interval here. Using higher values will dec
 
 If you want to rebuild your local database, for example, after losing all your data due to a harddisk problem, you can click the "Rebuild" button. This will reload all data, which is available to you. Since pushing this button will trigger a complete and very time consuming re-synchronization, use it only in *emergency* situations.
 
-Please note, that the initial synchronization might take quite a while (up to a couple of hours), depending on the amount of data in your local database, but also depending on the amount of data available by your team mates. The synchronization will run in the background without any further user interaction. The background process is automatically started by "Simulator Startup". Once, the initial synchronization is finished, the incremental update of your database will take only a few seconds and happens in the interval mentioned above.
-
-Final note: Once you have changed the database location or the synchronization settings, you will be prompted to restart all applications of Simulator Controller.
+> ###### Good to know
+>
+> - The initial synchronization might take quite a while (up to a couple of hours), depending on the amount of data in your local database, but also depending on the amount of data available by your team mates. The synchronization will run in the background without any further user interaction. The background process is automatically started by "Simulator Startup". Once, the initial synchronization is finished, the incremental update of your database will take only a few seconds and happens in the interval mentioned above.
+> - Once you have changed the database location or the synchronization settings, you will be prompted to restart all applications of Simulator Controller.
 
 In the second group, you can define the default choice for community sharing for the different objects in the session database. This default values is used, whenever a new object (a strategy, for example) is created. Whether the object will be really shared in the end, also depends on your consent (see below).
 
@@ -406,6 +426,8 @@ Only data which you explicitely selected for sharing will be contributed and whe
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Consent.JPG)
 
-Note: You can give separate consents for sharing your tyre pressure setups, your tyre wear data, your race strategies, your lap telemetry data and your mechanical and aerodynamic car setups. Since car setups, race strategies and also lap telemetry data might be considered kind of a secret, you must declare whether you want to share the given data item individually for each item and you must explicitly upload car setup data to be shared to the session database. On the other hand, tyre pressures and wear data will be collected automatically by the Race Engineer, but you will be asked whether to include them in the session database (see below).
+> ###### Good to know
+>
+> You can give separate consents for sharing your tyre pressure setups, your tyre wear data, your race strategies, your lap telemetry data and your mechanical and aerodynamic car setups. Since car setups, race strategies and also lap telemetry data might be considered kind of a secret, you must declare whether you want to share the given data item individually for each item and you must explicitly upload car setup data to be shared to the session database. On the other hand, tyre pressures and wear data will be collected automatically by the Race Engineer, but you will be asked whether to include them in the session database (see below).
 
 If you have given your consents, the data collected in your local sessions will be transferred to a cloud database once a week. You will get a payback in terms of a consolidated database of all contributors and the Race Engineer, for example, will then use the data to help you in your setup task in the pit, but also during a race, when radical weather changes are upcoming. This community database will be updated on your local PC frequently, so you will always get the latest and greatest data. The update process works completely in the background, so nothing to do on your side.

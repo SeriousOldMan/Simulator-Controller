@@ -15,7 +15,7 @@ As said, you can call these action functions in various parts of Simulator Contr
 
 [Expert] Please note, that all these functions are supplied by one of the installed plugins. So, if you do not have the corresponding plugin enabled, the function may not work properly.
 
-##### Important:
+##### Important
 
 Many functions below are taking arguments. The follow rules apply:
 

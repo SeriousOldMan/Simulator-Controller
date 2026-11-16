@@ -145,7 +145,9 @@ The alternative, GPT4ALL, can be downloaded from the corresponding [website](htt
 
 Please be aware, that running a GPT4All locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
-IMPORTANT: At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
+> ###### Important
+>
+> At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
 
 ### LLM Runtime
 
@@ -156,13 +158,17 @@ Additional installation reequirements:
 - You have to make sure that the Microsoft .NET Runtime version 10.0 or higher is installed on your system. You can download the installer for this runtime from [this Microsoft page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
 - The local LLM Runtime supports model execution on Nvidia GPUs using Cuda 11 or Cuda 12. To use CUDA for execution of the LLM on the GPU, you have to install the [CUDA drivers](https://developer.nvidia.com/cuda-12-1-0-download-archive?target_os=Windows) from the Nvidia homepage. Install only CUDA, all the other stuff should already be there with your standard Nvidia driver. Vulkan support for other GPU brands is included as well. Of course, the different AVX specifications are supported for CPU execution. For AMD GPUs, Vulkan drivers are supported, but you may also use CUDA as described [here](https://www.xda-developers.com/nvidia-cuda-amd-zluda/).
 
-  IMPORTANT: It can happen, that the Vulkan driver support conflicts with CUDA on Nvidia GPUs. If this is the case, the Driving Coach will give you an error message like "I am on the other line, please come back in a minute." To fix this, remove the *vulkan* folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder.
+  > ###### Important
+  >
+  > It can happen, that the Vulkan driver support conflicts with CUDA on Nvidia GPUs. If this is the case, the Driving Coach will give you an error message like "I am on the other line, please come back in a minute." To fix this, remove the *vulkan* folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder.
 
 You also have to download a LLM. Make sure the model is in GGUF file format. You can find good models on the [GPT4All website](https://gpt4all.io/index.html) or on the [Hugging Face website](https://huggingface.co/), the largest community for AI development world wide. I recommend starting with *Wizard 1.2* (["wizardlm-13b-v1.2.Q4_0.gguf"](https://gpt4all.io/models/gguf/wizardlm-13b-v1.2.Q4_0.gguf)), which is a very good allround model. Another very good model at the time of this writing is *Hermes* (["nous-hermes-llama2-13b.Q4_0.gguf"](https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf)). Both models consume up to 16GB of RAM, so you need to have at least 32 GB RAM in your machine. There are also some smaller models available on the GPT4All website, but their knowledge about our domain is very limited.
 
 Once you have selected and downloaded a model, enter the full path to the model file into the "Model" field and your done. And you can specify, how many layers of the model would be executed on your graphics card, which of course requires that the GPU can provide the amount of memory to the model. This might need some try and errors, until you find a suitable configuration, which also allows you to still run your favorite simulator. Additional settings are available for experts in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#llm-settings). Be sure what you are doing when changing them. Normally, you only want to change the "Threads" setting, when you encounter heavy stutter, when the LLM Runtime is using the CPU. As a general rule of thumb, set the number of threads to (number of cores / 2) for a CPU with more than 8 cores and to (number of cores / 4) for a CPU with less than 8 cores, if you encounter stutter.
 
-Good to know: The LLM Runtime supports tool/function calling which is required to trigger actions in the [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster) or even use a LLM for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster). But not every LLM can handle tool calls, therefore check the model card on the the [Hugging Face website](https://huggingface.co/). It is normally mentioned there, whether a given model supports tool calling. In general, you will need models with at least 13B parameters and a decent quantization.
+> ###### Good to know
+>
+> The LLM Runtime supports tool/function calling which is required to trigger actions in the [*Conversation* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#conversation-booster) or even use a LLM for the [*Reasoning* booster](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster). But not every LLM can handle tool calls, therefore check the model card on the the [Hugging Face website](https://huggingface.co/). It is normally mentioned there, whether a given model supports tool calling. In general, you will need models with at least 13B parameters and a decent quantization.
 
 Please be aware, that running a large language model locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
@@ -239,7 +245,9 @@ Below you find all instruction categories and the supported variables:
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
-IMPORTANT: Depending on the configuration, especially the chosen model and also the "# Tokens", you may encounter problems with very complex input, for example a longer race with many recorded handling issues. In this case, Aiden will refuse to give you answer with a stupic excuse. That means, that the GPT service returned with an error code, typically meaning that the input area of the LLM was too small. Never happened for me with the GPT-4 model with "# Tokens" set to 2048, though, but happened a couple of times using the *smaller* models.
+> ###### Important
+>
+> Depending on the configuration, especially the chosen model and also the "# Tokens", you may encounter problems with very complex input, for example a longer race with many recorded handling issues. In this case, Aiden will refuse to give you answer with a stupic excuse. That means, that the GPT service returned with an error code, typically meaning that the input area of the LLM was too small. Never happened for me with the GPT-4 model with "# Tokens" set to 2048, though, but happened a couple of times using the *smaller* models.
 
 ## Interacting with Aiden
 
@@ -344,7 +352,9 @@ Here is a recording of a training session, since no words can really adequately 
 
 [![](https://img.youtube.com/vi/mgfFkNh2_Lw/0.jpg)](https://youtu.be/mgfFkNh2_Lw)
 
-Good to know: The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Driving Coach\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+> ###### Good to know
+>
+> The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Driving Coach\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
 
 DISCLAIMER: This functionality requires a very capable LLM for decent results. This LLM must be able to follow multiple, complex chain of thoughts at the same time and must be able to perform reasoning based on supplied facts. At the time of this writing, only high end models like GPT 4.1, Claude 3 Opus or Mistral Large are in this group. The upcoming o1 model of OpenAI may be even better in this area, but it will be prohibitevly expensive. According to my testing, GPT 4.1 mini, the most cost-efficient model of OpenAI, or the Gemini 2 Flash models from Google and also Mistral Small by Mistral AI show good results as well, but sometimes they mix up things, for example, that applying less brake pressure at the start of the braking phase will make your braking phase shorter. This can also happen with the stronger models sometimes, but not that often. You can experiment with the *Creativity* configuration setting of the Driving Coach to find the best compromise here.
 
@@ -362,7 +372,9 @@ Please note, that you do not have to set sections for each corner, only for thos
 
 And be aware, that corners directly followed by another corner (a typical situation in chicanes on many tracks) are very challenging for Aiden. You can use that, but take the recommendations of Aiden with a grain of salt here.
 
-Good to know: If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point. 
+> ###### Good to know
+>
+> If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point. 
 
 ### Coaching on the track
 
@@ -370,11 +382,15 @@ Aiden can give you instructions and recommendations for the next corner while yo
 
 If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behavior that suites you the most, by using the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
-Important: If you want to use a reference lap from the community database, you must identify this lap explicitely by name using the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
+> ###### Important
+>
+> If you want to use a reference lap from the community database, you must identify this lap explicitely by name using the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
 Please note, that the recommendations of Aiden might not be trustworthy, if no reference lap is available. Therefore, unless you have loaded a reference lap from the session database, take all recomendations for the first lap after Aiden has told you that telemetry data is available with a grain of salt.
 
-Good to know: There is also a [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) available in the "Session Database", which instructs the Coach to automatically write the fastest lap of the current session to the session database, if it is faster as any lap already stored in the database.
+> ###### Good to know
+>
+> There is also a [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) available in the "Session Database", which instructs the Coach to automatically write the fastest lap of the current session to the session database, if it is faster as any lap already stored in the database.
 
 If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explanations as in the example conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". However, sometimes Aiden will be late, espeutcially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup Profile, for example.
 
@@ -406,7 +422,7 @@ with *X* the number of the corner you want to practice. This command can be issu
 
 If this mode is active, Aiden will not only give you instructions for the corners you requested, but will also give you immediate feedback after you have passed the corner and the following section. This feedback will compare the performance of your current lap at this corner with the performance of the previous lap (not the reference lap) and will tell you what was good and where you can still improve. The instruction "Coaching.Corner.Review" is used to generate this feedback.
 
-##### Notes
+###### Notes
 
 1. On-track coaching will also work in restricted mode, i.e. without a GPT connection (see below), but the instructions given to the driver will be quite simple.
 2. You can either use corner by corner coaching or brake point coaching (see below).
@@ -513,13 +529,13 @@ Another coaching mode can be enabled by asking the Coach to tell you where to br
 
 **Aiden:** Release
 
-Important: The command "Release" does not mean that you should completely release the brake at this point, but that you should begin releasing the brakes according to the braking technique mentioned in the first call.
+The command "Release" does not mean that you should completely release the brake at this point, but that you should begin releasing the brakes according to the braking technique mentioned in the first call.
 
 The following video gives you a good demonstration of this:
 
 [![](https://img.youtube.com/vi/ADI3DvOu_bw/0.jpg)](https://youtu.be/ADI3DvOu_bw)
 
-##### Notes
+###### Notes
 
 1. This works also in restricted mode, i.e. without a GPT connection (see below).
 2. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
@@ -578,7 +594,9 @@ But of course, you can go even shorter:
 	Tell me in which sector I am losing time compared to the other cars.
 	Please reply in one very short sentence. Don't call me by name.
 	
-Good to know: Always the telemetry data of the fastest lap of the session will be used as referencewhen using this mode, indepependent of what has been configured elsewhere.
+> ###### Important
+>
+> Always the telemetry data of the fastest lap of the session will be used as reference when using this mode, independent of what has been configured elsewhere.
 
 ### Automatic activation of coaching mode
 

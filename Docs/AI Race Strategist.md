@@ -8,7 +8,9 @@ As a complement to Jona, your AI Race Engineer, this new Assistant will accompan
 
 Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Cato.
 
-Important: If you have multiple *dialog partners* active, for example Jona and Cato, it will benecessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
+> ###### Important
+>
+> If you have multiple *dialog partners* active, for example Jona and Cato, it will benecessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
 
 ### A typical dialog
 
@@ -118,7 +120,9 @@ To reactivate the Assistant use:
 
 These commands are also available as "Mute" and "Unmute" plugin actions, which can be configured for a Button Box or a Stream Deck, for example.
 
-Good to know: Even if Cato is muted, you can interact with the Strategist, for example to ask for a undercut simulation. If a chain of conversation is initiated by you, the driver, Cato will react normally. The Strategist will also communicate normally with regards to all strategy related topics, if a strategy is active for the current race.
+> ###### Good to know
+>
+> Even if Cato is muted, you can interact with the Strategist, for example to ask for a undercut simulation. If a chain of conversation is initiated by you, the driver, Cato will react normally. The Strategist will also communicate normally with regards to all strategy related topics, if a strategy is active for the current race.
 
 ## Racing with Cato
 
@@ -134,7 +138,9 @@ Cato will always be active during a race, even if you have disabled data collect
 
 Normally, Cato will not contact you on its own as often as Jona does. Most of the time, you must ask Cato specifically for its support. An exception is, when you have an active race strategy or when a weather change will require you to conduct an unplanned pitstop for tyre change.
 
-Important: In the default configuration, Cato will be activated in the first lap of a session. This is necessary, so that Cato can setup the initial knowledge (starting grid, your position, the initial strategy, etc.). If you join a session later than during the first lap, Cato will refuse to work. This behavior can be changed with the setting "Strategist: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behavior of Cato may be somewhat confusing.
+> ###### Good to know
+>
+> In the default configuration, Cato will be activated in the first lap of a session. This is necessary, so that Cato can setup the initial knowledge (starting grid, your position, the initial strategy, etc.). If you join a session later than during the first lap, Cato will refuse to work. This behavior can be changed with the setting "Strategist: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behavior of Cato may be somewhat confusing.
 
 ### Multi-class support
 
@@ -154,7 +160,9 @@ To prepare for a race with this kind of strategy handling, set *Active* to "Yes"
 
 Using the list in the lower part you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used by Cato to determine the best tyre set for each pitstop in the derived strategy. If a given compound mixture is not available in a particular race, set the number of available tyre sets to **0**.
 
-Note: If the selected or currently running simulator provides information about tyre wear in the data and you already have driven enough laps on the selected track, you can click on the small button with the wheel icon to calculate the number of usable laps for the selected tyre compound.
+> ###### Good to know
+>
+> If the selected or currently running simulator provides information about tyre wear in the data and you already have driven enough laps on the selected track, you can click on the small button with the wheel icon to calculate the number of usable laps for the selected tyre compound.
 
 #### Tab *Strategy*
 
@@ -223,7 +231,9 @@ The Engineer, however, may revise parts of the request of the Strategist, especi
 
 As said above, Cato is also able to derive a strategy *on the fly* based on the supplied race rules in the "Race Settings" as long as enough data about the current car / track combination is available in the "Session Database". If this is possible, Cato will tell you that a strategy is available immediately after the end of the learning phase. This strategy may not be as sophisticated as a predefined strategy, but for the purpose of simple sprint races with one or two pitstops, going this route will be more than good enough.
 
-Important: Cato keeps track of your pitstops, if you visit the pit after being called and with a preparation done by Jona. But Cato also checks whether the current lap fits to the strategy, if you visit the pit *on your own*. As long as the current lap is equal to the lap planned in the strategy +/- the number of laps defined as the pitstop window in the settings, it will count as a valid pitstop with regards to the strategy. Since most simulators do not flag a stop in the pits, whether it is a normal one, or whether it is for serving a penalty, this can lead to *problems* in those special cases, when you got a penalty and serve it right before the next planned pitstop. Cato tries to cope with that, but is not always successful. Sometimes, Cato will come up with a strategy revision after you have been in the pit for serving a penalty (depending on the conditions and the initial race rules), if you  have enabled automatic strategy revisions in the settings. Be sure to check the revised strategy before accepting it, since Cato may count the penalty serving as a valid pitstop against the pitstop rules. If in doubt, reject the recommendation.
+> ###### Important
+>
+> Cato keeps track of your pitstops, if you visit the pit after being called and with a preparation done by Jona. But Cato also checks whether the current lap fits to the strategy, if you visit the pit *on your own*. As long as the current lap is equal to the lap planned in the strategy +/- the number of laps defined as the pitstop window in the settings, it will count as a valid pitstop with regards to the strategy. Since most simulators do not flag a stop in the pits, whether it is a normal one, or whether it is for serving a penalty, this can lead to *problems* in those special cases, when you got a penalty and serve it right before the next planned pitstop. Cato tries to cope with that, but is not always successful. Sometimes, Cato will come up with a strategy revision after you have been in the pit for serving a penalty (depending on the conditions and the initial race rules), if you  have enabled automatic strategy revisions in the settings. Be sure to check the revised strategy before accepting it, since Cato may count the penalty serving as a valid pitstop against the pitstop rules. If in doubt, reject the recommendation.
 
 The currently active strategy might be dropped, if you do not adhere to the pitstop plan defined in the strategy, or it might be automatically revised - depending on the settings. To conform to the strategy, you must execute the pitstops in the laps as defined in the strategy +/- a few laps (default here is the pitstop variation window as defined in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy)). If you think, that the predefined strategy is not of any use any more, because of a crash or changing weather conditions, you can cancel it actively with a voice command or by using ["StrategyCancel" controller action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist).
 
@@ -247,7 +257,9 @@ It is possible to enable a dynamic traffic simulation method, which uses a proba
 
 Please note, that if you are running a race with Team Server support, a new strategy can be also created and activated using the [strategy support of "Team Center"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Center#strategy-handling), which gives you much more control over various aspects of the new strategy.
 
-Good to know: The settings of the *Optimizer* will also be stored in the original strategy and the same settings will be used for all subsequent recalculations based on this particular strategy. This will be in general exactly what you want. But be aware, that the time needed (and therefore also the CPU consumption) to create a new strategy during a race will be the same as for the original strategy.
+> ###### Good to know
+>
+> The settings of the *Optimizer* will also be stored in the original strategy and the same settings will be used for all subsequent recalculations based on this particular strategy. This will be in general exactly what you want. But be aware, that the time needed (and therefore also the CPU consumption) to create a new strategy during a race will be the same as for the original strategy.
 
 It is also possible to enable automatic revision of the current strategy in the [race settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy). You can specify that an automatic revision will occur after each couple of laps as well as after an unplanned pitstop. Cato will inform you whenever a better strategy has been identified and will give you as much information as possible about the differences between the currently active and the new strategy. You then can decide, that it should be activated for the rest of the session. Whether you can use this without sacrificing performance or introducing lags, depends on your PC configuration (see next advice). Please note, that with the current release, automatic revision will only bring up strategies which are to be considered better in terms of final number of laps or race time. This means that the strategist **not** automatically suggests a *slower* strategy, which may be necessary, for example, due to the onset of rain. The reason for this is the large number of edge cases in these situations. However, you can manually request a new strategy via voice command or controller action to override the current, probably *better* strategy.
 

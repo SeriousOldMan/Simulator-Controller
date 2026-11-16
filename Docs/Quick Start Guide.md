@@ -10,7 +10,7 @@ On the next page, you can take all decisions for your initial setup. Then use th
 
 Read all available help texts to understand what each configuration option on this page is doing. Please note, that you can enable the Driving Coach here and he will react to your voice command afterwards, but for him to be fully functional, you will have to configure the GPT Service API in a later step of the full configuration. You can skip this for the moment, since the Driving Coach, although a very clever little helper, is not necessary for your initial experiences with the other Assistants.
 
-##### Notes
+###### Notes
 
 - You can choose the speech generation method for each Assistant independently by clicking on the small settings button with the "Gear" symbol.
 - To the right of this button, you find another button with a small "Rocket" symbol. This allows you to add additional intelligence for the Assistans by configuring several so-called boosters. This is definitely not recommended until you have read the documentation about [Customizing Assistants](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants) for more information.

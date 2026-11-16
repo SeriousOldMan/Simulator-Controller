@@ -137,7 +137,7 @@ Creates and returns a unique ID in the standard GUID format.
 ***
 
 ## File Handling ([Files.ahk](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Framework/Files.ahk))
-A small collection of functions to deal with files and directories. Note: All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
+A small collection of functions to deal with files and directories. All the directory names used with these functions must contain a trailing backslash "\", since this is standard in the Simulator Controller code.
 
 #### *getFileName*(fileName :: String, #rest directories :: String)*
 If *fileName* contains an absolute path, itself will be returned. Otherwise, all directories will be checked, if a file with the (partial) path can be found, and this file path will be returned. If not found, a path consisting of the first supplied directory and *fileName* will be returned.
@@ -344,7 +344,7 @@ Uses all JPG files available in [kSplashMediaDirectory](https://github.com/Serio
 Important: This function is deprecated and will be removed in a future version of Simulator Controller. Use *showSplashScreen* instead.
 
 #### *hideSplash()*
-Closes the current splash window. Note: If the splash window had been opened using *showSplashScreen*, use *hideSplashScreen* instead.
+Closes the current splash window. If the splash window had been opened using *showSplashScreen*, use *hideSplashScreen* instead.
 
 #### *showSplashScreen(splashScreen :: String, songHandler :: Func := false, alwaysOnTop :: Boolean := true)*
 Splash Screens are a collection of pictures or a GIF animation possibly combined with a sound file. They are maintained by the [themes editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#themes-editor). *showSplashScreen* opens a splash window according to the themes definition. If *songHandler* is not provided, a default handler will be used, but the song will stop playing, if the current splash window is closed.
@@ -391,16 +391,16 @@ Diasables all tray messages from now on. Every following call to *trayMessage* w
 The functions in this section are a little bit special. Although they can be called from your code as well, they are meant to be used as [actions for controller functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions). Therefore, they will be configured for controller functions using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration).
 
 #### *setDebug(debug :: Boolean)*
-Enables or disables debugging. *debug* must be either *true* or *false*. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
+Enables or disables debugging. *debug* must be either *true* or *false*. This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *setLogLevel(logLevel :: OneOf("Debug", "Info", "Warn", "Critical", "Off"))*
-Sets the log level. *logLevel* must be one of "Info", "Warn", "Critical" or "Off", where "Info" is the most verbose one. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
+Sets the log level. *logLevel* must be one of "Info", "Warn", "Critical" or "Off", where "Info" is the most verbose one. This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *increaseLogLevel()*
-Increases the log level, i.e. makes the log information more verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
+Increases the log level, i.e. makes the log information more verbose. This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *decreaseLogLevel()*
-Decreases the log level, i.e. makes the log information less verbose. Note: This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
+Decreases the log level, i.e. makes the log information less verbose. This function is identical to the one described above in the [Debugging and Logging](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Functions-Reference#debugging-and-logging-debugahk) section.
 
 #### *pushButton(number :: Integer)*
 Virtually pushes the button with the given number.

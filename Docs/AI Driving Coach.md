@@ -485,7 +485,7 @@ The following video gives you a good demonstration of this:
 
    - *Deviation from Ideal Line*
      
-	 Defines a threshold for your misplacement from the ideal line at which the Coach will tell you where to go. Default is 0.5 meters.
+	 Defines a threshold for your misplacement from the ideal line at which the Coach will tell you where to go. Default is 0.5 meters. However, if you are a beginner, start with a value of 1 or 1.5 meters for this setting. Decrease the value, once the Coach is telling you more and more, that you are matching the ideal line.
    
    - *Start Ideal Line coaching before the start of the Corner*
    

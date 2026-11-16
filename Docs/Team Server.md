@@ -80,9 +80,10 @@ Data tokens can also be shared with your team mates. You do not have to create a
 
 If you ever need to invalidate the current data token for any reason, for example because a driver left your team, you can click on the small button to the left of the data token field. The current data token will be invalidated and a new one will be created. Send the new token to all your team members that are still part of the data replication partnership.
 
-Note: Deleting Teams, Drivers and Sessions may take quite a while, depending on the amount of data to be changed on the server. Deleting a session with data from a 24 hour race, or deleting the corresponding team which owns this session, may take several minutes.
-
-Note: Sessions can be *used* multiple times. If you start a session, which has been used before, all data from the previous usage will be deleted automatically. On the other hand you want to have meaningful names for your sessions, so feel free to delete old sessions and create new ones as necessary.
+> ###### Good to know
+>
+> - Deleting Teams, Drivers and Sessions may take quite a while, depending on the amount of data to be changed on the server. Deleting a session with data from a 24 hour race, or deleting the corresponding team which owns this session, may take several minutes.
+> - Sessions can be *used* multiple times. If you start a session, which has been used before, all data from the previous usage will be deleted automatically. On the other hand you want to have meaningful names for your sessions, so feel free to delete old sessions and create new ones as necessary.
 
 That's it for team administration.
 
@@ -102,7 +103,9 @@ When you head out onto the track, you must decide, whether you want this session
 
 And now the important stuff: To declare, that you want to join a team session, you must use the corresponding [action from the "Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server). For your convenience, it is also possible, to always enable team sessions using the action declaration of this plugin or using the corresponding preset in "Simulator Setup", but I don't recommend that, since you might end up being part of a session, you are not planned for. And finally, you can use the tray menu of the Simulator Controller application as an alternative to declare an action to enable the Team Server with a button on your Button Box or Steering Wheel.
 
-Note: Simulator Controller detects a valid team session configuration upon startup, it will open a notification window and will show you the configuration of this session (either when the Team Server is enabled by default, or later, when you enable the Team Server using the corresponding button). If you missed this notification, you can still check whether the team mode is currently active, when you hover over the small cog wheel icon of Simulator Controller in the task bar. If Simulator Controller is enabled for a team session, the tooltip will show "Simulator Controller (Team)". When no valid team session could be established, the tooltip will read "Simulator Controller (Team) - Invalid". Also, the *Team Server* item in the right mouse menu of the tray icon will be checked.
+> ###### Good to know
+>
+> Simulator Controller detects a valid team session configuration upon startup, it will open a notification window and will show you the configuration of this session (either when the Team Server is enabled by default, or later, when you enable the Team Server using the corresponding button). If you missed this notification, you can still check whether the team mode is currently active, when you hover over the small cog wheel icon of Simulator Controller in the task bar. If Simulator Controller is enabled for a team session, the tooltip will show "Simulator Controller (Team)". When no valid team session could be established, the tooltip will read "Simulator Controller (Team) - Invalid". Also, the *Team Server* item in the right mouse menu of the tray icon will be checked.
 
 ## Team Center
 

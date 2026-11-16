@@ -14,7 +14,9 @@ During a team session, all team members can use the "Team Center" application, e
 
 Please note, that all the data and graphs shown in the window will be updated dynamically as the race progresses. Most updates will be done each lap, but some minor details will be updated more frequently.
 
-Important: "Team Center" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Team Center" once using administrator privileges.
+> ###### Important
+>
+> "Team Center" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Team Center" once using administrator privileges.
 
 ### Normal vs. Simple user interface
 
@@ -32,7 +34,9 @@ This version of the "Team Center" does not display any reports, only the most im
 >
 > Since the *Lite* version does not display live reports or no reports at all, this version also consumes a lot less resources and is therefore also a good alternative for middle-class PCs.
 
-IMPORTANT: This simplified interface use the Team Server credentials as configured for the driver in the ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) of the "Race Settings" application. There is no option to load a previous session stored in the "Session Database", and so on. Therefore, the Lite mode can only be used while participating as a driver in a team race.
+> ###### Important
+>
+> This simplified interface use the Team Server credentials as configured for the driver in the ["Team" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server#preparing-a-team-session) of the "Race Settings" application. There is no option to load a previous session stored in the "Session Database", and so on. Therefore, the Lite mode can only be used while participating as a driver in a team race.
 
 ### Connecting to a Session
 
@@ -50,7 +54,9 @@ It is no problem, to reuse a session for many races, because the old data (excep
 
 It is obvious, that it is **not** a good idea to use the same session in more than one race at the same time.
 
-Important: Although it is possible and I have done it on my own for several races longer than 6 hours, I do not recommend to run "Team Center" on the same PC where your simulation runs. Sevaral operations, for example updating the strategy using extensive traffic simulation will consume quite a lot of memory and CPU-cycles. This might interfere with the memory requirements of your running simulator and might lead to decreased frame rates and - in very worse cases - to freezes due to shortage of memory. Therefore, I strongly recommend using a laptop or another separate PC, that sits aside your simulation rig, for the "Team Center" operation.
+> ###### Important
+>
+> Although it is possible - and I have done it on my own for several races longer than 6 hours - I do not recommend to run "Team Center" on the same PC where your simulation runs. Sevaral operations, for example updating the strategy using extensive traffic simulation will consume quite a lot of memory and CPU-cycles. This might interfere with the memory requirements of your running simulator and might lead to decreased frame rates and - in very worse cases - to freezes due to shortage of memory. Therefore, I strongly recommend using a laptop or another separate PC, that sits aside your simulation rig, for the "Team Center" operation.
 
 #### Connection failures
 
@@ -62,7 +68,9 @@ All data of an active session is stored on the Team Server. It is therefore poss
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2024.JPG)
 
-IMPORTANT: The data format of locally saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
+> ###### Good to know
+>
+> The data format of locally saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
 
 #### Test Session
 
@@ -82,7 +90,9 @@ The reports at the top of the list are the well known reports, wich are also ava
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2019.JPG)
 
-Note: The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
+> ###### Good to know
+>
+> The values for wear (tyres and brake pads) range from 0% up to 100%. For most of the simulators these values are directly available through the API, whereas in *Assetto Corsa Competizione*, the data interface provide the remaining thickness of each pad. Depending on the compound of the pad, the wear level for 100% ranges from 12 mm to 15.5 mm left pad thickness here, with a starting thickness for a fresh pad with 29 mm.
 
 Last but not least, using the small button with the cog wheel icon, you can choose various settings for the currently selected report, for example the range of laps to be considered in the data or the set of drivers in reports which are driver specific.
 
@@ -126,7 +136,9 @@ Beside all that, you can request several context specific data, which will be sh
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Race%20Center%2016.JPG)
 	 
-	 Note: For *Assetto Corsa Competizione*, detailed tyre data is only available after a real driver swap when running on an ACC server (no single user session). For most of the other simulators, only the tyre wear percentage is provided for each tyre.
+	 > ###### Good to know
+	 >
+	 > For *Assetto Corsa Competizione*, detailed tyre data is only available after a real driver swap when running on an ACC server (no single user session). For most of the other simulators, only the tyre wear percentage is provided for each tyre.
 	 
   7. Setups Summary
 	 
@@ -166,7 +178,9 @@ A valuable tool to analyze your lap times and those of your team mates is the in
 
 While you are in an active session, lap telemetry data will be collected lap by lap for those drivers that have enabled the "Telemetry" setting in the "Session" menu (below the "Synchronize" command). The telemetry data for the last few laps of every driver, who has checked the "Telemetry" item in the "Session" menu, will be stored on the Team Server and will be replicated to all currently running "Team Center" for inspection and comparison with other laps.
 
-Important: Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
+> ###### Important
+>
+> Sessions that are saved with telemetry data to the session database will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly advise against it.
 
 > ###### Good to know
 >
@@ -198,7 +212,9 @@ If you are running a race based on a predefined strategy developed using the ["S
 
 To do this, you have to load the strategy, which have been selected for the current race using the "Load current Race Strategy" command from the "Strategy" menu. This command will load the strategy, which has been selected as the current race strategy in "Strategy Workbench" the last time. This will be done automatically for your convenience, when you enter the "Team Center" and no strategy has been selected so far. Please note, that it will not be checked, whether this strategy will be accepted by the Race Strategist for the current race. Please see the [documentation on strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) for more information. As an alternative to the active race strategy mentioned before you can always load any strategy by using the "Load Strategy..." command.
 
-Important: It is possible by using "Team Center" to activate a race strategy for the current race, even if no strategy has been present at the start of the race. You can switch strategies, discard strategies, activate a different strategy, and so on, as often as necessary or as you like.
+> ###### Important
+>
+> It is possible by using "Team Center" to activate a race strategy for the current race, even if no strategy has been present at the start of the race. You can switch strategies, discard strategies, activate a different strategy, and so on, as often as necessary or as you like.
 
 A summary of the loaded strategy will be displayed in the output area.
 
@@ -230,7 +246,9 @@ After you dialed the options, you can select "Adjust Strategy (Simulation)" from
 > 
 > The Team Center will keep track of all already used tyre sets and will consider this, when running a strategy simulation. However, this only covers tyre set usage in the current session. If there are tyre sets that already have been used in a previous session, for example in a qualifying run, this information is not available.
 
-IMPORTANT: Once you have created a new strategy, the stint plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
+> ###### Important
+>
+> Once you have created a new strategy, the stint plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will be correct, when it comes to the next pitstop.
 
 #### Monte Carlo traffic model
 
@@ -250,7 +268,9 @@ If you are interested in the theoretical background for this very exciting appro
 
 You can run as many strategy simulations, with or without traffic anaylsis as you like. You can even go back to the "Strategy Workbench" and create a complete new strategy after a severe weather change, for example, and the adopt this base strategy in the "Team Center" to the current race situation. Once you are satisfied with the new strategy, you can update the strategy on the Team Server with the command "Release Strategy", thereby also updating it on every currently connected "Team Center", or you can even send it to the AI Race Strategist of the currently active driver using the "Instruct Strategist" command. If you think, that a predefined strategy will no longer fit the requirements of the session, you can cancel the strategy completely using the "Discard Strategy" command and handle all upcoming pitstops manually using the functions described in the next section. In both cases, the selected strategy will be updated in the "Team Center"s of all team members as well.
 
-IMPORTANT: Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will reflect the latest strategy, when it comes to the next pitstop.
+> ###### Important
+>
+> Once you have created a new strategy, the Stint Plan (see below) must be updated as well, so that the information for refuel amount, tyre changes and so on, will reflect the latest strategy, when it comes to the next pitstop.
 
 > ###### Good to know
 >
@@ -316,11 +336,15 @@ You can also choose between two different methods to further adjust tyre pressur
 
 The choices will be remembered between different runs of "Team Center".
 
-Important: The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
+> ###### Important
+>
+> The correction factor to be applied for temperature corrections will be calculated with a linear regression using the supplied setup data. If there is not enough data available and the dependency of tyre pressures from the ambient temperatures cannot be derived, a fixed correction factor will be used instead. This correction factor can be defined in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings) independently for each simulator / car / track / weather combination, when necessary. When even these settings are missing, -0.1 PSI will be applied for each degree Celsius increase in air temperature, and -0.02 PSI for each increase in track temperature.
 
 Furthermore, it is possible to enable a compensation for pressure losses as reported by the Race Engineer, like slow punctures or sudden pressure losses cause of collisions with curbs. But be sure, that it is really a loss of pressure due to a puncture or running over curbs. If not, you will end up with even worse pressures in those tyres.
 
-Also important: "Team Center" will try to guess the best possible tyre pressures using input from the AI and also from the calculation methods discussed above. But you need to take a look as well, since the software can't cope with everything, especially sudden weather changes, moisture in the night, and so on. In these cases you might have to correct some of the recommended pressures manually to compensate for bad decisisions made by the software.
+> ###### Important
+>
+> "Team Center" will try to guess the best possible tyre pressures using input from the AI and also from the calculation methods discussed above. But you need to take a look as well, since the software can't cope with everything, especially sudden weather changes, moisture in the night, and so on. In these cases you might have to correct some of the recommended pressures manually to compensate for bad decisisions made by the software.
 
 Of course, you can calculate and enter all values here on your own. For your convenience, you can use the small button with the "Copy" icon to the right of the tyre change drop down menu.
 
@@ -341,7 +365,9 @@ The automatic selection of the next driver is supported for *Assetto Corsa Compe
 	 
 	 Please make sure, that the names and the order of the selected drivers are identical to the content of the entry list for your team in the upcoming session. Otherwise, wrong drivers might be selected for the next stint in the pitstop automation. As a beneficial side effect, you can see in the list of drivers also, which of the drivers are currently connected to the Team Server as a *Driver*.
 
-Note: Once you have dialed the next driver for the first time in the simulator, and you want to correct some values for the pitstop, choose "No driver change" in the *Driver* dropdown menu. This will preserve the last selection of the next driver in the pitstop settings, while changing the refuel amount, for example.
+> ###### Good to know
+>
+> Once you have dialed the next driver for the first time in the simulator, and you want to correct some values for the pitstop, choose "No driver change" in the *Driver* dropdown menu. This will preserve the last selection of the next driver in the pitstop settings, while changing the refuel amount, for example.
 
 #### Initiating a pitstop for the current driver
 

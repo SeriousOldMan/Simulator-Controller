@@ -12,9 +12,10 @@ The [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/A
 
 But is also possible to connect the rule based Assistants to a LLM to improve the cnversational capabilities or to alter or even extend the behavior of them. This all can be achieved by configuring the so called Assistant Boosters. The following documentation will give you all information you need to setup the Assistant Boosters.
 
-Note: Seting up a connection to a GPT service and configuring the Assistant Boosters require some knowledge. Customizing the *Conversation* and the *Reasoning* bosters may require even some development skills. If you feel overwhelmed, no problem. Simply leave it aside and use the Assistants without connecting them to a GPT service. The will do their job. Or you can become a Patreon of the project and I will setup everything for you.
-
-Important: Even if you are not using a local LLM Runtime are the resource requirements significantly higher compared to running an Assistant based on the rule engine alone. Therefore take a look at the Windows Task Manager to check whether your system can handle all that while using your favorite simulator.
+> ###### Good to know
+>
+> - Seting up a connection to a GPT service and configuring the Assistant Boosters require some knowledge. Customizing the *Conversation* and the *Reasoning* bosters may require even some development skills. If you feel overwhelmed, no problem. Simply leave it aside and use the Assistants without connecting them to a GPT service. The will do their job. Or you can become a Patreon of the project and I will setup everything for you.
+> - Even if you are not using a local LLM Runtime are the resource requirements significantly higher compared to running an Assistant based on the rule engine alone. Therefore take a look at the Windows Task Manager to check whether your system can handle all that while using your favorite simulator.
 
 ## Connecting an Assistant to a LLM
 
@@ -30,7 +31,9 @@ Please take a look at the documentation for the [Driving Coach](https://github.c
 
 As said, the Driving Coach is a bit different in the sense, that it allows free conversation with a LLM using a GPT service. But it also uses several pattern-based grammars for pre-defined commands like the other Assistants, therefore the Driving Coach is a kind of a hybrid, when it comes to voice interaction. For the pattern-based voice commands, the Driving Coach also supports the *Rephrasing* booster and the *Understanding* booster described a described below.
 
-IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to a LLM. Additionally, using a GPT service like OpenAI may create some costs, and running a LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
+> ###### Important
+>
+> As said at the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to a LLM. Additionally, using a GPT service like OpenAI may create some costs, and running a LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
 Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 4.1 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
@@ -58,7 +61,9 @@ If *Understanding* is activated, a GPT is used to semantically analyze your voic
 	 
 There are two *Activation* methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unrecognized" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
 
-Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is the case for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
+> ###### Good to know
+>
+> Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is the case for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 
 ### Conversation Booster
 
@@ -370,7 +375,9 @@ Additionally, you can allow the LLM to *call* [predefined or custom actions](htt
 
 Please be aware that you are talking to an AI based on GPT technology when using the *Conversation* booster. And AIs can lie or can give wrong answers. More details on that can be found below in the [How it works section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#how-it-works). To indicate that the upcoming answer will be generated by a LLM using the the *Conversation* booster, a short sound is played before the answer is given. As with the *Push-to-Talk* sound, you can route this acknowledge sound to a different device in a streaming setup, if required.
 
-IMPORTANT: When action handling is enabled, it might be necessary to disable the *Understanding* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM giving you an answer based on the supplied knowledge or even creating a custom action plan.
+> ###### Important
+>
+> When action handling is enabled, it might be necessary to disable the *Understanding* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM giving you an answer based on the supplied knowledge or even creating a custom action plan.
 
 #### Examples
 
@@ -390,7 +397,9 @@ The *Reasoning* booster implements a LLM agent framework architecture also used 
 
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence. Additionally, a LLM used for the *Reasoning* booster must support tool calling.
 	 
-Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the chosen large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
+> ###### Important
+>
+> This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the chosen large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
 As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using a LLM. To do this, use the "Rules" provider. In this case, you must write rules for each event to be handled. These rules then can either handle the event directly or you can define actions and trigger them from the event rule by calling the "Assistant.Trigger" function / predicate as described below.
 
@@ -530,7 +539,9 @@ Additionally you can export and import actions here to build a library for you a
    
    Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with many of the builtin voice commands. As a rule of thumb. this should be enabled for all actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
    
-   Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
+   > ###### Good to know
+   >
+   > The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
 
 2. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Four different types of actions are available:
 

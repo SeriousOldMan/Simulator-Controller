@@ -218,8 +218,7 @@ Returns the directory, where the application will be executed.
 Returns the pattern used to identify an active window for the given application. Fully supports the AutoHotkey *winTitle* syntax. See the AutoHotkey [documentation](https://www.autohotkey.com/docs/misc/WinTitle.htm) for reference.
 	
 #### *SpecialStartup*
-Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen.
-Important: Script functions used as special startup handler must accept optional arguments (which can be ignored) and return the process id of the started application.
+Returns the name of a script function to be invoked as a special startup method, or *false*, if no special startup method is applicable. Special startup methods may be defined to perform some additional tasks, after an application has been started, or to provide a custom splash screen, for example. See the [ACC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/ACC%20Plugin.ahk) for an example of a custom splash screen. Script functions used as special startup handler must accept optional arguments (which can be ignored) and return the process id of the started application.
 
 #### *SpecialShutdown*
 Returns the name of a script function to be invoked as a special shutdown method, or *false*, if no special shutdown method is applicable. Ses the ACC Plugin mentioned above for an example as well.
@@ -529,7 +528,9 @@ Removes a visual representation for the hardware controller from this controller
 #### *registerPlugin(name :: String, plugin :: ControllerPlugin)*
 Registers the given plugin for the controller. *name* is the official name of the plugin, for example "ACC" for *Assetto Corsa Competizione*. If the plugin is active, the *activate* method will be invoked, thereby allowing the plugin to register some actions for controller functions.
 
-Note: Normally, this method is called by the constructor of the plugin. Therefore it is in many cases unnecessary to call *registerPlugin* directly. But depending on initialization order, where modes and actions have been defined after the basic instance construction, a second activation of the plugin might be necessary. All side effects of *registerPlugin* are idempotent, so you can call it as many times you like.
+> ###### Good to know
+>
+> Normally, this method is called by the constructor of the plugin. Therefore it is in many cases unnecessary to call *registerPlugin* directly. But depending on initialization order, where modes and actions have been defined after the basic instance construction, a second activation of the plugin might be necessary. All side effects of *registerPlugin* are idempotent, so you can call it as many times you like.
 
 #### *unregisterPlugin(name :: String)*
 Unregisters the plugin which has been already registered for the given *name*. This can be used to actually register a different plugin, which has been created from a subclass of the original plugin.
@@ -537,7 +538,9 @@ Unregisters the plugin which has been already registered for the given *name*. T
 #### *registerMode(plugin :: ControllerPlugin, mode :: ControllerMode)*
 Registers the given mode of the given plugin for the controller.
 
-Note: Normally, this method is called by the *registerMode* method of the plugin. Therefore it is almost always unnecessary to call *registerMode* for the controller directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
+> ###### Good to know
+>
+> Normally, this method is called by the *registerMode* method of the plugin. Therefore it is almost always unnecessary to call *registerMode* for the controller directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
 
 #### *isActive(modeOrPlugin :: TypeUnion(ControllerPlugin, ControllerMode))*
 Returns *true*, if the given plugin or mode is active. Plugins may be deactivated according to configuration information, whereas modes may be deactivated based on a dynamic test, for example, whether a simulator is currently running.
@@ -682,7 +685,9 @@ Searches for an action with the given name defined by this plugin. Returns *fals
 #### *registerMode(mode :: ControllerMode)*
 Registers the given mode in the plugin.
 
-Note: Normally, this method is called by the constructor method of the mode. Therefore it is almost always unnecessary to call *registerMode* for the plugin directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
+> ###### Good to know
+>
+> Normally, this method is called by the constructor method of the mode. Therefore it is almost always unnecessary to call *registerMode* for the plugin directly. But, since all side effects of *registerMode* are idempotent, you can call it for your peace of mind as often as you like.
 
 #### *registerAction(action :: ControllerAction)*
 Registers the given action in the plugin. In deviation from all other *register...* methods, *registerAction* is not called automatically by the constructor of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk), since actions may be defined both for plugins or for modes. Therefore you need to register a new action for the right owner object.

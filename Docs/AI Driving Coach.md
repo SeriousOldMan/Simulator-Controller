@@ -145,7 +145,9 @@ The alternative, GPT4ALL, can be downloaded from the corresponding [website](htt
 
 Please be aware, that running a GPT4All locally puts heavy load on your PC and can use quite a lot of memory (even from your GPU). Therefore do not ask any questions while driving, unless you have a really powerful configuration. Even if your PC is idle, the answer will take some time to be generated, so be patient.
 
-IMPORTANT: At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
+> ###### Important
+>
+> At the time of this writing, the integrated REST API of the GPT4All chat client is under heavy development and cannot be considered final or even stable. If you have issues establishing a connection to the local GPT4All HTTP server, take a look at this [article on GitHub](https://github.com/nomic-ai/gpt4all/issues/934). As an alternative, you can either setup a dedicated API server for GPT4All, even on a different machine, if you are a seasoned developer, or you check out the next option.
 
 ### LLM Runtime
 
@@ -156,7 +158,9 @@ Additional installation reequirements:
 - You have to make sure that the Microsoft .NET Runtime version 10.0 or higher is installed on your system. You can download the installer for this runtime from [this Microsoft page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0).
 - The local LLM Runtime supports model execution on Nvidia GPUs using Cuda 11 or Cuda 12. To use CUDA for execution of the LLM on the GPU, you have to install the [CUDA drivers](https://developer.nvidia.com/cuda-12-1-0-download-archive?target_os=Windows) from the Nvidia homepage. Install only CUDA, all the other stuff should already be there with your standard Nvidia driver. Vulkan support for other GPU brands is included as well. Of course, the different AVX specifications are supported for CPU execution. For AMD GPUs, Vulkan drivers are supported, but you may also use CUDA as described [here](https://www.xda-developers.com/nvidia-cuda-amd-zluda/).
 
-  IMPORTANT: It can happen, that the Vulkan driver support conflicts with CUDA on Nvidia GPUs. If this is the case, the Driving Coach will give you an error message like "I am on the other line, please come back in a minute." To fix this, remove the *vulkan* folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder.
+  > ###### Important
+  >
+  > It can happen, that the Vulkan driver support conflicts with CUDA on Nvidia GPUs. If this is the case, the Driving Coach will give you an error message like "I am on the other line, please come back in a minute." To fix this, remove the *vulkan* folder from the *Simulator Controller\Programs\LLM Runtime\runtimes\win-x64\native* folder in your user *Documents* folder.
 
 You also have to download a LLM. Make sure the model is in GGUF file format. You can find good models on the [GPT4All website](https://gpt4all.io/index.html) or on the [Hugging Face website](https://huggingface.co/), the largest community for AI development world wide. I recommend starting with *Wizard 1.2* (["wizardlm-13b-v1.2.Q4_0.gguf"](https://gpt4all.io/models/gguf/wizardlm-13b-v1.2.Q4_0.gguf)), which is a very good allround model. Another very good model at the time of this writing is *Hermes* (["nous-hermes-llama2-13b.Q4_0.gguf"](https://gpt4all.io/models/gguf/nous-hermes-llama2-13b.Q4_0.gguf)). Both models consume up to 16GB of RAM, so you need to have at least 32 GB RAM in your machine. There are also some smaller models available on the GPT4All website, but their knowledge about our domain is very limited.
 
@@ -241,7 +245,9 @@ Below you find all instruction categories and the supported variables:
 
 As said, all instructions can be modified in the configuration. You can even clear a complete instruction, if you want (and don't want to dicuss the corresponding information with Aiden). I do not recommend to clear the "Character" instruction, though.
 
-IMPORTANT: Depending on the configuration, especially the chosen model and also the "# Tokens", you may encounter problems with very complex input, for example a longer race with many recorded handling issues. In this case, Aiden will refuse to give you answer with a stupic excuse. That means, that the GPT service returned with an error code, typically meaning that the input area of the LLM was too small. Never happened for me with the GPT-4 model with "# Tokens" set to 2048, though, but happened a couple of times using the *smaller* models.
+> ###### Important
+>
+> Depending on the configuration, especially the chosen model and also the "# Tokens", you may encounter problems with very complex input, for example a longer race with many recorded handling issues. In this case, Aiden will refuse to give you answer with a stupic excuse. That means, that the GPT service returned with an error code, typically meaning that the input area of the LLM was too small. Never happened for me with the GPT-4 model with "# Tokens" set to 2048, though, but happened a couple of times using the *smaller* models.
 
 ## Interacting with Aiden
 
@@ -376,7 +382,9 @@ Aiden can give you instructions and recommendations for the next corner while yo
 
 If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behavior that suites you the most, by using the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
-Important: If you want to use a reference lap from the community database, you must identify this lap explicitely by name using the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
+> ###### Important
+>
+> If you want to use a reference lap from the community database, you must identify this lap explicitely by name using the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
 
 Please note, that the recommendations of Aiden might not be trustworthy, if no reference lap is available. Therefore, unless you have loaded a reference lap from the session database, take all recomendations for the first lap after Aiden has told you that telemetry data is available with a grain of salt.
 
@@ -481,7 +489,7 @@ Another coaching mode can be enabled by asking the Coach to tell you where to br
 
 **Aiden:** Release
 
-Important: The command "Release" does not mean that you should completely release the brake at this point, but that you should begin releasing the brakes according to the braking technique mentioned in the first call.
+The command "Release" does not mean that you should completely release the brake at this point, but that you should begin releasing the brakes according to the braking technique mentioned in the first call.
 
 The following video gives you a good demonstration of this:
 

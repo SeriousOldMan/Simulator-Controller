@@ -67,7 +67,9 @@ Beside using all the predefined modes of the various plugins, you can define you
 
 Please consult the [documentation for controller configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller) for more information. Please note that when using "Simulator Setup", it is also possible to include custom functions and create custom modes using a configuration patch as described [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration).
 
-Hint: You can leave the trigger "Hotkey(s)" empty, if you want to use this action function only in a custom mode, since the trigger is defined for this purpose as shown below.
+> ###### Good to know
+>
+> You can leave the trigger "Hotkey(s)" empty, if you want to use this action function only in a custom mode, since the trigger is defined for this purpose as shown below.
 
 Once you have created all your custom action functions, you can define one or more custom modes using:
 
@@ -99,7 +101,9 @@ Voilà...
 
 This plugin integrates with [SimHub](https://www.simhubdash.com/) to give you excellent control over your vibration effects. It can handle pedal vibration effects as well as chassis vibration separated between the front and the rear part of your simulation rig.
 
-Note: The plugin "Tactile Feedback" will only be installed and activated, if a similar named application has been configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool. This application must point to an installation of *SimHub* on your PC. As an alternative, you can provide the name of the application configuration with the *controlApplication* plugin argument.
+> ###### Good to know
+>
+> The plugin "Tactile Feedback" will only be installed and activated, if a similar named application has been configured in the [Applications tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-applications) of the configuration tool. This application must point to an installation of *SimHub* on your PC. As an alternative, you can provide the name of the application configuration with the *controlApplication* plugin argument.
 
 The "Tactile Feedback" plugin will allow you to enable or disable pedal vibration, front chassis vibration or rear chassis vibration independently from your controller. And two modes, "Pedal Vibration" und "Chassis Vibration", will allow you to control all the underlying separate effects in detail. All these will only be available when *SimHub* is running, but *SimHub* will be started automatically, when one of the effect groups will be enabled from your controller.
 
@@ -162,7 +166,9 @@ In the next step, you may describe all the individual effects for your vibration
 	
 With these parameters, you define the effects that are part of the "Pedal Vibration" or "Chassis Vibration" mode. *effectX* is the name of the effect, for example "TC". This name must be identical to that used, when defining the external trigger in *SimHub* according to the pattern "increase[*Effect*]Vibration" or "decrease[*Effect*]Vibration". For the function bindings, you can use one binary functions, i.e. a rotary dial, for a given effect, or two unary functions, for example push buttons. If you only supply one unary function, you may only increase the effect intensity. Example: "chassisEffects: RPMS Dial.2, GearShift Button.2 Button.6"
 
-Note: To supply the labels, that will be displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
+> ###### Good to know
+>
+> To supply the labels, that will be displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
 ## Plugin *Motion Feedback*
 
@@ -218,9 +224,10 @@ With the following parameters you can configure the available effects for the "M
 
 With "motionEffectIntensity", you can configure, how to manipulate the intensity for one of the effects on your hardware controller. You must supply a unary function for *motionEffectIntensity*, which allows you the two select one of the effects using the *effectToggleFunctionX* function supplied above. After you have selected an effect, you can manipulate its intensity using the *effectIntensityFunction*. Please note, that you can supply either a binary *effectIntensityFunction*, for example a dial, or two unary functions, which then are used to decrease and increase the chosen effect accordingly.
 
-Important: Please be aware, that effect names containing spaces must be enclosed in double quotes, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments.
-
-Note: To change the labels, that are displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
+> ###### Good to know
+>
+> - Please be aware, that effect names containing spaces must be enclosed in double quotes, since spaces are allowed in *SimFeedback* effect names, but not in plugin arguments.
+> - To change the labels, that are displayed for all these effects and triggers on the visual representation of your controller hardware, use the *Labels Editor*, which is available at the [Plugins tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
 
 Last but not least, the connection between the "Motion Feedback" plugin and *SimFeedback* still has some stabilty issues. Looks like the root cause is located in the *SFX-100-Streamdeck* extension. For a workaround click on "Reload Profile..." button in the Extensions tab in SimFeedback, if you see strange numbers in the Button Box "Motion" mode page.
 
@@ -232,7 +239,9 @@ Connection between the "Motion Feedback" plugin and *SimFeedback* has some stabi
 
 This plugin allows you to choose between different calibration curves for your high end pedals directly from the Button Box. The current implementation supports the Heusinkveld pedal family, but the vendor specific part of the plugin is quite small. Therefore is an adoption to a different pedal product possible without much effort. The "Pedal Calibration" plugin It uses [SmartControl](https://heusinkveld.com/download-smartcontrol-configuration-tool/?q=%2Fdownload-smartcontrol-configuration-tool%2F&v=3a52f3c22ed6) to control the pedal calibration.
 
-IMPORTANT: Currently, only version 1.0 of *SmartControl* is supported, since version 1.3.3+ has still a lot of bugs right now.
+> ###### Important
+>
+> Currently, only version 1.0 of *SmartControl* is supported, since version 1.3.3+ has still a lot of bugs right now.
 
 ### Mode *Pedal Calibration*
 
@@ -261,7 +270,9 @@ All the arguments for the plugin parameters of the "Pedal Calibration" plugin mu
 
 The optional parameter *controlApplication* let you provide the name of the configured application object for *SmartControl*, as long as it is not named "Pedal Calibration". With the *pedalCalibrations* parameter, you can provide all calibration selections, you want to have on your Button Box. *pedal* can be either "Clutch", "Brake" or "Trottle" and *calibration* must be one of "Linear", "Sense+1", "Sense+2", "Sense-1", "Sense-2", "S-Shape", "S_on_Side", "Slow_Start", "Slow_End" or "Custom" for the Heusinkveld Pedals. "Example: "pedalCalibrations: Clutch.Linear Button.1, Brake.Linear Button.2, ..."
 
-Important: Please be aware, that curve names  containing spaces must be enclosed in double quotes, since spaces are allowed in *SmartControl* curve names, but not in plugin arguments.
+> ###### Important
+>
+> Please be aware, that curve names  containing spaces must be enclosed in double quotes, since spaces are allowed in *SmartControl* curve names, but not in plugin arguments.
 
 ## Plugin *Driving Coach*
 
@@ -322,9 +333,10 @@ For Jona to be generally available, you must supply an argument for the *name* p
 The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#race-settings), which you will use before a race to give Jona the necessary information about your car setup and other stuff. As an alternative you can use the plugin action *importSetup* to import the current tyre setup data only, without opening the settings dialog. Nevertheless, you will get a notification, when the setup has been imported successfully.
 Last, but not least, with *openSessionDatabase* you can open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool. If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openSetupWorkbench*, *openSoloCenter* and *openTeamCenter*, which let you open the "Setup Workbench", the "Solo Center" and the "Team Center" tool.
 
-Hint: You can bind the activation and deactivation of all the AI Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
-
-Note: If you disable Jona during an active race, the Race Engineer will stop working immediately. You can also enable Jona at the beginning of a race, but only until you cross the start/finish line for the first time in your first stint. If you enable Jona after the initial lap, Jona will not be available until the next session. 
+> ###### Good to know
+>
+> - You can bind the activation and deactivation of all the AI Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
+> - If you disable Jona during an active race, the Race Engineer will stop working immediately. You can also enable Jona at the beginning of a race, but only until you cross the start/finish line for the first time in your first stint. If you enable Jona after the initial lap, Jona will not be available until the next session. 
 
 With "On" (or *true*) supplied for *logo*, Jona will show a nice rotating AI brain in the lower right corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
@@ -346,7 +358,7 @@ It is possible, although not much fun, to use Jona without its natural language 
 	
 All these command actions will be bound to the plugin itself, thereby are available all the time, and only unary functions are supported here. By using this actions, you will be able to use Jona with voice output, but no voice control, thereby getting most of the support from Jona, but you have to use an *oldschool* interface to control the engineer actions. To *answer* "Yes" to one of the questions of Jona, you must supply a controller function, for example a push button function, to the *Accept* parameter and for "No", you must use the *Reject* parameter. A little bit different is the *Call* action. This action will activate Jona and will make it the active listening dialog partner for voice control by the push of a button. This is similar to issuing the "Hey Jona" activation command. With *Interrupt* you can interrupt the currently running speech of Jona, and last but not least, you can use *Mute* and *Unmute*, when you temporarely want to deactivate voice ouput for Jona.
 
-Note: The *FuelRatioOptimize* is available only when using *Le Mans Ultimate*.
+The *FuelRatioOptimize* is available only when using *Le Mans Ultimate*. See the plugin documentation for more information.
 
 Furthermore, you can request a lot of information from Jona, mostly about the current state of your car. Thefore, you can supply the *InformationRequest* parameter multiple times.
 
@@ -375,7 +387,9 @@ Please see the following table for available information commands.
 | BrakeWear | This command will give you the current tyre wear in percentage of total wear for the brakes. Not all simulators support this, and to be honest, it also not available for most race cars in real life. |
 | EngineTemperatures | This command will give you the current water and oil temperatures, if they are available. |
 
-Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
+> ###### Good to know
+>
+> All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
 ## Plugin *Race Strategist*
 
@@ -398,7 +412,9 @@ The "Race Strategist" plugin handles the interaction of the currently active sim
 For Cato to be generally available, you must supply an argument for the *name* parameter, for example "Khato". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the AI Race Strategist dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 The *teamServer* parameter replicates the configuration option of the ["Team Server" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-team-server) for your convience (and to have it available for configuration in "Simulator Setup"). Additionally, the parameter *openRaceSettings* allows you to bind a plugin action to your hardware controller, which opens the [settings dialog](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#race-settings), which you will use before a race to give Cato the necessary information about your car setup and strategy options. With *openRaceReports* you can open the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool with the current simulator, car and track already selected and with *openSessionDatabase* you can open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) tool. If a simulation is currently running, most of the query arguments will already be prefilled. Very similar are the parameters *openStrategyWorkbench*, *openSoloCenter* and *openTeamCenter*, which let you open the "Strategy Workbench", "Solo Center" and the "Team Center" tool.
 
-Hint: You can bind the activation and deactivation of all the AI Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
+> ###### Good to know
+>
+> You can bind the activation and deactivation of all the AI Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
 
 With "On" (or *true*) supplied for *logo*, Cato will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
@@ -461,7 +477,9 @@ Please see the following table for available information commands.
 | StrategyOverview | As the name says, you will get a complete overview of the race strategy, as long as one has been defined in the "Strategy Workbench" and has been exported to be used in this session. |
 | NextPitstop | Cato tells you the lap, where the next pitstop according to the strategy has been planned. The Strategist will also ask, whether the Engineer should be informed right away, even if the planned pitstop is still far in the future. |
 
-Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
+> ###### Good to know
+>
+> All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
 ## Plugin *Race Spotter*
 
@@ -480,7 +498,9 @@ The "Race Spotter" plugin handles the interaction of the currently active simula
 	
 For Elisa to be generally available, you must supply an argument for the *name* parameter, for example "Elias". You can define a function on your hardware controller with the parameter *raceAssistant*, to enable or disable the AI Race Spotter dynamically. The *onOffFunction* may be ommited, if you only want to enable or disable the Assistant for all your sessions. The also optional *initialState* must be either "On" or "Off" (default is "On") and for *onOffFunction* unary and binary functions are supported. The function will be bound to a plugin action.
 
-Hint: You can bind the activation and deactivation of all the AI Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
+> ###### Good to know
+>
+> You can bind the activation and deactivation of all the AI Race Assistants to one function, if you want to control them with the same switch on your hardwar controller.
 
 With "On" (or *true*) supplied for *logo*, Elisa will show a nice rotating AI brain in the lower left corner of the screen, while the AI kernel is working, but you will get a short lag in your simulation, when this window pops up.
 
@@ -531,7 +551,9 @@ Please see the following table for available information commands.
 | CarCupAhead | The Spotter will tell you the cup category of the car ahead of you. |
 | CarCupBehind | The Spotter will tell you the cup category of the car behind of you. |
 
-Note: All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
+> ###### Good to know
+>
+> All these commands are also available in most of the simulation plugins, either in the "Pitstop" mode or in the "Assistant" mode, depending on the configuration parameters.
 
 ## Plugin *Team Server*
 
@@ -579,7 +601,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -624,7 +648,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa Competizione* simulation.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa Competizione* simulation.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -650,7 +676,9 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Important preparation for the Pitstop MFD handling
 
@@ -668,15 +696,14 @@ It is possible in very rare situations or when you have accidently interfered us
 
    These pictures are located in the *Resources\Screen Images\ACC folder* in the installation folder of Simulator Controller. They have been taken from a Full HD triple screen setup (5760 * 1080) using the English language setting in *Assetto Corsa Competizione*. If you are running a different resolution or, even more important, are using a different language, the search for these pictures will fail. But there is help, since you can provide your own pictures by placing your own ones with identical names in the *Simulator Controller\Screen Images\ACC* folder in your user *Documents* folder. Use the Snipping Tool of Windows to create all the necessary pictures, it will only take a few minutes. It is important, that you choose identical names as the originals for your versions of the picture files. While testing your images, you will find information about the images found (or not found) in the "Simulator Controller Logs.txt" file located in the *Logs* folder in your user *Documents* folder. If you set the log level to "Information" in the configuration (see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-general) on how to do this), you will even get more information in the logs.
 	 
-   Note: You may use the Windows print screen command to generate a full screen picture of the ACC window and then open this screenshot with "Paint" and grab the pictures using the Snipping Tool. But you will introduce the double amount of compression artefacts into the pictures, since JPG does not use a losslesss compression. This may lead to recognition errors. The preferred method is to switch between the Snipping Tool and ACC back and forth using Alt-Tab and take the pictures single by single.
-
-   Hint: The "Select Driver" option might only be available in special multiuser server setups or custom single user races, whereas the "Strategy" option is available in almost every session.
-
-   Note: The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
+   > ###### Good to know
+   >
+   > - You may use the Windows print screen command to generate a full screen picture of the ACC window and then open this screenshot with "Paint" and grab the pictures using the Snipping Tool. But you will introduce the double amount of compression artefacts into the pictures, since JPG does not use a losslesss compression. This may lead to recognition errors. The preferred method is to switch between the Snipping Tool and ACC back and forth using Alt-Tab and take the pictures single by single.
+   > - The "Select Driver" option might only be available in special multiuser server setups or custom single user races, whereas the "Strategy" option is available in almost every session.
+   > - The picture search will initially take some time, but the algorithm will learn the position of the Pitstop MFD during the initial run. Depending on your screen size and resolution the initial search will consume quite some CPU cycles. Therefore I advice to open the Pitstop MFD using one of the mode actions above once you are driving in a safe situation, to avoid lags later on. Simulator Controller will learn the position and will only search the much reduced screen area from now on and the CPU load will be 10 times less than before.
+   > - On our Discord server (https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
 
    If you haven't taken the pictures or the system have trouble identifying the objects on the screen, Simulator Controller will use a fallback mechanism. You will hear the short standard Windows sound for errors three times to inform you that the picture search has failed, the first time Simulator Controller wants to tweak the pitstop settings and you may hear a single error sound now and then in subsequent tries. And you will find corresponding information in the "Simulator Controller Logs.txt" file located in the *Logs* folder in your user *Documents* folder. Since the fallback mechanism has no understanding of the actual structure and current selections of the Pitstop MFD, it will use a reasonable set of available settings and will navigate accordingly. To be precise, it works only for Dry tyres (since only then the Tyre Set option is available), it will assume that refueling is possible, that tyre change is selected, but brake change is deselected. It will also assume, that the "Select Driver" option is available, as this is the typical layout in an endurance race. For a single user race, refueling and tyre pressure selection will still function correctly, but repair options will be off by one in this case. But be aware, if any of the above conditions are not met, the selection of pitstop settings may fail. Therefore I strongly recommend, that you create the search pictures as described above.
-
-   Last note: On our Discord server (https://discord.gg/5N8JrNr48H), there is a small tool in the channel #tools-and-fixes available, with which you can test, whether all your pictures can be be found.
 
    If you have come so far in your reading and still want to use the image recognition method, because the jumping cursor disturbes you to much, you must do the following: Open the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) and insert and check the setting "Pitstop: Image Search" for the *Assetto Corsa Competizione* simulator. And, of course, you have to create all search images.
 
@@ -708,7 +735,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest LapsRemaining Button.3, InformationRequest Weather Button.4,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -747,7 +776,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Assetto Corsa* simulation.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -773,7 +804,9 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Installation of the *Assetto Corsa* data interface
 
@@ -820,7 +853,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -863,7 +898,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -889,7 +926,9 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special notes for *iRacing*
 
@@ -901,7 +940,9 @@ Note: For convenience, all commands available for the *assistantCommands* parame
 
 This plugin handles the *rFactor 2* simulation game. An application with the name "rFactor 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startRF2" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
+> ###### Important
+>
+> You must install a plugin into *rFactor 2* plugins directory ([rF2]\Bin64\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Mode *Chat*
 
@@ -934,7 +975,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -975,7 +1018,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *rFactor 2* simulation.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *rFactor 2* simulation.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -1001,7 +1046,9 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Installation of the *rFactor 2* data interface
 
@@ -1040,7 +1087,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -1079,7 +1128,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -1105,13 +1156,17 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ## Plugin *AMS2*
 
 This plugin handles the *Automobilista 2* simulation game. An application with the name "Automobilista 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startAMS2" as a special function hook in this configuration and "ahk_exe AMS2AVX.exe" as the window title.
 
-Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Automobilista 2* in the "PCars 2" mode.
+> ###### Important
+>
+> So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Automobilista 2* in the "PCars 2" mode.
 
 The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
@@ -1139,7 +1194,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -1176,7 +1233,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -1202,7 +1261,9 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special requirements when using the Pitstop automation
 
@@ -1216,7 +1277,9 @@ Not complying with this requirements will give you funny results at least.
 
 This plugin handles the *Project CARS 2* simulation game. An application with the name "Project CARS 2" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startPCARS2" as a special function hook in this configuration and "ahk_exe PCARS2AVX.exe" as the window title.
 
-Important: So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
+> ###### Important
+>
+> So that the telemetry data can be accessed, the shared memory interface must be activated in the settings of *Project CARS 2* in the "PCars 2" mode.
 
 The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, and an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
@@ -1244,7 +1307,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToFront Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -1278,7 +1343,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -1304,7 +1371,9 @@ See the following table for the supported assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* amd *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Special requirements when using the Pitstop automation
 
@@ -1314,7 +1383,9 @@ It is very important, that you do not use the *Project CARS 2* ICM on your own, 
 
 This plugin handles the *Le Mans Ultimate* simulation game. An application with the name "Le Mans Ultimate" needs to be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration). Please set "startLMU" as a special function hook in this configuration. The plugin supports a "Pitstop" mode to control the pitstop settings and an integration with Jona is available through the "Race Engineer" plugin, an integration with Cato through the plugin "Race Strategist", and an integration with Elisa through the plugin "Race Spotter".
 
-Important: You must install a plugin into *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
+> ###### Important
+>
+> You must install a plugin into the *Le Mans Ultimate* plugins directory ([LMU]\Plugins\) for the telemetry interface and the pitstop mode to work. You can find the plugin in the *Utilities\3rd Part\rf2_sm_tools_3.7.14.2.zip*. Take a look [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers) for installation instructions.
 
 ### Mode *Chat*
 
@@ -1344,7 +1415,9 @@ The above will be achieved using the following plugin argument:
 					   InformationRequest GapToAhead Standings Button.5, InformationRequest GapToBehind Standings Button.6,
 					   Accept Button.7, Reject Button.8
 
-Note: You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
+> ###### Good to know
+>
+> You can use all these commands in the *pitstopCommands* list as well, which will generate one giant controller mode.
 
 ### Configuration
 
@@ -1387,7 +1460,9 @@ See the following table for the supported settings:
 
 Beside controlling the pitstop settings from the button box, most of the settings are also available as actions, which can be bound to external event sources. See the list of [actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) for more information.
 
-Note: Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Le Mans Ultimate* simulation.
+> ###### Good to know
+>
+> Be careful, when you change pitstop settings while Jona is active, the Race Engineer will at least be very confused. There is one notable exception, if Jona has planned and prepared a pitstop, but this pitstop has not been carried out yet, every change to the pitstop settings using the "Pitstop" mode will be recognized and taken into account by Jona in the *Le Mans Ultimate* simulation.
 
 With the plugin parameter *assistantCommands* you can supply a list of the commands you want to trigger, when the "Assistant" mode is active. Only unary controller functions are allowed here.
 
@@ -1414,7 +1489,9 @@ See the following table for the supported Assistant commands.
 
 See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) for the "Race Engineer" plugin above for more information on *PitstopPlan*, *DriverSwapPlan*, *PitstopPrepare*, *Accept* and *Reject* and the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) for the "Race Strategist" plugin above for more information on *PitstopRecommend* or *StrategyCancel*.
 
-Note: For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
+> ###### Good to know
+>
+> For convenience, all commands available for the *assistantCommands* parameter, may also be passed to the *pitstopCommands* parameter, thereby including all these commands in the "Pitstop" mode.
 
 ### Installation of the *Le Mans Ultimate* data interface
 
@@ -1434,12 +1511,13 @@ For *Le Mans Ultimate*, you need to install a plugin into a special location for
 
      When the Engineer announces the amount of fuel to be added for the next pitstop, the fuel amount will be divided by the *fuel ratio* as currently set in the pitstop menu of the HUD, before being used as the value for the virtual energy replenishment. So make sure, that your *fuel ratio* setting is as desired at the time, when the pitstop settings are changed.
 
-     Note: The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it. This has the following implications at the moment:
-   
-       - The fuel ratio normally contain a certain amount of safety fuel, that assure that you will not run out of fuel with 100% energy consumption. But make sure you pit before dropping virtual energy to 0%. You can recalibrate the fuel ratio once you have driven a few laps using the "FuelRatioOptimize" action or the corresponding voice command of the Race Engineer. This will use your current fuel consumption for every 1% virtual energy plus the safety fuel specified in the settings to compute an optimal fuel ratio.
+     > ###### Good to know
+	 >
+	 > The *fuel ratio* implicitely includes the max fuel the car can carry, since the value can be greater than 1. Confusing, isn't it. This has the following implications at the moment:
+     >
+     > - The fuel ratio normally contain a certain amount of safety fuel, that assure that you will not run out of fuel with 100% energy consumption. But make sure you pit before dropping virtual energy to 0%. You can recalibrate the fuel ratio once you have driven a few laps using the "FuelRatioOptimize" action or the corresponding voice command of the Race Engineer. This will use your current fuel consumption for every 1% virtual energy plus the safety fuel specified in the settings to compute an optimal fuel ratio.
+	 > - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be against the rules of the WEC. You can set the fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers (it may have been set there already for you by the Assistants, but be sure to correct the value, once you have found a perfect fuel ratio). Then use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
 	 
-	   - When working with the ["Setup Workbench"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench), it is important to set the max fuel the car can carry to fulfill the virtual energy constraints, which will be lower than the fuel capacity of the car on most tracks. Otherwise you will end up with strategies, which might be against the rules of the WEC. You can set the fuel capacity in the "Session Database" for a given car / track combination, once you have dialed your numbers (it may have been set there already for you by the Assistants, but be sure to correct the value, once you have found a perfect fuel ratio). Then use the "Initialize from Database" command in the "Session" menu of "Setup Workbench", before you simulate your strategy.
-
      Another important aspect of the virtual energy system is that the setting in the pitstop menu of *Le Mans Ultimate* does not define how much energy has to be added at the next pitstop, but instead specifies the energy amount that will be available, when you leave the pit. This will be taken automatically into account when the refuel amount is calculated, but this is only correct at the current lap. So don't wait too long before you go to the pit or let the Engineer create a new pitstop plan, just before coming to the pit.
    
      When running on a pre-defined strategy, refueling calculation works a bit different. The Strategist and the Engineer will tell you the lap you have to come in. The calculation of the virtual energy will be exact for this particular lap. Of course you can come in later, if you have still some virtual energy left, but then you may have to correct the virtual energy level by this number of laps, at least if the next stint will be your last one.
@@ -1520,7 +1598,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    - Select the first page and enter "Project Motor Racing" into the list of all available simulators.
    - Save the configuration.
    
-IMPORTANT: It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
+   > ###### Important
+   >
+   > It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
 
 3. The current implementation of the UDP API still has many deficits regarding important information at the time of writing.
 
@@ -1612,7 +1692,9 @@ See the [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wi
    - Select the first page and enter "F1 25" into the list of all available simulators.
    - Save the configuration.
    
-   IMPORTANT: It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
+   > ###### Important
+   >
+   > It may be necessary, that these steps need to be repeated, whenever a new configuration is created with "Simulator Setup".
 
 6. The current implementation of the *F1 25* API shows the following problems:
 

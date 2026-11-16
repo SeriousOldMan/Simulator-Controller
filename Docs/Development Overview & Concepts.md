@@ -153,7 +153,7 @@ In the implementation of *loadFromConfiguration* all chat messages are retrieved
 
 The *ACCPlugin* is aware of "Assetto Corsa Competizione", as you can see by the implementation of the *runningSimulator* method above. Since "Assetto Corsa Competizione" might also be configured in the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration) as a required simulator for this plugin, the "Chat" mode will only be active, i.e. available, when "Assetto Corsa Competizione" is running. As a convenience function, the implmentation of the *simulatorStartup* method  will automatically switch to "Chat" mode, when ACC has been started, thereby making the chat messages available on the hardware controller buttons.
 
-Note: With the introduction of Release 2.0, the *ACC* plugin has become much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
+Please note that with the introduction of Release 2.0, the *ACC* plugin has become much more capable. The above example shows only a fraction of the functionality of this plugin for didactical reasons.
 
 ## Rule Engine
 
@@ -181,7 +181,9 @@ The build rules are defined in the file *Simulator Tools.targets* in the *Config
 		%kBinariesDirectory%Simulator Controller.exe <- %kSourcesDirectory%Controller\Simulator Controller.ahk;
 														%kFrameworkDirectory%, %kSourcesDirectory%Controller\Plugins\
 
-Note: You cannot normally format the rules like in this example, since due to technical restrictions, the complete rule must be kept on one line without CRs or LFs.
+> ###### Good to know
+>
+> You cannot normally format the rules like in this example, since due to technical restrictions, the complete rule must be kept on one line without CRs or LFs.
 
 This rule defines the *Simulator Controller.exe* application in the *Binaries* folder as the target. The main source file will be *Sources\Controller\Simulator Controller.ahk* and there are additional files in the *Includes* and in the *Plugins* folders, that will be checked for modification. Variables enclosed in "%" will be replaced with theirs current runtime values.
 
@@ -199,7 +201,9 @@ You can decide which targets you want to include in your build run by holding do
 
 You can also choose a [splash screen](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor) here for your entertainment, while waiting for the build tool to finish.
 
-Note: You can cancel a build run anytime by pressing the Escape key.
+> ###### Good to know
+>
+> You can cancel a build run anytime by pressing the Escape key.
 
 ## Customizing the Configuration Tool
 
@@ -242,7 +246,9 @@ To support translation, all Simulator Controller applications use external, text
 
 For most files used in the translation process, Simulator Controller provides a kind of inheritance mechanism, which allow you to modify all or only small parts of a given translation, or to create a completely new translation not already supported by the standard distribution. To support this, the applications of Simulator Controller searches different directories and the loads the files found in these directories in specific order, so that user specific definitions can *overwrite* definitions in the standard distribution.
 
-IMPORTANT: If you want to work on translation files, be sure to use a Unicode-capable text editor, like notepad++, and be sure to save all files containing language specific texts in the "UTF-16" format with little endian byte order. You can use *\n* to represent a new line in a given text and you must use *\\* to create a backslash, of course.
+> ###### Important
+>
+> If you want to work on translation files, be sure to use a Unicode-capable text editor, like notepad++, and be sure to save all files containing language specific texts in the "UTF-16" format with little endian byte order. You can use *\n* to represent a new line in a given text and you must use *\\* to create a backslash, of course.
 
 All translation files are located somewhere inside the *Resources* directory in the distribution package. The specific locations are mentioned for each of the different files in the sections below. You can make copies of the these files and compare it always to the original file whenever you have installed a new release, so that you will be informed about any additions or changes in the original file. Once you are done with the translation, you can send me the translated files, and I will make a quality check and integrate everything into the standard distribution.
 
@@ -273,11 +279,13 @@ After that you can have any number of sections with translations which look like
 
 The section "[General]" is only used to structure the content and is ignored while reading the translation file. As you can see, the original text is always in English, since the untranslated base version of Simulator Controller uses the English language.
 
-IMPORTANT: Leading and trainling spaces in the original texts are important and must be included in the translated text accordingly. Examples:
-
-	 at line => in der Zeile 
-	": =>": 
-	           Running =>           Starte 
+> ###### Important
+>
+> Leading and trainling spaces in the original texts are important and must be included in the translated text accordingly. Examples:
+>
+>	 at line => in der Zeile 
+>	": =>": 
+>	           Running =>           Starte 
 
 When you want substitute your own translations, you don't have to copy the whole original file of a given language translation, you only have to provide those translations, you want to change. Example:
 
@@ -388,7 +396,9 @@ The supported languages for the translator can be extended by placing a file nam
 	Avestan,ae,Upastawakaēna
 	...
 	
-Note: Lines can be empty or can contain comments, if the first character is a ";".
+> ###### Good to know
+>
+> Lines can be empty or can contain comments, if the first character is a ";".
 	
 A good source for the ISO 639 language codes can be found on [Wikipedia](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes).
 

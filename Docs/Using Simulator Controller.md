@@ -54,7 +54,9 @@ As said, by default the first name that has been found will be used for all thes
 
 Simulator Controller can provide diagnostics data to the development team to increase the stability and also the functionality in future releases. Additionally you can share anonymous data from your session for training purposes of GPT models of the Assistants AI. And you can share some data from your sessions (for example, reference telemetry data, tyre pressure information for different weather conditions, and so on) with the community for which you will receive similar data in return. Of course, also fully anonymous. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#sharing-data-with-the-community) for more information. But sharing data and diagnostics information is voluntary. You can manage all this in the lower section of the profile dialog.
 
-**Important:** Transfer of information about critical errors and also statistical usage information is enabled by default.
+> ###### Important
+>
+> Transfer of information about critical errors and also statistical usage information is enabled by default.
 
 ###### Notes
 
@@ -150,7 +152,9 @@ Simulataor Controller is a modular software and consists of many functions, whic
 
 Beside manually enabling and disabling functions when enterring a session, you can also manage your preferences using the so called startup profiles as described in the following section.
 
-Important: These menus are not working correctly, if scaling has been actived for the current monitor.
+> ###### Important
+>
+> These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask me why...
 
 ### Startup Profiles
 
@@ -182,7 +186,9 @@ And you can choose furthermore which Assistants will be available and whether th
 | Muted    | "Muted" means, that the Assistant is fully active, including voice capabilities. But the Assistant will not contact the driver pro-actively, for example, to inform about an upcoming weather change. The Assistant will, however, react to voice commands and will allow full voice interaction, as long as the dialog is started by the driver.<br><br>Note: A "muted" Assistant can be fully or partially unmuted using a voice command. This is described in the individual documentation for each Assistant. |
 | Active   | This is the normal operation mode of the Assistant with all voice capabilities enabled. |
 
-Note: Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active *Push-To-Talk* button, this configuration is not necessary.
+> ###### Good to know
+>
+> Although it is technically possible to configure an Assistant with enabled voice output, but disabled voice recognition, this kind of configuration is not offered in the startup profiles, since in environment with an active *Push-To-Talk* button, this configuration is not necessary.
 
 Additionally, you can activate the ["Autonomous Mode" for strategy handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#tab-strategy) by the Assistants, if required. "Default" is available here as well.
 
@@ -272,7 +278,11 @@ In many cases all drivers in a given team want to share the same configuration. 
 
    You can prepare any number of exports from your session database you want to share with your team mates.
    
-   - These exports can include settings for the Assistants and other applications of Simulator Controller from the [settings page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings). Hint: Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included.
+   - These exports can include settings for the Assistants and other applications of Simulator Controller from the [settings page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#settings).
+ 
+     > ###### Good to know
+	 >
+	 > Normally you want to use the Control key while exporting the settings from your "Session Database", so that everythig is included.
    - You can also export telemetry data, track maps and other stuff from the [administration page](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#administration) of the "Session Database".
    
    Put all the export files into the folder of the team package.
@@ -295,7 +305,9 @@ Translators can be configured directly for the corresponding [plugins of the Ass
 
 The list of supported translator languages can be extended. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#machine-translation) for more information.
 
-Important: Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
+> ###### Important
+>
+> Voice recognition for translated languages will only work reliable when a neural network based voice recognition method is used, for example from Azure or Google or when using Whisper. Also read the section about the *Activation* listener below.
 
 #### Talking with your *crew*
 
@@ -368,7 +380,9 @@ Beside the *builtin* voice recognition capabilities, you can still use specializ
 
 If it looks like, that voice commands are not recognized correctly, you can activate a troubleshooting mode, where a small window pops up and shows what has been understood, whenever a voice command has been given. To enable this mode, go to the tray in the lower righ corner of the Windows task bar and find the "Voice Server" process (indicated by a small icon with a green microphone). Right-click on the icon to open the process menu and select "Debug Recognitions" from the "Support" submenu.
 
-Important: These menus are not working correctly, if scaling has been actived for the current monitor. Don't ask me why...
+> ###### Important
+>
+> These menus may not be working correctly, if scaling has been actived for the current monitor. Don't ask me why...
 
 #### Non-standard voice configurations
 
@@ -550,7 +564,9 @@ You can use an asterisk ("*") for the simulation and also for the session type, 
 
 Please note, that specifying a simulator is more specific than specifying a session, so "[Output.Assetto Corsa.\*]" takes precedence over "[Output.\*.Race]". Specifying both the simulator and the session will be the most specific, of course, whereas using the "\*" for both will be the most unspecific.
 
-Important: Using audio routes is only possible, if *NirCmd* has been installed.
+> ###### Important
+>
+> Using audio routes is only possible, if *NirCmd* has been installed.
 
 ### Keyboard shortcuts & modifiers
 
@@ -670,7 +686,9 @@ The "System Monitor" is divided into several pages of information:
 	 
 	 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/System%20Monitor%205.JPG)
 
-Final note: The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problems will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued. Also it is possible that state information is not updated anymore, when central backgroud processes, first and formost "Simulator Controller.exe" have been terminated manually.
+> ###### Good to know
+>
+> The information provided by "System Monitor" is asynchronous by nature, in order to not interfere with some time critical operations of other parts of the system. Therefore it can take a couple of seconds before problems will be visible. If you loose the connection to the Team Server, for example, it might not become evident, when no requests against against the Server are currently being issued. Also it is possible that state information is not updated anymore, when central backgroud processes, first and formost "Simulator Controller.exe" have been terminated manually.
 
 ## And now it's time
 

@@ -90,7 +90,9 @@ Literals are represented as a sequence of characters. They can contain almost an
    
       Although it is possible to create a variable which starts with a number like *?42*, this is not recommended.
 	  
-	  Important: The names of variables can also contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *dotted Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
+	  > ###### Important
+	  >
+	  > The names of variables can also contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *dotted Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
 	  
 	  - When used in production rules the variables *?a.b* and *?a.c* will match to different facts as expected, i.e. they will be bound to the current value of the facts **!a.b** and **!a.c** respectively. Purpose of doing this is to support a pseudo object structure for *Facts*, as mentioned above.
 	  - In reduction rules only the part of the name before the first dot is used to identify a variable, which means that in the same lexical scope (normally the head and tail of one rule) the variables *?a.b*, *?a.c* and actually *?a* as well represent the same entity. But here dotted variables can be used as a part of a composite variable. Example: If the variable *?Person* is already bound to "Peter", the variables *?Person.Mother* and *?Person.Father* will represent the values "Peter.Mother" and "Peter.Father" respectively.
@@ -128,7 +130,9 @@ Rules are made up of expressions. Expressions are complex structures composed of
   
 The different types of expressions are discussed below. In the implementation of the rule engine, expressions are not (yet) fully composable, i.e. elements of expressions cannot be of any type. This is also discussed below.
 
-Important: Literals and expressions conjunctly are also called *terms* in reduction rules.
+> ###### Good to know
+>
+> Literals and expressions conjunctly are also called *terms* in reduction rules.
 
 ##### Lists
 
@@ -430,7 +434,7 @@ but it cannot be unfied with:
 	test(A, foo(?, ?))
 	test(?a, foo([?a, ?b])
 
-Note: In the last example, the unification fails, because *?a* has been bound to **A** in the first step and **A** cannot be unified with the first element of the list in *foo*, which is a **1**.
+In this example, the unification fails, because *?a* has been bound to **A** in the first step and **A** cannot be unified with the first element of the list in *foo*, which is a **1**.
 
 #### Cut and Fail
 
@@ -654,7 +658,9 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Compiles a rule from the given textual rule definition supplied in *rule* and adds it to the active rule set. The internal ID of the rule is unified with the second argument *id*, which can be used to remove the rule later on using the *removeRule* predicate. *addRule* will fail, when a syntax error is detected. Please note, that the side effect of adding the rule is not undone, when backtracking is performed.
 	
-	Important: When a rule is added to the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
+	> ###### Good to know
+	>
+	> When a rule is added to the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
 	
   - removeRule
   
@@ -662,7 +668,9 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Removes the rule with supplied *id* from the active rule set. *removeRule* will fail, if *id* is not a vaild rule ID or if a rule with such an ID does not exist. Please note, that the side effect of removing the rule is not undone, when backtracking is performed.
 	
-	Important: When a rule is removed from the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
+	> ###### Good to know
+	>
+	> When a rule is removed from the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
   
 ### Event-based programming
 

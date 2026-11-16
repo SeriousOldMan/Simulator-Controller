@@ -4,7 +4,9 @@ The "Strategy Workbench" is a very valuable tool, which can be used either stand
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Workbench.JPG)
 
-Important: "Strategy Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Strategy Workbench" once using administrator privileges.
+> ###### Important
+>
+> "Strategy Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Strategy Workbench" once using administrator privileges.
 
 ## Overview
 
@@ -134,7 +136,9 @@ If you enable "Auto Initialize" in the "Settings" menu, settings will be initial
 
 Beside the session rules, you can enter into the fields in the "Rules & Settings" tab, the simulation engine supports two different methods of extended validation of strategy scenarios created during the simulation. The first one uses the builtin [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) and the second method uses a scipting engine base on the well-know [Lua](https://lua.org) scripting language, which is used in many commercial applications as well.
 
-Note: The rule-based validation in general requires less coding for complex validations, but it requires a good understanding of logical programming. If you are unexperienced with this, I strongly recommend to use script-based validation.
+> ###### Good to know
+>
+> The rule-based validation in general requires less coding for complex validations, but it requires a good understanding of logical programming. If you are unexperienced with this, I strongly recommend to use script-based validation.
 
 ##### Rule-based validation
 
@@ -353,7 +357,7 @@ The above functions will give you summarized information about all pitstops, whi
 					 tyreCompound :: false or \<string\>, tyreCompoundColor = false or \<string\>,
 					 tyreSet :: false or \<string\>}
   
-     This function returns an object which fully describes a planned pitstop. Notes: Tyre information will be *false*, if no tyre change is planned. The time represents the number of minutes into the race. 
+     This function returns an object which fully describes a planned pitstop. Tyre information will be *false*, if no tyre change is planned. The time represents the number of minutes into the race. 
 
 ##### Editing validation rules and scripts
 
@@ -377,7 +381,9 @@ In very rare cases it might be beneficial to define one or more fixed pitstops b
 
 Enter the number of the pitstop that should be fixed. You can also specify, that this pitstop should carried out at a specific lap and you can define rules for refueling and/or tyre change.
 
-Important: The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
+> ###### Important
+>
+> The strategy simulation tries to compensate for the intervention as best as possible. But there are limits. For example, it is not checked whether the available fuel in the stint before a fixed pitstop is sufficient to extent this stint up to the fixed lap. Also, any additional restrictions like stint timers, tyre life, pitstop rules, and so on, might be ignored as well. Therefore it is possible that the simulation will come up with an invalid strategy, which, even worse, might not be detected correctly.
 
 > ###### Good to know
 >
@@ -401,7 +407,9 @@ Here you can configure a time dependent weather forecast for the strategy simula
 
 Depending on the forecast, appropriate pitstops with tyre changes will be planned just before the weather change. If you use this feature, make sure to have sufficient telemetry data for all applicable tyre compounds available. Otherwise, the simulation will fail or yield false results.
 
-Note: This information will be only used during the initial simulation of the strategy. If you later on recalculate the strategy using the Race Strategist or the "Team Center", the actual current weather or the weather outlook (if available by the simulator) will be used instead.
+> ###### Good to know
+>
+> This information will be only used during the initial simulation of the strategy. If you later on recalculate the strategy using the Race Strategist or the "Team Center", the actual current weather or the weather outlook (if available by the simulator) will be used instead.
 
 ### Simulation
 
@@ -415,7 +423,9 @@ Enter the required values in the *Initial Conditions* group, choose the data to 
   
 	Perhaps the most tricky one and it needs a lot of historical telemetry data to create sensible results. Using the slider, you can optimize the amount of fuel to be used for the first stint, thereby influencing the car weight and in the end the resulting lap times in the critical first phase of a race. For some cars, for example, lap times increase significantly, if the amount of fuel and therefore the car weight is above a specific threshold. This can be derived from the telemetry data. If you set the slider completely to the left, the initial fuel amount entered in the *Initial Conditions* field group will be used only, whereas, if you set the slider to the right, you specify, how much of the fuel capacity of the car might be used as additional fuel for the simulation variations.
 	
-	Hint: If you want to simulate the whole range of initial fuel levels, enter **0** for the initial fuel level in the *Initial Conditions* field group and set the slider completely to the right.
+	> ###### Good to know
+    >
+    > If you want to simulate the whole range of initial fuel levels, enter **0** for the initial fuel level in the *Initial Conditions* field group and set the slider completely to the right.
 	
   - Refuel
   
@@ -453,9 +463,11 @@ For every slider not at the zero position, different variations of the underlyin
 
 You can use the commands in the *Simulation* menu to start a simulation (similar to use the "Simulate!" button), and to copy the current results over to the *Strategy* tab. If you hold the Control key while pressing the "Simulate!" button or choosing the corresponding menu item, the selected scenario will be copied to the *Strategy* tab after the simulation.
 
-Important: You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, for example for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. You can either use the [*Laps* editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#browsing-laps-data) in the "Administration" tab of the "Session Database". Or you can use the a text editor to work directly with the database files. The telemetry data is stored lap by lap in the files "Electronics.CSV" and "Tyres.CSV" which follow standard CSV format conventions. These files are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. A third approach is to use the "Cleanup..." command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value. Only the values for the currently selected driver (or in case "All" are selected, your own driver) will be considered during the cleanup process, and if you have configured a data replication to the Team Server, the entries will be deleted there as well.
-
-Attention: Depending on the given data constellation, the command "Cleanup..." can remove quite a lot of data. So be careful and have a backup at hand, if the result is not as desired.
+> ###### Important
+>
+> You all know the phrase "Shit in - shit out". Therefore please check that the telemetry data, that is used for the strategy simulation, is correct. There is a filter that learns, what are correct entries and what are not, but this filter uses a standard variation algorithm and therefore needs a lot of valid data vs. a small amount of invalid data. Especially in the beginning, if you only have data from a few laps, double check the results of the simulation and - if you think, they are off, for example for the fuel consumption - use only the data, you entered in the *Initial Conditions* field group for the simulation. By the way, you can delete corrupt data, if necessary. You can either use the [*Laps* editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#browsing-laps-data) in the "Administration" tab of the "Session Database". Or you can use the a text editor to work directly with the database files. The telemetry data is stored lap by lap in the files "Electronics.CSV" and "Tyres.CSV" which follow standard CSV format conventions. These files are located in the folder *Simulator Controller\Database\User\\[simulator]\\[car]\\[track]* (with [simulator], [car] and [track] substituted with the corresponding values) in your user *Documents* folder. You can open this file with your favorite editor and delete the suspicious lines. A third approach is to use the "Cleanup..." command from the data selection popup. It will remove all entries from the telemetry database, whose values are way off the average value. Only the values for the currently selected driver (or in case "All" are selected, your own driver) will be considered during the cleanup process, and if you have configured a data replication to the Team Server, the entries will be deleted there as well.
+>
+> Attention: Depending on the given data constellation, the command "Cleanup..." can remove quite a lot of data. So be careful and have a backup at hand, if the result is not as desired.
 
 ### Strategy
 
@@ -465,6 +477,5 @@ The values in this tab and also the document display on the right side of the ta
 
 > ###### Good to know
 >
-> The document shown on the right side can be printed using the right mouse button context menu.
-
-Note: Exported strategies will be saved in the file "Race.strategy", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. There can only be one currently active strategey. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) for information, how Cato uses such a predefined strategy during a race.
+> - The document shown on the right side can be printed using the right mouse button context menu.
+> - Exported strategies will be saved in the file "Race.strategy", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. There can only be one currently active strategey. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Strategist#strategy-handling) for information, how Cato uses such a predefined strategy during a race.

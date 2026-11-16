@@ -6,15 +6,13 @@ Ok, enough marketing bullshit. Jona is a voice chat bot with a special knowledge
 
 ***
 
-Before we head on, an important note: Depending on the simulation, the Race Assistants can not be used in a team race, since the required data is not availabe, when you are not the currently active driver.  I have concepts for a server based solution in the drawer, which will allow Jona to act as a Race Engineer for a complete team multiplayer endurance race. But this will be quite a huge undertaking and will take a while, depending on my available time to invest in this project.
-
-***
-
 As said above, Jona is a voice chat bot and therefore you can control Jona completely by voice. If you don't want to use voice control, there are other possibilities as well. More on that later in this documentation.
 
 Before we dig deeper into the inner workings, here is a typical dialog based interaction, to give you an understanding of the current capabilities of Jona.
 
-Important: If you have multiple *dialog partners* active, for example Jona and Cato, it will benecessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
+> ###### Important
+>
+> If you have multiple *dialog partners* active, for example Jona and Cato, it will benecessary to use the [activation phrase](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) the first time you start talking to a specific *dialog partner*.
 
 ### A typical dialog
 
@@ -108,7 +106,9 @@ To have an error free session like this one, you must have a perfect setup for v
 
 Not much to do here, since Jona is a fully integrated component of the Simulator Controller package. Of yourse, you have to configure the Simulator Controller software, before you can use the AI Race Engineer. Please read the [installation documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration) for a complete overview of the steps required, especially the installation and configuration for [Voice Control](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). You might want to have a look at the ["Race Engineer" plugin arguments](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer), since this plugin controls Jona during your simulator sessions.
 
-IMPORTANT: Also take a look at the [installation of telemetry providers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers).
+> ###### Important
+>
+> Also take a look at the [installation of telemetry providers](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-telemetry-providers).
 
 ### Important preparation for the Pitstop MFD handling in *Assetto Corsa Competizione* and *RaceRoom Racing Experience*
 
@@ -139,9 +139,11 @@ As you can see, a typical recognition phrase looks like this:
 
 	[(TellMe) {the tyre pressures, the current tyre pressures, the pressures in the tyres}, (TellMe) the current pressures]
 	
-(TellMe) is a variable for a set of predefined optional filler phrases (in the example above TellMe stands for "Tell me, Give me, What are"). The definition above consists of two different independent phrases, which lead to the same reaction of Jona. This is denoted by the "[..., ...]" bracket construct. For the first phrase the "{..., ..., ...}" defines inner alternatives for this phrase. By using "[" and "{" constructs, you can create a variety of pattern alternatives. But in the end, Jona reacts only to the core words of a phrase, for example "the current pressures" in the above example.
+(TellMe) is a variable for a set of predefined optional filler phrases (in the example above TellMe stands for "Tell me, Give me, What are"). The definition above consists of two different independent phrases, which lead to the same reaction of Jona. This is denoted by the "[..., ...]" bracket construct. For the first phrase the "{..., ..., ...}" defines inner alternatives for this phrase. By using "\[" and "{" constructs, you can create a variety of pattern alternatives. But in the end, Jona reacts only to the core words of a phrase, for example "the current pressures" in the above example.
 
-Important: The words of the recognized phrase are reported to the Jona control program and may be analyzed there for further processing. For example, when asking for tyre pressures or temperaturs, the words "front", "left", ... are very important. Therefore be careful, if you change some of the predefined phrases.
+> ###### Important
+>
+> The words of the recognized phrase are reported to the "Race Engineer" process and may be analyzed there for further processing. For example, when asking for tyre pressures or temperaturs, the words "front", "left", ... are very important. Therefore be careful, if you change some of the predefined phrases.
 
 Some phrases (input and output) may have additional variables enclosed in "%", as in *%name%* above. These variables are provided by the runtime to customize the questions and answers.
 
@@ -224,7 +226,9 @@ The AI Race Engineer is handled by the "Race Engineer" plugin, which may be inte
 
 Most of the information, that Jona needs, will be collected from the telemetry information of the simulation game. Unfortunately, this data does not contain every required information, and also there are additional data and configuration information, which are required by Jona. For example, data is required to understand the given race situation and the corresponding telemetry information, and to precisely predict tyre pressures, fuel requirements, tyre compound recommendations, and so on. In the end, all that means, that some setup work is required, before you start your session. 
 
-Important: In the default configuration, Jona will be activated in the first lap of a session. This is necessary, so that Jona can setup the initial knowledge (fuel, pressures, etc.). If you join a session later than during the first lap, Jona will refuse to work. This behavior can be changed with the setting "Engineer: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behavior of Jona may be somewhat confusing.
+> ###### Good to know
+>
+> In the default configuration, Jona will be activated in the first lap of a session. This is necessary, so that Jona can setup the initial knowledge (fuel, pressures, etc.). If you join a session later than during the first lap, Jona will refuse to work. This behavior can be changed with the setting "Engineer: Late Join" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database), but the behavior of Jona may be somewhat confusing.
 
 ### Race Settings
 
@@ -299,7 +303,7 @@ Then you must supply the tyre selection and pressure setup that is used at the b
 
 The tyre compound selection as well as the selection of the tyre sets will depend on the detected simulator / car / track combination. If "Race Settings" had been started without a simulator currently running, you can only select one tyre compound for all four wheels and the selection of tyre sets is not possible. But if your are running *RaceRoom Racing Experience* and are preparing a session, for example, you will be able to select distinct tyre compounds for the front and for the rear axle. But please note, that for most simulators, the pre-selection of the tyre compound is not necessary, because this information can be retrieved from the API during the first lap.
 
-The management of tyre sets (mainly used in *Assetto Corsa Competizione*) can be set to "Auto", if you are using automatic import from the simulation. See the discussion about [pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop) below for more information. Note: We requested a more versatile access to setup informations from Kunos already. Hopefully, this will be available in a future version of *Assetto Corsa Competizione*, and the whole process will become much less cumbersome. But to be honest, there is even less functionality available at the moment for other simulators.
+The management of tyre sets (mainly used in *Assetto Corsa Competizione*) can be set to "Auto", if you are using automatic import from the simulation. See the discussion about [pitstop handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#the-pitstop) below for more information.
 
 Please consult the documentation for the [configuration of the "Race Engineer" plugin](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-race-engineer) for more information on the different methods to initialize the initial pressures at the beginning of a session, and also take a look at the documentation about [handling tyre compounds](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds) in general.
 
@@ -660,7 +664,9 @@ The following statistical models are currently implemented:
 	   
 	   At the time of this writing, *Project Motor Racing* only supplies weather information in the API for the current weather. Furthermore, this information is supplied in a language-localized string, so in effect, this information is unreliable in most case. When *Project Motor Racing* has been configured for *English* in the *Steam* settings, "Dry", "Light Rain" and "Rainfall" conditions will be detected for the current weather.
 	 
-Note: Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always double-check under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
+> ###### Good to know
+>
+> Extrem changes in the conditions, for example an incoming thunderstorm on a previously dry and hot track, will result in extreme variances in the statistical models and thereby will lead to strange recommendations in many cases. This is a drawback for the moment, so always double-check under those circumstances. Jona will use the data collection of recent races, if available, to guess the best possible combination of tyre compound and pressures, but especially in changing conditions tyre pressures may be way off. So double check the recommendations fo the Race Engineer against your own experiences and gut feeling.
 
 Additional notes for *iRacing* users: It looks like that tyre pressures and also to some extent tyre temperatures for most of the cars are not available in the *iRacing* live data. To make it worse, damage information is also not available in the API, although *iRacing* apparently has a sophisticated damage model. Since *iRacing* is a quite mature (not to say old) simulation game, and the API hasn't changed in a while, I am quite pessimistic, that this will be fixed. Therefore, the recommendations of the AI Race Engineer will be at best limited and in some cases even false. Nevertheless, Jona will help you with refuel recommendation for an upcoming pitstop and you will have someone to talk to while hunting down your opponent on the long straights.
 
@@ -794,18 +800,16 @@ The "Race Engineer" plugin writes this information to a temporary file and hands
 
 The *[Setup Data]* section reference the settings at the start of the session and must only be written by the data provider, if the *-Setup* option has been passed to the process. These information are ussed in the pitstop preparation process and also by the *Race Settings* when importing the initial setup data.
 
-Note: If you are a developer and want to take the challenge to adopt Jona to a different simulation game, you are welcome. You can use the "RF2" plugin code and the above file format as a blueprint, but the shared memory interface of each simulation game is different. Please feel free to contact me, if you have questions. I would be happy to integrate plugins for other simulation games into Simulator Controller in the future.
-
 ## Troubleshooting
 
-The biggest hurdle to overcome when using Jona, is to find a satisfying setting for voice recognition. Here are some hints:
+The biggest hurdle to overcome when using Jona, is to find a satisfying setting for voice recognition. Here are some things to look out for:
 
   - First and foremost, check your audio settins, especially if you have different microphones connected from time to time to your system. Windows switches the standard audio device without notice.
   - I strongly recommend to use a head set. Although it is possible, and I have tested it myself, to talk to Jona using a desktop or webcam microphone, it is hard to find a satisfying setup. Typically, you will get a couple of false positives in this scenario, while the V12 sound from the Aston Martin is hammering from the speakers. You have been warned...
   - Even when using headset, you might get false positives. The reason for that, normally is a too sensitive microphone level. Reduce the input level of the microphone as low as possible in the Windows audio devices settings, so that Jona still recognizes your spoken words, but does not interpret your sighs and breath noises as valid input.
   - If voice recognition is not working at all, you might need to unblock the DLLs. Follow the instructions in the [installation section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#installation-of-speech-recognition-libraries) above.
   - Although it is very helpful to be able to talk to Jona anytime, you might consider to use the *Push-To-Talk* functionality introduced with release 2.4. Please consult the corresponding [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control) on how to configure this feature, which will eliminate false positives almost completely.
-  - Most important: Learn the phrases, which are defined as input for Jona. Sometimes, only a somewhat different pronounciation is needed, and everything is fine. As a last line of defence, define your own input grammar as described above in the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#phrase-grammars). But doing this will make your upgrade path for future versions much more complicated.
+  - Learn the phrases, which are defined as input for Jona. Sometimes, only a somewhat different pronounciation is needed, and everything is fine. As a last line of defence, define your own input grammar as described above in the section about [phrase grammars](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#phrase-grammars). But doing this will make your upgrade path for future versions much more complicated.
 
 It has been reported, that the system sound volume gets sometimes significantly reduced, when voice recognition is active. In most cases, it will help to enable [*Push-To-Talk*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control), since the sound volume reduction should then only happen while you are holing down the *Push-To-Talk* button. If this does not help, you can try to uncheck the sound enhacement option in the properties dialog of your select Microphone, but you might encounter reduced recognition quality afterwards.
 

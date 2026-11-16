@@ -4,7 +4,9 @@ When it comes to race cars, the vast amount of available settings when developin
 
 Welcome to "Setup Workbench", a new member in the growing collection of tools of the Simulator Controller suite.
 
-Important: "Setup Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Workbench" once using administrator privileges.
+> ###### Important
+>
+> "Setup Workbench" displays various graphs using the Google chart library in an embedded web browser. This web browser, which is part of Windows, must be configured for a given application using a setting in the Windows Registry. In most cases, this setting can be configured automatically by the given application, but in rare cases, admin privileges are required to insert the corresponding key in the registry. If you encounter an error, that the Google library can not be loaded, you must run "Setup Workbench" once using administrator privileges.
 
 ## Settings
 
@@ -34,7 +36,7 @@ Please note, that it is possible to describe and edit several issues at once. "S
 
 Using the "Load..." and "Save..." buttons in the lower left corner of the window, you can store and retrieve your current selection of issues to your hard drive. The current state will also be stored, when you hold down the Control key, while exiting "Setup Workbench". This state can be retrieved again, when you hold down the Control key, while starting "Setup Workbench". Last, but not least, when you load a set of saved issues, you suppress the deletion of all present issues by holding down the Control key as well. But be aware, that there is a restriction for the overall number of issues.
 
-Important: If you are new to car racing or in general feel not comfortable to describe your handling issues, several other and to some extent automatic ways to detect and work on handling issues are available. These are described further down below.
+If you are new to car racing or in general feel not comfortable to describe your handling issues, several other and to some extent automatic ways to detect and work on handling issues are available. These are described further down below.
 
 ### Real-time Issue Analyzer
 
@@ -150,8 +152,6 @@ For each individual issue category, for example *low speed corner entry underste
 When you are satiesfied with the displayed issues, click on "Apply". The analyzer will clear all current issues from the left pane of the "Setup Workbench" and will create new ones for the recorded issues. Please note, that all issues for a given category, for example "Understeer on low speed corner entry", will be combined into one issue in the problem list.
 
 Please be aware that not every handling issue is related to problems with the car setup. Equally often they arise when you are not used to specific characteristics of the car and you are kind of *overdriving* it. The analyzer can help you here as well. Try to drive clean laps as without too much detected over- or understeering events. You will see, that this will feel slower most of the time, but in the end you will be faster.
-
-Final note: I would like to take the opportunity to thank the user "WallyM" of the *Assetto Corsa Competizione* forum, who provided parts of the algorithms used in the handling part of the analyzer.
 
 #### Analyzing handling issues based on saved lap telemetry files
 
@@ -710,9 +710,8 @@ Now you can alter the set of settings handled by the "Setup Workbench". You can 
 
 > ###### Good to know
 >
-> It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
-
-Note: Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have an extensive understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
+> - It is possible to use the asterisk \* as a part of a setting descriptor, but all dots must be included. Example: Bumpstop.\*.\*.\*
+> - Beside given these definitions for a specific car, you can also use similar definitions when introducing a complete new simulator as described below. And, using the same approach, you can modify the characteristics handled by "Simulator Workbench" for a given car or for a complete simulator. But to do this, you must have an extensive understanding of the rules set, which derives setup recommendations on behalf of reported handlind problems.
 
 If you want the new setting to be available in the Setup Editor as well, you will have to define the mapping for the setting.
 

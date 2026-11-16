@@ -30,7 +30,9 @@ This maps the compound identifier "Hard" from *RaceRoom Racing Experience* to th
 	Dry (Green)
 	Dry (Blue)
 
-Note: *Black* is used whenever a simulator does not provide different compound mixtures. Currently, this is the case especially for *Assetto Corsa Competizione*, which provides only one dry and one wet tyre compound. These compounds can also be abbreviated by ommitting the "(Black)" suffix, naming them simply "Dry" or "Wet" or "Immediate".
+> ###### Good to know
+>
+> *Black* is used whenever a simulator does not provide different compound mixtures. Currently, this is the case especially for *Assetto Corsa Competizione*, which provides only one dry and one wet tyre compound. These compounds can also be abbreviated by ommitting the "(Black)" suffix, naming them simply "Dry" or "Wet" or "Immediate".
 
 As you probably expect, the list of internal identifiers for a given race simulator (on the left side of the "->" in the above example) is potentially endless. Most of the time, there are more than one tyre compound available for a given car. Potentially the set of available tyre compounds might even vary depending on a given track, but this is a very special case. Let's take a look at two examples with a couple of available tyre compounds:
 
@@ -118,15 +120,19 @@ You can create your own "Tyre Data.ini" files. Use the above examples as a guide
 
 Please make sure, that you use unique identifiers in the "[Compounds]" section, otherwise you will *overwrite* predefined compounds from the standard files. By the way, this is a possibility to substitute definitions from *standard*, but this is a different story.
 
-Note: Once you have created your own sets of car and tyre compound definitions, you can send them to me. I will incorporate them into the standard distribution with the next release.
+> ###### Good to know
+>
+> Once you have created your own sets of car and tyre compound definitions, you can send them to me. I will incorporate them into the standard distribution with the next release.
 
 #### Settings in the "Session Database"
 
-The other - and to be honest much more convenient - possibility to create a tyre compound mapping for a given car, is by using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Insert a new setting for the car in question and enter the tyre compound mapping as follows:
+The other and to be honest much more convenient way to create a tyre compound mapping for a given car, is by using the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Insert a new setting for the car in question and enter the tyre compound mapping as follows:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Session%20Database%2012.jpg)
 
-Note: The same is true here, you may want to share your definitions with me, so that I can incorporate them into the standard distribution with the next release.
+> ###### Good to know
+>
+> The same is true here, you may want to share your definitions with me, so that I can incorporate them into the standard distribution with the next release.
 
 ## Using Tyre Compounds
 
@@ -167,7 +173,9 @@ Depending on the given car and track combination, and also depending on the pers
 
 where the number specifies the number of laps for which the corresponding tyre compound mixture can be used.
 	
-Important: If a strategy is active or if race rules have been activated in "Race Settings", the values defined there will be used. But any applicable "Pitstop: Tyre Compound Usage" setting will have been used to initialize those values in the first place.
+> ###### Important
+>
+> If a strategy is active or if race rules have been activated in "Race Settings", the values defined there will be used. But any applicable "Pitstop: Tyre Compound Usage" setting will have been used to initialize those values in the first place.
 
 Another way to handle tyre life, which is available in simulators which provide the current tyre wear in the API, is to provide a threshold for the maximum tyre wear (or the minimum available tyre tread depth, whatever you prefer). You can specifiy the default values for the minimum available tyre tread depth in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database) using the ["Pitstop: Minimum tyre tread depth"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#pitstop-settings) setting. The format is similar:
 
@@ -222,4 +230,6 @@ At the time of this writing, tyre changes are planned by the Engineer always for
 
 Additionally, the information about tyre wear and the number of laps driven on a specific tyre will also be collected and processed for each tyre individually. You can use this information in the "Strategy Workbench", for example, or you can create reports in "Solo Center" or "Team Center" using the information about the number of driven laps.
 
-Important: Whenever a single tyre compound is assumed for the whole car, for example, for a strategy simulation, the current compound of the front left tyre is used.
+> ###### Important
+>
+> Whenever a single tyre compound is assumed for the whole car, for example, for a strategy simulation, the current compound of the front left tyre is used.

@@ -30,9 +30,10 @@ The "Solo Center" allows you to save the complete session data for later inspect
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Practice%20Center%2011.JPG)
 
-IMPORTANT: The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
-
-The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
+> ###### Good to know
+>
+> - The data format of saved sessions has changed over time. To load a session in the *old* format (before they have been saved to the session database by default), hold down the Control key, once the session browser is open. You will see that the "Load..." button changes to an "Import..." button.
+> - The "Auto Save" setting in the "Session" mennu allows you to automatically save a session before the window of the "Solo Center" is closed or before a new session will be started. However, doing this will collect a great amount of probably unnecessary data in your session database, therefore choose wisely.
 
 #### Difference between saving a session and exporting data
 
@@ -113,11 +114,10 @@ A valuable tool to improve your lap times is the integrated Telemetry Viewer, wh
 
 While you are in an active session and the Telemetry Viewer is open, car telemetry data will be collected lap by lap in the background and stored in the session. You can use the browser to load the telemetry for a given lap and you can choose a reference lap for comparison. Additionally, you can enable telemetry collection without opening the Telemetry Viewer with holding down the Control key while choosing the "Telemetry..." command from the "Session" menu, so that the command line in the menu is checked.
 
-Note: You can use the "Auto Telemetry" setting, so that telemetry collection is automatically started whenever a new session is started. The Telemetry Viewer window is not opened in this case.
-
 > ###### Good to know
 >
-> The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Solo\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
+> - You can use the "Auto Telemetry" setting, so that telemetry collection is automatically started whenever a new session is started. The Telemetry Viewer window is not opened in this case.
+> - The telemetry data is stored lap by lap in the *Simulator Controller\Temp\Sessions\Solo\Telemetry* folder which is located in your user *Documents* folder. You can use these files in the "Setup Workbench" for analyzing handling issues after a session, for example.
 
 #### Choosing the telemetry provider
 
@@ -125,7 +125,9 @@ The Telemetry Viewer supports two different sources of telemetry data. One, whic
 
 When looking for areas of improvement take a close look to your application of throttle and brakes and the activation of TC and ABS. Trailing off the brakes and the transition back to full throttle is the most important skill to master for fast lap times. This does not mean, that sometimes coasting around a corner is not necessary. Use the Telemetry Viewer to compare your laps with the fastest lap of a given session and learn what exactly made you faster there.
 
-Important: Sessions that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
+> ###### Important
+>
+> Sessions that are saved with telemetry data will NOT be synchronized with the Team Server by default, since the amount of data is quite large and will put a lot of stress on the Team Server. You can still activate the synchronization for a particular session in the "Session Database", but I strongly recommend advise against it.
 
 ###### Notes
 

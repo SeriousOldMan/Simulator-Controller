@@ -360,7 +360,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 		}
 	}
 
-Notes:
+###### Notes
 
 - As said, the available data depends on the current simulator. If available, information about tyre wear, brake temperatures and wear and so on are included as well.
 - The number of laps in the lap history is limited to the 5 recent laps.
@@ -835,8 +835,8 @@ Beside the predefined actions for the different Assistant, which come with the s
 
 ###### Notes
 
-(1) This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.<br>
-(2) This version of "Strategy Recommendation" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it may be triggered, for example, when the Spotter detected, that a direct opponent has entered the pit.
+(1) This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.
+<br>(2) This version of "Strategy Recommendation" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it may be triggered, for example, when the Spotter detected, that a direct opponent has entered the pit.
 
 #### Events
 

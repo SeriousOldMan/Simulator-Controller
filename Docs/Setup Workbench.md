@@ -328,6 +328,8 @@ Most of the recommended setup values will be self-explanatory. The table below w
 | Toe (1)                 | Less toe out / More toe in         | More toe out / Less toe in         |
 | Camber                  | Less negative camber               | More negative camber               |
 
+###### Notes
+
 (1) Most race cars run a little bit of toe in at the rear. The recommendations are based on that assumption. If that is not the case with your car, please reverse the recommendations.
 
 Please be aware, that a long list of change recommendations does not mean that you have to change each and every setting. It rather means, that all these settings have an influence on the given issue. I recommend starting with the setting with the biggest impact and then work through the list step by step while monitoring the resulting change in car handling by driving a few laps after each change.
@@ -662,11 +664,11 @@ The most important part is the "[Setup.Settings.Handler]" section. Here you spec
 	
 	  *decrease_value* takes a *display* value and returns the next value *below* the given value. If there are no more values available, the *lowest* allowed value must be returned.
 	
-	Notes:
+	###### Notes
 	
-	  (1) A *display* value is the value used in the setup editor user interface.<br>
-	  (2) A *raw* value is the value, that is stored in the setup file.<br>
-	  (3) All arguments, that have been passed to the *ScriptHandler* in the car definition file, are available in the global array *Arguments*.
+	  (1) A *display* value is the value used in the setup editor user interface.
+	  <br>(2) A *raw* value is the value, that is stored in the setup file.
+	  <br>(3) All arguments, that have been passed to the *ScriptHandler* in the car definition file, are available in the global array *Arguments*.
 	
 	You can take a look at [this implementation](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Garage/Scripts/DecimalSettingHandler.script) of a handler script for decimal values for an inspiration for your own handler script. Once you have created your script, you can use it in your car definition file like this:
 	

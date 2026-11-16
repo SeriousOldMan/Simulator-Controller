@@ -20,7 +20,9 @@ If you have data for different drivers available in your telemetry database, you
 
 The lower area allows you to create a race strategy. You have to enter the race rules and various settings before you can use the simulation tool to create the required pitstops based on your entered settings and also on the telemetry information. In the lower left part of the window, you find a tabbed pane with several input sections.
 
-Good to know: The chart in the upper area of the "Strategy Workbench" allows you to display different information. You can choose between "Telemetry", "Strategy" and "Comparison" in the "Chart" menu located above the chart area. The default, "Telemetry", displays the information for the currently selected set of data. "Strategy" will display the consumption graph of the currently simulated or selected strategy and "Comparison" displays the report of the last strategy comparison, if any.
+> ###### Good to know
+>
+> The chart in the upper area of the "Strategy Workbench" allows you to display different information. You can choose between "Telemetry", "Strategy" and "Comparison" in the "Chart" menu located above the chart area. The default, "Telemetry", displays the information for the currently selected set of data. "Strategy" will display the consumption graph of the currently simulated or selected strategy and "Comparison" displays the report of the last strategy comparison, if any.
 
 ### Rules & Settings
 
@@ -115,16 +117,18 @@ Loading of settings is supported for:
 
 If you enable "Auto Initialize" in the "Settings" menu, settings will be initialized automatically when a strategy is loaded. And whenever you switch between simulators, cars and/or tracks, the settings will be loaded from the database as described above. Your choice of "Auto Initialize" will be remembered between runs of "Strategy Workbench".
 
-Notes:
+###### Notes
 
-  1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
-  2. If you have set a pitstop window, it is possible that some settings of the optimizer will be ignored to fullfil the pitstop window requirements.
-  3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
-  4. Using the list labeled "Tyre Sets" you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used to determine the best tyre set for each pitstop in the derived strategy. Typically all tyre compound mixtures, which are generally available for a given car are listed here. If a given compound mixture is not available for a particular race or should not be used in the resulting strategy, set the number of available tyre sets to **0**.
+1. If you have set a number of required pitstops **and** a pitstop window, it depends on the starting fuel, whether the requirements can be met.
+2. If you have set a pitstop window, it is possible that some settings of the optimizer will be ignored to fullfil the pitstop window requirements.
+3. If you choose "Disallowed" for refueling or tyre change, this restriction applies to the whole session. If you have to apply more context specific restrictions, this can be achieved using the rule based validations, which are described in the next section.
+4. Using the list labeled "Tyre Sets" you can specify how many laps are typically possible with a give tyre compound mixture and how many tyre sets of each of these are available. This will be used to determine the best tyre set for each pitstop in the derived strategy. Typically all tyre compound mixtures, which are generally available for a given car are listed here. If a given compound mixture is not available for a particular race or should not be used in the resulting strategy, set the number of available tyre sets to **0**.
   
-     Note: If the selected simulator provides information about tyre wear in the data and you already have driven enough laps on the selected track, you can click on the small button with the wheel icon to calculate the number of usable laps for the selected tyre compound.
-  5. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
-  6. Be aware, that only *Automobilista 2* and *Project CARS 2* support sessions with one additional lap after the *normal* end of the session, which can be simulated with "Time + 1" or "Laps + 1" session lengths. 
+   > ###### Good to know
+   >
+   > If the selected simulator provides information about tyre wear in the data and you already have driven enough laps on the selected track, you can click on the small button with the wheel icon to calculate the number of usable laps for the selected tyre compound.
+5. If you are simulating a session with a restricted number of tyre sets, the simulation will keep track of the the tyre usage and may reuse a tyre set, when necessary. In this case, the tyre set with the least amount of usage will always be used next.
+6. Be aware, that only *Automobilista 2* and *Project CARS 2* support sessions with one additional lap after the *normal* end of the session, which can be simulated with "Time + 1" or "Laps + 1" session lengths. 
   
 #### Scenario validation
 
@@ -385,7 +389,9 @@ Using this tab, you can create a kind of a stint plan for the simulated session.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Strategy%20Settings%205.JPG)
 
-Note: If you import the strategy into the "Team Center", the driver information may be used to populate the stint plan for the session in "Team Center".
+> ###### Good to know
+>
+> If you import the strategy into the "Team Center", the driver information may be used to populate the stint plan for the session in "Team Center".
 
 ### Weather
 

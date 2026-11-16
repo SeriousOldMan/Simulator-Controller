@@ -182,7 +182,7 @@ Processing all this information is time consuming by itself, but on a typical ga
 As mentioned, each simulator is different. The Spotter will make as much out of the data supplied by the simulation as possible, as long as a specific information is available, even if it is somewhat restricted. The following table shows you which capability of the Spotter is available in the different simulators.
 
 | Capability                      | Assetto Corsa | Assetto Corsa EVO | Assetto Corsa Competizione | Automobilista 2 | iRacing | RaceRoom Racing Experience | rFactor 2 | Project CARS 2 | Le Mans Ultimate | Project Motor Racing | F1 25     |
-| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- | ------------------------- | ------------------------- |
+| ------------------------------- | --------------| -------------------------- | --------------- | ------- | -------------------------- | --------- | -------------- | ---------------- | ------------------------- | ------------------------- | --------------|
 | Side Alert                      | Yes (1)       | Yes                        | Yes                        | Yes             | Yes     | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
 | Behind Alert                    | Yes           | Yes                        | Yes                        | Yes             | Yes (2) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
 | Accidents Ahead (7)             | Yes           | Yes                        | Yes                        | Yes             | Yes (8) | Yes                        | Yes       | Yes            | Yes              | Yes                       | Yes                       |
@@ -204,40 +204,25 @@ As mentioned, each simulator is different. The Spotter will make as much out of 
 ###### Notes
 
 (1) Due to the way the data acquisition for *Assetto Corsa* works, it is possible that alerts for cars on your side will be given for the wrong side from time to time. I am working on a heuristic to prevent that.
-
-(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. Therefore the decision, whether a car is behind you, is based on the track percentage value of the data interface and is therefore not as precise as in the other simulators.
-
-(3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
-
-(4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, information about cars in other classes, and so on. The warnings for faster or slower cars in multiclass races will be given independent of the configured minimum wait time between shout outs, but you may want to tweak the [setting "Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to the lowest possible value and you can specify the observation range with other settings as well, for example: "Spotter: Forward traffic observation".
-
-(5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
-
-(6) No detailed information for the concrete penalty available.
-
-(7) The distance ahead or behind, for which this is checked and reported can be defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
-
-(8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
-
-(9) iRacing has no information of number of cuts per lap in the available data. It is only detectable in a given point in time, whether the car is off track. It therefore depends on the data sampling frequency, how reliable the detection of track cuts is.
-
-(10) Only in a race session.
-
-(11) Calculating the time gaps between two cars on the track is one of the most complex mathematical problems in sim racing. Even some of the most well-known simulators don't get it right. Simulator Controller, especially the Spotter and also the Strategist, uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please not that this method is not supported for all simulators.
-
-(12) It depends on the simulator, how accurate the provided position data, lap times, gap times, and so on will be. Some simulators will update some or all of this information only once per sector or even less. It will also depend on your configuration, how often this information will be acquired from the simulator and how often the Spotter will provide this information to you. I recommend to start with this configuration choices:
+<br>(2) The iRacing data interface does not provide any real time position information, only a flag whether there are cars on your side. Therefore the decision, whether a car is behind you, is based on the track percentage value of the data interface and is therefore not as precise as in the other simulators.
+<br>(3) The position and timing data provided by the UDP interface of Assetto Corsa Competizione is asynchronous by design. Therefore it might be possible, that the information provided by the Spotter does not reflect the current race situation exactly. It might be possible. for example, that you get a notification, that you now can overtake your opponent although you overtook him just a second ago.
+<br>(4) This includes information when your opponents are going to the pit, when and where it will be best to overtake another car, whether your opponents have a risky driving style, information about cars in other classes, and so on. The warnings for faster or slower cars in multiclass races will be given independent of the configured minimum wait time between shout outs, but you may want to tweak the [setting "Data: Update Frequency"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database" to the lowest possible value and you can specify the observation range with other settings as well, for example: "Spotter: Forward traffic observation".
+<br>(5) This includes a summary of the start performance, final laps announcement, weather updates, best lap acknowledgement and general information about stint, session and fuel limits.
+<br>(6) No detailed information for the concrete penalty available.
+<br>(7) The distance ahead or behind, for which this is checked and reported can be defined in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". Default is 800 meter for accidents ahead and 500 meter for slow cars and accidents behind. The track spline will be learned during the initial laps, depending on the simulator. Therefore accident detection might not be available in this time. See also the special notes for *Assetto Corsa Competizione* below.
+<br>(8) The *iRacing* API does not provide any information about the current speed of all cars on the track, only for the drivers car. Since the crash detection is implemented using an integral over track distance and speed, the algorithm tries to learn the typical speed for each car over time. The detection is therefore not reliable during the first laps.
+<br>(9) iRacing has no information of number of cuts per lap in the available data. It is only detectable in a given point in time, whether the car is off track. It therefore depends on the data sampling frequency, how reliable the detection of track cuts is.
+<br>(10) Only in a race session.
+<br>(11) Calculating the time gaps between two cars on the track is one of the most complex mathematical problems in sim racing. Even some of the most well-known simulators don't get it right. Simulator Controller, especially the Spotter and also the Strategist, uses a sampling method to create a 3-dimensional matrix defined by the distance into track, time into the track and the current speed of each car. This is used to derive an almost perfect estimation of how long it would take the drivers car to reach a specific point on the track. Please not that this method is not supported for all simulators.
+<br>(12) It depends on the simulator, how accurate the provided position data, lap times, gap times, and so on will be. Some simulators will update some or all of this information only once per sector or even less. It will also depend on your configuration, how often this information will be acquired from the simulator and how often the Spotter will provide this information to you. I recommend to start with this configuration choices:
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Spotter%20Config.jpg)
 
 Also use a very low setting for "Data: Update Frequency" of around 2 - 3 seconds in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database). Doing all this, you will create a very verbose Spotter and you can check whether the provided information is accurate. Once you have seen, what information the Spotter provides and how accurate it is for your chosen simulator, you can reduce the frequency of the Spotter callouts again and also choose "Sector" for opponent information, for example. As a side note, the Strategist will update all this information only once per sector, even if available at a higher resolution by the simulator.
-
-(13) Depending on system performance, the session start may be too fast for the AI to catch up and the "Green, Green, Green" shoutout will be skipped.
-
-(14) Not always reported correctly, when UDP packets ar lost du to high frequency events.
-
-(15) This information is not available in the API of *Assetto Corsa EVO* for the current early access version.
-
-(16) The "Green, green, green" shout out may be too late for standing starts.
+<br>(13) Depending on system performance, the session start may be too fast for the AI to catch up and the "Green, Green, Green" shoutout will be skipped.
+<br>(14) Not always reported correctly, when UDP packets ar lost du to high frequency events.
+<br>(15) This information is not available in the API of *Assetto Corsa EVO* for the current early access version.
+<br>(16) The "Green, green, green" shout out may be too late for standing starts.
 
 ##### Accident detection for *Assetto Corsa Competizione*
 

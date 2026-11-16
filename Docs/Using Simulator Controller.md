@@ -535,6 +535,8 @@ To create such a specific set of audio routes, precede the settings with "[Outpu
 	Race
 	Time Trial
 	
+###### Notes
+
 (1) Active, when the simulator is running, but no session has been started (yet).
 	
 You can use an asterisk ("*") for the simulation and also for the session type, which then acts as a wildcard. If no match for the current simulator and session type is found, the default "[Output]" or "[Input]" settings are used. If they are also not configured, the current devices of Windows are used. Examples:

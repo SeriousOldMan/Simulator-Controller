@@ -22,8 +22,31 @@
 
 # Upcoming release
 
-Not yet planned...
+## 7.3.5.0
 
+#### Date: 11/20/26 (planned)
+
+#### Fixes
+
+  - Fixed the state of track sections for track maps created before the introduction of the *Active* state handling. The default should have been active, but a critical bug prevented that. This caused track sections for these track maps to be ignored.
+  - Fixed the display of the laps driven on a specific tyre in the "System Monitor". The value is and was always correct in the underlying data, but the value displayed on the *Session* page of the "System Monitor" was in many cases the number of laps already driven in the current session.
+  - Fixed the same bug for the "Integration" plugin and the data integration with SimHub.
+  - Fixed a bug introduced recently that prevented the zoom factor to be used in the Telemetry Viewer.
+  
+#### Changes
+
+  - Another (and this time final) bunch of improvements and additions for the log book in the "Setup Workbench":
+    - The name of a session entry in the logbook can be changed.
+	- It is possible to create a full report for a session (for printing, for example).
+	- The relative increment values are now shown in the legend of the recommendations chart.
+	- For all this see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) for more information.
+  - The final race review given by the Race Strategist will now be suppressed, when the Strategist is muted or silent.
+  - The documentation has been given a lot of love and many specially marked tips have been included.
+  - [Internal] Migrated to AHK 2.1-alpha.39.
+  - Updated car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - BMW M4 GT3 (fixed the rear wing settings)
+  
 # Release history
 
 ## 7.3.3.0

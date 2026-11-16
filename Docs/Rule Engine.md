@@ -201,9 +201,9 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 
     This predicate compares two values. Allowed operators are **>**, **<**, **=**, **==**, **<=**, **>=**, **!=** and **contains**. Both sides can be variables, facts or literal values (numbers, strings).
 
-    Notes:
-      - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
-      - The operator **contains** requires a string literal value or a *list* for the left side of the comparison. If a string is supplied, it will be split by "," and then is checked whether the right side value is contained in the resulting list.
+    > ###### Good to know
+    > - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
+    > - The operator **contains** requires a string literal value or a *list* for the left side of the comparison. If a string is supplied, it will be split by "," and then is checked whether the right side value is contained in the resulting list.
 
   - Exists Quantor
 

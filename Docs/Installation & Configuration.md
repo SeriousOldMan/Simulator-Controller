@@ -14,19 +14,21 @@ The automatic Installer will always download and install the latest version of S
 
 The same applies, if you want to run an update manually or go back to a previous version. Download the installation package, unzip it at any location you want and run "Install.exe". It will detect that a version of Simulator Controller is alraedy installed on your Computer and will update it accordingly. If you decide to install an earlier version than your current one this way, you might also have to use a backup copy of an earlier version of the *Simulator Controller* folder fron your user *Documents* folder, since there may be incompatibilities in some cases. Additionally, when running a manual installation, it might be necessary to unblock the applications and DLLs afterwars, since Windows may block them against execution. You can do this on the second page of the "Simulator Setup" application as [described further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#unblocking-of-applications--dlls).
 
-Notes: You will find an application "Simulator Download" in the *Binaries* folder. This application is identical to the automated installer mentioned above. Under normal circumstances it is not necessary to run this application on your own, but it might be helpful in situations where automatic updates have been deactivated during the initial installation. The installation options you have chosen during your initial installation will be saved in the file "Simulator Controller.install", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. This file looks like this:
-
-	[Install]
-	Type=Portable
-	Location=D:\Controller
-	[Updates]
-	Automatic=false
-	Verbose=false
-	[Shortcuts]
-	StartMenu=false
-	Desktop=false
-
-You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates. You can also set *[Updates]Verbose* to *true*, if you want the above dialog window appear even during a normal update. Do **not** change any of the other options, please.
+> ###### Technical Mote
+>
+> You will find an application "Simulator Download" in the *Binaries* folder. This application is identical to the automated installer mentioned above. Under normal circumstances it is not necessary to run this application on your own, but it might be helpful in situations where automatic updates have been deactivated during the initial installation and the "Simulator Startup" is not available. The installation options you have chosen during your initial installation will be saved in the file "Simulator Controller.install", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. This file looks like this:
+>
+>	[Install]
+>	Type=Portable
+>	Location=D:\Controller
+>	[Updates]
+>	Automatic=false
+>	Verbose=false
+>	[Shortcuts]
+>	StartMenu=false
+>	Desktop=false
+>
+> You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates. You can also set *[Updates]Verbose* to *true*, if you want the above dialog window appear even during a normal update. Do **not** change any of the other options, please.
 
 After you have installed Simulator Controller for the first time, the system will automatically detect any available newer versions. You will be asked once a day, whenever a new version is available, whether you want to download and install the new version. If you decide to install the newest version, downlaod and installation will be handled automatically for you. It is also posssible here to do the downlaod manually as described above. Unzip the download package and start the "Simulator Tools" application. It will update your installation and will delete the installation files afterwards.
 
@@ -252,8 +254,7 @@ Please note, that you can remove presets later on. But depending on the type of 
 ###### Notes
 
 (1) If *Project Motor Racing* is installed on a console, hold down the left Alt key when clicking on "Locate...". This will allow you to configure *Project Motor Racing*, even when it cannot be found.
-
-(2) Because the EA AntiCheat system *Javelin* does not allow Simulator Controller to be used on the same machine as *F1 25*, hold down the left Alt key when clicking on "Locate..." to configure *F1 25*.
+<br>(2) Because the EA AntiCheat system *Javelin* does not allow Simulator Controller to be used on the same machine as *F1 25*, hold down the left Alt key when clicking on "Locate..." to configure *F1 25*.
 
 #### Patching the configuration
 
@@ -295,7 +296,9 @@ The tool is divided in tabs for each aspect of the configuration process. You wi
 
 Important: Once again, when you change your configuration with "Simulator Configuration", these changes will be unknown to "Simulator Setup" and might therefore be overwritten, whenever you run "Simulator Setup" again, especially when "Simulator Setup" is working on the same configuration item. No problem when you have a deeper knowledge of the inner workings of Simulator Controller, since you will use "Simulator Configuration" for all your configuration tasks, because it is much more powerful. But for the beginners, I recommend to stick with "Simulator Setup" as long as possible.
 
-Hint: Beside simply running the configuration tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down, additional options for developers will be available. These will automatically appear, when an active AutoHotkey installation is detected (by checking, if the folder C:\Program Files\AutoHotkey is available). Second, if you hold the Control key and the Shift key simultaneously  while starting the configuration tool, any currently available configuration file in the *Config* folder will be ignored and you will start with a fresh, completely empty configuration.
+> ###### Good to know
+>
+> Beside simply running the configuration tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down, additional options for developers will be available. These will automatically appear, when an active AutoHotkey installation is detected (by checking, if the folder C:\Program Files\AutoHotkey is available). Second, if you hold the Control key and the Shift key simultaneously  while starting the configuration tool, any currently available configuration file in the *Config* folder will be ignored and you will start with a fresh, completely empty configuration.
 
 ### Using the Configuration tool
 
@@ -433,12 +436,10 @@ ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs
 
 You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with ElevenLabs in the browser. Using the API, however, will require a paid subscription.
 
-Notes:
+###### Notes
 
 1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
-
 2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings).
-
 3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
 
 ###### Yandex

@@ -151,6 +151,8 @@ When a tyre compound will be selected for a given weather condition, the followi
 | Heavy Rain   | Wet               | Wet              |
 | Thunderstorm | Wet               | Wet              |
 
+###### Notes
+
 (1) If no Intermediates are available, Dry Tyres will be recommended in Drizzle conditions and Wet Tyres in Light Rain conditions.
 
 When different mixtures are available for a given tyre type, only the first one will be used in most cases, where the tyre compound is chosen automatically, for example by the Race Engineer. Therefore it is wise, to configure the most suitable mixture in the first place. The same is true for the "Strategy Workbench", unless you limit the number of available tyre sets per mixture and use *Tyre Compound Variation* during the strategy simulation, but it will also choose a tyre compound based on the number of laps for a given stint. If you have configured soft tyres to be usable for 15 laps and a stint has less than these laps, soft tyres will be chosen over hard tyres, which may be used more than these 15 laps. However, in "Team Center", you can manually select the desired tyre compound for the next pitstop.
@@ -209,9 +211,10 @@ All applications of Simulator Controller can handle individual tyre compounds fo
 | RaceRoom Racing Experience | Axle (2)              |
 | All other simulators       | All                   |
 
-(1) Individual tyre changes are supported, but all tyres must be of the same compound.
+###### Notes
 
-(2) No support for chosen pitstop settings provided in the API, so the understanding of tyre compounds in Simulator Controller is very restricted.
+(1) Individual tyre changes are supported, but all tyres must be of the same compound.
+<br>(2) No support for chosen pitstop settings provided in the API, so the understanding of tyre compounds in Simulator Controller is very restricted.
 
 Various applications like the "Solo Center" or the session info widgets in "System Monitor" display tyre compounds. If the tyre compound is identical for all wheels, only a signle tyre compound will be displayed, otherwise tyre compounds will be shown individually for all four wheels or for the axles, depending on the capabilities of the simulator (see above).
 

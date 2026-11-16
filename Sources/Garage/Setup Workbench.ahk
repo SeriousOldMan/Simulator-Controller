@@ -333,7 +333,7 @@ class IssuesEntry extends Logbook.LogbookEntry {
 						</script>
 					)"
 
-					chartFunction := SetupWorkbench.Instance.createSettingsDeltasChart(settings, id)
+					chartFunction := SetupWorkbench.Instance.createSettingsDeltasChart(settings, id, true)
 
 					chartFunction := StrReplace(chartFunction, "%", "\%")
 
@@ -1601,7 +1601,7 @@ class SetupWorkbench extends ConfigurationItem {
 		}
 	}
 
-	createSettingsDeltasChart(settings, id := "id") {
+	createSettingsDeltasChart(settings, id := "id", forLog := false) {
 		local drawChartFunction, names, values, ignore, setting, theMax, index, value
 
 		if (settings && (settings.Length > 0)) {
@@ -1618,7 +1618,11 @@ class SetupWorkbench extends ConfigurationItem {
 			}
 
 			for ignore, setting in settings {
-				names.Push(setting[1])
+				if forLog
+					names.Push(setting[1] . translate(" (") . displayValue("Float", setting[2]) . translate(")"))
+				else
+					names.Push(setting[1])
+
 				values.Push(setting[2])
 			}
 
@@ -6166,7 +6170,10 @@ class LogbookBrowser {
 	}
 
 	windowResized() {
-		this.showEntry(this.iHead, this.iBody)
+		if this.SelectedEntry
+			this.loadEntry(this.SelectedEntry)
+		else
+			this.showEntry(this.iHead, this.iBody)
 	}
 
 	browseLogbooks(fileName) {

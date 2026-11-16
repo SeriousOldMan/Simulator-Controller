@@ -150,13 +150,17 @@ class TelemetryChart {
 		static lastChannels := false
 		static lastWidth := 0
 		static lastHeight := 0
+		static lastWidthZoom := 0
+		static lastHeightZoom := 0
 
 		areaWidth := (chartArea ? chartArea.getWidth() : 0)
 		areaHeight := (chartArea ? chartArea.getHeight() : 0)
 
 		if ((cluster != lastCluster) || (channels != lastChannels)
 									 || (areaWidth != lastWidth)
-									 || (areaHeight != lastHeight))
+									 || (areaHeight != lastHeight)
+									 || (this.WidthZoom != lastWidthZoom)
+									 || (this.HeightZoom != lastHeightZoom))
 			drawerCache.Clear()
 
 		lastCluster := cluster

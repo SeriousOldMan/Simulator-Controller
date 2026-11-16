@@ -410,7 +410,7 @@ If this mode is active, Aiden will not only give you instructions for the corner
 
 1. On-track coaching will also work in restricted mode, i.e. without a GPT connection (see below), but the instructions given to the driver will be quite simple.
 2. You can either use corner by corner coaching or brake point coaching (see below).
-3. On-track coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+3. On-track coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck or by activating it in the tray menu of the "Simulator Controller" process.
 4. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control many details of this coaching mode.
 
    - *Distance before Corner*
@@ -480,7 +480,7 @@ The following video gives you a good demonstration of this:
 ##### Notes
 
 1. This works also in restricted mode, i.e. without a GPT connection (see below).
-2. Line coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+2. Line coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck or by activating it in the tray menu of the "Simulator Controller" process.
 3. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control how precise you have to match the ideal line and where on the track you will get these instructions.
 
    - *Deviation from Ideal Line*
@@ -522,7 +522,7 @@ The following video gives you a good demonstration of this:
 ##### Notes
 
 1. This works also in restricted mode, i.e. without a GPT connection (see below).
-2. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck, and so on.
+2. Brake coaching can be enabled by voice command, by enabling the corresponding function in the [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles), by using a button on your Button Box or Stream Deck or by activating it in the tray menu of the "Simulator Controller" process.
 3. Several [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" let you control what is to be considered hard braking, when trail braking is detected, and so on.
 
    - *Time before Braking Point*

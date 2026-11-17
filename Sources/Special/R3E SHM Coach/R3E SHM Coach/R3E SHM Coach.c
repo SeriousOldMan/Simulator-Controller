@@ -210,7 +210,7 @@ long getTickCount() {
 char* player = "";
 char* workingDirectory = "";
 char* audioDevice = "";
-float volume = 1;
+float volume = 1.0;
 STARTUPINFOA si = { sizeof(si) };
 
 void playSound(char* wavFile, BOOL wait) {
@@ -1775,7 +1775,7 @@ char* chooseSound(int type) {
 }
 
 void playHint(char* sound) {
-	if (strcmp(audioDevice, "null") != 0)) {
+	if (strcmp(audioDevice, "null") != 0)
 		if ((strcmp(audioDevice, "") != 0) || (volume != 1))
 		{
 			if (strcmp(player, "") == 0) {

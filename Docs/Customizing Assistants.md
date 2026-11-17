@@ -12,9 +12,10 @@ The [Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wiki/A
 
 But is also possible to connect the rule based Assistants to a LLM to improve the cnversational capabilities or to alter or even extend the behavior of them. This all can be achieved by configuring the so called Assistant Boosters. The following documentation will give you all information you need to setup the Assistant Boosters.
 
-Note: Seting up a connection to a GPT service and configuring the Assistant Boosters require some knowledge. Customizing the *Conversation* and the *Reasoning* bosters may require even some development skills. If you feel overwhelmed, no problem. Simply leave it aside and use the Assistants without connecting them to a GPT service. The will do their job. Or you can become a Patreon of the project and I will setup everything for you.
-
-Important: Even if you are not using a local LLM Runtime are the resource requirements significantly higher compared to running an Assistant based on the rule engine alone. Therefore take a look at the Windows Task Manager to check whether your system can handle all that while using your favorite simulator.
+> ###### Good to know
+>
+> - Seting up a connection to a GPT service and configuring the Assistant Boosters require some knowledge. Customizing the *Conversation* and the *Reasoning* bosters may require even some development skills. If you feel overwhelmed, no problem. Simply leave it aside and use the Assistants without connecting them to a GPT service. The will do their job. Or you can become a Patreon of the project and I will setup everything for you.
+> - Even if you are not using a local LLM Runtime are the resource requirements significantly higher compared to running an Assistant based on the rule engine alone. Therefore take a look at the Windows Task Manager to check whether your system can handle all that while using your favorite simulator.
 
 ## Connecting an Assistant to a LLM
 
@@ -30,7 +31,9 @@ Please take a look at the documentation for the [Driving Coach](https://github.c
 
 As said, the Driving Coach is a bit different in the sense, that it allows free conversation with a LLM using a GPT service. But it also uses several pattern-based grammars for pre-defined commands like the other Assistants, therefore the Driving Coach is a kind of a hybrid, when it comes to voice interaction. For the pattern-based voice commands, the Driving Coach also supports the *Rephrasing* booster and the *Understanding* booster described a described below.
 
-IMPORTANT: As said in the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to a LLM. Additionally, using a GPT service like OpenAI may create some costs, and running a LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
+> ###### Important
+>
+> As said at the beginning, all this is optional. The Race Assistants will do their job really good even without being connected to a LLM. Additionally, using a GPT service like OpenAI may create some costs, and running a LLM locally on your PC will require a very powerful system, especially when doing this while on the track. Therefore I recommend to use this feature not before everything else has been configured and is fully functional.
 
 Disclaimer: Large Language Models, although incredibly impressive, are still under heavy development. Therefore it depends on the quality and capabilities of the model, whether the Assistant will react like expected. And in most cases, the support for non-English languages is quite limited. I recommend to use the Assistant Booster only for English-speaking Assistants for the time being. Beside that, you will get good results for the *Rephrasing* booster with almost any model, whereas for the *Conversation* or *Reasoning* boosters you will need one of the big boys like GPT 4.1 and above for decent results. The requirements in terms of language understanding is somewhat in between for the *Recognition* booster. You will have to invest some time experimenting with different models, but that is part of the the fun.
 
@@ -38,7 +41,9 @@ Disclaimer: Large Language Models, although incredibly impressive, are still und
 
 Several boosters are available at the moment. The boosters *Rephrasing* and *Understanding* will not introduce additional capabilities or functionality, but will make the conversation more natural. I recommend to start with these boosters.
 
-Good to know: Whenever one or more Assistant Boosters are configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
+> ###### Good to know
+>
+> Whenever one or more Assistant Boosters are configured for a Race Assistant, a transcript of every LLM activation is stored in the *Simulator Controller\Logs\Transcripts* folder which is located in your user *Documents* folder.
 
 ### Rephrasing Booster
 
@@ -56,7 +61,9 @@ If *Understanding* is activated, a GPT is used to semantically analyze your voic
 	 
 There are two *Activation* methods available, both with their pros and cons. "Always" means, that the LLM is always asked to interpret the given command, whereas "Unrecognized" means, that it is only used, when the pattern-based voice recognition cannot identify the command. The later will result in less calls to the LLM and therefore will probably reduce costs and - even more important - will be better in terms of responsiveness, if you are already quite familar with the command patterns.
 
-Note: Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is the case for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
+> ###### Good to know
+>
+> Using the semantic *Understanding* booster may only be usable in conjunction with voice recognition methods, that are cabable to recognize continuous, unstructured text. This is the case for Google and Azure voice recognition, but not for the builtin voice recognition of Windows, which only work reliable for pattern-based recognition.
 
 ### Conversation Booster
 
@@ -358,7 +365,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 		}
 	}
 
-Notes:
+###### Notes
 
 - As said, the available data depends on the current simulator. If available, information about tyre wear, brake temperatures and wear and so on are included as well.
 - The number of laps in the lap history is limited to the 5 recent laps.
@@ -368,7 +375,9 @@ Additionally, you can allow the LLM to *call* [predefined or custom actions](htt
 
 Please be aware that you are talking to an AI based on GPT technology when using the *Conversation* booster. And AIs can lie or can give wrong answers. More details on that can be found below in the [How it works section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#how-it-works). To indicate that the upcoming answer will be generated by a LLM using the the *Conversation* booster, a short sound is played before the answer is given. As with the *Push-to-Talk* sound, you can route this acknowledge sound to a different device in a streaming setup, if required.
 
-IMPORTANT: When action handling is enabled, it might be necessary to disable the *Understanding* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM giving you an answer based on the supplied knowledge or even creating a custom action plan.
+> ###### Important
+>
+> When action handling is enabled, it might be necessary to disable the *Understanding* booster or at least set the "Creativity" to a very low value. Otherwise the *Understanding* booster might detect a command pattern, which will match to a pre-defined voice command, thereby preventing the LLM giving you an answer based on the supplied knowledge or even creating a custom action plan.
 
 #### Examples
 
@@ -388,7 +397,9 @@ The *Reasoning* booster implements a LLM agent framework architecture also used 
 
 As already mentioned, you can choose a different LLM for this booster, because here strong reasoning skills are way more important than conversational excellence. Additionally, a LLM used for the *Reasoning* booster must support tool calling.
 	 
-Important: This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the chosen large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
+> ###### Important
+>
+> This booster directly alters the behavior of the Assistant for the good or for the bad. Even if you don't change or extend the definition of the events and actions, it still depends on the reasoning capabilities of the chosen large language model, whether the Assistant will behave as expected. Therefore, always test everything before using it in an important race.
 
 As a special case can the *Reasoning* booster also be used to extend the rules of the Assistant as such, without using a LLM. To do this, use the "Rules" provider. In this case, you must write rules for each event to be handled. These rules then can either handle the event directly or you can define actions and trigger them from the event rule by calling the "Assistant.Trigger" function / predicate as described below.
 
@@ -444,9 +455,9 @@ Below you find all instruction categories and the supported variables:
 
 ###### Notes
 
-(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.<br>
-(2) Only English instructions are available for the *Reasoning* booster, since this LLM will never interact with the user using speech.<br>
-(3) Some Assistants will have *internal* instructions for special behavior (for example the "Pitstop Planning" event of the Race Engineer. To inspect and/or modify this instructions, hold down the Control key when clicking on the "Instructions..." button.
+(1) Each phrase is available in different languages, for example "Rephrase (DE)" for the German version.
+<br>(2) Only English instructions are available for the *Reasoning* booster, since this LLM will never interact with the user using speech.
+<br>(3) Some Assistants will have *internal* instructions for special behavior (for example the "Pitstop Planning" event of the Race Engineer. To inspect and/or modify this instructions, hold down the Control key when clicking on the "Instructions..." button.
 
 ### Answer Filter
 
@@ -454,7 +465,9 @@ Some models, especially *smaller* ones, cannot follow all your instructions as r
 
 This script, which is specific for the selected GPT provider, can be created or modified by clicking on the button labeled "Filter...". It will have access to a single global variable named "Answer", which holds the text generated by the model. The script must return the new answer as its single value.
 
-Good to know: During the execution of the script you can use the *extern* function to call any global *AutoHotkey* object in the current process. Example: extern("showMessage")("Hello World!"). Beside calling functions, *extern* can also be used to access any global variable in that process.
+> ###### Good to know
+>
+> During the execution of the script you can use the *extern* function to call any global *AutoHotkey* object in the current process. Example: extern("showMessage")("Hello World!"). Beside calling functions, *extern* can also be used to access any global variable.
 
 Example: For the *problem* mentioned above, when a model prepends a "New text: " for every text generated by the *Rephrasing* booster, the filter script will be as simple as:
 
@@ -526,7 +539,9 @@ Additionally you can export and import actions here to build a library for you a
    
    Additionally to all the information required by the LLM function definition you can specify whether the corresponding action will be available during the learning phase of the Assistant and whether the Assistant will acknowledge your request like it is done with many of the builtin voice commands. As a rule of thumb. this should be enabled for all actions you want to trigger by a corresponding question or command and should be disabled for all functions you expect the LLM to call automatically whenever needed.
    
-   Note: The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
+   > ###### Good to know
+   >
+   > The description of a function and each of their parameters is very important, since these are used by the LLM to *understand* when and how to invoke the function. It may require several iterations and different formulations until the LLM reacts as desired. 
 
 2. When the LLM decides to call such a function, it returns a special response which indicates the function(s) to be called together with values for at least all required parameters. You can now decide what to do, when the logical function is called by the LLM. Four different types of actions are available:
 
@@ -596,7 +611,9 @@ Additionally you can export and import actions here to build a library for you a
 
    Here you can use (Call: *Assistant.Call*(function, arg1, ..., pn)), if more than 6 arguments should be passed to the function. Same applies to any other of the above *calls*.
    
-   Good to know: During the execution of a rule you can use the *execute* action / predicate not only to call batch files and executable, but you can also run any script defined in the *Lua* scripting language. The arguments passed to the script will be available in the global array *Arguments*. Since the script is run in the host process it will have access to the same global functions as defined for "Assistant Script" *Action Type* below.
+   > ###### Good to know
+   >
+   > During the execution of a rule you can use the *execute* action / predicate not only to call batch files and executables, but you can also run any script defined in the *Lua* scripting language. The arguments passed to the script will be available in the global array *Arguments*. Since the script is run in the host process it will have access to the same global functions as defined for the "Assistant Script" *Action Type* below.
 
 4. Equally useful as "Assistant Rule" is "Assistant Script" and since *Lua* is a widespread scripting language, it may be more accessible to the typical user. When defining the script for a custom action, you can use the following functions to connect to the given Assistant or even the "Simulator Controller.exe" process:
    
@@ -754,7 +771,9 @@ As a last example, the following event rules can be used the Engineer, for examp
  
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you can use in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 
-Good to know: When an event handler is located for a given event signal, custom events are checked before all predefined events. This allows for customization of the predefined events.
+> ###### Good to know
+>
+> When an event handler is located for a given event signal, custom events are checked before all predefined events. This allows for customization of the predefined events.
 
 ## Predefined Actions & Events
 
@@ -784,7 +803,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Pressure Loss Warning     | 1. [Required] tyre<br>2. [Required] lostPressure | No | Yes | Typically activated when a pressure loss has been detected in the telemetry data. There is an event available, that signals pressure loss. *tyre* must be one of "FL", "FR", "RL" and "RR" and *lostPressure* must be the amount of lost pressure in PSI. |
 | Weather Reporting (1)       | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 
-##### Notes
+###### Notes
 
 (1) Not available, when the Race Strategist is active.
 
@@ -806,7 +825,7 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Rain Stopped                | - | This event is signalled, if rain just stopped. |
 | Pitstop Planning            | 1. [Optional] targetLap<br>2. [Optional] refuelAmount<br>3. [Optional] tyreChange<br>4. [Optional] repairs | This event, if enabled, will route the request to plan an upcoming pitstop to the LLM together with all available data about the session and car state. The LLM acting as a LAM (aka large action model) in this case, may come up with a better pitstop plan, especially for tyre changes, than the internal rule engine. But this depends on the capabilities of the configured LLM, so be careful and use enable at your own risk. Please note, that this approach will not be used in all cases, for example, if the requests was created remotely in the "Team Center". |
 
-##### Notes
+###### Notes
 
 (1) Not available, when the Race Strategist is active.
 
@@ -825,10 +844,10 @@ Beside the predefined actions for the different Assistant, which come with the s
 | Strategy Update | [Optional] strategy    | No | Yes | Loads the given strategy supplied in textual JSON format and informs the driver about a new available strtegy. This action is triggered by the "Strategy Recommendation" event and must be enabled together with this event. It is only meant to be called in this context and must be called even if the strategy is unchanged. In this case no argument for *strategy* must be passed to the call. |
 | Weather Reporting      | 1. [Required] weather<br>2. [Required] minutes<br>3. [Required] impactsStrategy | No | Yes | Typically activated when an upcoming weather change is detected in the telemetry data. There is an event available, that signals a change in the weather forecast. *weather* must be one of "Dry", "Drizzle", "LightRain", "MediumRain", "HeavyRain" and "Thunderstorm". *minutes* specify the time, when the new weather will arrive and *impactsStrategy* accepts a *Boolean* that indicates, whether a tyre change might be beneficial. |
 
-##### Notes
+###### Notes
 
-(1) This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.<br>
-(2) This version of "Strategy Recommendation" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it may be triggered, for example, when the Spotter detected, that a direct opponent has entered the pit.
+(1) This action is available in the *Conversation* booster. It will recalculate the strategy according to the current race situation and environmental conditions. Will show the same result as the [plugin action "StrategRecommend"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) and the corresponding voice command.
+<br>(2) This version of "Strategy Recommendation" is available in the *Reasoning* booster. It will check whether a pitstop in the next lap is valid in the context of the current strategy and might create some benefit. Therefore it may be triggered, for example, when the Spotter detected, that a direct opponent has entered the pit.
 
 #### Events
 

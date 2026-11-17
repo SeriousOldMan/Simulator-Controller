@@ -3580,7 +3580,7 @@ class RaceEngineer extends RaceAssistant {
 		static pitstopHistory := false
 
 		if knowledgeBase {
-			if (lapNumber != lastLap) {
+			if ((lapNumber != lastLap) || !pitstopHistory) {
 				pitstopHistory := this.createPitstopHistory()
 
 				lastLap := lapNumber
@@ -3599,11 +3599,6 @@ class RaceEngineer extends RaceAssistant {
 					knowledgeBase.setFact("Tyre.RL.Laps", lapNumber)
 					knowledgeBase.setFact("Tyre.RR.Laps", lapNumber)
 				}
-			}
-			else {
-				pitstopHistory := newMultiMap()
-
-				setMultiMapValue(pitstopHistory, "Pitstops", "Count", 0)
 			}
 
 			this.saveSessionInfo(simulator, car, track, lapNumber
@@ -5065,22 +5060,23 @@ class RaceEngineer extends RaceAssistant {
 
 			loop knowledgeBase.getValue("Pitstop.Last") {
 				numPitstops += 1
+				pitstop := A_Index
 
-				pitstopLap := knowledgeBase.getValue("Pitstop." . A_Index . ".Lap", kUndefined)
+				pitstopLap := knowledgeBase.getValue("Pitstop." . pitstop . ".Lap", kUndefined)
 
 				if (pitstopLap != kUndefined) {
 					pitstopLaps := (pitstopLap - lastLap)
 
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Lap", pitstopLap)
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Time"
-								   , Round(knowledgeBase.getValue("Pitstop." . A_Index . ".Time", 0) / 1000))
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".Refuel"
-								   , knowledgeBase.getValue("Pitstop." . A_Index . ".Fuel", 0))
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".Lap", pitstopLap)
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".Time"
+								   , Round(knowledgeBase.getValue("Pitstop." . pitstop . ".Time", 0) / 1000))
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".Refuel"
+								   , knowledgeBase.getValue("Pitstop." . pitstop . ".Fuel", 0))
 
-					tyreCompound := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound", false)
-					tyreCompoundColor := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Compound.Color", false)
+					tyreCompound := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound", false)
+					tyreCompoundColor := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Compound.Color", false)
 
-					tyreSet := knowledgeBase.getValue("Pitstop." . A_Index . ".Tyre.Set", false)
+					tyreSet := knowledgeBase.getValue("Pitstop." . pitstop . ".Tyre.Set", false)
 
 					if tyreCompound {
 						setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Laps", pitstopLaps)
@@ -5094,18 +5090,17 @@ class RaceEngineer extends RaceAssistant {
 						if tyreSets
 							setMultiMapValue(pitstopHistory, "TyreSets", numTyreSets . ".Set", tyreSet)
 
-						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompound", tyreCompound)
-						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreCompoundColor", tyreCompoundColor)
-						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompound", tyreCompound)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreCompoundColor", tyreCompoundColor)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreChange", true)
 
 						if tyreSets
-							setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreSet", tyreSet)
+							setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreSet", tyreSet)
 					}
 					else
-						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", false)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreChange", false)
 
 					tyreChange := false
-					pitstop := A_Index
 
 					if (tyreService = "Axle") {
 						first := true
@@ -5198,24 +5193,24 @@ class RaceEngineer extends RaceAssistant {
 						loop 4
 							tyreLaps[A_Index] += pitstopLaps
 
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontLeft", tyreLaps[1])
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsFrontRight", tyreLaps[2])
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearLeft", tyreLaps[3])
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreLapsRearRight", tyreLaps[4])
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreLapsFrontLeft", tyreLaps[1])
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreLapsFrontRight", tyreLaps[2])
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreLapsRearLeft", tyreLaps[3])
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreLapsRearRight", tyreLaps[4])
 
 					if tyreChange
-						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".TyreChange", true)
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".TyreChange", true)
 
 					if brakeService
-						setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".BrakeChange"
-													   , knowledgeBase.getValue("Pitstop." . A_Index . ".Brake.Change", false))
+						setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".BrakeChange"
+													   , knowledgeBase.getValue("Pitstop." . pitstop . ".Brake.Change", false))
 
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairBodywork"
-								   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Bodywork", false))
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairSuspension"
-								   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Suspension", false))
-					setMultiMapValue(pitstopHistory, "Pitstops", A_Index . ".RepairEngine"
-								   , knowledgeBase.getValue("Pitstop." . A_Index . ".Repair.Engine", false))
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".RepairBodywork"
+								   , knowledgeBase.getValue("Pitstop." . pitstop . ".Repair.Bodywork", false))
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".RepairSuspension"
+								   , knowledgeBase.getValue("Pitstop." . pitstop . ".Repair.Suspension", false))
+					setMultiMapValue(pitstopHistory, "Pitstops", pitstop . ".RepairEngine"
+								   , knowledgeBase.getValue("Pitstop." . pitstop . ".Repair.Engine", false))
 				}
 			}
 

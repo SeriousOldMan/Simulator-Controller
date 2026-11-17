@@ -40,7 +40,9 @@ Only one topic is defined, which is named "Simulator". It defines the following 
 
 The "Session" module for the integrated script engine defines three global objects (named topic in the following documentation), which can be used to access important information about the current session.
 
-Important: This module is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
+> ###### Important
+>
+> This module is only available for scripts running in an Assistant process, either called by the rule engine or as an action in a *Conversation* or *Reasoning* booster.
 
 ### Topics
 

@@ -90,7 +90,9 @@ Literals are represented as a sequence of characters. They can contain almost an
    
       Although it is possible to create a variable which starts with a number like *?42*, this is not recommended.
 	  
-	  Important: The names of variables can also contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *dotted Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
+	  > ###### Important
+	  >
+	  > The names of variables can also contain dots ("."). This is necessary for variables in production rules, that represent the current value of a *dotted Fact* (see previous item). There is a subtle difference between the different rule types, when it comes to dotted variables.
 	  
 	  - When used in production rules the variables *?a.b* and *?a.c* will match to different facts as expected, i.e. they will be bound to the current value of the facts **!a.b** and **!a.c** respectively. Purpose of doing this is to support a pseudo object structure for *Facts*, as mentioned above.
 	  - In reduction rules only the part of the name before the first dot is used to identify a variable, which means that in the same lexical scope (normally the head and tail of one rule) the variables *?a.b*, *?a.c* and actually *?a* as well represent the same entity. But here dotted variables can be used as a part of a composite variable. Example: If the variable *?Person* is already bound to "Peter", the variables *?Person.Mother* and *?Person.Father* will represent the values "Peter.Mother" and "Peter.Father" respectively.
@@ -128,7 +130,9 @@ Rules are made up of expressions. Expressions are complex structures composed of
   
 The different types of expressions are discussed below. In the implementation of the rule engine, expressions are not (yet) fully composable, i.e. elements of expressions cannot be of any type. This is also discussed below.
 
-Important: Literals and expressions conjunctly are also called *terms* in reduction rules.
+> ###### Good to know
+>
+> Literals and expressions conjunctly are also called *terms* in reduction rules.
 
 ##### Lists
 
@@ -144,10 +148,12 @@ The "|" seperates the first element (or elements, if separated by a ",") of the 
 
 	[?firstElement | ?moreElements]
 	
-Good to know: The following two expressions are equivalent.
-
-	[1, 2, 3]
-	[1, 2, 3 | []]
+> ###### Good to know
+>
+> The following two expressions are equivalent.
+>
+>	[1, 2, 3]
+>	<br>[1, 2, 3 | []]
 
 ##### Compounds
 
@@ -199,9 +205,9 @@ The left-hand side of a production rule is evaluated whenever the knowledge base
 
     This predicate compares two values. Allowed operators are **>**, **<**, **=**, **==**, **<=**, **>=**, **!=** and **contains**. Both sides can be variables, facts or literal values (numbers, strings).
 
-    Notes:
-      - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
-      - The operator **contains** requires a string literal value or a *list* for the left side of the comparison. If a string is supplied, it will be split by "," and then is checked whether the right side value is contained in the resulting list.
+    > ###### Good to know
+    > - The operator **=** compares case-insensitive, wherease the operator **==** is case-sensitive.
+    > - The operator **contains** requires a string literal value or a *list* for the left side of the comparison. If a string is supplied, it will be split by "," and then is checked whether the right side value is contained in the resulting list.
 
   - Exists Quantor
 
@@ -428,7 +434,7 @@ but it cannot be unfied with:
 	test(A, foo(?, ?))
 	test(?a, foo([?a, ?b])
 
-Note: In the last example, the unification fails, because *?a* has been bound to **A** in the first step and **A** cannot be unified with the first element of the list in *foo*, which is a **1**.
+In this example, the unification fails, because *?a* has been bound to **A** in the first step and **A** cannot be unified with the first element of the list in *foo*, which is a **1**.
 
 #### Cut and Fail
 
@@ -652,7 +658,9 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Compiles a rule from the given textual rule definition supplied in *rule* and adds it to the active rule set. The internal ID of the rule is unified with the second argument *id*, which can be used to remove the rule later on using the *removeRule* predicate. *addRule* will fail, when a syntax error is detected. Please note, that the side effect of adding the rule is not undone, when backtracking is performed.
 	
-	Important: When a rule is added to the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
+	> ###### Good to know
+	>
+	> When a rule is added to the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
 	
   - removeRule
   
@@ -660,7 +668,9 @@ The rule engine has some builtin predicates which can be used when formulating r
   
     Removes the rule with supplied *id* from the active rule set. *removeRule* will fail, if *id* is not a vaild rule ID or if a rule with such an ID does not exist. Please note, that the side effect of removing the rule is not undone, when backtracking is performed.
 	
-	Important: When a rule is removed from the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
+	> ###### Good to know
+	>
+	> When a rule is removed from the rule set, all production rules will become flagged for re-evaluation at the end of the current production cycle. This will lead to a full evaluation at the next production cycle.
   
 ### Event-based programming
 

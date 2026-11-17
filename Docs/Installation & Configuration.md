@@ -14,19 +14,21 @@ The automatic Installer will always download and install the latest version of S
 
 The same applies, if you want to run an update manually or go back to a previous version. Download the installation package, unzip it at any location you want and run "Install.exe". It will detect that a version of Simulator Controller is alraedy installed on your Computer and will update it accordingly. If you decide to install an earlier version than your current one this way, you might also have to use a backup copy of an earlier version of the *Simulator Controller* folder fron your user *Documents* folder, since there may be incompatibilities in some cases. Additionally, when running a manual installation, it might be necessary to unblock the applications and DLLs afterwars, since Windows may block them against execution. You can do this on the second page of the "Simulator Setup" application as [described further down below](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#unblocking-of-applications--dlls).
 
-Notes: You will find an application "Simulator Download" in the *Binaries* folder. This application is identical to the automated installer mentioned above. Under normal circumstances it is not necessary to run this application on your own, but it might be helpful in situations where automatic updates have been deactivated during the initial installation. The installation options you have chosen during your initial installation will be saved in the file "Simulator Controller.install", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. This file looks like this:
-
-	[Install]
-	Type=Portable
-	Location=D:\Controller
-	[Updates]
-	Automatic=false
-	Verbose=false
-	[Shortcuts]
-	StartMenu=false
-	Desktop=false
-
-You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates. You can also set *[Updates]Verbose* to *true*, if you want the above dialog window appear even during a normal update. Do **not** change any of the other options, please.
+> ###### Technical Mote
+>
+> You will find an application "Simulator Download" in the *Binaries* folder. This application is identical to the automated installer mentioned above. Under normal circumstances it is not necessary to run this application on your own, but it might be helpful in situations where automatic updates have been deactivated during the initial installation and the "Simulator Startup" is not available. The installation options you have chosen during your initial installation will be saved in the file "Simulator Controller.install", which is located in the *Simulator Controller\Config* folder in your user *Documents* folder. This file looks like this:
+>
+>	[Install]
+>	Type=Portable
+>	Location=D:\Controller
+>	[Updates]
+>	Automatic=false
+>	Verbose=false
+>	[Shortcuts]
+>	StartMenu=false
+>	Desktop=false
+>
+> You are allowed to change the *[Updates]Automatic* option with a text editor, if you change your mind regarding automatic updates. You can also set *[Updates]Verbose* to *true*, if you want the above dialog window appear even during a normal update. Do **not** change any of the other options, please.
 
 After you have installed Simulator Controller for the first time, the system will automatically detect any available newer versions. You will be asked once a day, whenever a new version is available, whether you want to download and install the new version. If you decide to install the newest version, downlaod and installation will be handled automatically for you. It is also posssible here to do the downlaod manually as described above. Unzip the download package and start the "Simulator Tools" application. It will update your installation and will delete the installation files afterwards.
 
@@ -136,8 +138,6 @@ The Assistants acquire telemetry data from the different simulation games using 
 
 The startup process of Simulator Controller can entertain you with nice images and even play videos and emotional songs while starting all the components or your favorite simulation game (no worry, this can be completely switched off using the [configuration tool](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#configuration), if you prefer a more reduced kind of life style). The standard distribution comes with some default media from the GT3 world, but, since every racer or even pilot might have a different taste, you can install your own media files. You will find all the standard media files in the *Resources\Splash Media* folder. For your own media, you can use any JPG, GIF, WAV or MP3 files, as long as the pictures and videos adhere to a strict 16:9 format. Last but not least, you can use the settings editor to choose between picture carousel or GIF animation, whether to play one of the sound files during startup, and so on. To keep the standard distribution clean, a *Simulator Controller\Splash Media* folder will be created by the configuration tool in your standard *Documents* folder, where you can store your media files. The "Simulator Configuration" tool allows you to [create a splash screen](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor) from all these files, which then can be selected for the various applications as default splash screen.
 
-Note: Choosing media files depending on the currently selected simulation game is on the wish list for a future release :-)
-
 ### Using your own sounds for confirmation sounds
 
 Many Simulator Controller applications use confirmation sounds to inform you of certain events. For example, if you have pressed the *Push-To-Talk* button, you will hear a silent notification tone, which informs you, that the system is listening now. These sounds are stored in the folder *Resources\Sounds*, which is located in the program folder. If you want to change a given sound, you can place your own sound using the same name in the folder *Simulator Controller\Sounds*, which is located in your user *Documents* folder.
@@ -189,28 +189,30 @@ Three files will be created by the "Simulator Setup" tool at the end of the inst
 
 As already said, I recommend to stick to this tool for all your configuration tasks, unless you have a configuration need, which cannot be handled by "Simulator Setup". Please note, that some configuration changes that you make with the "Simulator Configuration" tool, which is described in the following sections, will be overwritten, if you use "Simulator Setup" to generate a new configuration afterwards.
 
-Good to know: As said, you can run "Simulator Setup" as often as necessary. During later configuration sessions it might be benefical to skip the initial pages automatically on startup. To do this, you can enter the following two lines into the file "Application Settings.ini" in the *Simulator Controller\Config* folder which resides in the user *Documents* folder:
+> ###### Good to know
+>
+> As said, you can run "Simulator Setup" as often as necessary. During later configuration sessions it might be benefical to skip the initial pages automatically on startup. To do this, you can enter the following two lines into the file "Application Settings.ini" in the *Simulator Controller\Config* folder which resides in the user *Documents* folder:
+>
+>	[Simulator Setup]
+>	StartPage=X
+>
+> Replace *X* with the number of the page you want to jump to on startup. As an alternative, you can also use the internal n ame of the step here:
 
-	[Simulator Setup]
-	StartPage=X
-
-Replace *X* with the number of the page you want to jump to on startup. As an alternative, you can also use the internal name of the step here:
-
-| Step | Name              |
-|------|-------------------|
-| 1    | Start             |
-| 2    | Basic             |
-| 3    | Modules           |
-| 4    | Installation      |
-| 5    | Applications      |
-| 6    | Controller        |
-| 7    | General           |
-| 8    | Simulators        |
-| 9    | Assistants        |
-| 10   | Motion Feedback   |
-| 11   | Tactile Feedback  |
-| 12   | Pedal Calibration |
-| 13   | Finish            |
+> | Step | Name              |
+> |------|-------------------|
+> | 1    | Start             |
+> | 2    | Basic             |
+> | 3    | Modules           |
+> | 4    | Installation      |
+> | 5    | Applications      |
+> | 6    | Controller        |
+> | 7    | General           |
+> | 8    | Simulators        |
+> | 9    | Assistants        |
+> | 10   | Motion Feedback   |
+> | 11   | Tactile Feedback  |
+> | 12   | Pedal Calibration |
+> | 13   | Finish            |
 
 #### Presets & Special Configurations
 
@@ -247,11 +249,10 @@ Please note, that you can remove presets later on. But depending on the type of 
 | F1 25 (2)                   | F1_25.exe            |                                                        |
 | Rennsport                   | Rennsport.exe        |                                                        |
 
-##### Notes
+###### Notes
 
 (1) If *Project Motor Racing* is installed on a console, hold down the left Alt key when clicking on "Locate...". This will allow you to configure *Project Motor Racing*, even when it cannot be found.
-
-(2) Because the EA AntiCheat system *Javelin* does not allow Simulator Controller to be used on the same machine as *F1 25*, hold down the left Alt key when clicking on "Locate..." to configure *F1 25*.
+<br>(2) Because the EA AntiCheat system *Javelin* does not allow Simulator Controller to be used on the same machine as *F1 25*, hold down the left Alt key when clicking on "Locate..." to configure *F1 25*.
 
 #### Patching the configuration
 
@@ -291,15 +292,22 @@ The more comprehensive configuration tool is located in the *Binaries* folder an
 
 The tool is divided in tabs for each aspect of the configuration process. You will find an explanation of each tab and its content below. Before you start experimenting with the configuration tool, be sure to make a backup copy of the current configuration file *Simulator Configuration.ini* in the *Config* folder, just to be safe. Generally, all your changes to the configuration files will be saved to the *Simulator Controller\Config* *Simulator Controller\Translations* folders in your user *Documents* folder.
 
-Important: Once again, when you change your configuration with "Simulator Configuration", these changes will be unknown to "Simulator Setup" and might therefore be overwritten, whenever you run "Simulator Setup" again, especially when "Simulator Setup" is working on the same configuration item. No problem when you have a deeper knowledge of the inner workings of Simulator Controller, since you will use "Simulator Configuration" for all your configuration tasks, because it is much more powerful. But for the beginners, I recommend to stick with "Simulator Setup" as long as possible.
+> ###### Important
+>
+> Once again, when you change your configuration with "Simulator Configuration", these changes will be unknown to "Simulator Setup" for the most part and might therefore be overwritten, whenever you run "Simulator Setup" again, especially when "Simulator Setup" is working on the same configuration item. No problem when you have a deeper knowledge of the inner workings of Simulator Controller, since you will use "Simulator Configuration" for all your configuration tasks, because it is much more powerful. But for the beginners, I recommend to stick with "Simulator Setup" as long as possible.
 
-Hint: Beside simply running the configuration tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down, additional options for developers will be available. These will automatically appear, when an active AutoHotkey installation is detected (by checking, if the folder C:\Program Files\AutoHotkey is available). Second, if you hold the Control key and the Shift key simultaneously  while starting the configuration tool, any currently available configuration file in the *Config* folder will be ignored and you will start with a fresh, completely empty configuration.
+> ###### Good to know
+>
+> Beside simply running the configuration tool by double clicking it, there are two hidden modifiers. First, if you hold the Control key down, additional options for developers will be available. These will automatically appear, when an active AutoHotkey installation is detected (by checking, if the folder C:\Program Files\AutoHotkey is available). Second, if you hold the Control key and the Shift key simultaneously  while starting the configuration tool, any currently available configuration file in the *Config* folder will be ignored and you will start with a fresh, completely empty configuration.
 
 ### Using the Configuration tool
 
 The configuration tool consists of several pages or tabs. Below you will find a description of each tab. Beside the pages, there are the well known buttons "Ok", "Cancel" and "Apply".
 
-Note: You will find field labels that look like well known hyperlinks at several places in the configuration tool. Yes, you can click on them and a context sensitive section of the this documentation will be opened in your browser. With the *Save* mode dropdown menu in the lower left corner of the configuration dialog you can choose between *Manual* and *Automatic* save mode of all your changes to list items in the different editors.
+> ###### Good to know
+>
+> - You will find field labels that look like well known hyperlinks at several places in the configuration tool. Yes, you can click on them and a context sensitive section of this documentation will be opened in your browser.
+> - With the *Save* mode dropdown menu in the lower left corner of the configuration dialog you can choose between *Manual* and *Automatic* save mode of all your changes to list items in the different editors.
 
 #### Tab *General*
 
@@ -309,7 +317,9 @@ As the name of this tab suggests, some very general configuration options are pr
 
 The second group, *Settings* allows you to choose whether the Simulator Controller will start together with Windows and whether it will run silently, i.e. without any splash animation or sound. With the button "Splash Screens..." you can jump to a special editor to customize the splash screens of various applications of Simulator Controller. See the chapter on the [splash screen editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#splash-screen-editor) for a complete explanation of splash screens. Last but not least you may choose a language for all user interface elements. English as the base language and a German translation are part of the Simulator Controller distribution, but you may define your own translations using the [translations editor](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#translations-editor), wich you can open by clicking on the small button next to the language drop down. For a full introduction to translation, see the separate [documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#localization-and-translation).
 
-IMPORTANT: I recommend to not run Simulator Controller in silent mode, until everything has been setup and configured correctly. There are many message windows, that will inform you about configuration errors, but will be suppressed in silent mode to not interfere with the simulators operation.
+> ###### Important
+>
+> I recommend to not run Simulator Controller in silent mode, until everything has been setup and configured correctly. There are many message windows, that will inform you about configuration errors, but will be suppressed in silent mode to not interfere with the simulators operation.
 
 Beside chosing the language for the user interface, you can also choose your preferred units and data formats for all displays and entry fields by clicking on the small button to the left of the language drop down menu. Please see the [next section](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#units-and-formats) for a detailed discussion on using customized units and formats.
 
@@ -341,7 +351,9 @@ This choices are also the default, if you don't change anything here, except lap
 
 Please be also aware, that changing any of the units in the user interface of Simulator Controller does not change the corresponding unit in your simulator. If you set the pressure unit to *Bar* here and your simulator is working with *PSI*, the conversion for all entered values in the applications of Simulator Controller will be handled automatically, but if you look at the info in your simulator, you will still see *PSI*, of course.
 
-Good to know: You can create several named sets of units and formats. The set that is selected here is the default when running applications from "Simulator Startup", but you can switch to a specific set, when starting using a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This can be very helpful, when a simulator is using specific units that cannot be changed and you want Simulator Controller to match those units.
+> ###### Good to know
+>
+> You can create several named sets of units and formats. The set that is selected here is the default when running applications from "Simulator Startup", but you can switch to a specific set, when starting using a [startup profile](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles). This can be very helpful, when a simulator is using specific units that cannot be changed and you want Simulator Controller to match those units.
 
 #### Tab *Voice Control*
 
@@ -394,7 +406,9 @@ Please note, that although you must supply a credit card when registering, you w
 
 After choosing the speech synthesis method, you can choose the concrete voice to be used for voice synthesis. Be careful, a mismatch between chosen language and the selected voice generator will give you very funny results. And not all voices support the SSML format for supplying speed, tonality and so on. Therefore use the "Play" button to find the voices you can use. According to my own experiments, all *Neural* voices can be used without restrictions. For voice output you can set the volume, the pitch and the speed (rate) using the three corresponding sliders.
 
-Good to know: You can use the *Play* button to the left of the voice drop down menu to prelisten the selected voice incl. the current settings of the vocalics and the SoX-based sound post-processing.
+> ###### Good to know
+>
+> You can use the *Play* button to the left of the voice drop down menu to prelisten the selected voice incl. the current settings of the vocalics and the SoX-based sound post-processing.
 
 Quite similar, you can define which recognition engine should be used. I recommend to start with the so called *Desktop* engine, which is built into Windows and needs no installation. If you can't provide the required audio quality and have a lot of recognition errors, please use the *Server* recognition engine as described above. Runtime and language libraries will have been installed by "Simulator Setup" automatically, if you have used the *Basic* setup. Or you can install them manually on the pages for additional software.
 
@@ -404,7 +418,9 @@ You can also use the speech to text capabilities of the Azure Cognitive Services
 
 As an alternative to the Azure cloud services, corresponding Google services are available as well. Similar to the Text to Speech service of Google, this service must be activated before it can be used. However, the free contingent for the Google speech recognition service is only one hour per month, therefore you might prefer the Azure offer.
 
-IMPORTANT: It is necessary to use one of the cloud based speech recognition services or the Whisper Runtime described below, if you want to talk to Aiden, the AI Driving Coach. This is necessary, since the interaction with Aiden does not use pattern based commands, for which the builtin speech recognition engines of Windows are optimized for (the *Desktop* engine can actually handle a bit of free speech, but not very well). The aforementioned speech recognition services of Azure, Google or the free Whisper are way better, when it comes to free speech.
+> ###### Important
+>
+> It is necessary to use one of the cloud based speech recognition services or the Whisper Runtime described below, if you want to talk to Aiden, the AI Driving Coach. This is necessary, since the interaction with Aiden does not use pattern based commands, for which the builtin speech recognition engines of Windows are optimized for (the *Desktop* engine can actually handle a bit of free speech, but not very well). The aforementioned speech recognition services of Azure, Google or the free Whisper are way better, when it comes to free speech.
 
 ###### OpenAI API
 
@@ -427,12 +443,10 @@ ElevenLabs is also supported. Beside offering many voices on its own, ElevenLabs
 
 You can register an account on [ElevenLabs](https://elevenlabs.io) and create an API key for free. This allows you to experiment with ElevenLabs in the browser. Using the API, however, will require a paid subscription.
 
-Notes:
+###### Notes
 
 1. Using *Speed* and *Pitch* variations are not (yet) supported for ElevenLabs voices.
-
 2. When generating voice audio using the ElevenLabs text to speech API, the resolution of the resulting audio can be specified. Supported are sample frequencies of 8000, 16000, 22050, 24000, 44100 and 48000 Hz (with the higher values only supported in the paid tiers). 16000 is used by default, but this can be changed with the "Sample Frequency" setting in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings).
-
 3. In the drop down menu of the available voices, *only* those voices are made available for selection which are tagged as 'default', 'personal' or 'workspace' in ElevenLabs. But it is also possible to use any of the community voices. Find the *voice id* for the particular voice and provide it for the "speaker" parameter of the respective Race Assistant plugin in the low-level configuration. This can either be done in the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) in "Simulator Configuration" or using a [patch file](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#patching-the-configuration) for "Simulator Setup".
 
 ###### Yandex
@@ -445,7 +459,9 @@ For speech synthesis, you must supply an API key and choose a voice (do not chan
 
 For recognition, do not change any of the default values for the *Service URL* as well and also not the *Model*, only supply the API key. A *service* account is also required here.
 
-Important: *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
+> ###### Important
+>
+> *SoX* needs to be installed for the Yandex voice recognition to work and only audio input shorter than 30 seconds may be processed reliably.
 
 ###### Piper
 
@@ -453,7 +469,9 @@ Important: *SoX* needs to be installed for the Yandex voice recognition to work 
 
 You can find extensive documentation for Piper [here](https://thedocs.io/piper1-gpl/) and all voices for the different language are hosted on the [Hugging Face website](https://huggingface.co/rhasspy/piper-voices/tree/main).
 
-Important: Piper must be run as a web server and obviously it must be running during configuration and while Simulator Controller is running.
+> ###### Important
+>
+> Piper must be run as a web server and obviously it must be running during configuration and while Simulator Controller is running.
 
 ###### Whisper Runtime
 
@@ -483,11 +501,10 @@ In either case, when using Whisper Runtime, you can choose between models of dif
 
 If you are using English to interact with all Assistants, you can use one of the models with the ".en" ending. They are much smaller and also a bit faster than their multilingual counterparts.
 
-IMPORTANT:
-
-- If you are using an RTX 50xx GPU, it is currently necessary to tweak the execution of the neural network to use 16-bit floating point numbers. Use the [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings) "Compute Type" and set it to *float16*.
-
-- When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
+> ###### Important
+>
+> - If you are using an RTX 50xx GPU, it is currently necessary to tweak the execution of the neural network to use 16-bit floating point numbers. Use the [core setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#voice-settings) "Compute Type" and set it to *float16*.
+> - When you are using a given model for the first time, it will be downloaded and installed automatically. Depending on the size of the model, this can take a very long time. A progress bar will be opened while downloading (if Whisper is running locally), so be sure to not do this while driving. When running Whisper on a a remote machine, this information will be available in the window of the server process.
  
 ###### Notes
 
@@ -499,12 +516,16 @@ Last, but not least, if you have installed [SoX](http://sox.sourceforge.net/), i
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Sound%20Processing.JPG)
 
-Note: Additionally to this default configuration, you can specify the spoken and recognized language and the voice for each Race Assistant individually using plugin parameters (see the configuration documentation of [Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) or [Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) or [Elisa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter) for more details). Choosing different voices will be helpful to better recognize who is currently talking.
+> ###### Good to know
+>
+> Additionally to this default configuration, you can specify the spoken and recognized language and the voice for each Race Assistant individually using plugin parameters (see the configuration documentation of [Jona](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-engineer) or [Cato](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-race-strategist) or [Elisa](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter) for more details). Choosing different voices will be helpful to better recognize who is currently talking.
 
 With the last option, you have to configure a *Push-To-Talk* function for voice recognition, which will greatly enhance the voice recognition quality and will avoid almost all false positives, if you are not in a very quite environment. The argument to be entered in the field is a key code as defined in the AutoHotkey [key list](https://www.autohotkey.com/docs/KeyList.htm). For example, "LControl" defines the left control key on the keyboard, whereas "4Joy2" defines the second button on your 4th connected hardware controller.
 Using the second entry field *Activation* you can supply a keyword or a complete phrase to focus the voice recognition framework to the commands you defined as voice commands for the controller itself, normally using [controller actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-controller). The recognition language for this activation command will always be the one chosen by the language dropdown menu above. Language translation is supported, but then you have to define all voice commands in English, because this is the base language for all translated languages. For more information on how to use multiple voice *communication partners*, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands).
 
-Good to know: You can also provide a name for the controller to be used in combined commands like "Jim, activate wiper" (when you have defined a custom command "?Activate wiper"), if *Jim* is the name you want to use for your *controller*. The value for the *Activation* field then has to be "Jim: Hi Jim". So you can use "Hi Jim" as single activation phrase, but also can target the controller in a combined phrase directly, as in the example above.
+> ###### Good to know
+>
+> You can also provide a name for the controller to be used in combined commands like "Jim, activate wiper" (when you have defined a custom command "?Activate wiper"), if *Jim* is the name you want to use for your *controller*. The value for the *Activation* field then has to be "Jim: Hi Jim". So you can use "Hi Jim" as single activation phrase, but also can target the controller in a combined phrase directly, as in the example above.
 
 ###### Notes
 
@@ -557,7 +578,9 @@ Special editors are available by clicking on the settings button with the small 
 
 Last but not least, you will find an "Edit Labels & Icons..." button in the lower left corner of this tab. Pressing this button will open a special editor, which allows you to configure the language specific labels and icons for all controller actions. You will find more information on this in the [chapter on controller layout configuration](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#action-labels--icons).
 
-Note: You can deactivate or delete all plugins except *System*. The *System* plugin is required and part of the framework. If you delete one or more of the other plugins here, they will still be loaded by the Simulator Controller, but they won't be activated. On the other hand, if you add a plugin here, but haven't added any plugin code, nothting will happen. And, last but not least, the plugin names given here must be identical to those used in the plugin code. Some sort of primary key, hey. If you have some development skills, see the documentation on [plugin development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for further information.
+> ###### Good to know
+>
+> You can deactivate or delete all plugins except *System*. The *System* plugin is required and included in the framework. If you delete one or more of the other plugins here, they will still be loaded by the Simulator Controller, but they won't be activated. On the other hand, if you add a plugin here, but haven't added any plugin code, nothting will happen. And, last but not least, the plugin names given here must be identical to those used in the plugin code. Some sort of primary key, hey. If you have some development skills, see the documentation on [plugin development](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts) for further information.
 
 #### Tab *Applications*
 
@@ -567,11 +590,12 @@ Simulator Controller can handle as many applications as you want. Beside the sim
 
 There are three diffenrent types of applications, "Core", "Feedback" and "Other". All of these applications are optional, but for the "Core" and "Feedback" category, Simulator Controller is aware of them, either directly or with the help of a plugin, and use them for a better user experience. Since adding "Core" and "Feedback" applications also need some development efforts, the categories cannot be changed by using the configuration tool, which means, that any application added here will be automatically of type "Other". But "Other" applications may be used by the [Launchpad](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-launchpad).
 
-Note: To change the category of an application, you need to directly edit the *Simulator Configuration.ini* file.
+An application must a have a unique name and you must supply the path to the executable file and sometimes also to a special working directory. Also you may supply a [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) according to the AutoHotkey specification. This is used to detect whether the application is running.
 
-An application must a have a unique name, you must supply the path to the executable file and sometimes also to a special working directory, and you may supply a [window title pattern](https://www.autohotkey.com/docs/misc/WinTitle.htm) according to the AutoHotkey specification. This is used to detect whether the application is running.
-
-Second note: Although you cannot delete any application in the "Core" or "Feedback" category, you still can disable them in the [settings for the startup process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
+> ###### Good to know
+>
+> - To change the category of an application, you need to directly edit the *Simulator Configuration.ini* file.
+> - Although you cannot delete any application in the "Core" or "Feedback" category, you still can disable them in the [settings for the startup process](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-process--settings).
 
 For developers: Sometimes you want magic stuff to happen, when an application is started. For example, you may automatically switch to your favorite team channel when starting your voice chat software. This need some code support, which can be provided in a plugin. You *simply* define a function, which handles this special stuff and reference it here in the application configuration. See the plugins [Core Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/Core%20Plugin.ahk), [RST Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/RST%20Plugin.ahk) and [AC Plugin](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Sources/Plugins/AC%20Plugin.ahk) for some examples.
 
@@ -581,18 +605,26 @@ This tab represents the most important, the most versatile and also the most dif
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%204.JPG)
 
-Note: Beginning with Release 2.4, Simulator Controller supports multiple connected hardware controller, like Button Boxes. The functions defined on the *Controller tab* will span all connected controller. So, the first controller might define Button #1 to Button #8 and the second controller will define Button #9 onwards. A single mode can use controls from several controller, but you can also have multiple modes active at the same time, as long as these modes uses controls from distinct controller. See the documentation on the "System" plugin for more information on [how to control multiple simultaneous modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system).
+Beginning with Release 2.4, Simulator Controller supports multiple connected hardware controller, like Button Boxes. The functions defined on the *Controller tab* will span all connected controller. So, the first controller might define Button #1 to Button #8 and the second controller will define Button #9 onwards.
+
+> ###### Good to know
+>
+> A single mode can use controls from several controller, but you can also have multiple modes active at the same time, as long as these modes uses controls from distinct controller. See the documentation on the "System" plugin for more information on [how to control multiple simultaneous modes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Plugins-&-Modes#plugin-system).
 
 In the first step you have to define the controller, Button Boxes, Stream Decks and so on, which will be activated by Simulator Controller, by entering them into the list. Each controller must have a name, which might be displayed on the visual representation and you must chose a layout definition from the dropdown next to the name entry field. Button Box layouts, for example can be configured using a separate tool, which is described in a [dedicated documentation chapter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#button-box-layouts) below. This tool can be opened by pressing the small little button with the three dots next to the dropdown menu. The same applies for [Stream Deck layouts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#stream-deck-layouts).
 
-Note: The order, in which the controller are entered into the given list, establish the order they will initially appear on screen, as long as they have a visual representation, which is the case for Button Boxes. You can move this windows around using the mouse later on.
+> ###### Good to know
+>
+> The order, in which the controller are entered into the given list, establish the order they will initially appear on screen, as long as they have a visual representation, which is the case for Button Boxes. You can move this windows around using the mouse later on.
 
 After you have configured all your controller, you must configure the controller functions, which will be associated with the controls on your hardware controller or which might be triggered by other software systems using hotkeys. For each function and its corrsponding binding, you have to create an entry in the *Functions* list.
 In the *Bindings* group, you define one or two hotkeys and optionally corresponding actions, depending on whether you have defined a unary or binary function type. 2-way toggles and dials need two bindings for the "On" and "Off", respectivly the "Increase" and "Decrease" trigger. The binding of a function happens by defining [hotkeys](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys), which might trigger the given function. You can define more than one hotkey descriptor, separated by the vertical bar "|", for each trigger in the controller tab. This might be useful, if you have several sources, which can trigger a given function. For example you might have a function, which can be triggered by pushing a button on the controller, but also from the keyboard, which might be emulated by another tool, for example a voice recognition software.
 
 Additionally to definining hotkeys for keyboard or controller triggers, you can now use the voice recognition capabilities of Simulator Controller, which were introduced with Release 2.1 for the AI Race Engineer (see [update notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-21) for specific installation information). A voice trigger must be preceeded by "?" and you can use the full [phrase grammar](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#phrase-grammars) capabilities of the voice recognition framework. But in most cases, you will use simple phrases like "?Next Page", which might be used as a voice trigger for the mode switch. Please be aware, that the recognition language uses the language setting, that is chosen in the configuration. As a result, you might have to change your phrases, if you decide to switch to a different language setting in the user interface. Examples can be found below in the [*Hotkeys*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#hotkeys) section.
 
-Note: As already documented in the [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#troubleshooting) section of the documentation for the AI Race Engineer, you will get the best results with a headset.
+> ###### Good to know
+>
+> As already documented in the [troubleshooting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#troubleshooting) section of the documentation for the AI Race Engineer, you will get the best results with a headset.
 
 Beside the hotkey(s), one or more functions may define an [action](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions), which must represent calls to global functions in the scripting language. For all functions managed by plugins, you can leave the action field empty, since in the Simulator Controller framework, actions are represented by instances of [ControllerAction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Classes-Reference#controlleraction-simulator-controllerahk). If you want to have multiple functions be called as actions, they must be separated by the vertical bar "|" as for the hotkey descriptors (";" may be used here as well). 
 
@@ -626,7 +658,9 @@ Beside using the standard Hotkey syntax of AutoHotkey, you can use a special *Ho
 | ?Next mode | This voice *hotkey* will most likely be used to switch the mode on the controller. You simply have to say: "Next Mode". |
 | ?{Please} activate motion | This voice *hotkey* can be used for a function that activates the rig motion. You can say: "Please activate motion", but the "please" is optional, so "Activate motion" will work as well. |
 
-Note: The handling of voice hotkeys follow the general rules of voice commands. Therefore you might need to use *Push-To-Talk* and also activation commands, if you have more than one voice dialog partner configured, for example the AI Race Assistants. Please see the documentation on [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
+> ###### Good to know
+>
+> The handling of voice hotkeys follow the general rules of voice commands. Therefore you might need to use *Push-To-Talk* and also activation commands, if you have more than one voice dialog partner configured, for example the AI Race Assistants. Please see the documentation on [Voice Commands](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands) for more information.
 
 ##### Actions
 
@@ -662,11 +696,13 @@ Many simulation games provide an ingame multiplayer text based chat system. Sinc
 
 It is possible to create chat messages using voice. Using the field *Activation* you can supply a keyword or a complete phrase to focus the voice recognition framework to listen for chat messages. The recognition language for this activation command will be the one chosen by the language dropdown menu in the [*Voice Control* tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-voice-control). Language translation is supported and when used, the chat message will be transferred to the simulator in English.
 
-Note: For more information on how to use multiple voice *communication partners*, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands).
+For more information on how to use multiple voice *communication partners*, see the [corresponding documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#voice-commands).
 
 When the chat is chosen as target for your voice input, each of your *commands* will be interpreted as a message to be sent to the in-game chat. For this to work properly a voice recognition method must be used, which can handle free speech, like Azure or Google.
 
-Good to know: You can also provide a name for the controller to be used in combined commands like "Message, Thanks for letting me pass", if *Message* is the name you want to use for the chat system. The value for the *Activation* field then has to be "Message: Hi Message". So you can use "Hi Message" as single activation phrase, but also can target the chat system in a combined phrase directly, as in the example above.
+> ###### Good to know
+>
+> You can also provide a name for the chat system to be used in combined commands like "Message, Thanks for letting me pass", if *Message* is the name you want to use for the chat system. The value for the *Activation* field then has to be "Message: Hi Message". So you can use "Hi Message" as single activation phrase, but also can target the chat system in a combined phrase directly, as in the example above.
 
 In many cases, you additionally may want to use a set of predefined chat messages, if you have a controller with some buttons to spare for this. These can be defined in the list below. Using the first field below the list, you define the push button function for the given chat message on one of your hardware controllers. You also need to specify a small label text to display on the visual representation of your controller and you specifiy the long chat message, which will be send to the ingame chat system, when the corresponding button is pressed.
 
@@ -721,7 +757,9 @@ Please see the following table for an explanation of the different methods for i
 
 The third group allows you to customize some parts of the statistical algorithms of Jona, the AI Race Engineer. The first field defines the number of laps, Jona uses to populate its data collection. During this period, most of the functions of Jona are not available, but the predictions of dynamic values, like cold tyre pressures, will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of tyre pressures. If you set this to **0**, almost all statistical calculations will fail, what e.g. means that tyre pressures will not be adjusted during a pitstop. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those recent laps. If you want all laps to be considered with equal weight, set this to *0*, whereas a value o *0.2* will weigh each lap with *20%* less than the more recent lap before. *Adjust Lap Time* will inform Jona to use the lap time from the *Race Settings* for special laps like the first one or the lap after a pitstop and the last field *Damage Analysis* defines the number of laps, Jona oberves your lap times after you collected some damage.
 
-Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators. But be aware, that not all simulators might supprt all settings combinations, for example, loading of tyre pressures from the simulation is only supported by *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*.
+> ###### Good to know
+>
+> The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators. But be aware, that restrictions apply depending on the simulator. For example, loading of tyre pressures from the simulation is only supported by *Assetto Corsa Competizione*, *rFactor 2* and *Le Mans Ultimate*.
 
 #### Tab *Race Strategist*
 
@@ -732,9 +770,10 @@ Similar as with the tab for the *Race Engineer*, the dynamic behavior of the [AI
 In the first field, you can select a folder, where the *Race Strategist* will save the race data for after race analysis using the ["Race Reports"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Race-Reports) tool. Whether a report for a specific race will be saved, can be selected with "Save Race Report" setting further down below, which is specific for a given simulator. Choose this simulator with the "Simulator" dropdown menu, before you change one of the settings beneath. Then you can customize some parts of the statistical algorithms of Cato, the AI Race Strategist. The first field defines the number of laps, Cato uses to populate its data collection. During this period, most of the functions of Cato are not available, but the predictions of dynamic values will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of lap times. If you set this to **0**, almost all statistical calculations will fail, what e.g. means that over- or undercut scenarios cannot be evaluated. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those recent laps. If you want all laps to be considered with equal weight, set this to *0*, whereas a value o *0.2* will weigh each lap with *20%* less than the more recent lap before.
 With the "Save Telemetry" setting you specify, whether the telemetry data of the last session will be saved for further analysis in the "Strategy Workbench" tool. Although possible, I do not recommend to use “Ask” here, since it might interfere with a similar question by the Race Engineer to save your tyre pressures. Last, but not least, the "Race Review" drop down allows you to enable or disable a spoken review issued by the Race Strategist, when you have finished your race.
 
-Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the AI Race Strategist as well, as long as no other Assistants are active.
-
-Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
+> ###### Good to know
+>
+> - The settings for loading and saving the *Race Settings* specified on the *Race Engineer* tab apply for the AI Race Strategist as well, as long as no other Assistants are active.
+> - The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
 
 #### Tab *Race Spotter*
 
@@ -744,11 +783,15 @@ Similar as with the tab for the *Race Engineer* and for the *Race Strategist*, t
 
 You can customize some parts of the statistical algorithms of Elisa, the AI Race Spotter, in the first group of fields. The first field defines the number of laps, Elisa uses to populate its data collection. During this period, most of the higher functions of Elisa are not available (an exception are the proximity alerts for nearby cars in dense traffic, this functionality is available rightaway from the start of the engines), but the predictions of dynamic values will be much more precise afterwards. The second field, *Statistical Window*, is also quite important. It defines the number of recent laps, which are used for each and every statistical calculation, for example the standard deviation of lap times. If you set this to **0**, almost all statistical calculations will fail, what e.g. means that traffic based tactical recommendations will not be available. The next field, *Damping Factor*, can be used to influence the calculation weight for each of those recent laps. If you want all laps to be considered with equal weight, set this to *0*, whereas a value o *0.2* will weigh each lap with *20%* less than the more recent lap before.
 
-Note: The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the AI Race Spotter as well, as long as no other Assistants are active.
+> ###### Good to know
+>
+> The settings for loading and saving the *Race Settings* specified on *Race Engineer* tab apply for the AI Race Spotter as well, as long as no other Assistants are active.
 
 Below you will find the groups *Alerts* and *Information & Advices*. There you can enable or disable the individual warnings, messages and announcements of Elisa for the driver. If you don't like, for example, the alerts of Elisa that another car is directly behind you, you can simply switch it off. Most callouts can only be enabled or disabled, but for the periodic distance information regarding your direct opponents you can set the number of laps between each update as well. You can even choose an update each sector, if you want the Spotter to be really verbose. For more information about the individual announcements and alerts, please see the [Spotter documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Spotter#alerts--information). Beside that, you can set a minimum time, Elisa waits before contacting you again with the next information or advice.
 
-Good to know: The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
+> ###### Good to know
+>
+> The little button on the right side of the Simulator dropdown menu lets you replicate the current settings for the chosen simulator to all other simulators.
 
 #### Going deeper into the rabbit hole
 
@@ -784,9 +827,10 @@ With the dropdown menu at the top of the window you can choose any of the availa
 
 The translations editor is useful to supplay alternative texts for a given text in an already available translation according to your personal taste. For a full localization and translation guide, see teh separate [documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Development-Overview-&-Concepts#localization-and-translation).
 
-Note: The original text sometimes has leading and/or trailing spaces. Be sure to include them in the translated text as well, since they are important for formatting.
-
-Important: The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely. And last but not least be careful, if you ever want to edit the translation files directly using a text editor. This editor must be able to handle multibyte files, since the tranlation files are stored in an UTF-16 format.
+> ###### Good to know
+>
+> - The original text sometimes has leading and/or trailing spaces. Be sure to include them in the translated text as well, since they are important for formatting.
+> - The ISO language code and the language name itself cannot be changed, once a new language has been initially saved. So choose them wisely. And last but not least be careful, if you ever want to edit the translation files directly using a text editor. This editor must be able to handle multibyte files, since the tranlation files are stored in an UTF-16 format.
 
 ## Controller Layouts
 
@@ -871,7 +915,9 @@ The configuration file for Stream Deck controller is to some extent similar to t
 
 To connect your Stream Deck(s) with Simulator Controller, you must install the special Stream Deck plugin, which is supplied in the *Utilities\Plugins* folder, which is located in the installation directory of Simulator Controller. Copy the complete folder *de.thebigo.simulatorcontroller.sdplugin* to *%appdata%\Elgato\StreamDeck\Plugins* and restart the Stream Deck software.
 
-Important: If you have used the quick setup method of "Simulator Setup", the plugin might already have been installed.
+> ###### Important
+>
+> If you have used the "Basic" setup method of "Simulator Setup", the plugin might already have been installed.
 
 After you have installed and activated the plugin, create a profile using the special action *Controller Function* supplied by this Stream Deck plugin. It is important that you leave the title of the action blank and set the *Function* to the desired controller function, for example "Buttton.1".
 
@@ -879,9 +925,10 @@ After you have installed and activated the plugin, create a profile using the sp
 
 Please note, that you don't have to place all controller actions on one page, although the above example looks like this. You can even distribute them over several profiles and you may have more then one instance for "Button.3" as well. Therefore, you have total freedom to organize your layout, at least when you directly edit the configuration file. Creating a configuration using the editor is a little bit more restricted for good reason, as we will see. Please be aware, that the Stream Deck Actions automatically adopts to the currently active controller actions, so conventional switching of profiles on the Stream Deck is not necessary as with usual Stream Deck profiles.
 
-Hint: Do you want to automatically switch to the created profile, when Simulator Controller starts up? Easy to achieve, if you start "Simulator Startup" from the Stream Deck itself. Simply use a multi action and switch to the profile just before start "Simulator Startup".
-
-Good to know: You can find a preconfigured Stream Deck profile with 2 pages in the *Profiles* folder in the installation directory of Simulator Controller.
+> ###### Good to know
+>
+> - Do you want to automatically switch to the created profile, when Simulator Controller starts up? Easy to achieve, if you start "Simulator Startup" from the Stream Deck itself. Simply use a multi action and switch to the profile just before start "Simulator Startup".
+> - You can find a preconfigured Stream Deck profile with 2 pages in the *Profiles* folder in the installation directory of Simulator Controller.
 
 After you have setup your Stream Deck profile(s) you have to create "Stream Deck Configuration.ini" file similar to the example above and save it to the *Simulator Controller\Config* folder in your user *Documents* folder. In the "Layouts" section you describe the layout for one or more profiles on one or more connected Stream Deck. The *...Grid* property is simply ignored during runtime, but will be used by the editor to select between a graphical Mini, Standard oder XL layout. Please note, that only "Button.X" function descriptors may be used and that you can leave positions blank.
 
@@ -949,4 +996,6 @@ As you expect, there is a graphical tool to edit this language specific configur
 
 Simulator Controller comes with preconfigured labels for most supported languages, and the icons may speak for themselves. Howerver you are free to change everything according to your own preferences.
 
-Note: This editor can be opened from the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.
+> ###### Good to know
+>
+> This editor can be opened from the ["Plugins" tab](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#tab-plugins) of the configuration tool.

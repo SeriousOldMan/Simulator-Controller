@@ -1775,23 +1775,24 @@ char* chooseSound(int type) {
 }
 
 void playHint(char* sound) {
-	if (strcmp(audioDevice, "") != 0)
-	{
-		if (strcmp(player, "") == 0) {
-			char buffer[512] = "";
-			
-			strcat_s(buffer, 512, "acousticFeedback:");
-			strcat_s(buffer, 512, sound);
+	if (strcmp(audioDevice, "null") != 0)) {
+		if ((strcmp(audioDevice, "") != 0) || (volume != 1))
+		{
+			if (strcmp(player, "") == 0) {
+				char buffer[512] = "";
+				
+				strcat_s(buffer, 512, "acousticFeedback:");
+				strcat_s(buffer, 512, sound);
 
-			sendTriggerMessage(buffer);
+				sendTriggerMessage(buffer);
+			}
+			else
+				playSound(sound, TRUE);
 		}
-		else
-			playSound(sound, TRUE);
-	}
-	else {
-		PlaySoundA(NULL, NULL, SND_FILENAME);
-		PlaySoundA(sound, NULL, SND_FILENAME);
-	}
+		else {
+			PlaySoundA(NULL, NULL, SND_FILENAME);
+			PlaySoundA(sound, NULL, SND_FILENAME);
+		}
 }
 
 void checkLine(int playerID)

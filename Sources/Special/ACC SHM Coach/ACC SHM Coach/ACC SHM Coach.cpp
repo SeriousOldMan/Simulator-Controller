@@ -1265,17 +1265,18 @@ string chooseSound(int type) {
 }
 
 void playHint(string sound) {
-	if (audioDevice != "")
-	{
-		if (player != "")
-			playSound(sound, true);
-		else
-			sendTriggerMessage("acousticFeedback:" + sound);
-	}
-	else {
-		PlaySoundA(NULL, NULL, SND_FILENAME);
-		PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
-	}
+	if (audioDevice != "null")
+		if ((audioDevice != "") || (volume != 1))
+		{
+			if (player != "")
+				playSound(sound, true);
+			else
+				sendTriggerMessage("acousticFeedback:" + sound);
+		}
+		else {
+			PlaySoundA(NULL, NULL, SND_FILENAME);
+			PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
+		}
 }
 
 void checkLine()

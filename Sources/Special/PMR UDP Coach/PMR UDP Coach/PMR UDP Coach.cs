@@ -1362,26 +1362,27 @@ namespace PMRUDPCoach {
 					   ref UDPVehicleTelemetry playerTelemetry)
 		{
 			void playHint(string sound) {
-				if (audioDevice != "")
-				{
-					if (player != "")
-						playSound(sound, false);
-					else
-						SendTriggerMessage("acousticFeedback:" + sound);
-				}
-				else
-				{
-					if (lastPlayer != null)
+				if (!string.Equals(audioDevice, "null", StringComparison.OrdinalIgnoreCase))
+					if ((audioDevice != "") || (volume != 1.0f))
 					{
-						lastPlayer.Stop();
-
-						lastPlayer.Dispose();
+						if (player != "")
+							playSound(sound, false);
+						else
+							SendTriggerMessage("acousticFeedback:" + sound);
 					}
+					else
+					{
+						if (lastPlayer != null)
+						{
+							lastPlayer.Stop();
 
-					lastPlayer = new System.Media.SoundPlayer(sound);
+							lastPlayer.Dispose();
+						}
 
-					lastPlayer.Play();
-				}
+						lastPlayer = new System.Media.SoundPlayer(sound);
+
+						lastPlayer.Play();
+					}
 			}
 			
 			string chooseSound(int type) {

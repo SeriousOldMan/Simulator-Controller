@@ -1491,17 +1491,18 @@ std::string chooseSound(int type) {
 }
 
 void playHint(std::string sound) {
-	if (audioDevice != "")
-	{
-		if (player != "")
-			playSound(sound, true);
-		else
-			sendTriggerMessage(("acousticFeedback:" + sound).c_str());
-	}
-	else {
-		PlaySoundA(NULL, NULL, SND_FILENAME);
-		PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
-	}
+	if (audioDevice != "null")
+		if ((audioDevice != "") || (volume != 1))
+		{
+			if (player != "")
+				playSound(sound, true);
+			else
+				sendTriggerMessage(("acousticFeedback:" + sound).c_str());
+		}
+		else {
+			PlaySoundA(NULL, NULL, SND_FILENAME);
+			PlaySoundA(sound.c_str(), NULL, SND_FILENAME);
+		}
 }
 
 void checkLine(const irsdk_header* header, const char* data, const int playerCarIndex, float trackLength)

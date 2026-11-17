@@ -1407,26 +1407,27 @@ namespace F125UDPCoach {
 		void checkLine(PacketMotionData motion, PacketLapData lapData, int playerIdx)
 		{
 			void playHint(string sound) {
-				if (audioDevice != "")
-				{
-					if (player != "")
-						playSound(sound, true);
-					else
-						SendTriggerMessage("acousticFeedback:" + sound);
-				}
-				else
-				{
-					if (lastPlayer != null)
+				if (!string.Equals(audioDevice, "null", StringComparison.OrdinalIgnoreCase))
+					if ((audioDevice != "") || (volume != 1.0f))
 					{
-						lastPlayer.Stop();
-
-						lastPlayer.Dispose();
+						if (player != "")
+							playSound(sound, true);
+						else
+							SendTriggerMessage("acousticFeedback:" + sound);
 					}
+					else
+					{
+						if (lastPlayer != null)
+						{
+							lastPlayer.Stop();
 
-                    lastPlayer = new System.Media.SoundPlayer(sound);
+							lastPlayer.Dispose();
+						}
 
-                    lastPlayer.PlaySync();
-				}
+						lastPlayer = new System.Media.SoundPlayer(sound);
+
+						lastPlayer.PlaySync();
+					}
 			}
 			
 			string chooseSound(int type) {

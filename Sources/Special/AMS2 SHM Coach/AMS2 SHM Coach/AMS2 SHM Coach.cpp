@@ -111,7 +111,7 @@ inline float vectorLength(float x, float y) {
 std::string player = "";
 std::string workingDirectory = "";
 std::string audioDevice = "";
-float volume = 0;
+float volume = 1;
 STARTUPINFOA si = { sizeof(si) };
 
 void playSound(std::string wavFile, bool wait = true) {
@@ -345,8 +345,8 @@ bool triggerUSOSBeep(std::string soundsDirectory, std::string audioDevice, float
 	else if (usos > understeerLightThreshold)
 		wavFile = soundsDirectory + "\\Understeer Light.wav";
 
-	if (wavFile != "") {
-		if (audioDevice != "") {
+	if ((wavFile != "") && (audioDevice != "null")) {
+		if ((audioDevice != "") || (volume != 1)) {
 			if (player != "")
 				playSound(wavFile, false);
 			else
@@ -1125,23 +1125,24 @@ void checkCoordinates(const SharedMemory* sharedData) {
 						lastGroup = group;
 						lastPhase = phase;
 
-						if (audioDevice != "")
-						{
-							if (player != "")
-								playSound(hintSounds[bestHint], false);
-							else {
-								char buffer[512] = "";
+						if (audioDevice != "null")
+							if ((audioDevice != "") || (volume != 1))
+							{
+								if (player != "")
+									playSound(hintSounds[bestHint], false);
+								else {
+									char buffer[512] = "";
 
-								strcat_s(buffer, "acousticFeedback:");
-								strcat_s(buffer, hintSounds[bestHint].c_str());
+									strcat_s(buffer, "acousticFeedback:");
+									strcat_s(buffer, hintSounds[bestHint].c_str());
 
-								sendTriggerMessage(buffer);
+									sendTriggerMessage(buffer);
+								}
 							}
-						}
-						else {
-							PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
-							PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
-						}
+							else {
+								PlaySoundA(NULL, NULL, SND_FILENAME | SND_ASYNC);
+								PlaySoundA(hintSounds[bestHint].c_str(), NULL, SND_FILENAME | SND_ASYNC);
+							}
 					}
 				}
 			}

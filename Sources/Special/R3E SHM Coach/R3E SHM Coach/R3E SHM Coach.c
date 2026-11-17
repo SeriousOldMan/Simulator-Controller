@@ -175,7 +175,7 @@ inline r3e_float64 vectorLength(r3e_float64 x, r3e_float64 y) {
 char* player = "";
 char* workingDirectory = "";
 char* audioDevice = "";
-float volume = 0;
+float volume = 1;
 STARTUPINFOA si = { sizeof(si) };
 
 void playSound(char* wavFile, BOOL wait) {
@@ -802,8 +802,8 @@ BOOL triggerUSOSBeep(char* soundsDirectory, double usos) {
 	else
 		sound = FALSE;
 
-	if (sound) {
-		if (strcmp(audioDevice, "") != 0) {
+	if (sound && (strcmp(audioDevice, "null") != 0)) {
+		if ((strcmp(audioDevice, "") != 0) || (volume != 1)) {
 			if (strcmp(player, "") == 0) {
 				char buffer[512];
 
@@ -1716,25 +1716,26 @@ void checkCoordinates(int playerID) {
 						lastGroup = group;
 						lastPhase = phase;
 
-						if (strcmp(audioDevice, "") != 0)
-						{
-							if (strcmp(player, "") == 0) {
-								char buffer[512] = "";
-								
-								strcat_s(buffer, 512, "acousticFeedback:");
-								strcat_s(buffer, 512, hintSounds[bestHint]);
+						if (strcmp(audioDevice, "null") != 0)
+							if ((strcmp(audioDevice, "") != 0) || (volume != 1))
+							{
+								if (strcmp(player, "") == 0) {
+									char buffer[512] = "";
+									
+									strcat_s(buffer, 512, "acousticFeedback:");
+									strcat_s(buffer, 512, hintSounds[bestHint]);
 
-								sendTriggerMessage(buffer);
+									sendTriggerMessage(buffer);
+								}
+								else
+									playSound(hintSounds[bestHint], FALSE);
+
+								nextUpdate = time(NULL) + 1;
 							}
-							else
-								playSound(hintSounds[bestHint], FALSE);
-
-							nextUpdate = time(NULL) + 1;
-						}
-						else {
-							PlaySoundA(NULL, NULL, SND_ASYNC);
-							PlaySoundA(hintSounds[bestHint], NULL, SND_ASYNC);
-						}
+							else {
+								PlaySoundA(NULL, NULL, SND_ASYNC);
+								PlaySoundA(hintSounds[bestHint], NULL, SND_ASYNC);
+							}
 					}
 				}
 			}

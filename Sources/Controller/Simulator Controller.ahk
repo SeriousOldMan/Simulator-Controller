@@ -1090,7 +1090,7 @@ class SimulatorController extends ConfigurationItem {
 			else
 				descriptor := "Chat"
 
-			messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", descriptor, "Controller", pid
+			messageSend(kFileMessage, "Voice", "registerVoiceClient:" . values2String(";", descriptor, "Chat", pid
 																						 , activationCommand, "chatActivation" , false, false
 																						 , true, true, true
 																						 , false, false, true, true

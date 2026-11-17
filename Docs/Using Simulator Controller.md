@@ -514,6 +514,7 @@ As you might expect, you can configure voice input as well. There are some addit
 	Race Engineer.AudioDevice=Headset
 	Race Strategist.AudioDevice=Headset
 	Controller.AudioDevice=Headset
+	Chat.AudioDevice=Headset
 
 Supported input routes are:
 
@@ -526,6 +527,7 @@ Supported input routes are:
 | Race Engineer   | All voice output for the Race Engineer.                                                                              |
 | Race Strategist | All voice output for the Race Strategist.                                                                            |
 | Controller      | Listens to the voice commands directly issued to the Controller, for example to switch between track automations.    |
+| Chat            | This input route is used for the voice interaction with an in-game chat system.    |
 
 First you **have to identify** the default audio input device, which should be active whenever no voice input is captured by Simulator Controller (i.e. the *Push-To-Talk* button is not activated). This may be important, when you are using different microphones, for example, because you are streaming your race on a video platform. In the example above, this microphone device is named "Streaming". This setting must be identical to that you have chosen in the Windows settings, otherwise you won't get the desired results.
 

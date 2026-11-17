@@ -42,6 +42,7 @@
 	- For all this see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) for more information.
   - The final race review given by the Race Strategist will now be suppressed, when the Strategist is muted or silent.
   - The documentation has been given a lot of love and many specially marked tips have been included.
+  - [Experts] A new input audio route named "Chat" is supported for the voice interaction with an in-game chat system.
   - [Internal] Migrated to AHK 2.1-alpha.39.
   - Updated car models for "Setup Workbench":
     - Le Mans Ultimate

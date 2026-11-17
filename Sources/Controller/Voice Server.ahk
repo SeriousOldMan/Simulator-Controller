@@ -665,7 +665,7 @@ class VoiceServer extends ConfigurationItem {
 				else {
 					if this.VoiceServer.hasPushToTalk()
 						playSound("VSSoundPlayer", (this.VoiceServer.PushToTalkMode = "Hold") ? talkSound : startTalkSound
-													 , getAudioSettings("Activation"))
+												 , getAudioSettings("Activation"))
 
 					this.iListening := true
 
@@ -1408,7 +1408,7 @@ class VoiceServer extends ConfigurationItem {
 
 				if this.hasPushToTalk()
 					playSound("VSSoundPlayer", (this.PushToTalkMode = "Hold") ? talkSound : startTalkSound
-												 , getAudioSettings("Activation"))
+											 , getAudioSettings("Activation"))
 
 				this.iListening := true
 

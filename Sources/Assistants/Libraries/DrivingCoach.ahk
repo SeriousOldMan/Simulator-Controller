@@ -2688,7 +2688,7 @@ class DrivingCoach extends GridRaceAssistant {
 		local player := requireSoundPlayer("DCTriggerPlayer.exe")
 		local options := ""
 		local sessionDB, code, data, options, telemetry, reference, workingDirectory
-		local exePath, protocol, pid, arguments
+		local exePath, protocol, pid, arguments, audioDevice
 
 		if (!this.iBrakeTriggerPID && simulator && analyzer) {
 			this.iBrakeTriggerFile := temporaryFileName("Brake", "trigger")
@@ -2724,7 +2724,14 @@ class DrivingCoach extends GridRaceAssistant {
 							else
 								workingDirectory := A_WorkingDir
 
-							options := (" `"" . this.AudioSettings.AudioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
+							audioDevice := this.AudioSettings.AudioDevice
+
+							if !audioDevice
+								audioDevice := ""
+							else if (audioDevice = kNull)
+								audioDevice := StrLower(audioDevice)
+
+							options := (" `"" . audioDevice . "`" " . this.AudioSettings.Volume . (player ? (" `"" . player . "`" `"" . workingDirectory . "`"") : ""))
 						}
 
 						if data

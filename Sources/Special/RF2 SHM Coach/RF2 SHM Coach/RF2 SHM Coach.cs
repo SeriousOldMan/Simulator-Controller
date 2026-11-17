@@ -157,13 +157,15 @@ namespace RF2SHMCoach {
 		}
 
 		void playSound(string wavFile, bool wait = true) {
-            try
+            string device = (audioDevice != "") ? ("\"" + audioDevice + "\"") : "";
+			
+			try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
                     FileName = player,
 					WorkingDirectory = workingDirectory,
-                    Arguments = $"\"{wavFile}\" -t waveaudio \"{audioDevice}\" vol {volume}",
+                    Arguments = $"\"{wavFile}\" -t waveaudio {device} vol {volume}",
                     UseShellExecute = false,
                     RedirectStandardOutput = false,
                     RedirectStandardError = false,
@@ -425,8 +427,8 @@ namespace RF2SHMCoach {
 			else
 				return false;
 
-			if (wavFile != "")
-				if (audioDevice != "")
+			if ((wavFile != "") && (!string.Equals(audioDevice, "null", StringComparison.OrdinalIgnoreCase)))
+				if ((audioDevice != "") || (volume != 1.0f))
 				{
 					if (player != "")
 						playSound(wavFile, false);
@@ -1267,26 +1269,27 @@ namespace RF2SHMCoach {
 							lastGroup = hintGroups[bestHint];
 							lastPhase = hintPhases[bestHint];
 
-							if (audioDevice != "")
-							{
-								if (player != "")
-									playSound(hintSounds[bestHint], false);
-								else
-									SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
-							}
-							else
-							{
-								if (lastPlayer != null)
+							if (!string.Equals(audioDevice, "null", StringComparison.OrdinalIgnoreCase))
+								if ((audioDevice != "") || (volume != 1.0f))
 								{
-									lastPlayer.Stop();
-
-									lastPlayer.Dispose();
+									if (player != "")
+										playSound(hintSounds[bestHint], false);
+									else
+										SendTriggerMessage("acousticFeedback:" + hintSounds[bestHint]);
 								}
+								else
+								{
+									if (lastPlayer != null)
+									{
+										lastPlayer.Stop();
 
-								lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
+										lastPlayer.Dispose();
+									}
 
-								lastPlayer.Play();
-							}
+									lastPlayer = new System.Media.SoundPlayer(hintSounds[bestHint]);
+
+									lastPlayer.Play();
+								}
 						}
 					}
 				}
@@ -1618,7 +1621,7 @@ namespace RF2SHMCoach {
 		string audioDevice = string.Empty;
         string player = string.Empty;
         string workingDirectory = string.Empty;
-        float volume = 0;
+        float volume = 1.0f;
 		string hintFile = string.Empty;
 		string hintAudioFiles = string.Empty;
 

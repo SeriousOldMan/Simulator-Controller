@@ -714,7 +714,7 @@ The [AI Driving Coach](https://github.com/SeriousOldMan/Simulator-Controller/wik
 
 Several providers are supported: For "OpenAI" you have to register an [API account](https://openai.com) at OpenAI (it will need a little payment, but $5 will be enough for months of usage, believe me). "Azure" will provide many models of OpenAI as well, but is normally not available to private persons. Almost similar is the provider for "Mistral AI", which uses the same HTTPS-based API connection. In any case, you **must** supply an API key for the service, otherwise the Coach will tell you all the time, that it is currently busy.
 
-For "GPT4All", no authentification is required, but you must enable the local API server in the settings. Please follow the instructions [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#installation) to register with the different GPT providers and get access to your secret API key.
+For "GPT4All", no authentification is required, but you must enable the local API server in the settings. Please follow the instructions [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services) to register with the different GPT providers and get access to your secret API key.
 
 Last, but not least, you can also use a local "LLM Runtime", which executes the LLM on your local PC. In this case, you have to supply a file path pointing to the model file in *GGUF* format.
 

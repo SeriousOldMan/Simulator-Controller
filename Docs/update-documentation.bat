@@ -32,6 +32,7 @@ copy "Strategy Workbench.md" ..\..\Controller.Wiki\Strategy-Workbench.md
 copy "Race Reports.md" ..\..\Controller.Wiki\Race-Reports.md
 copy "Team Center.md" ..\..\Controller.Wiki\Team-Center.md
 copy "Session Database.md" ..\..\Controller.Wiki\Session-Database.md
+copy "GPT Services.md" ..\..\Controller.Wiki\GPT-Services.md
 copy "Driving Coach Commands (EN).md" ..\..\Controller.Wiki\Driving-Coach-Commands-(EN).md
 copy "Race Engineer Commands (EN).md" ..\..\Controller.Wiki\Race-Engineer-Commands-(EN).md
 copy "Race Strategist Commands (EN).md" ..\..\Controller.Wiki\Race-Strategist-Commands-(EN).md

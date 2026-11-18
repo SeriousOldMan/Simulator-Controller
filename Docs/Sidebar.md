@@ -297,6 +297,21 @@
   - [Managing Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)
   - [Predefined Actions & Events](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#predefined-actions--events)
     - [Connecting Events & Actions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#connecting-events--actions)
+  
+[GPT Services](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services)
+------
+  - [Introduction](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#introduction)
+  - [Generic](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#generic)
+  - [OpenAI](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#openai)
+  - [Azure](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#azure)
+  - [Anthropic](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#anthropic)
+  - [Mistral AI](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#mistral-ai)
+  - [Google](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#google)
+  - [Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#yandex)
+  - [OpenRouter](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#openrouter)
+  - [Ollama](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#ollama)
+  - [GPT4All](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#gpt4all)
+  - [LLM Runtime](https://github.com/SeriousOldMan/Simulator-Controller/wiki/GPT-Services#llm-runtime)
 	
 [Team Server](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Team-Server)
 ------

@@ -2058,7 +2058,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		editorGui["settingsTab"].UseTab(2)
 
-		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name"], translate))
+		this.iSessionListView := editorGui.Add("ListView", "x296 ys w360 h433 H:Grow X:Move(0.2) W:Grow(0.8) -Multi -LV0x10 AltSubmit NoSort NoSortHdr", collect(["Source", "Category", "Name", "Date"], translate))
 		this.iSessionListView.OnEvent("Click", chooseSession)
 		this.iSessionListView.OnEvent("DoubleClick", openSession)
 		this.iSessionListView.OnEvent("ItemSelect", navSession)
@@ -3180,7 +3180,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 	loadSessions(select := false) {
 		local window := this.Window
-		local sessions, infos, index, name, info, origi
+		local sessions, infos, index, name, info, origin, data
 
 		this.SessionListView.Delete()
 
@@ -3192,13 +3192,24 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 				origin := this.SessionDatabase.getDriverName(this.SelectedSimulator, origin)
 
-				if (select = name) {
-					this.SessionListView.Add("Select Vis", origin, translate(type), name)
+				if (infos && infos.Has(index)) {
+					date := getMultiMapValue(infos[index], "Session", "Date", kUndefined)
 
-					select := this.StrategyListView.GetCount()
+					if (date != kUndefined)
+						date := FormatTime(date, "ShortDate")
+					else
+						date := translate("-")
 				}
 				else
-					this.SessionListView.Add("", origin, translate(type), name)
+					date := translate("-")
+
+				if (select = name) {
+					this.SessionListView.Add("Select Vis", origin, translate(type), name, date)
+
+					select := this.SessionListView.GetCount()
+				}
+				else
+					this.SessionListView.Add("", origin, translate(type), name, date)
 			}
 		}
 

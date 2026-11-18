@@ -42,6 +42,7 @@
 	- For all this see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) for more information.
   - The final race review given by the Race Strategist will now be suppressed, when the Strategist is muted or silent.
   - The documentation has been given a lot of love and many specially marked tips have been included.
+  - Added a date column to the session list in the "Session Database".
   - [Experts] A new input audio route named "Chat" is supported for the voice interaction with an in-game chat system.
   - [Experts] Improved audio handling for the different coaching modes when audio routes are in effect for the "Driving Coach". Sound volume settings can now be used without specifying an audio device.
   - [Internal] Migrated to AHK 2.1-alpha.39.

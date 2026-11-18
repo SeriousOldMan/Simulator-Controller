@@ -34,21 +34,19 @@ Here is a short video which shows how to configure Simulator Controller for the 
 
 #### Latest release build
 
-[7.3.4.0-release](https://cutt.ly/syPnwocs) (Changes: Setup recommendations are noted in the log book, Removed UTF errors from LMU track names, Grammar correction for Russian language, Fixed settings in "System Monitor", Rework of "Solo Center" startup, Optimized Spotter Multiclass warnings, Select active session in logbook, Fixed coaching restart for session restarts, Fixed unit selection in startup profiles.)
+[7.3.5.0-release](https://cutt.ly/SyA6dHvQ) (Changes: Migrated to AHK 2.1-alpha.39, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU, Fixed active state of track sections, Suppress Strategist race review when muted, Fixed wrong number of tyre laps in "System Monitor", Fixed wrong number of tyre laps in SimHub plugin, Added setting value to chart in logbook, Fixed zoom factor in Telemetry Viewer, Updated documentation, Date column for session list in "Session Database".)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7340) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-734) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7350) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-735) of this version and all the versions you might have skipped, before installing and using this version.
 
 ##### Earlier release builds
 
-[7.3.3.0-release](https://cutt.ly/LyInjDyr) (Changes: More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management, Fixed Assistants grammars.)
+[7.3.4.0-release](https://cutt.ly/syPnwocs) (Changes: Setup recommendations are noted in the log book, Removed UTF errors from LMU track names, Grammar correction for Russian language, Fixed settings in "System Monitor", Rework of "Solo Center" startup, Optimized Spotter Multiclass warnings, Select active session in logbook, Fixed coaching restart for session restarts, Fixed unit selection in startup profiles.)
 
-[7.3.2.0-release](https://cutt.ly/ryYCP1Gt) (Changes: Migrated to AHK 2.1-alpha.37, Extended fixed pitstops in strategy simulation, Fixed Spotter rejoin advice for Polish, Fixed unavailable issues menu in "Setup Workbench", Fixed lap time normalization, New core settng for LMU HTTP timeouts, Fixed a divide by zero in "Setup Workbench".)
+[7.3.3.0-release](https://cutt.ly/LyInjDyr) (Changes: More filtering of "Issues" log book entries, Analyzer runs are noted in the log book, Rework of the R3E pitstop settings management, Fixed Assistants grammars.)
 
 #### Current development build
 
-[7.3.5.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ka8oQyxe?inline=true) (Test build for 7.3.5. Changes: Migrated to AHK 2.1-alpha.39, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU, Fixed active state of track sections, Suppress Strategist race review when muted, Fixed wrong number of tyre laps in "System Monitor", Fixed wrong number of tyre laps in SimHub plugin, Added setting value to chart in logbook, Fixed zoom factor in Telemetry Viewer, Updated documentation, Date column for session list in "Session Database".)
-
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7350) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-735) of this version and all the versions you might have skipped, before installing and using this version.
+None for the moment...
 
 ### Documentation
 

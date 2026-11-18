@@ -39,7 +39,7 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 ## Release 7.3.5
 
-Everything handled automatically.
+No actions required.
 
 ## Release 7.3.4
 

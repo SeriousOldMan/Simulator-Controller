@@ -271,7 +271,7 @@ browseLapTelemetries(ownerOrCommand := false, arguments*) {
 
 					for ignore, name in communityTelemetries
 						if !inList(userTelemetries, name) {
-							info := sessionDB.readTelemetryInfo(simulator, car, track, name, "Community")
+							info := sessionDB.readTelemetryInfo(simulator, car, track, name, ["Community"])
 
 							if info
 								lapTime := lapTimeDisplayValue(getMultiMapValue(info, "Lap", "LapTime", translate("-")))

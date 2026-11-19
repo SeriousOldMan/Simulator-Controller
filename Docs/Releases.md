@@ -1,5 +1,40 @@
 # Latest stable release
 
+## 7.3.5.0
+
+#### Date: 11/20/26
+
+#### Fixes
+
+  - Fixed the state of track sections for track maps created before the introduction of the *Active* state handling. The default should have been active, but a critical bug prevented that. This caused track sections for these track maps to be ignored.
+  - Fixed the display of the laps driven on a specific tyre in the "System Monitor". The value is and was always correct in the underlying data, but the value displayed on the *Session* page of the "System Monitor" was in many cases the number of laps already driven in the current session.
+  - Fixed the same bug for the "Integration" plugin and the data integration with SimHub.
+  - Fixed a bug introduced recently that prevented the zoom factor to be used in the Telemetry Viewer.
+  - Fixed a critical bug in the "Driving Coach", that prevented loading the reference lap in mode "Fastest (incl. Community)" in case of a name conflict.
+  
+#### Changes
+
+  - Another (and this time final) bunch of improvements and additions for the log book in the "Setup Workbench":
+    - The name of a session entry in the logbook can be changed.
+	- It is possible to create a full report for a session (for printing, for example).
+	- The relative increment values are now shown in the legend of the recommendations chart.
+	- For all this see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) for more information.
+  - The final race review given by the Race Strategist will now be suppressed, when the Strategist is muted or silent.
+  - The documentation has been given a lot of love and many specially marked tips have been included.
+  - Added a date column to the session list in the "Session Database".
+  - [Experts] A new input audio route named "Chat" is supported for the voice interaction with an in-game chat system.
+  - [Experts] Improved audio handling for the different coaching modes when audio routes are in effect for the "Driving Coach". Sound volume settings can now be used without specifying an audio device.
+  - [Internal] Migrated to AHK 2.1-alpha.39.
+  - Updated car models for "Setup Workbench":
+    - Le Mans Ultimate
+	  - BMW M4 GT3 (fixed the rear wing settings)
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.3.4.0
 
 #### Date: 11/13/26
@@ -19,38 +54,6 @@
   - Implemented a postprocessor for the several languages (incl. Russian) to handle the singular/plural forms of words like lap, second, minute, etc. related to preceeding numbers.
   - The "Solo Center" will now receive data even if some or all Assistants have been disabled. The available data will be quite restricted, though, if the Assistants are deactivated.
   - Multiclass warnings for cars already very close (less than 1 second distance) will no longer be given by the Spotter. Due to the asynchronous processing, this may prevent in many cases superfluous warnings for cars that already have passed or have been passed.
-
-# Upcoming release
-
-## 7.3.5.0
-
-#### Date: 11/20/26 (planned)
-
-#### Fixes
-
-  - Fixed the state of track sections for track maps created before the introduction of the *Active* state handling. The default should have been active, but a critical bug prevented that. This caused track sections for these track maps to be ignored.
-  - Fixed the display of the laps driven on a specific tyre in the "System Monitor". The value is and was always correct in the underlying data, but the value displayed on the *Session* page of the "System Monitor" was in many cases the number of laps already driven in the current session.
-  - Fixed the same bug for the "Integration" plugin and the data integration with SimHub.
-  - Fixed a bug introduced recently that prevented the zoom factor to be used in the Telemetry Viewer.
-  
-#### Changes
-
-  - Another (and this time final) bunch of improvements and additions for the log book in the "Setup Workbench":
-    - The name of a session entry in the logbook can be changed.
-	- It is possible to create a full report for a session (for printing, for example).
-	- The relative increment values are now shown in the legend of the recommendations chart.
-	- For all this see the [updated documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Setup-Workbench#logbook-browser) for more information.
-  - The final race review given by the Race Strategist will now be suppressed, when the Strategist is muted or silent.
-  - The documentation has been given a lot of love and many specially marked tips have been included.
-  - Added a date column to the session list in the "Session Database".
-  - [Experts] A new input audio route named "Chat" is supported for the voice interaction with an in-game chat system.
-  - [Experts] Improved audio handling for the different coaching modes when audio routes are in effect for the "Driving Coach". Sound volume settings can now be used without specifying an audio device.
-  - [Internal] Migrated to AHK 2.1-alpha.39.
-  - Updated car models for "Setup Workbench":
-    - Le Mans Ultimate
-	  - BMW M4 GT3 (fixed the rear wing settings)
-  
-# Release history
 
 ## 7.3.3.0
 

@@ -5508,9 +5508,6 @@ class LogbookBrowser {
 	iSelectedLogbook := false
 	iSelectedEntry := false
 
-	iHead := false
-	iBody := false
-
 	iResult := false
 
 	class BrowserWindow extends Window {
@@ -5987,9 +5984,6 @@ class LogbookBrowser {
 											  , headerBackColor: this.Window.Theme.TableColor["Header"], frameColor: this.Window.Theme.TableColor["Frame"]})
 		}
 
-		this.iHead := head
-		this.iBody := body
-
 		if (!head && !body) {
 			width := (viewer.getWidth() - 20)
 
@@ -6173,7 +6167,7 @@ class LogbookBrowser {
 		if this.SelectedEntry
 			this.loadEntry(this.SelectedEntry)
 		else
-			this.showEntry(this.iHead, this.iBody)
+			this.showLogbook(this.SelectedLogbook)
 	}
 
 	browseLogbooks(fileName) {

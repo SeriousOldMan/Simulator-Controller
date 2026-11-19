@@ -2346,55 +2346,62 @@ class SessionDatabase extends ConfigurationItem {
 		return Buffer(0)
 	}
 
-	readTelemetryInfo(simulator, car, track, name, scope := "User") {
+	readTelemetryInfo(simulator, car, track, name, scope := ["User"]) {
+		local info := false
+		local userFileName := false
 		local fileName, info
 
 		if !InStr(name, ".telemetry")
 			name .= ".telemetry"
 
-		if (scope = "User") {
+		if !isObject(scope)
+			scope := Array(scope)
+
+		if inList(scope, "User") {
 			fileName := (this.getTelemetryDirectory(simulator, car, track, "User") . name . ".info")
 
-			if !FileExist(fileName) {
+			if FileExist(fileName)
+				return readMultiMap(fileName)
+			else {
 				fileName := (this.getTelemetryDirectory(simulator, car, track, "User") . name)
 
-				if FileExist(fileName) {
-					info := newMultiMap()
-
-					setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-					setMultiMapValue(info, "Origin", "Car", car)
-					setMultiMapValue(info, "Origin", "Track", track)
-					setMultiMapValue(info, "Origin", "Driver", this.ID)
-
-					setMultiMapValue(info, "Telemetry", "Name", name)
-					setMultiMapValue(info, "Telemetry", "Driver", this.ID)
-					setMultiMapValue(info, "Telemetry", "Date", FileGetTime(fileName, "C"))
-					setMultiMapValue(info, "Telemetry", "Identifier", createGuid())
-					setMultiMapValue(info, "Telemetry", "Synchronized", false)
-
-					setMultiMapValue(info, "Access", "Share", this.getShareDefault("Lap Telemetries"))
-					setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Lap Telemetries"))
-
-					writeMultiMap(fileName . ".info", info)
-
-					return info
-				}
-				else
-					return false
+				if FileExist(fileName)
+					userFileName := fileName
 			}
-			else
-				return readMultiMap(fileName)
 		}
-		else {
+
+		if inList(scope, "Community") {
 			fileName := (this.getTelemetryDirectory(simulator, car, track, "Community") . name . ".info")
 
 			if FileExist(fileName)
 				return readMultiMap(fileName)
-			else if FileExist(this.getTelemetryDirectory(simulator, car, track, "Community") . name)
-				return newMultiMap()
-			else
-				return false
 		}
+
+		if userFileName {
+			info := newMultiMap()
+
+			setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+			setMultiMapValue(info, "Origin", "Car", car)
+			setMultiMapValue(info, "Origin", "Track", track)
+			setMultiMapValue(info, "Origin", "Driver", this.ID)
+
+			setMultiMapValue(info, "Telemetry", "Name", name)
+			setMultiMapValue(info, "Telemetry", "Driver", this.ID)
+			setMultiMapValue(info, "Telemetry", "Date", FileGetTime(userFileName, "C"))
+			setMultiMapValue(info, "Telemetry", "Identifier", createGuid())
+			setMultiMapValue(info, "Telemetry", "Synchronized", false)
+
+			setMultiMapValue(info, "Access", "Share", this.getShareDefault("Lap Telemetries"))
+			setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Lap Telemetries"))
+
+			writeMultiMap(userFileName . ".info", info)
+
+			return info
+		}
+		else if (inList(scope, "Community") && FileExist(this.getTelemetryDirectory(simulator, car, track, "Community") . name))
+			return newMultiMap()
+		else
+			return false
 	}
 
 	writeTelemetry(simulator, car, track, name, telemetry, size, share, synchronize
@@ -2839,55 +2846,62 @@ class SessionDatabase extends ConfigurationItem {
 		return Buffer(0)
 	}
 
-	readSetupInfo(simulator, car, track, type, name, scope := "User") {
+	readSetupInfo(simulator, car, track, type, name, scope := ["User"]) {
+		local info := false
+		local userFileName := false
 		local simulatorCode := this.getSimulatorCode(simulator)
-		local fileName, info
+		local fileName
 
 		car := this.getCarCode(simulator, car)
 		track := this.getTrackCode(simulator, track)
 
-		if (scope = "User") {
+		if !isObject(scope)
+			scope := Array(scope)
+
+		if inList(scope, "User") {
 			fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name . ".info")
 
-			if !FileExist(fileName) {
+			if FileExist(fileName)
+				return readMultiMap(fileName)
+			else {
 				fileName := (kDatabaseDirectory . "User\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name)
 
-				if FileExist(fileName) {
-					info := newMultiMap()
-
-					setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-					setMultiMapValue(info, "Origin", "Car", car)
-					setMultiMapValue(info, "Origin", "Track", track)
-					setMultiMapValue(info, "Origin", "Driver", this.ID)
-
-					setMultiMapValue(info, "Setup", "Name", name)
-					setMultiMapValue(info, "Setup", "Type", type)
-					setMultiMapValue(info, "Setup", "Identifier", createGuid())
-					setMultiMapValue(info, "Setup", "Synchronized", false)
-
-					setMultiMapValue(info, "Access", "Share", this.getShareDefault("Car Setups"))
-					setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Car Setups"))
-
-					writeMultiMap(fileName . ".info", info)
-
-					return info
-				}
-				else
-					return false
+				if FileExist(fileName)
+					userFileName := fileName
 			}
-			else
-				return readMultiMap(fileName)
 		}
-		else {
+
+		if inList(scope, "Community") {
 			fileName := (kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name . ".info")
 
 			if FileExist(fileName)
 				return readMultiMap(fileName)
-			else if FileExist(kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name)
-				return newMultiMap()
-			else
-				return false
 		}
+
+		if userFileName {
+			info := newMultiMap()
+
+			setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+			setMultiMapValue(info, "Origin", "Car", car)
+			setMultiMapValue(info, "Origin", "Track", track)
+			setMultiMapValue(info, "Origin", "Driver", this.ID)
+
+			setMultiMapValue(info, "Setup", "Name", name)
+			setMultiMapValue(info, "Setup", "Type", type)
+			setMultiMapValue(info, "Setup", "Identifier", createGuid())
+			setMultiMapValue(info, "Setup", "Synchronized", false)
+
+			setMultiMapValue(info, "Access", "Share", this.getShareDefault("Car Setups"))
+			setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Car Setups"))
+
+			writeMultiMap(userFileName . ".info", info)
+
+			return info
+		}
+		else if (inList(scope, "Community") && FileExist(kDatabaseDirectory . "Community\" . simulatorCode . "\" . car . "\" . track . "\Car Setups\" . type . "\" . name))
+			return newMultiMap()
+		else
+			return false
 	}
 
 	writeSetup(simulator, car, track, type, name, setup, size, share, synchronize
@@ -3066,52 +3080,59 @@ class SessionDatabase extends ConfigurationItem {
 	}
 
 	readStrategyInfo(simulator, car, track, name, scope := "User") {
-		local fileName, info
+		local info := false
+		local userFileName := false
+		local fileName
 
 		if !InStr(name, ".strategy")
 			name .= ".strategy"
 
-		if (scope = "User") {
+		if !isObject(scope)
+			scope := Array(scope)
+
+		if inList(scope, "User") {
 			fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name . ".info")
 
-			if !FileExist(fileName) {
+			if FileExist(fileName)
+				return readMultiMap(fileName)
+			else {
 				fileName := (this.getStrategyDirectory(simulator, car, track, "User") . name)
 
-				if FileExist(fileName) {
-					info := newMultiMap()
-
-					setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
-					setMultiMapValue(info, "Origin", "Car", car)
-					setMultiMapValue(info, "Origin", "Track", track)
-					setMultiMapValue(info, "Origin", "Driver", this.ID)
-
-					setMultiMapValue(info, "Strategy", "Name", name)
-					setMultiMapValue(info, "Strategy", "Identifier", createGuid())
-					setMultiMapValue(info, "Strategy", "Synchronized", false)
-
-					setMultiMapValue(info, "Access", "Share", this.getShareDefault("Race Strategies"))
-					setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Race Strategies"))
-
-					writeMultiMap(fileName . ".info", info)
-
-					return info
-				}
-				else
-					return false
+				if FileExist(fileName)
+					userFileName := fileName
 			}
-			else
-				return readMultiMap(fileName)
 		}
-		else {
+
+		if inList(scope, "Community") {
 			fileName := (this.getStrategyDirectory(simulator, car, track, "Community") . name . ".info")
 
 			if FileExist(fileName)
 				return readMultiMap(fileName)
-			else if FileExist(this.getStrategyDirectory(simulator, car, track, "Community") . name)
-				return newMultiMap()
-			else
-				return false
 		}
+
+		if userFileName {
+			info := newMultiMap()
+
+			setMultiMapValue(info, "Origin", "Simulator", this.getSimulatorName(simulator))
+			setMultiMapValue(info, "Origin", "Car", car)
+			setMultiMapValue(info, "Origin", "Track", track)
+			setMultiMapValue(info, "Origin", "Driver", this.ID)
+
+			setMultiMapValue(info, "Strategy", "Name", name)
+			setMultiMapValue(info, "Strategy", "Identifier", createGuid())
+			setMultiMapValue(info, "Strategy", "Synchronized", false)
+
+			setMultiMapValue(info, "Access", "Share", this.getShareDefault("Race Strategies"))
+			setMultiMapValue(info, "Access", "Synchronize", this.getSynchronizeDefault("Race Strategies"))
+
+			writeMultiMap(fileName . ".info", info)
+
+			return info
+		}
+		else if (inList(scope, "Community") && FileExist(this.getStrategyDirectory(simulator, car, track, "Community") . name))
+			return newMultiMap()
+		else
+			return false
 	}
 
 	writeStrategy(simulator, car, track, name, strategy, share, synchronize

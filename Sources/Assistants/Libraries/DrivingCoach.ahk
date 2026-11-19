@@ -1589,21 +1589,7 @@ class DrivingCoach extends GridRaceAssistant {
 					for ignore, candidate in telemetries {
 						info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
 
-						lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
-
-						if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
-							bestLap := candidate
-							bestLapTime := lapTime
-							bestInfo := info
-						}
-					}
-
-					if (this.LoadReference = "Fastest (incl. Community)") {
-						sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &ignore := false, &telemetries := true)
-
-						for ignore, candidate in telemetries {
-							info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
-
+						if info {
 							lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
 
 							if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
@@ -1613,9 +1599,27 @@ class DrivingCoach extends GridRaceAssistant {
 							}
 						}
 					}
+
+					if (this.LoadReference = "Fastest (incl. Community)") {
+						sessionDB.getTelemetryNames(this.Simulator, this.Car, this.Track, &ignore := false, &telemetries := true)
+
+						for ignore, candidate in telemetries {
+							info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate, ["Community"])
+
+							if info {
+								lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+
+								if (lapTime && ((bestLap == kUndefined) || (lapTime < bestLapTime))) {
+									bestLap := candidate
+									bestLapTime := lapTime
+									bestInfo := info
+								}
+							}
+						}
+					}
 				}
 				else {
-					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, this.LoadReference)
+					info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, this.LoadReference, ["User", "Community"])
 
 					if info {
 						lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
@@ -1766,11 +1770,13 @@ class DrivingCoach extends GridRaceAssistant {
 			for ignore, candidate in telemetries {
 				info := sessionDB.readTelemetryInfo(this.Simulator, this.Car, this.Track, candidate)
 
-				lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
+				if info {
+					lapTime := getMultiMapValue(info, "Lap", "LapTime", false)
 
-				if (lapTime && ((bestDBLap == kUndefined) || (lapTime < bestDBLapTime))) {
-					bestDBLap := candidate
-					bestDBLapTime := lapTime
+					if (lapTime && ((bestDBLap == kUndefined) || (lapTime < bestDBLapTime))) {
+						bestDBLap := candidate
+						bestDBLapTime := lapTime
+					}
 				}
 			}
 

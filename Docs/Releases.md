@@ -10,6 +10,7 @@
   - Fixed the display of the laps driven on a specific tyre in the "System Monitor". The value is and was always correct in the underlying data, but the value displayed on the *Session* page of the "System Monitor" was in many cases the number of laps already driven in the current session.
   - Fixed the same bug for the "Integration" plugin and the data integration with SimHub.
   - Fixed a bug introduced recently that prevented the zoom factor to be used in the Telemetry Viewer.
+  - Fixed a critical bug in the "Driving Coach", that prevented loading the reference lap in mode "Fastest (incl. Community)" in case of a name conflict.
   
 #### Changes
 

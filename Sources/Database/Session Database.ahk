@@ -3276,7 +3276,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if communityTelemetries
 			for ignore, name in communityTelemetries
 				if !inList(userTelemetries, name) {
-					info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, "Community")
+					info := this.SessionDatabase.readTelemetryInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, ["Community"])
 
 					if info {
 						date := getMultiMapValue(info, "General", "Date", kUndefined)
@@ -3356,7 +3356,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		if communityStrategies
 			for ignore, name in communityStrategies
 				if !inList(userStrategies, name) {
-					info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, "Community")
+					info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack, name, ["Community"])
 
 					if info {
 						date := getMultiMapValue(info, "General", "Date", kUndefined)
@@ -3440,7 +3440,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 				for ignore, name in communitySetups[setupType]
 					if !inList(userSetups, name) {
 						info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
-																 , setupType, name, "Community")
+																 , setupType, name, ["Community"])
 
 						if info {
 							date := getMultiMapValue(info, "General", "Date", kUndefined)
@@ -6658,7 +6658,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local origin := this.StrategyListView.GetText(row, 1)
 		local name := this.StrategyListView.GetText(row, 2)
 		local info := this.SessionDatabase.readStrategyInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
-														  , name, (origin = translate("Community")) ? "Community" : "User")
+														  , name, (origin = translate("Community")) ? "Community" : ["User"])
 		local fileName
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
@@ -6693,7 +6693,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		local window := this.Window
 		local info := this.SessionDatabase.readSetupInfo(this.SelectedSimulator, this.SelectedCar, this.SelectedTrack
 													   , kSetupTypes[window["setupTypeDropDown"].Value]
-													   , name, (origin = translate("Community")) ? "Community" : "User")
+													   , name, (origin = translate("Community")) ? "Community" : ["User"])
 
 		if (info && getMultiMapValue(info, "Origin", "Driver", false) = this.SessionDatabase.ID) {
 			window["shareSetupWithCommunityCheck"].Value := getMultiMapValue(info, "Access", "Share", false)

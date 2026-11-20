@@ -425,7 +425,7 @@ The following video gives you a good demonstration of this:
    
    - *Start Ideal Line coaching before the start of the Corner*
    
-     Defines the distance before a corner section where the Coach starts telling you about the ideal line. Default is 100 meters.
+     Defines the distance before a corner section where the Coach starts informing you about the ideal line. Default is 100 meters.
    
    - *Stop Ideal Line coaching after the start of the Straight*
    

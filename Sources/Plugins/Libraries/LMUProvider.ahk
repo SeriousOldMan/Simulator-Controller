@@ -324,7 +324,7 @@ class LMUProvider extends Sector397Provider {
 		local car, track, data, setupData, tyreCompound, tyreCompoundColor, key, postFix, fuelAmount
 		local weatherData, lap, weather, time, session, remainingTime, fuelRatio
 		local newPositions, position, virtualEnergy, tyreWear, brakeWear, suspensionDamage
-		local sessionData, sessionState, paused, fuelAmount, tyreWear, brakeWear, active
+		local sessionData, sessionState, paused, fuelAmount, active
 
 		static logRequests := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	  , kUserConfigDirectory, kConfigDirectory))

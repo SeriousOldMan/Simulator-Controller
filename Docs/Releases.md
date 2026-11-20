@@ -14,7 +14,7 @@
   
 #### Changes
 
-  - Another (and this time final) bunch of improvements and additions for the log book in the "Setup Workbench":
+  - Another bunch of improvements and additions for the log book in the "Setup Workbench":
     - The name of a session entry in the logbook can be changed.
 	- It is possible to create a full report for a session (for printing, for example).
 	- The relative increment values are now shown in the legend of the recommendations chart.

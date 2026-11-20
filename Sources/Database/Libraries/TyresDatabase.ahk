@@ -477,6 +477,8 @@ class TyresDatabase extends SessionDatabase {
 					continue
 				else if (wear["Tyre.Laps"] > 50)
 					break
+				else if (wear["Tyre.Wear"] = 0)
+					continue
 				else if (lastLap == 0) {
 					tyreWears.Push({Laps: wear["Tyre.Laps"], Wears: [wear["Tyre.Wear"]]})
 
@@ -495,7 +497,7 @@ class TyresDatabase extends SessionDatabase {
 					tyreWears[tyreWears.Length].Wears.Push(wear["Tyre.Wear"])
 
 			if (tyreWears.Length > 0) {
-				do(tyreWears, (w) => w.Wears := Max(w.Wears*) / w.Laps)
+				do(tyreWears, (w) => w.Wears := average(w.Wears) / w.Laps)
 
 				return Floor(maxWear / average(collect(tyreWears, (w) => w.Wears)))
 			}

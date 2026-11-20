@@ -1261,7 +1261,7 @@ class SpeechSynthesizer {
 		}
 	}
 
-	correctRUGrammar(text) {
+	static correctRUGrammar(text) {
 		static units := Map(
 			0, cm("ноль", "нуля", "нулю", "ноль", "нулём", "нуле"),
 			1, Map("m", cm("один", "одного", "одному", "один", "одним", "одном")
@@ -1548,10 +1548,17 @@ class SpeechSynthesizer {
 		return correct(text)
 	}
 
-	correctGrammar(text) {
+	static correctENGrammar(text) {
 		local word, count
 
-		static numerals := false
+		static numerals := CaseInsenseMap("lap", ["lap", "laps"]					; lap
+										, "second", ["second", "seconds"]			; second
+										, "minute", ["minute", "minutes"]			; minute
+										, "position", ["position", "positions"]		; position
+										, "pitstop", ["pitstop", "pitstops"]		; pitstop
+										, "liter", ["liter", "liters"]				; liter
+										, "meter", ["meter", "meters"]				; meter
+										, "car", ["car", "cars"])					; car
 
 		correctWord(num, word) {
 			local candidate, cases
@@ -1563,55 +1570,64 @@ class SpeechSynthesizer {
 			return word
 		}
 
-		if (this.Language = "EN") {
-			text := string2Values(A_Space, text)
+		text := string2Values(A_Space, text)
 
-			if !numerals
-				numerals := CaseInsenseMap("lap", ["lap", "laps"]					; lap
-										 , "second", ["second", "seconds"]			; second
-										 , "minute", ["minute", "minutes"]			; minute
-										 , "position", ["position", "positions"]	; position
-										 , "pitstop", ["pitstop", "pitstops"]		; pitstop
-										 , "liter", ["liter", "liters"]				; liter
-										 , "meter", ["meter", "meters"]				; meter
-										 , "car", ["car", "cars"])					; car
+		count := text.Length
 
-			count := text.Length
+		loop count {
+			word := text[A_Index]
 
-			loop count {
-				word := text[A_Index]
-
-				if (isInteger(word) && (A_Index < count))
-					text[A_Index + 1] := correctWord(word, text[A_Index + 1])
-			}
-
-			text := values2String(A_Space, text*)
+			if (isInteger(word) && (A_Index < count))
+				text[A_Index + 1] := correctWord(word, text[A_Index + 1])
 		}
-		else if (this.Language = "DE") {
-			text := string2Values(A_Space, text)
 
-			if !numerals
-				numerals := CaseInsenseMap("runde", ["Runde", "Runden"]					; lap
-										 , "sekunde", ["Sekunde", "Sekunden"]			; second
-										 , "minute", ["Minute", "Minuten"]				; minute
-										 , "position", ["Position", "Positionen"]		; position
-										 , "boxenstop", ["Boxenstopp", "Boxenstopps"])	; pitstop
+		return values2String(A_Space, text*)
+	}
 
-			count := text.Length
+	static correctDEGrammar(text) {
+		local word, count
 
-			loop count {
-				word := text[A_Index]
+		static numerals := CaseInsenseMap("runde", ["Runde", "Runden"]					; lap
+										, "sekunde", ["Sekunde", "Sekunden"]			; second
+										, "minute", ["Minute", "Minuten"]				; minute
+										, "position", ["Position", "Positionen"]		; position
+										, "boxenstop", ["Boxenstopp", "Boxenstopps"])	; pitstop
 
-				if (isInteger(word) && (A_Index < count))
-					text[A_Index + 1] := correctWord(word, text[A_Index + 1])
-			}
+		correctWord(num, word) {
+			local candidate, cases
 
-			text := values2String(A_Space, text*)
+			for candidate, cases in numerals
+				if (InStr(word, candidate) == 1)
+					return ((num == 1) ? cases[1] : cases[2])
+
+			return word
 		}
-		else if (this.Language = "RU")
-			text := this.correctRUGrammar(text)
 
-		return text
+		text := string2Values(A_Space, text)
+
+		count := text.Length
+
+		loop count {
+			word := text[A_Index]
+
+			if (isInteger(word) && (A_Index < count))
+				text[A_Index + 1] := correctWord(word, text[A_Index + 1])
+		}
+
+		return values2String(A_Space, text*)
+	}
+
+	correctGrammar(text) {
+		switch this.Language, false {
+			case "EN":
+				return SpeechSynthesizer.correctENGrammar(text)
+			case "DE":
+				return SpeechSynthesizer.correctDEGrammar(text)
+			case "RU":
+				return SpeechSynthesizer.correctRUGrammar(text)
+			default:
+				return text
+		}
 	}
 
 	isSpeaking() {

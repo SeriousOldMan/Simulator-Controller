@@ -38,6 +38,7 @@
 #### Fixes
 
   - Fixed several command grammars for the Russian language.
+  - Fixed some errors in the Polish grammars.
   - Also fixed a few commands for the Japanese language.
   
 #### Changes

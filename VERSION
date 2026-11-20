@@ -3,7 +3,7 @@ Type=Development
 [Development]
 Version=7.4.0.0-dev
 Target=7.4.0.0-release
-Date=11/19/26
+Date=11/20/26
 Download=
 Changes=New ideal line coaching mode, Fixed some commands in Russian grammars, Fixed some errors in Japanese grammars, Fixed some errors in Polish grammars
 Components=Media->6.9.0,Configuration->7.4.0,Utilities->7.3.1
@@ -22,7 +22,7 @@ Configuration.7.3.1.Content=Setup
 Configuration.7.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/FjGl_JA9?inline=true;https://www.dropbox.com/scl/fi/vga5tlfal32d0w62hjajg/Configuration-7.3.1.zip?rlkey=klld6dlmayp50r7yfqjedzhsp&st=bnru3dph&dl=1;http://%master%/Components/Configuration 7.3.1.zip
 Configuration.7.4.0.Path=Resources
 Configuration.7.4.0.Content=Setup
-Configuration.7.4.0.Download=
+Configuration.7.4.0.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Ib5tepsp?inline=true;https://www.dropbox.com/scl/fi/zihu45hmujxsdf3r03lhb/Configuration-7.4.0.zip?rlkey=tanhymv43l56jr15egvhypajb&st=mdjkirk6&dl=1;http://%master%/Components/Configuration 7.4.0.zip
 Utilities.7.3.1.Path=.
 Utilities.7.3.1.Content=Utilities
 Utilities.7.3.1.Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/mm4glraE?inline=true;https://www.dropbox.com/scl/fi/58jk03kxbk17n135gciij/Utilities-7.3.1.zip?rlkey=apzj9klofhmgjz7z5xxt8rnxs&st=xl5a7ir9&dl=1;http://%master%/Components/Utilities 7.3.1.zip

@@ -1578,13 +1578,25 @@ class CallbacksEditor {
 		editorGui.Add("DropDownList", "x110 yp w90 Y:Move(0.25) vcallbackConfirmationDropDown", collect(["Yes", "No"], translate)).OnEvent("Change", (*) => this.updateState())
 		editorGui["callbackConfirmationDropDown"].Visible := InStr(this.Type, "Actions")
 
-		this.iPhraseField := [editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Phrase"))
-							, editorGui.Add("Edit", "x110 yp w308 Y:Move(0.25) vcallbackPhraseEdit")]
+		widget1 := editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Phrase"))
+		widget2 := editorGui.Add("Edit", "x110 yp w283 Y:Move(0.25) vcallbackPhraseEdit")
+		widget3 := editorGui.Add("Button", "x394 yp-1 w23 h23 X:Move Center +0x200 vphraseEditButton")
+		widget3.OnEvent("Click", (*) {
+			local newPhrase := editPhrase(this, editorGui["callbackPhraseEdit"].Value)
+
+			if newPhrase
+				editorGui["callbackPhraseEdit"].Value := newPhrase
+
+		})
+		setButtonIcon(editorGui["phraseEditButton"], kIconsDirectory . "Pencil.ico", 1, "L4 T4 R4 B4")
+
+		this.iPhraseField := [widget1, widget2, widget3]
 
 		this.iPhraseField[1].Visible := (this.Type = "Agent.LLM.Events")
 		this.iPhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
+		this.iPhraseField[3].Visible := (this.Type = "Agent.LLM.Events")
 
-		this.iCallableField := [editorGui.Add("Text", "x16 yp+28 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
+		this.iCallableField := [editorGui.Add("Text", "x16 yp+29 w90 h23 +0x200 Y:Move(0.25)", translate("Call"))
 							  , editorGui.Add("Edit", "x110 yp w738 h140 H:Grow(0.75) W:Grow Y:Move(0.25)")]
 
 		editorGui.SetFont("Norm", "Courier New")
@@ -1822,6 +1834,7 @@ class CallbacksEditor {
 				this.CallableField[2].Visible := false
 				this.PhraseField[1].Visible := (this.Type = "Agent.LLM.Events")
 				this.PhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
+				this.PhraseField[3].Visible := (this.Type = "Agent.LLM.Events")
 			}
 			else if (type = "Script") {
 				if (this.ScriptEditor.Content[true] = "") {
@@ -1836,6 +1849,7 @@ class CallbacksEditor {
 				this.CallableField[2].Visible := false
 				this.PhraseField[1].Visible := (this.Type = "Agent.LLM.Events")
 				this.PhraseField[2].Visible := (this.Type = "Agent.LLM.Events")
+				this.PhraseField[3].Visible := (this.Type = "Agent.LLM.Events")
 			}
 			else {
 				this.ScriptEditor.Visible := false
@@ -1843,6 +1857,7 @@ class CallbacksEditor {
 				this.CallableField[2].Visible := true
 				this.PhraseField[1].Visible := false
 				this.PhraseField[2].Visible := false
+				this.PhraseField[3].Visible := false
 
 				this.CallableField[1].Text := translate(type . (InStr(this.Type, "Actions") ? "(s)" : ""))
 			}
@@ -2732,6 +2747,67 @@ class ActionsEditor extends CallbacksEditor {
 ;;;-------------------------------------------------------------------------;;;
 ;;;                        Private Functions Section                        ;;;
 ;;;-------------------------------------------------------------------------;;;
+
+editPhrase(editorOrCommand, arguments*) {
+	global kOk, kCancel
+
+	local x, y, w, h
+
+	static phraseGui, result, phraseEdit
+
+	if (editorOrCommand == kOk)
+		result := kOk
+	else if (editorOrCommand == kCancel)
+		result := kCancel
+	else {
+		result := false
+
+		phraseGui := Window({Descriptor: "Booster Editor.Phrase", Resizeable: true, Options: "0x400000"}, translate("Phrase"))
+
+		phraseGui.SetFont("Norm", "Arial")
+
+		choices := []
+
+		phraseGui.Add("Edit", "x16 y16 w484 h200 Multi vphraseEdit W:Grow H:Grow", StrReplace(arguments[1], "\n", "`n"))
+
+		phraseGui.Add("Button", "x175 yp+210 w80 h23 Default Y:Move X:Move(0.5)", translate("Ok")).OnEvent("Click", editPhrase.Bind(kOk))
+		phraseGui.Add("Button", "x261 yp w80 h23 Y:Move X:Move(0.5)", translate("&Cancel")).OnEvent("Click", editPhrase.Bind(kCancel))
+
+		phraseGui.Opt("+Owner" . editorOrCommand.Window.Hwnd)
+
+		phraseGui.Show("AutoSize Center")
+
+		if getWindowPosition("Booster Editor.Phrase", &x, &y)
+			phraseGui.Show("x" . x . " y" . y)
+		else
+			phraseGui.Show("AutoSize Center")
+
+		if getWindowSize("Booster Editor.Phrase", &w, &h)
+			phraseGui.Resize("Initialize", w, h)
+
+		editorOrCommand.Window.Block()
+
+		try {
+			loop
+				Sleep(200)
+			until result
+		}
+		finally {
+			editorOrCommand.Window.Unblock()
+			editorOrCommand.Window.Show("NoActivate")
+		}
+
+		try {
+			if (result == kCancel)
+				return false
+			else if (result == kOk)
+				return StrReplace(phraseGui["phraseEdit"].Value, "`n", "\n")
+		}
+		finally {
+			phraseGui.Destroy()
+		}
+	}
+}
 
 editInstructions(editorOrCommand, type := false, title := false, originalInstructions := false, owner := false) {
 	local choices, key, value, descriptor, reloadAll

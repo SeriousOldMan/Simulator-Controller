@@ -482,7 +482,7 @@ Since the control flow between the rule engine and the LLM especially for the *R
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Agent%20Flow.JPG)
 
 1. It all starts with an event, typically signalled by the rule engine. An event will be in most cases a special condition in the state of the car or the session (fuel is running low, weather is changing, and so on). There are many predefined events available, which you can find below and you can define your own events, of course.
-2. The event will generate a command or information phrase for the LLM and this will be passed to the GPT service together with a complete representation of the current knowledge, as show above, and a list of available actions to call.
+2. The event will generate a command or information phrase for the LLM and this will be passed to the GPT service together with a complete representation of the current knowledge, as shown above, and a list of available actions to call.
 3. The LLM can decide to *call* one or more of these actions, which then will be executed in parallel.
 4. An action can do almost anything. Typically it triggers a special behavior of the Assistant, for example, create a pitstop plan, but it can also call any of the available [action functions](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) in Simulator Controller, or it can generate voice output, and so on. Using *Assistant.Raise* (see below for [more information](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events)), it can also raise additional events, even for other Assistants. These enables the LLM to create a complex chain of thought or collaborate with other Assistants.
 
@@ -692,6 +692,10 @@ As you can see, this editor looks very similar to the actions editor discussed a
 2. You have to supply a phrase which decribes the event to the LLM. Example: "It just started raining." If your event has defined parameters, you can reference the values of the arguments to the event in the phrase by enclosing them in "%". Example: "We started lap %lapNumber%." Since the "%" has therefore a special meaning, you must escape it when it is used alone. Preceed the percentage character with a backquote (`) or a backslash (\\) to do that.
 
    ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Reasoning%20Event%20Arguments.JPG)
+   
+   > ###### Good to know
+   >
+   > Phrases are not restricted to short single sentences. Actually they can get quite long and descriptive. Click on the small button to the right of the "Phrase" field to open an editor which allows you to edit longer texts.
 
 3. The following event typs are supported:
 

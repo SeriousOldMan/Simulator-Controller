@@ -397,7 +397,7 @@ If this mode is active, Aiden will not only give you instructions for the corner
 
 ### Practicing the ideal line
 
-Beside the general instructions for upcoming corners, the Driving Coach can give you very specific instructions regarding the ideal line or perfect braking (see next section). The coaching mode for the ideal line by asking the Coach to tell you hw to position the car. Example:
+Beside the general instructions for upcoming corners, the Driving Coach can give you very specific instructions regarding the ideal line or perfect braking (see next section). The coaching mode for the ideal line by asking the Coach to tell you how to position the car. Example:
 
 **Aiden:** Hold left
 

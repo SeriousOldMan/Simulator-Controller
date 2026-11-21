@@ -294,23 +294,44 @@ And be aware, that corners directly followed by another corner (a typical situat
 
 > ###### Good to know
 >
-> If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point. 
+> If no sections are defined for the current track, the Driving Coach will try to derive sections automatically based on the lap telemetry data. I strongly recommend to define the sections manually, because this will yield the best results, but the automatically generated sections will provide a starting point.
+
+### Reference laps
+
+All the different coaching modes provided by the Coach are described in the next sections. What they all have in common, is, that they are using so called reference laps, which are represented as telemetry data. The telemetry data from your current session and your last lap(s) is then compared to the telemetry data of the reference lap and the Coach tells you - depending on the active coaching mode - what you should change in your driving to better match the reference lap. It is obvious, that you have to use reference laps of better and faster drivers to improve your own driving. If you only use data from your own sessions, the Coach will emphasize your own - possibly bad - habbits.
+
+Many settings are available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) to tell the Coach, which reference lap should be used. These settings can be defined per car and/or per track.
+
+   - *Reference lap*
+   
+     Declares which lap telemetry data will be used as a reference when evaluating the current lap telemetry.
+   
+   - *Load reference lap from Database*
+   
+     Specifies, whether the Coach will load the telemetry for a potential reference lap from the database. It can be the telemetry data for the fastest lap in the database (incl. data provided by the community) or a specific one (see next setting).
+   
+   - *Name of reference lap from Database*
+   
+     If loading of a reference lap from the database is enabled, the Driving Coach will normally look for the fastest lap in the database. Using this setting you can specify the name of the reference lap to use and since settings can be weather specific, it is possible to specify different reference laps for different conditions. If you want to use a specifi reference lap from the community database, this can also be defined explicitely by name.
+
+   - *Save fastest lap to Database*
+   
+     Use this setting, if you want the Coach to automatically save the telemetry data for your fastest lap to the session database at the end of a session, of course, unless there is already telemetry data for a faster lap available in the database.
 
 ### Coaching on the track
 
 Aiden can give you instructions and recommendations for the next corner while you are driving. You can enable this by a voice command, for example: "Can you give me instructions while I am driving?", or you can use the plugin action "TrackCoaching" on you your controller.
 
-If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. It is also possible to load the [fastest lap stored in the "Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Database#telemetries), which will then be used as a reference lap unless you have driven a faster one in the current session. You configure the behavior that suites you the most, by using the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
-
-> ###### Important
->
-> If you want to use a reference lap from the community database, you must identify this lap explicitely by name using the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database".
-
-Please note, that the recommendations of Aiden might not be trustworthy, if no reference lap is available. Therefore, unless you have loaded a reference lap from the session database, take all recomendations for the first lap after Aiden has told you that telemetry data is available with a grain of salt.
+If activated, Aiden will use the telemetry data of the recent lap to check for any areas for improvement. Additionally, the lap before the last lap, or the fastest lap of the session so far can be used as a reference for braking points, start of the acceleration phase, and so on. You configure the behavior that suites you the most, by using the corresponding [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) in the "Session Database" as decribed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#reference-laps).
 
 > ###### Good to know
 >
-> There is also a [setting](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) available in the "Session Database", which instructs the Coach to automatically write the fastest lap of the current session to the session database, if it is faster as any lap already stored in the database.
+> If you want to use a reference lap from the community database, you can either use the value "Fastest (incl. community)" for the "Load reference lap from Database" setting or you can identify the desired reference lap explicitely by name using the setting "Name of reference lap from Database" in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings).
+
+
+> ###### Important
+>
+> As said, the recommendations of Aiden might not be trustworthy, if no reference lap is available. Therefore, unless you have loaded a reference lap from the session database, take all recomendations for the first lap after Aiden has told you that telemetry data is available with a grain of salt.
 
 If you approach a corner, Aiden will then evaluate possible areas for improvement and will give you the necessary instructions before you enter the corner. This instructions will be very short and focused and not so detailed with explanations as in the example conversation above, of course. You can configure the typical distance to the corner, where these instructions will be given also in the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) in the "Session Database". However, sometimes Aiden will be late, espeutcially when the Spotter interrupted with an important message. Therefore, I recommend to do practice sessions with all other Assistants muted, which can be done with a Startup Profile, for example.
 
@@ -330,7 +351,7 @@ How the Driving Coach interprets the telemetry data and what instructions will b
 	
 	%telemetry%
 
-Important is here the restriction to a short message (25 to 35 words) and the focus on driver inputs. However, you can change that, if you want different corner hints from the Coach or longer explanations, for example. But bear in mind, that these instructions will be given while you are driving, so keeping them short might be a good idea. If you experiment with the length of the Coach's corner hints by increasing the number of words, for example, be sure to adjust the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings) "Coach: Time between Instructions" and "Coach: Distance before Corner" in the "Session Database" as well.
+Important is here the restriction to a short message (25 to 35 words) and the focus on driver inputs. However, you can change that, if you want different corner hints from the Coach or longer explanations, for example. But bear in mind, that these instructions will be given while you are driving, so keeping them short might be a good idea. If you experiment with the length of the Coach's corner hints by increasing the number of words, for example, be sure to adjust the [settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings) "Coach: Time between Instructions" and "Coach: Distance before Corner" in the "Session Database" as well.
 
 #### Focusing on specific corners
 
@@ -357,22 +378,6 @@ If this mode is active, Aiden will not only give you instructions for the corner
    
      The time in seoonds the Coach waits after the last instructions before starting the next instructions.
    
-   - *Reference lap*
-   
-     Declares which past lap telemetry will be used as a reference when evaluating the current lap telemetry.
-   
-   - *Load reference lap from Database*
-   
-     Specifies, whether the Coach will load the telemetry for a potential reference lap from the database. It can be the telemetry data for the fastest lap in the database or a specific one (see next setting).
-   
-   - *Name of reference lap from Database*
-   
-     If loading of a reference lap from the database is enabled, the Driving Coach will normally look for the fastest lap in the database. Using this setting you can specify the name of the reference lap to use and since settings can be weather specific, it is possible to specify different reference laps for different conditions. If you want to use a reference lap from the community database, this must also be defined explicitely by name.
-
-   - *Save fastest lap to Database*
-   
-     Use this setting, if you want the Coach to automatically save the telemetry data for your fastest lap to the session database at the end of a session, of course, unless there is already telemetry data for a faster lap available in the database.
-	 
    - *Threshold for TC activations*
    
      If the percentage of TC activations at corner exit is **above** this threshold, it will be considered by the Coach during telemetry evaluation.
@@ -432,7 +437,7 @@ The following video gives you a good demonstration of this:
      The number of meters after the start of the straight section, where the Coach stops telling you how to position the car. Default is 20 meters.
 	 
    Please note, that all these settings can be defined per car and even per track.
-4. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own driving style over and over again.
+4. Lastly and most important, it is absolutely necessary to use very good reference laps for this. Otherwise you will practice your own driving style over and over again. But that has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#reference-laps).
 5. Although this coaching mode functions technically the same way in *iRacing* as it does in all other simulators, the limitations of the *iRacing* API — specifically regarding the vehicle's position on the track — render it virtually useless.
 
 ### Practicing braking points
@@ -486,7 +491,7 @@ The following video gives you a good demonstration of this:
      Defines the reciproke ratio of brake pressure to relative steer angle on Kamm's circle for a braking zone to be interpreted as proper trail braking, which means P(t) must be greater than S(t) / S(max) \* R (with R the value of this setting). Default is 1.0, which is the ideal value. Values below 1.0 allow for less braking than ideal, but even values above 1.0 are possible when you want to push very hard on the brakes and know how to handles an instable car on turning in.
 	 
    Please note, that all these settings can be defined per car and even per track.
-5. Lastly, and most important, is it necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again.
+5. Lastly and most important, it is absolutely necessary to use very good reference laps for this. Otherwise you will practice your own braking habits over and over again. But that has already been discussed [above](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#reference-laps).
 
 ### Motivation on the track
 

@@ -9235,7 +9235,7 @@ class TeamCenter extends ConfigurationItem {
 					lastLap := false
 
 				if (synchronize && hadLastLap && !lastLap) {
-					this.initializeSession()
+					this.initializeSession(true)
 
 					hadLastLap := false
 					nextPitstopUpdate := false
@@ -11510,7 +11510,7 @@ class TeamCenter extends ConfigurationItem {
 
 		if save {
 			report := this.SelectedReport
-			
+
 			setSetting("Team Center", "Chart." . report . ".Plot", ["Scatter", "Bar", "Bubble", "Line"][this.Control["chartTypeDropDown"].Value])
 			setSetting("Team Center", "Chart." . report . ".X-Axis", xAxis)
 			setSetting("Team Center", "Chart." . report . ".Y-Axises", values2String(";", yAxises*))

@@ -21,6 +21,15 @@
 ;;;-------------------------------------------------------------------------;;;
 
 class RaceAssistantPlugin extends ControllerPlugin {
+	static sLogSimulator := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																	, kUserConfigDirectory
+																	, kConfigDirectory))
+										   , "Debug", "LogSimulator", false)
+	static sLogTeamSession := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																	  , kUserConfigDirectory
+																	  , kConfigDirectory))
+											 , "Debug", "LogTeamSession", false)
+
 	static sAssistantCooldown := kUndefined
 	static sTeamServerCooldown := kUndefined
 
@@ -412,13 +421,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				dataLap := getMultiMapValue(this.Data, "Stint Data", "Laps", false)
 
 				if (!dataLap || !stateLap || (Abs(dataLap - stateLap) <= 5)) {
-					if isDebug() {
-						if isLogLevel(kLogDebug)
-							logMessage(kLogDebug, "Restoring session state for " . raceAssistant.Plugin)
-
-						logMessage(kLogCritical, "Restoring session state for " . raceAssistant.Plugin . "...")
-					}
-
 					raceAssistant.Simulator.restoreSessionState(&sessionSettings, &sessionState)
 
 					raceAssistant.RaceAssistant.restoreSessionState(this.createDataFile(sessionSettings, "settings")
@@ -426,14 +428,38 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 					this.stop()
 
+					if RaceAssistantPlugin.LogTeamSession {
+						logMessage(kLogWarn, "Session state for " . raceAssistant.Plugin . " restored")
+						logMessage(kLogWarn, "Lap (Data): " . dataLap . ", Lap (State): " . stateLap)
+					}
+
 					return
 				}
+				else if RaceAssistantPlugin.LogTeamSession {
+					logMessage(kLogWarn, "Session state for " . raceAssistant.Plugin . " NOT restored")
+					logMessage(kLogWarn, "Lap (Data): " . dataLap . ", Lap (State): " . stateLap)
+				}
+			}
+			else if RaceAssistantPlugin.LogTeamSession {
+				logMessage(kLogWarn, "Session state for " . raceAssistant.Plugin . " NOT restored")
+				logMessage(kLogWarn, "Settings: " . (sessionSettings ? kTrue : kFalse)
+								   . ", State: " . (sessionState ? kTrue : kFalse))
 			}
 
-			if (this.iTries-- > 0)
-				this.Sleep := 1000
-			else
+			this.iTries -= 1
+
+			if (this.iTries >= 0) {
+				if RaceAssistantPlugin.LogTeamSessions
+					logMessage(kLogWarn, "Retry restoring session state for " . raceAssistant.Plugin)
+
+				this.Sleep := 2000
+			}
+			else {
+				if RaceAssistantPlugin.LogTeamSession
+					logMessage(kLogWarn, "Giving up restoring session state for " . raceAssistant.Plugin)
+
 				this.stop()
+			}
 		}
 
 		getData(teamServer, type) {
@@ -460,6 +486,18 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			FileAppend(data, dataFile, "UTF-16")
 
 			return dataFile
+		}
+	}
+
+	static LogTeamSession {
+		Get {
+			return this.sLogTeamSession
+		}
+	}
+
+	static LogSimulator {
+		Get {
+			return this.sLogSimulator
 		}
 	}
 
@@ -2649,7 +2687,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (settingsFile && FileExist(settingsFile)) {
 			sessionSettings := readMultiMap(settingsFile)
 
-			deleteFile(settingsFile)
+			if !RaceAssistantPlugin.LogTeamSession
+				deleteFile(settingsFile)
 		}
 		else
 			sessionSettings := false
@@ -2657,7 +2696,8 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		if (stateFile && FileExist(stateFile)) {
 			sessionState := readMultiMap(stateFile)
 
-			deleteFile(stateFile)
+			if !RaceAssistantPlugin.LogTeamSession
+				deleteFile(stateFile)
 		}
 		else
 			sessionState := false
@@ -2670,22 +2710,21 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 		this.Simulator.saveSessionState(&settings, &state)
 
-		if isDebug() {
+		if RaceAssistantPlugin.LogTeamSession {
+			logMessage(kLogWarn, "Saving session state for " . this.Plugin
+							   . (" [" . (teamServer ? kTrue : kFalse) . ", "
+							    . (this.TeamSessionActive ? kTrue : kFalse) . "]"))
+
 			if (!settings || (settings.Count = 0))
-				logMessage(kLogCritical, "Session settings are empty for " . this.Plugin . "...")
+				logMessage(kLogCritical, "Session settings are empty for " . this.Plugin)
 
 			if (!state || (state.Count = 0))
-				logMessage(kLogCritical, "Session state is empty for " . this.Plugin . "...")
+				logMessage(kLogCritical, "Session state is empty for " . this.Plugin)
+			else
+				logMessage(kLogWarn, "Lap (Data): " . getMultiMapValue(this.Data, "Stint Data", "Laps", false))
 		}
 
 		if (teamServer && this.TeamSessionActive) {
-			if isDebug() {
-				if isLogLevel(kLogDebug)
-					logMessage(kLogDebug, "Saving session state for " . this.Plugin)
-
-				logMessage(kLogCritical, "Saving session state for " . this.Plugin . "...")
-			}
-
 			if settings
 				teamServer.setSessionValue(this.Plugin . " Settings", printMultiMap(settings))
 
@@ -2695,12 +2734,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 	}
 
 	restoreSessionState(data) {
-		if isDebug() {
-			if isLogLevel(kLogDebug)
-				logMessage(kLogDebug, "Start session state restoring for " . this.Plugin)
-
-			logMessage(kLogCritical, "Start session state restoring for " . this.Plugin . "...")
-		}
+		if RaceAssistantPlugin.LogTeamSession
+			logMessage(kLogWarn, "Restoring session state for " . this.Plugin
+							   . (" [" . (this.TeamServer ? kTrue : kFalse) . ", "
+							    . (this.TeamSessionActive ? kTrue : kFalse) . "]"))
 
 		if (this.RaceAssistant && this.TeamServer && this.TeamSessionActive)
 			RaceAssistantPlugin.RestoreSessionStateTask(this, data).start()
@@ -2795,10 +2832,6 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		local newLap, firstLap, ignore, assistant, hasAssistant, finalLap
 		local simulator, car, track, weather, driverActive
 
-		static logSimulator := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
-																	   , kUserConfigDirectory, kConfigDirectory))
-											  , "Debug", "LogSimulator", false)
-
 		static replayLap := false
 		static replayIndex := false
 		static collectorLastLap := 0
@@ -2890,7 +2923,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 
 			dataLastLap := getMultiMapValue(data, "Stint Data", "Laps", 0)
 
-			if (debug || logSimulator) {
+			if (debug || this.LogSimulator) {
 				if (dataLastLap != collectorLastLap)
 					collectorLapRunning := 0
 
@@ -3181,11 +3214,10 @@ class RaceAssistantPlugin extends ControllerPlugin {
 														 , dataLastLap
 														 , Round((getMultiMapValue(data, "Session Data", "SessionTimeRemaining", 0) / 1000) / 60))
 
-									for ignore, assistant in this.Assistants
-										if assistant.Enabled {
-											teamServer.setSessionValue(assistant.Plugin . " Settings", "")
-											teamServer.setSessionValue(assistant.Plugin . " State", "")
-										}
+									for ignore, assistant in this.Assistants {
+										teamServer.setSessionValue(assistant.Plugin . " Settings", "")
+										teamServer.setSessionValue(assistant.Plugin . " State", "")
+									}
 								}
 								else {
 									; Wrong Driver - no team session

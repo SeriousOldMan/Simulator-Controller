@@ -3666,7 +3666,7 @@ class RaceEngineer extends RaceAssistant {
 			}
 		}
 
-		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName)) {
+		if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) = this.DriverFullName)) {
 			this.iPitstopAdjustments := false
 			this.iPitstopFillUp := false
 

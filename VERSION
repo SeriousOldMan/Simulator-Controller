@@ -5,7 +5,7 @@ Version=7.3.6.0-dev
 Target=7.3.6.0-release
 Date=11/22/26
 Download=
-Changes=More Russian grammar correction, Improved data-driven tyre wear prediction, Fixed logbook resizing for recommendations, Phrase editor for Booster event phrases, Fixed session restart in Team Center
+Changes=More Russian grammar correction, Improved data-driven tyre wear prediction, Fixed logbook resizing for recommendations, Phrase editor for Booster event phrases, Fixed session restart in Team Center, Fixed WelcomeBack message in team sessions, Special logging for team sessions
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]
 Version=7.3.5.0-release

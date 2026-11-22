@@ -386,7 +386,7 @@ You can define the spoken language you want to use for speech generation with th
 
 ###### Azure Cognitive Services
 
-If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure API key for the Speech Service and the endpoint for your region.
+If you choose "Azure Cognitive Services", two additional fields will appear, where you have to enter your Azure API key (also named subscription key) for the Speech Service and the endpoint for your region.
 
 ![](https://github.com/SeriousOldMan/Simulator-Controller/blob/main/Docs/Images/Configuration%20Tab%207%20Azure%20Service.JPG)
 

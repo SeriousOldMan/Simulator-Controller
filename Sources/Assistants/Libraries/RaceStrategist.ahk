@@ -2532,9 +2532,9 @@ class RaceStrategist extends GridRaceAssistant {
 				driverNickname := knowledgeBase.getValue("Driver.Nickname", "JD")
 			}
 
-			if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) != this.DriverFullName))
-				if this.Speaker[false]
-					this.getSpeaker().speakPhrase(ProcessExist("Race Engineer.exe") ? "" : "WelcomeBack")
+			if ((lastLap < (lapNumber - 2)) && (driverName(driverForname, driverSurname, driverNickname) = this.DriverFullName))
+				if (this.Speaker[false] && !ProcessExist("Race Engineer.exe"))
+					this.getSpeaker().speakPhrase("WelcomeBack")
 
 			lastLap := lapNumber
 

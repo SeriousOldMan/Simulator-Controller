@@ -2557,33 +2557,42 @@ class RaceAssistant extends ConfigurationItem {
 
 	restoreSessionState(settingsFile, stateFile) {
 		local tries := 10
-		local sessionState, sessionSettings
+
+		static logTeamSession := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																		 , kUserConfigDirectory
+																		 , kConfigDirectory))
+												, "Debug", "LogTeamSession", false)
 
 		restoreState() {
+			local sessionState := false
+			local sessionSettings := false
+
 			if this.KnowledgeBase {
-				if isDebug() {
-					logMessage(kLogCritical, "Restoring session state for " . this.AssistantType . "...")
+				if logTeamSession {
+					logMessage(kLogWarn, "Restoring session state for " . this.AssistantType)
 
-					if (!settingsFile || (readMultiMap(settingsFile).Count = 0))
-						logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType . "...")
+					if (!settingsFile || ((sessionSettings := readMultiMap(settingsFile)).Count = 0))
+						logMessage(kLogCritical, "Session settings are empty for " . this.AssistantType)
 
-					if (!stateFile || (readMultiMap(stateFile).Count = 0))
-						logMessage(kLogCritical, "Session state is empty for " . this.AssistantType . "...")
+					if (!stateFile || ((sessionState := readMultiMap(stateFile)).Count = 0))
+						logMessage(kLogCritical, "Session state is empty for " . this.AssistantType)
 				}
 
 				if stateFile {
-					sessionState := readMultiMap(stateFile)
+					if !sessionState
+						sessionState := readMultiMap(stateFile)
 
-					if !isDebug()
+					if !logTeamSession
 						deleteFile(stateFile)
 
 					this.loadSessionState(sessionState)
 				}
 
 				if settingsFile {
-					sessionSettings := readMultiMap(settingsFile)
+					if !sessionSettings
+						sessionSettings := readMultiMap(settingsFile)
 
-					if !isDebug()
+					if !logTeamSession
 						deleteFile(settingsFile)
 
 					this.loadSessionSettings(sessionSettings)
@@ -2620,7 +2629,8 @@ class RaceAssistant extends ConfigurationItem {
 								, TrackLength: knowledgeBase.getValue("Session.Track.Length")
 								, SessionDuration: knowledgeBase.getValue("Session.Duration") * 1000
 								, SessionLaps: knowledgeBase.getValue("Session.Laps")})
-		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0, LastEnergyAmount: 0, InitialEnergyAmount: 0, EnoughData: false})
+		this.updateDynamicValues({LastFuelAmount: 0, InitialFuelAmount: 0
+								, LastEnergyAmount: 0, InitialEnergyAmount: 0, EnoughData: false})
 	}
 
 	loadSessionSettings(settings) {

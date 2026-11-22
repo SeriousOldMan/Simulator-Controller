@@ -1579,8 +1579,8 @@ class CallbacksEditor {
 		editorGui["callbackConfirmationDropDown"].Visible := InStr(this.Type, "Actions")
 
 		widget1 := editorGui.Add("Text", "x16 yp w90 h23 +0x200 Y:Move(0.25)", translate("Phrase"))
-		widget2 := editorGui.Add("Edit", "x110 yp w283 Y:Move(0.25) vcallbackPhraseEdit")
-		widget3 := editorGui.Add("Button", "x394 yp-1 w23 h23 X:Move Center +0x200 vphraseEditButton")
+		widget2 := editorGui.Add("Edit", "x110 yp w283 Y:Move(0.25) W:Grow(0.34) vcallbackPhraseEdit")
+		widget3 := editorGui.Add("Button", "x394 yp-1 w23 h23 X:Move(0.34) Y:Move(0.25) Center +0x200 vphraseEditButton")
 		widget3.OnEvent("Click", (*) {
 			local newPhrase := editPhrase(this, editorGui["callbackPhraseEdit"].Value)
 

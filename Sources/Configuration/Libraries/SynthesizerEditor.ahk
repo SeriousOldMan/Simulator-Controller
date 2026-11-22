@@ -248,13 +248,13 @@ class SynthesizerEditor extends ConfiguratorPanel {
 							 , [editorGui["basicWindowsSpeakerPitchLabel"], editorGui["basicSpeakerPitchSlider"]]
 							 , [editorGui["basicWindowsSpeakerSpeedLabel"], editorGui["basicSpeakerSpeedSlider"]]]
 
-		widget11 := editorGui.Add("Text", "x" . x0 . " ys+24 w140 h23 +0x200 VbasicAzureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
+		widget11 := editorGui.Add("Text", "x" . x0 . " ys+24 w110 h23 +0x200 VbasicAzureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
 		widget11.Info := "Basic.Synthesizer.Info"
 		widget12 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VbasicAzureSubscriptionKeyEdit Hidden")
 		widget12.Info := "Basic.Synthesizer.Info"
 		widget12.OnEvent("Change", updateAzureVoices)
 
-		widget13 := editorGui.Add("Text", "x" . x0 . " yp+24 w140 h23 +0x200 VbasicAzureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
+		widget13 := editorGui.Add("Text", "x" . x0 . " yp+24 w110 h23 +0x200 VbasicAzureTokenIssuerLabel Hidden", translate("Token Issuer Endpoint"))
 		widget13.Info := "Basic.Synthesizer.Info"
 		widget14 := editorGui.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 W:Grow VbasicAzureTokenIssuerEdit Hidden")
 		widget14.Info := "Basic.Synthesizer.Info"

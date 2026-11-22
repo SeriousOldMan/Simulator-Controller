@@ -565,7 +565,7 @@ class VoiceControlConfigurator extends ConfiguratorPanel {
 							  , window["pushToTalkEdit"], window["pushToTalkButton"], window["pushToTalkTestButton"]
 							  , window["controllerActivationEdit"]]]
 
-		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Service Key"))
+		widget26 := window.Add("Text", "x" . x . " ys+24 w112 h23 +0x200 VazureSubscriptionKeyLabel Hidden", translate("Subscription Key"))
 		widget27 := window.Add("Edit", "x" . x1 . " yp w" . w1 . " h21 Password W:Grow VazureSubscriptionKeyEdit Hidden")
 		widget27.OnEvent("Change", updateAzureVoices)
 

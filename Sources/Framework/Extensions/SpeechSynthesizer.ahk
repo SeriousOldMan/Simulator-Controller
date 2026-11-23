@@ -1412,13 +1412,14 @@ class SpeechSynthesizer {
 		}
 
 		findNoun(word) {
-			local key
+			local key, data, name, form
 
 			word := StrLower(word)
 
-			for key in nounKeys
-				if (SubStr(word, 1, StrLen(key)) = key)
-					return key
+			for key, data in nouns
+				for name, form in data
+					if ((name != "g") && (word = form))
+						return key
 
 			return ""
 		}
@@ -1426,16 +1427,19 @@ class SpeechSynthesizer {
 		getCase(before) {
 			before := Trim(before)
 
-			if RegExMatch(before, "i)(?<![а-яё])(на|через)\s*$")
+			if RegExMatch(before, "i)(?<![а-яё])(на|через|за|про)\s*$")
 				return "acc"
 
 			if RegExMatch(before, "i)(?<![а-яё])в\s*$")
 				return "prep"
 
-			if RegExMatch(before, "i)(?<![а-яё])(около|до|после|для|от)\s*$")
+			if RegExMatch(before, "i)(?<![а-яё])(около|до|после|для|от|с)\s*$")
 				return "gen"
 
-			if RegExMatch(before, "i)(отыграли|потеряли|смоделировал)\s*$")
+			if RegExMatch(before, "i)(?<![а-яё])к\s*$")
+				return "dat"
+
+			if RegExMatch(before, "i)(отыграл|отыграла|отыграли|потерял|потеряла|потеряли|уступил|уступила|уступили|смоделировал|смоделировала|проехал|проехала)\s*$")
 				return "acc"
 
 			return "nom"
@@ -1536,7 +1540,7 @@ class SpeechSynthesizer {
 
 			while RegExMatch(result, "(?<![\w-])(\d+)(?![\w-])", &nm, pos) {
 				n := Integer(nm[1])
-				words := numberToWords(n, "nom", "m")
+				words := numberToWords(n, getCase(SubStr(result, 1, nm.Pos - 1)), "m")
 
 				result := (SubStr(result, 1, nm.Pos - 1) . words . SubStr(result, nm.Pos + nm.Len))
 				pos := nm.Pos + StrLen(words)

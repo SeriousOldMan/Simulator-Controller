@@ -1095,7 +1095,7 @@ class External extends Primary {
 						object := object.%identifier[A_Index]%
 			}
 			else
-				value := Literal(%identifier[A_Index]%)
+				value := %identifier%
 
 			return value
 		}

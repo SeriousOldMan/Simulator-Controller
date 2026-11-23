@@ -54,7 +54,7 @@
       - Coach: Start Ideal Line coaching before the start of the Corner
       - Coach: Stop Ideal Line coaching after the start of the Straight
     - A new icon has been added to the Stream Deck icon set, which can be used to represent the action to activate the new coaching mode.
-
+  
 # Release history
 
 ## 7.3.4.0

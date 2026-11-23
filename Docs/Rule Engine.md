@@ -692,6 +692,39 @@ If you only want to add some rules, there is a much better way. You can create a
 	
 You can place any number of "*.rules" files in this folder and they will be loaded typically in alphapbetical order.
 
+Here is a useful example:
+
+	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0), (Set: Tyre.Pitstop.Warn, 0)
+
+	{All: {Any: [?Lap], [?Update]}, {None: [?Tyre.Cold.Warned]}, [?Tyre.Pitstop.Warn < #A_TickCount]} =>
+			(Call: Assistant.Speak("Watch out, tyres may be cold.")), (Set: Tyre.Cold.Warned)
+
+	priority: -20, {All: [?Pitstop.Last != ?Tyre.Pitstop.Last],
+						 {Prove: Pitstop.TyreChanged(!Session.Settings.Tyre.Service, ?Pitstop.Last)}} =>
+			(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, ?Pitstop.Last),
+			(Let: ?Warn = #A_TickCount + 20000), (Set: Tyre.Pitstop.Warn, ?Warn)
+
+	Pitstop.TyreChanged(All, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound, ?compound),
+										  ?compound != false
+
+	Pitstop.TyreChanged(Axle, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.Front, ?compound),
+										   ?compound != false
+	Pitstop.TyreChanged(Axle, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.Rear, ?compound),
+										   ?compound != false
+
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.FrontLeft, ?compound),
+											?compound != false
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.FrontRight, ?compound),
+											?compound != false
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearLeft, ?compound),
+											?compound != false
+	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearRight, ?compound),
+											?compound != false
+
+This set of rules will let the Engineer warn you about cold tyres at the race start and after each pitstop with tyre changes. Of course, creating extensions for the rule set requires deep knowledge about the knowledgebase and the standard rule set of a given Assistant. By the way, you can download the above example using this URL:
+
+	http://simulator-controller.selfhost.co/Attachments/Cold%20Tyres.rules
+
 Last but not least, you can extend the reasoning process of a Race Assistant by connecting the rule engine to a GPT-based large language model, which will open up endless new possibilities. Please see [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
 
 ## Execution of Scripts by the Rule Engine

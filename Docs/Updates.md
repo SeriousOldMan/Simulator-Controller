@@ -41,6 +41,10 @@ Although the code, that handles all the update tasks, is integrated into *Simula
 
 Nothing to do.
 
+## Release 7.3.6
+
+Nothing to do.
+
 ## Release 7.3.5
 
 No actions required.

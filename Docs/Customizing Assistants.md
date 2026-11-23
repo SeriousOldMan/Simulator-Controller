@@ -746,14 +746,17 @@ This event signals a position change. The previous position and the new position
 
 As a last example, the following event rules can be used the Engineer, for example using the "Rules" provider, to tell the driver to be careful on fresh tyres.
 
-	{None: [?Tyre.Cold.Warned]} => (Call: Assistant.Speak("Watch out, tyres may be cold.")),
-								   (Set: Tyre.Cold.Warned)
+	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0), (Set: Tyre.Pitstop.Warn, 0)
 
-	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0)
+	{All: {Any: [?Lap], [?Update]},
+		  {None: [?Tyre.Cold.Warned], [?Pitstop.Last != ?Tyre.Pitstop.Last]},
+		  [?Tyre.Pitstop.Warn < #A_TickCount]} =>
+			(Call: Assistant.Speak("Watch out, tyres may be cold.")), (Set: Tyre.Cold.Warned)
 
-	priority: -20, {All: [?Pitstop.Last != Tyre.Pitstop.Last],
+	priority: -20, {All: [?Pitstop.Last != ?Tyre.Pitstop.Last],
 						 {Prove: Pitstop.TyreChanged(!Session.Settings.Tyre.Service, ?Pitstop.Last)}} =>
-			(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, ?Pitstop.Last)
+			(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, ?Pitstop.Last),
+			(Let: ?Warn = #A_TickCount + 20000), (Set: Tyre.Pitstop.Warn, ?Warn)
 
 	Pitstop.TyreChanged(All, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound, ?compound),
 										  ?compound != false

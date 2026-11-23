@@ -721,6 +721,7 @@ Here is a useful example:
 	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearLeft, ?compound),
 											?compound != false
 	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearRight, ?compound),
+											?compound != falseyre.Compound.RearRight, ?compound),
 											?compound != false
 
 This set of rules will let the Engineer warn you about cold tyres at the race start and after each pitstop with tyre changes. Of course, creating extensions for the rule set requires deep knowledge about the knowledgebase and the standard rule set of a given Assistant. By the way, you can download the above example using this URL:

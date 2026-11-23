@@ -1,0 +1,27 @@
+{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0), (Set: Tyre.Pitstop.Warn, 0)
+
+
+{All: {Any: [?Lap], [?Update]}, {None: [?Tyre.Cold.Warned]}, [?Tyre.Pitstop.Warn < #A_TickCount]} =>
+		(Call: Assistant.Speak("Watch out, tyres may be cold.")), (Set: Tyre.Cold.Warned)
+
+priority: -20, {All: [?Pitstop.Last != ?Tyre.Pitstop.Last],
+                     {Prove: Pitstop.TyreChanged(!Session.Settings.Tyre.Service, ?Pitstop.Last)}} =>
+		(Clear: Tyre.Cold.Warned), (Set: Tyre.Pitstop.Last, ?Pitstop.Last),
+		(Let: ?Warn = #A_TickCount + 20000), (Set: Tyre.Pitstop.Warn, ?Warn)
+
+Pitstop.TyreChanged(All, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound, ?compound),
+                                      ?compound != false
+
+Pitstop.TyreChanged(Axle, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.Front, ?compound),
+                                       ?compound != false
+Pitstop.TyreChanged(Axle, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.Rear, ?compound),
+                                       ?compound != false
+
+Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.FrontLeft, ?compound),
+                                        ?compound != false
+Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.FrontRight, ?compound),
+                                        ?compound != false
+Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearLeft, ?compound),
+                                        ?compound != false
+Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearRight, ?compound),
+                                        ?compound != false

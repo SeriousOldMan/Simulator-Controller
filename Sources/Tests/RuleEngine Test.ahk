@@ -124,6 +124,9 @@ global kExecutionTestRules := "
 				{All: [?Test], {Is: :%Singleton.Instance.testMethodCall1%=("Foo", ?Result)}} =>
 						(Call: Singleton.Instance.testMethodCall2("Baz")), (Set: CallResult2 = ?Result)
 
+				[?Test] => (Set: Answer.What = 42)
+				[?Answer.What < #A_TickCount] => (Set: CallResult6 = Success)
+
 				[?Test] => (Let: ?var = father(Peter, Paul)), (Prove: printFather(?var))
 				[?Test] => (Prove: parse("son(Paul, Peter)", ?term)), (Prove: print(?term, ?text)),
 						   (Call: showArgs(?text)), (Set: ParseResult1 = ?text)
@@ -358,7 +361,7 @@ class Compiler extends Assert {
 
 		compiler.compileRules(kExecutionTestRules, &productions, &reductions)
 
-		this.AssertEqual(31, productions.Length, "Not all production rules compiled...")
+		this.AssertEqual(33, productions.Length, "Not all production rules compiled...")
 		this.AssertEqual(43, reductions.Length, "Not all reduction rules compiled...")
 	}
 
@@ -401,7 +404,7 @@ class Compiler extends Assert {
 			}
 		})
 
-		this.AssertEqual(31, pCount, "Not all production rules converted...")
+		this.AssertEqual(33, pCount, "Not all production rules converted...")
 		this.AssertEqual(43, rCount, "Not all reduction rules compiled...")
 	}
 }
@@ -787,6 +790,7 @@ class HybridEngine extends Assert {
 		this.AssertEqual("Baz_Bar", kb.getValue("CallResult3"), "Unexpected function call result...")
 		this.AssertEqual(42, kb.getValue("CallResult4"), "Unexpected external literal result...")
 		this.AssertEqual(42, kb.getValue("CallResult5"), "Unexpected extern call result...")
+		this.AssertEqual("Success", kb.getValue("CallResult6"), "Unexpected function call result...")
 		this.AssertEqual("father(Peter, Paul)", kb.getValue("FatherResult"), "Unexpected function call result...")
 		this.AssertEqual("son(Paul, Peter)", kb.getValue("ParseResult1"), "Unexpected function call result...")
 		this.AssertEqual("47.11", kb.getValue("ParseResult2"), "Unexpected function call result...")

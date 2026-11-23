@@ -31,29 +31,24 @@
   
 # Upcoming release
 
-## 7.4.0.0
+## 7.3.6.0
 
-#### Date: 12/04/26 (planned)
+#### Date: 11/27/26 (planned)
 
 #### Fixes
 
-  - Fixed several command grammars for the Russian language.
-  - Fixed some errors in the Polish grammars.
-  - Also fixed a few commands for the Japanese language.
+  - Fixed a redrawing problem in the logbook of the "Setup Workbench" when the window is resized.
+  - Fixed an error in the "Team Center" when a session is automatically restarted.
+  - Fixed a bug, that prevented the Engineer to welcome you back after a driver swap in a team session.
+  - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
   
 #### Changes
 
-  - The Driving Coach supports a new coaching mode, which helps you to position the car optimal on the track fr a prefect entry to the next corner. This is comparable to the ideal line display offered by some simulators without the ugly green markings on the track.
-    - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-the-ideal-line) has been added for the Driving Coach.
-	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
-	- The new coaching mode can also be activated from the tray menu of the "Simulator Controller" process.
-	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
-	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
-	- Several new settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings), which can be used to fine-tune the ideal line coaching.
-      - Coach: Deviation from Ideal Line
-      - Coach: Start Ideal Line coaching before the start of the Corner
-      - Coach: Stop Ideal Line coaching after the start of the Straight
-    - A new icon has been added to the Stream Deck icon set, which can be used to represent the action to activate the new coaching mode.
+  - 138 car models for *RaceRoom Racing Experience* have been added to the "Setup Workbench" by @inthebagbud UK. It is still not possible to edit setup files for this simulator using the "Setup Workbench", but you will now get car specific setup recommendations.
+  - The data-driven tyre wear prediction has been optimized. High tyre wear outside the standard distribution caused by spins, for example, is ignored now.
+  - The event editor for Assistant Boosters now supports an additional pop-up editor for very long LLM instruction phrases. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for more information.
+  - The grammar postprocessor introduced with Release 7.3.4 has been extended for the Russian language.
+  - Special logging has been implemented for knowledge and session state handover between different drivers in a team session. This logging can be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
   
 # Release history
 
@@ -221,7 +216,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Fixed a bug in the new standings and gap calculation which showed up sporadically for *iRacing*.
   - A rare bug that prevented the state and Assistant knowledge handover to the next driver in team races with *Le Mans Ultimate* has been fixed.
-  - Fixed another rare bug which prevented saving of instructions for Assistant boosters.
+  - Fixed another rare bug which prevented saving of instructions for Assistant Boosters.
   
 #### Changes
 
@@ -639,7 +634,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 	- The max. tyre wear for all available tyre compounds will also be passed to the *Reasoning* booster for the synthetical "Pitstop Planning" event for pitstop planning by the LLM, if enabled.
 	- More details can be found in the [extended documentation for the Race Engineer](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Race-Engineer#how-it-works) and for [tyre compound handling](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Tyre-Compounds#usable-life-of-a-tyre-compound) in general.
   - In preparation for the upcoming support for the Russian language, Yandex can be used now for speech recognition. See the [added documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Installation-&-Configuration#yandex) for more information.
-  - And support for using [GPT services from Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#yandex) has been added to the Driving Coach and the Assistant boosters.
+  - And support for using [GPT services from Yandex](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#yandex) has been added to the Driving Coach and the Assistant Boosters.
   - New car models for "Setup Workbench":
     - Le Mans Ultimate
 	  - ADESS AD25 LMP3

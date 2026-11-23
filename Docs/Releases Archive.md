@@ -121,7 +121,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
 #### Fixes
 
-  - Fixed a bug in "Simulator Setup" which prevented changing #Tokens and the instructions of an Assistant booster for the second time.
+  - Fixed a bug in "Simulator Setup" which prevented changing #Tokens and the instructions of an Assistant Booster for the second time.
   - [Internal] Fixed a rare bug in the rule engine, where a full production cycle returned an empty result.
   
 #### Changes
@@ -312,7 +312,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - A bug has been fixed for *iRacing* when cars are towed to the pit or are otherwise absent. This bug caused the Monte Carlo strategy simulation to crash.
-  - Fixed handling of language specific instructions for the Driving Coach and the Assistant boosters, when a machine translated language is used.
+  - Fixed handling of language specific instructions for the Driving Coach and the Assistant Boosters, when a machine translated language is used.
   - Fixed a misbehavior of a Race Asistant, when no language specification had been provided to the plugin. This cannot happen, when the configuration was created by "Simulator Setup", but it could happen in synthetic testing scenarios.
   - Fixed a rare bug introduced with one of the recent releases, which caused the "Telemetry" and the "Analyzer" item to be unavailable in the "Issues" selector menu of "Setup Workbench".
   - Fixed a bug in "Simulator Setup" which prevented pre-listening a voice in a translated language.
@@ -792,7 +792,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Fixed another bug in the knowledge passed to a LLM in the *Conversation* and *Reasoning* boosters, where brake wear was confused with brake temperatures.
   - Fixed several rounding errors in the knowledge passed to a LLM in the *Conversation* and in the *Reasoning* booster.
   - Fixed a bug in the *Reasoning* booster, which prevented loading of instructions in a rare situation.
-  - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant booster.
+  - Fixed a bug, which caused modified LLM instructions to get lost when a GPT Provider is changed for an Assistant Booster.
   - Fixed a bug for *iRacing*, which caused wrong positions to be calculated and reported for all cars in some situations.
   - Fixed a bug for *iRacing*, which prevented pitstop reporting for oppenent cars in some situations.
   - Fixed handling of brake duct blanking in the "Setup Workbench" for *Le Mans Ultimate*, where the duct blanking was changed in the wrong direction.
@@ -1249,7 +1249,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
   - Two new controller action functions [*enableDataCollection* and *disableDataCollection*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) allow you to disable the transfer of collected data of the Assistants to the session database. This is especially useful to prevent data which originates from sessions with 2x fuel consumption, for example, to pollute the database.
   - The driver is now always included in the default selection of drivers/cars in reports for "Race Reports", "Team Center" or "Solo Center".
   - If the "Reload" button is used in "Race Reports", new cars and tracks, which may have been registered since the start of "Race Reports" will be considered as well.
-  - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
+  - [*Google*](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#google) has been added to the list of supported GPT service providers for the Driving Coach and also the Assistant Boosters. This makes it possible to the use the *Gemini* models, of which some are even available for free.
   - [Internal] A specialized debugging mode for strategy handling by the Race Strategist can now be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
 
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-630), if you are experiencing problems with *rFactor 2* and *le Mans Ultimate*.
@@ -1267,9 +1267,9 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 
   - Added support for more track grip conditions like "Dusty".
   - The Race Engineer no longer announces temperature related pressure corrections, if the pitstop had been completely planned externally, for example in the "Team Center".
-  - Actions and Events can now be exported and imported in the Assistant booster editor, so that it is possible now to share them with the community or your team mates.
+  - Actions and Events can now be exported and imported in the Assistant Booster editor, so that it is possible now to share them with the community or your team mates.
   - [Experts] Once again comprehensive extensions of the integrated script engine:
-    - Several modules haven been defined, which can be included in a *Lua* script using the "require" function. They give you access to the state of the session and also to some functions of the simulator in scripts running in an Assistant booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for more information.
+    - Several modules haven been defined, which can be included in a *Lua* script using the "require" function. They give you access to the state of the session and also to some functions of the simulator in scripts running in an Assistant Booster. See the [new documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Script-Modules) for more information.
 	- It is now possible to use *Lua* coroutines even while interface with the host environments or with the Rule Engine.
   - [Internal] Full rewrite of the simulator data acquisition interface.
 
@@ -1332,7 +1332,7 @@ As mentioned above, this version contains an all new simulator data interface. I
   - The tyre meta data for *Automobilista 2* has been updated to reflect a recent change by Reiza in the naming of the Soft, Medium and Hard Slick tyre compounds.
   - [Experts] A new type of *Reasoning* booster named "Rules" has been introduced, which runs without a connected LLM. Only rules are allowed as event source, but all action types, including scripts defined in  [Lua](https://lua.org) are supported. Please read the [extended documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#reasoning-booster) for more information.
     - A new action function / predicate named *Assistant.Trigger* is available, which allows the event rules to trigger a defined action by name, rather than by using a LLM to select the action by the current situation, since no LLM is active when the "Rules" booster is selected.
-  - [Experts] The "Assistant.Speak" function / predicate used in the Assistant booster actions now uses the *Rephrasing* booster, if it is configured. This introduces immersive variations of the spoken message.
+  - [Experts] The "Assistant.Speak" function / predicate used in the Assistant Booster actions now uses the *Rephrasing* booster, if it is configured. This introduces immersive variations of the spoken message.
   - [Experts] Rules defined in the [Hybrid Rule Engine](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine) can now use the *Execute* clause to [call scripts](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#actions) written in the script language [Lua](https://lua.org) introduced with the last release and vice-versa. This allows you to choose the language, which is best suited for a given task.
   
 Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-627), if you experience inaccessible car or track data in the session database.
@@ -1365,7 +1365,7 @@ Please also take a look at the [Update Notes](https://github.com/SeriousOldMan/S
 #### Fixes
 
   - Fixed a bug which crashed the Driving Coach, when the *Reasoning* booster was enabled, but no action had been defined.
-  - Fixed a bug which restricted the number of output tokes for the Driving Coach LLM and also for the different Assistant boosters to a max value of 999.
+  - Fixed a bug which restricted the number of output tokes for the Driving Coach LLM and also for the different Assistant Boosters to a max value of 999.
   - Fixed some translations and added a few which were missing.
   - Fixed a bug which caused a request to a *Conversation* booster to fail in case specific informaton wasmissing in the knowledgebase.
 

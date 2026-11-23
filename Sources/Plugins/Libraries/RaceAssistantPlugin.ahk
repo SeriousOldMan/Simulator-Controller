@@ -481,9 +481,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 		createDataFile(data, extension) {
 			local dataFile := temporaryFileName(this.RaceAssistant.Plugin, extension)
 
-			data := printMultiMap(data)
-
-			FileAppend(data, dataFile, "UTF-16")
+			FileAppend(printMultiMap(data), dataFile, "UTF-16")
 
 			return dataFile
 		}
@@ -2721,7 +2719,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			if (!state || (state.Count = 0))
 				logMessage(kLogCritical, "Session state is empty for " . this.Plugin)
 			else
-				logMessage(kLogWarn, "Lap (Data): " . getMultiMapValue(this.Data, "Stint Data", "Laps", false))
+				logMessage(kLogWarn, "Lap (State): " . getMultiMapValue(state, "Session State", "Lap", false))
 		}
 
 		if (teamServer && this.TeamSessionActive) {

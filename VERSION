@@ -4,7 +4,7 @@ Type=Development
 Version=7.3.6.0-dev
 Target=7.3.6.0-release
 Date=11/24/26
-Download=
+Download=https://fileshare.impresion3d.pro/filebrowser/api/public/dl/unTQDScD?inline=true
 Changes=More Russian grammar correction, Improved data-driven tyre wear prediction, Fixed logbook resizing for recommendations, Phrase editor for Booster event phrases, Fixed session restart in Team Center, Fixed WelcomeBack message in team sessions, Special logging for team sessions, Fixed external literal in Rule Engine
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Release]

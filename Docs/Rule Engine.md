@@ -696,7 +696,9 @@ Here is a useful example:
 
 	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0), (Set: Tyre.Pitstop.Warn, 0)
 
-	{All: {Any: [?Lap], [?Update]}, {None: [?Tyre.Cold.Warned]}, [?Tyre.Pitstop.Warn < #A_TickCount]} =>
+	{All: {Any: [?Lap], [?Update]},
+		  {None: [?Tyre.Cold.Warned], [?Pitstop.Last != ?Tyre.Pitstop.Last]},
+		  [?Tyre.Pitstop.Warn < #A_TickCount]} =>
 			(Call: Assistant.Speak("Watch out, tyres may be cold.")), (Set: Tyre.Cold.Warned)
 
 	priority: -20, {All: [?Pitstop.Last != ?Tyre.Pitstop.Last],

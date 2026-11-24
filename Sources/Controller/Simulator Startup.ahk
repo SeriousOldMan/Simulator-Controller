@@ -626,8 +626,12 @@ updateNews(availableNews := false, news := false) {
 			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
 							  , "http://" . MASTER . "/News/NEWS"
 							  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
-				try
+				try {
 					Download(url, kTempDirectory . "NEWS.ini")
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 				if FileExist(kTempDirectory . "NEWS.ini") {
 					availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
@@ -724,7 +728,7 @@ loadNews(urls) {
 				return true
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 
 	return false
@@ -756,8 +760,12 @@ checkForNews() {
 				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
 								  , "http://" . MASTER . "/News/NEWS"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
-					try
+					try {
 						Download(url, kTempDirectory . "NEWS.ini")
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 
 					if FileExist(kTempDirectory . "NEWS.ini") {
 						check := true

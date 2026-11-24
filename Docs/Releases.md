@@ -41,6 +41,7 @@
   - Fixed an error in the "Team Center" when a session is automatically restarted.
   - Fixed a bug, that prevented the Engineer to welcome you back after a driver swap in a team session.
   - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
+  - Fixed several Spotter phrases for the Japanese language.
   
 #### Changes
 

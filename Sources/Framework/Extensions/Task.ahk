@@ -220,7 +220,7 @@ class Task {
 			throw "Non-function callable detected in Task.__New..."
 
 		this.iSleep := ((sleep = kUndefined) ? 0 : sleep)
-		this.iNextExecution := (A_TickCount + this.iSleep)
+		this.iNextExecution := (A_TickCount + this.Sleep)
 
 		this.iCallable := callable
 		this.iPriority := ((priority = kUndefined) ? kNormalPriority : priority)

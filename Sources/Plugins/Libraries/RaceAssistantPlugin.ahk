@@ -406,7 +406,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 			this.iRaceAssistant := raceAssistant
 			this.iData := data
 
-			super.__New(false, 0, kHighPriority)
+			super.__New(false, 20000, kHighPriority)
 		}
 
 		run() {

@@ -43,13 +43,13 @@
 
 #### Changes
 
-  - The Driving Coach supports a new coaching mode, which helps you to position the car optimal on the track fr a prefect entry to the next corner. This is comparable to the ideal line display offered by some simulators without the ugly green markings on the track.
+  - The Driving Coach supports a new coaching mode, which helps you to position the car optimal on the track for a perfect entry into the next corner. This is comparable to the ideal line display offered by some simulators, though without those unsightly green markings on the track, which don’t exactly help with immersion, do they?
     - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-the-ideal-line) has been added for the Driving Coach.
 	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
-	- The new coaching mode can also be activated from the tray menu of the "Simulator Controller" process.
-	- And of course, it is also available as controller action for your Stream Deck, Button Box or even your steering wheel.
+	- The ideal line coaching mode can also be activated from the tray menu of the "Simulator Controller" process.
+	- And of course, it is also available as controller action for your Stream Deck, Button Box or your steering wheel.
 	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
-	- Several new settings in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings), which can be used to fine-tune the ideal line coaching.
+	- Several new settings are available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings), which can be used to fine-tune the ideal line coaching.
       - Coach: Deviation from Ideal Line
       - Coach: Start Ideal Line coaching before the start of the Corner
       - Coach: Stop Ideal Line coaching after the start of the Straight

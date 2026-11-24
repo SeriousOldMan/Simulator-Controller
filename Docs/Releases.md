@@ -50,6 +50,7 @@
   - The event editor for Assistant boosters now supports an additional pop-up editor for very long LLM instruction phrases. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for more information.
   - The grammar postprocessor introduced with Release 7.3.4 has been extended for the Russian language.
   - Special logging has been implemented for knowledge and session state handover between different drivers in a team session. This logging can be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
+  - Added a new article for the tipps and tricks system about custom coaching modes.
   
 # Release history
 

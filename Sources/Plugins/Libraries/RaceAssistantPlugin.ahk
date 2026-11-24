@@ -452,7 +452,7 @@ class RaceAssistantPlugin extends ControllerPlugin {
 				if RaceAssistantPlugin.LogTeamSession
 					logMessage(kLogWarn, "Retry restoring session state for " . raceAssistant.Plugin)
 
-				Task.CurrentTask.Sleep := 2000
+				this.Sleep := 2000
 			}
 			else {
 				if RaceAssistantPlugin.LogTeamSession

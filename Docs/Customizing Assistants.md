@@ -744,7 +744,7 @@ Another example, this time using arguments:
 
 This event signals a position change. The previous position and the new position are passed to the LLM for further investigation. Please note the subtle usage of the previous value of *Position.Lost* in the rule actions. Although it will be reset in the first action, the old value will be used in the second action. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Rule-Engine#referencing-facts-in-production-rules) for more information about this variable behavior.
 
-As a last example, the following event rules can be used the Engineer, for example using the "Rules" provider, to tell the driver to be careful on fresh tyres.
+And another one: The following event rules can be used the Engineer, for example using the "Rules" provider, to tell the driver to be careful on fresh tyres.
 
 	{None: [?Tyre.Pitstop.Last]} => (Set: Tyre.Pitstop.Last, 0), (Set: Tyre.Pitstop.Warn, 0)
 
@@ -775,7 +775,11 @@ As a last example, the following event rules can be used the Engineer, for examp
 	Pitstop.TyreChanged(Wheel, ?pitstop) <= Get(Pitstop, ?pitstop, Tyre.Compound.RearRight, ?compound),
 											?compound != false
 
- 
+And a last example, this time for the Driving Coach:
+
+	{All: [?Lap > 0], {Prove: :%Mod%=(?Lap, 2, 0)}} =>
+			(Call: Assistant.Ask("Evaluate my last lap and compare it to the performance of the other drivers. Avoid numbers and calculations, just a short better or worse judgement. Estimate, whether I can catch some of them and what I have to do to accomplish that. Also give me short and concise instructions for the next lap."))
+			
 Please also take a look at the other predefined events of the Race Engineer or the other Assistants to learn more about writing event rules. And I recommend to take a look at the knowledge base of a session to learn more about all the facts you can use in the event rules (and also the action rules). To do this, activate the "Debug Knowledgebase" item in the tray bar menu of a given Assistant applicaton. Then open the corrsponding "*.knowledge" file in the *Simulator Controller\Temp* folder which is located in your user *Documents* folder.
 
 > ###### Good to know

@@ -42,6 +42,7 @@
   - Fixed a bug, that prevented the Engineer to welcome you back after a driver swap in a team session.
   - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
   - Fixed several Spotter phrases for the Japanese language.
+  - Fixed a bug in date/time comparison. This bug could cause numerous problems, among others a failure to load articles for the "News, tips & tricks" system, but also in the handling of automatic updates.
   
 #### Changes
 

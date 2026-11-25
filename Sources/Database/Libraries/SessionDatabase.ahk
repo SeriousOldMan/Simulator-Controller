@@ -3782,7 +3782,7 @@ synchronizeSessions(groups, sessionDB, connector, simulators, timestamp, lastSyn
 						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\" . type . "\*.info", "F" {
 							lastModified := FileGetTime(A_LoopFilePath, "M")
 
-							if (StrCompare(lastModified, lastRun) > 0) {
+							if (DateDiff(lastModified, lastRun, "Seconds") > 0) {
 								info := readMultiMap(A_LoopFilePath)
 
 								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
@@ -3907,7 +3907,7 @@ synchronizeSetups(groups, sessionDB, connector, simulators, timestamp, lastSynch
 						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Car Setups\" . type . "\*.info", "F" {
 							lastModified := FileGetTime(A_LoopFilePath, "M")
 
-							if (StrCompare(lastModified, lastRun) > 0) {
+							if (DateDiff(lastModified, lastRun, "Seconds") > 0) {
 								info := readMultiMap(A_LoopFilePath)
 
 								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
@@ -4024,7 +4024,7 @@ synchronizeTelemetries(groups, sessionDB, connector, simulators, timestamp, last
 						loop Files, kDatabaseDirectory . "User\" . simulator . "\" . car . "\" . track . "\Lap Telemetries\*.info", "F" {
 							lastModified := FileGetTime(A_LoopFilePath, "M")
 
-							if (StrCompare(lastModified, lastRun) > 0) {
+							if (DateDiff(lastModified, lastRun, "Seconds") > 0) {
 								info := readMultiMap(A_LoopFilePath)
 
 								if ((getMultiMapValue(info, "Origin", "Driver", false) = sessionDB.ID)
@@ -4149,7 +4149,7 @@ synchronizeStrategies(groups, sessionDB, connector, simulators, timestamp, lastS
 						loop Files, directory . "*.info", "F" {
 							lastModified := FileGetTime(A_LoopFilePath, "M")
 
-							if (StrCompare(lastModified, lastRun) > 0) {
+							if (DateDiff(lastModified, lastRun, "Seconds") > 0) {
 								SplitPath(A_LoopFileName, , , , &name)
 
 								info := sessionDB.readStrategyInfo(simulator, car, track, name)

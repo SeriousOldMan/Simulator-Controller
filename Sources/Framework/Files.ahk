@@ -222,11 +222,16 @@ compress(directory, pattern, archive) {
 	}
 }
 
-expand(archive, directory) {
+expand(archive, directory, method := kUndefined) {
 	local curWorkingDir
 
-	static method := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-									, "Archive", "Expander", "Tar")
+	static defaultMethod := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																	, kUserConfigDirectory
+																	, kConfigDirectory))
+										   , "Archive", "Expander", "Tar")
+
+	if (method == kUndefined)
+		method := defaultMethod
 
 	directory := normalizeDirectoryPath(directory)
 

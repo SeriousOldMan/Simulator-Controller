@@ -174,7 +174,7 @@ startupProcessManager() {
 	if !FileExist(kUserHomeDirectory . "Diagnostics\UPLOAD")
 		FileAppend(A_Now, kUserHomeDirectory . "Diagnostics\UPLOAD")
 
-	if (DateAdd(FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M"), 1, "Days") < A_Now) {
+	if (DateDiff(FileGetTime(kUserHomeDirectory . "Diagnostics\UPLOAD", "M"), A_Now, "Days") < 0) {
 		try {
 			deleteFile(kUserHomeDirectory . "Diagnostics\UPLOAD")
 
@@ -196,7 +196,7 @@ startupProcessManager() {
 			local ignore, directory
 
 			loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
-				if (DateAdd(FileGetTime(A_LoopFileFullPath, "M"), 2, "Days") < A_Now) {			
+				if (DateDiff(FileGetTime(A_LoopFileFullPath, "M"), A_Now, "Days") < -1) {			
 					compress(A_LoopFileFullPath, "*.*", kTempDirectory . A_LoopFileName . ".zip")
 
 					if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {

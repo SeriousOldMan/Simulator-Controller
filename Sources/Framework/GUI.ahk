@@ -3499,7 +3499,7 @@ modifiedImage(fileName, postFix, modifier, cache := "Images") {
 	create := !FileExist(modifiedFileName)
 
 	if !create
-		create := (FileGetTime(modifiedFileName, "M") < FileGetTime(fileName, "M"))
+		create := (DateDiff(FileGetTime(modifiedFileName, "M"), FileGetTime(fileName, "M"), "Seconds") < 0)
 
 	if create {
 		deleteFile(modifiedFileName)

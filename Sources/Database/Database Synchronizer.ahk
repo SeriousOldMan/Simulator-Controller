@@ -85,7 +85,7 @@ uploadSessionDatabase(id, uploadPressures, uploadWears, uploadSetups, uploadStra
 	setMultiMapValue(configuration, "Database Synchronizer", "Synchronization", "Uploading")
 
 	if FileExist(uploadTimeStamp)
-		if (DateDiff(A_Now, StrSplit(FileRead(uploadTimeStamp), "`n", "`r")[1], "days") <= 7)
+		if (DateDiff(A_Now, StrSplit(FileRead(uploadTimeStamp), "`n", "`r")[1], "Days") <= 7)
 			return
 
 	targetDB.DatabaseDirectory := (kTempDirectory . "Shared Database\")
@@ -407,7 +407,7 @@ downloadSessionDatabase(id, downloadPressures, downloadWears, downloadSetups, do
 	local ignore, fileName, type
 
 	if FileExist(downloadTimeStamp)
-		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "days") <= 2)
+		if (DateDiff(A_Now, StrSplit(FileRead(downloadTimeStamp), "`n", "`r")[1], "Days") <= 2)
 			return
 
 	updateState() {

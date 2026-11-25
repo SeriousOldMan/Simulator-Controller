@@ -1760,7 +1760,7 @@ class ACCPlugin extends RaceAssistantSimulatorPlugin {
 					if FileExist(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json") {
 						updateTime := DateAdd(FileGetTime(A_MyDocuments . "\Assetto Corsa Competizione\Debug\swap_dump_carjson.json", "M"), 5, "Minutes")
 
-						if (updateTime < A_Now)
+						if (DateDiff(updateTime, A_Now, "Seconds") < 0)
 							retry := true
 						else
 							Sleep(5000)

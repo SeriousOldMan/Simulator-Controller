@@ -626,8 +626,12 @@ updateNews(availableNews := false, news := false) {
 			for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
 							  , "http://" . MASTER . "/News/NEWS"
 							  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
-				try
+				try {
 					Download(url, kTempDirectory . "NEWS.ini")
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 
 				if FileExist(kTempDirectory . "NEWS.ini") {
 					availableNews := readMultiMap(kTempDirectory . "NEWS.ini")
@@ -700,13 +704,13 @@ showNews() {
 
 loadNews(urls) {
 	local MASTER := StrSplit(FileRead(kConfigDirectory . "MASTER"), "`n", "`r")[1]
-	local ignore, url
+	local ignore, url, method
 
-	deleteFile(A_Temp . "\News.zip")
+	deleteFile(kTempDirectory . "News.zip")
 
 	for ignore, url in string2Values(";", urls)
 		try {
-			Download(substituteVariables(url, {master: MASTER}), A_Temp . "\News.zip")
+			Download(substituteVariables(url, {master: MASTER}), kTempDirectory . "News.zip")
 
 			try {
 				if InStr(FileExist(kTempDirectory . "News"), "F")
@@ -716,15 +720,23 @@ loadNews(urls) {
 					deleteDirectory(kTempDirectory . "News")
 			}
 
-			DirCreate(kTempDirectory . "News")
+			for ignore, method in ["Tar", "PowerShell"]
+				try {
+					deleteDirectory(kTempDirectory . "News")
 
-			expand(A_Temp . "\News.zip", kTempDirectory . "News")
+					DirCreate(kTempDirectory . "News")
 
-			if FileExist(kTempDirectory . "News\News.htm")
-				return true
+					expand(kTempDirectory . "News.zip", kTempDirectory . "News", method)
+
+					if FileExist(kTempDirectory . "News\News.htm")
+						return true
+				}
+				catch Any as exception {
+					logError(exception, true)
+				}
 		}
 		catch Any as exception {
-			logError(exception)
+			logError(exception, true)
 		}
 
 	return false
@@ -739,9 +751,13 @@ checkForNews() {
 	if !check {
 		lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
 
-		lastModified := DateAdd(lastModified, 1, "Days")
+		if true
+			check := ((DateDiff(lastModified, A_Now, "Days") < 0) || isDebug())
+		else {
+			lastModified := DateAdd(lastModified, 1, "Days")
 
-		check := ((lastModified < A_Now) || isDebug())
+			check := ((lastModified < A_Now) || isDebug())
+		}
 	}
 
 	if check {
@@ -756,8 +772,12 @@ checkForNews() {
 				for ignore, url in ["https://fileshare.impresion3d.pro/filebrowser/api/public/dl/r0q9-d-3"
 								  , "http://" . MASTER . "/News/NEWS"
 								  , "https://www.dropbox.com/scl/fi/s5ewrqo9lzwcv6omvx667/NEWS?rlkey=j3t7aopmdye4efc8uc3xlekxz&st=wbuipual&dl=1"] {
-					try
+					try {
 						Download(url, kTempDirectory . "NEWS.ini")
+					}
+					catch Any as exception {
+						logError(exception, true)
+					}
 
 					if FileExist(kTempDirectory . "NEWS.ini") {
 						check := true
@@ -768,6 +788,8 @@ checkForNews() {
 			}
 		}
 		catch Any as exception {
+			logError(exception, true)
+
 			check := false
 		}
 	}
@@ -801,7 +823,8 @@ checkForNews() {
 						if InStr(rule, "Timed") {
 							rule := string2Values(":", rule)
 
-							if (((A_Now > rule[2]) && ((rule.Length = 2) || (A_Now <= rule[3])))
+							if (((DateDiff(A_Now, rule[2], "Seconds") > 0)
+							  && ((rule.Length = 2) || (DateDiff(A_Now, rule[3], "Seconds") <= 0)))
 							 && !getMultiMapValue(news, "Visited", nr, false)) {
 								newsNr := nr
 								newsUrls := url
@@ -831,7 +854,7 @@ checkForNews() {
 						shown := getMultiMapValue(news, "Visited", nr, false)
 						rule := getMultiMapValue(availableNews, "Rules", nr, "Once")
 
-						if (InStr(rule, "Repeat") && shown && (DateAdd(shown, string2Values(":", rule)[2], "Days") < A_Now))
+						if (InStr(rule, "Repeat") && shown && (DateDiff(DateAdd(shown, string2Values(":", rule)[2], "Days"), A_Now, "Seconds") < 0))
 							candidates.Push([nr, url])
 					}
 
@@ -1136,7 +1159,7 @@ launchPad(command := false, arguments*) {
 
 				restart := true
 			}
-			else if (lastModified != FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M"))
+			else if (DateDiff(lastModified, FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M"), "Seconds") != 0)
 				restart := true
 		}
 		finally {
@@ -1371,7 +1394,7 @@ launchPad(command := false, arguments*) {
 					while ProcessExist(theApplication)
 						Sleep(1000)
 
-					if (lastModified != FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M")) {
+					if (DateDiff(lastModified, FileGetTime(getFileName(kSimulatorConfigurationFile, kUserConfigDirectory, kConfigDirectory), "M"), "Seconds") != 0) {
 						loadSimulatorConfiguration()
 
 						launchPad(kRestart)
@@ -2694,7 +2717,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 
 					manageTeams(profilesEditorGui)
 
-					if (FileExist(kUserConfigDirectory . "Team Server.ini") && (!lastModified || (lastModified != FileGetTime(kUserConfigDirectory . "Team Server.ini", "M")))) {
+					if (FileExist(kUserConfigDirectory . "Team Server.ini")
+					 && (!lastModified || (DateDiff(lastModified, FileGetTime(kUserConfigDirectory . "Team Server.ini", "M"), "Seconds") != 0))) {
 						profile := profiles[selectedProfile - 1]
 
 						configuration := readMultiMap(kUserConfigDirectory . "Team Server.ini")

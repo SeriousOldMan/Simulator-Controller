@@ -972,7 +972,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		for ignore, assistant in kRaceAssistants {
 			fileName := (kTempDirectory . assistant . " Session.state")
 
-			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate)) {
+			if (FileExist(fileName) && (DateDiff(FileGetTime(fileName, "M"), lastUpdate, "Seconds") > 0)) {
 				needsUpdate := true
 
 				break
@@ -982,7 +982,7 @@ class IntegrationPlugin extends ControllerPlugin {
 		if !needsUpdate {
 			fileName := (kTempDirectory . "Simulator Controller.state")
 
-			if (FileExist(fileName) && (FileGetTime(fileName, "M") > lastUpdate))
+			if (FileExist(fileName) && (DateDiff(FileGetTime(fileName, "M"), lastUpdate, "Seconds") > 0))
 				needsUpdate := true
 		}
 

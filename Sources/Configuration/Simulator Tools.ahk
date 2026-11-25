@@ -3488,7 +3488,7 @@ checkFileDependency(file, modification) {
 		lastModified := false
 	}
 
-	if (lastModified > modification) {
+	if (DateDiff(lastModified, modification, "Seconds") > 0) {
 		logMessage(kLogInfo, translate("File ") . file . translate(" found more recent than ") . modification)
 
 		return true
@@ -3756,7 +3756,7 @@ runCopyTargets(&buildProgress) {
 
 				if srcLastModified {
 					if dstLastModified
-						copy := (srcLastModified > dstLastModified)
+						copy := (DateDiff(srcLastModified, dstLastModified, "Seconds") > 0)
 					else
 						copy := true
 				}
@@ -3810,7 +3810,7 @@ runCopyTargets(&buildProgress) {
 
 				if srcLastModified {
 					if dstLastModified
-						copy := (srcLastModified > dstLastModified)
+						copy := (DateDiff(srcLastModified, dstLastModified, "Seconds") > 0)
 					else
 						copy := true
 				}
@@ -3898,7 +3898,7 @@ runBuildTargets(&buildProgress) {
 		if gTargetConfigurationChanged
 			build := true
 		else if binLastModified {
-			build := (build || (srcLastModified > binLastModified))
+			build := (build || (DateDiff(srcLastModified, binLastModified, "Seconds") > 0))
 			build := (build || checkDependencies(target[4], binLastModified))
 		}
 		else

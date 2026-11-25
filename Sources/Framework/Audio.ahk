@@ -302,7 +302,7 @@ initializeAudioConfiguration() {
 		global gAudioConfiguration, gAudioConfigurationModTime, gAudioConfigurationMode, gAudioConfigurationModeModTime
 
 		try {
-			if (gAudioConfigurationModTime && (FileGetTime(kUserConfigDirectory . "Audio Settings.ini", "M") > gAudioConfigurationModTime)) {
+			if (gAudioConfigurationModTime && (DateDiff(FileGetTime(kUserConfigDirectory . "Audio Settings.ini", "M"), gAudioConfigurationModTime, "Seconds") > 0)) {
 				gAudioConfiguration := false
 				gAudioConfigurationModTime := false
 			}
@@ -312,7 +312,7 @@ initializeAudioConfiguration() {
 		}
 
 		try {
-			if (gAudioConfigurationModeModTime && (FileGetTime(kUserConfigDirectory . "Audio.mode", "M") > gAudioConfigurationModeModTime)) {
+			if (gAudioConfigurationModeModTime && (DateDiff(FileGetTime(kUserConfigDirectory . "Audio.mode", "M"), gAudioConfigurationModeModTime, "Seconds") > 0)) {
 				gAudioConfigurationMode := false
 				gAudioConfigurationModeModTime := false
 			}

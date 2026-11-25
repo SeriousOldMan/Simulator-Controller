@@ -263,9 +263,13 @@ checkForUpdates() {
 		if !check {
 			lastModified := FileGetTime(kUserConfigDirectory . "VERSION", "M")
 
-			lastModified := DateAdd(lastModified, 1, "Days")
+			if true
+				check := (DateDiff(lastModified, A_Now, "Days") < 0)
+			else {
+				lastModified := DateAdd(lastModified, 1, "Days")
 
-			check := (lastModified < A_Now)
+				check := (lastModified < A_Now)
+			}
 		}
 
 		if check {

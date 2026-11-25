@@ -197,7 +197,7 @@ startupProcessManager() {
 
 			loop Files, kUserHomeDirectory . "Diagnostics\Sessions\*.*", "D"
 				if (DateDiff(FileGetTime(A_LoopFileFullPath, "M"), A_Now, "Days") < -1) {			
-					compress(A_LoopFileFullPath, "*.*", kTempDirectory . A_LoopFileName . ".zip")
+					compress(A_LoopFileFullPath, kTempDirectory . A_LoopFileName . ".zip")
 
 					if ftpUpload(MASTER, "SimulatorController", "Sc-1234567890-Sc", kTempDirectory . A_LoopFileName . ".zip", "Session-Uploads/" . A_LoopFileName . ".zip") {
 						deleteFile(kTempDirectory . A_LoopFileName . ".zip")

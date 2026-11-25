@@ -117,8 +117,8 @@ Using these settings, you can control how ZIP archives will be compressed and ex
 
 | Category      | Setting        | Default | Description |
 |---------------|----------------|---------|-------------|
-| Archive       | Compressor     | Tar     | Supported values are *PowerShell* and *Tar*. Specifies which Windows command will be used to create ZIP archives. *Tar* is much faster, but depending on Windows security settings, *PowerShell* may be used as well. |
-|               | Expander       | Tar     | Supported values are also *PowerShell* and *Tar*. Specifies which Windows command will be used to extract ZIP archives. *Tar* is much faster, but it cannot handle archives with symbolic links in it. Therefore, if you have moved your user *Documents* folder to a different drive, *Powershell* must be used instead. |
+| Archive       | Compressor     | Internal | Supported values are *Internal*, *PowerShell* and *Tar*. Specifies which method will be used to create ZIP archives. The default, *Internal* uses the .NET builtin ZipFile class. *Tar* is much faster, but depending on Windows security settings, *PowerShell* may be used as well. |
+|               | Expander       | Internal | Supported values are also *Internal*, *PowerShell* and *Tar*. Specifies which method will be used to extract ZIP archives. The default, *Internal* uses the .NET builtin ZipFile class. *Tar* is much faster, but it cannot handle archives with symbolic links in it. Therefore, if you have moved your user *Documents* folder to a different drive, *Powershell* must be used instead. |
 
 ### Simulator Settings
 

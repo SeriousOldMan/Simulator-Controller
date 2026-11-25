@@ -5,7 +5,7 @@ Version=7.4.0.0-dev
 Target=7.4.0.0-release
 Date=11/25/26
 Download=
-Changes=New ideal line coaching mode, Fixed some commands in Russian grammars, Fixed some errors in Japanese grammars, Fixed some errors in Polish grammars, Special logging for team sessions 
+Changes=New ideal line coaching mode, Fixed some commands in Russian grammars, Fixed some errors in Japanese grammars, Fixed some errors in Polish grammars, Special logging for team sessions, Added "Internal" compression tool
 Components=Media->6.9.0,Configuration->7.4.0,Utilities->7.3.1
 [Release]
 Version=7.3.5.0-release

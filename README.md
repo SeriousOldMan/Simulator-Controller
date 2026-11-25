@@ -46,9 +46,9 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 
 #### Current development build
 
-[7.3.6.0-beta](https://fileshare.impresion3d.pro/filebrowser/api/public/dl/8J0OU6nA?inline=true) (Test build for 7.3.6. Changes: More Russian grammar correction, Improved data-driven tyre wear prediction, Fixed logbook resizing for recommendations, Phrase editor for Booster event phrases, Fixed session restart in Team Center, Fixed WelcomeBack message in team sessions, Special logging for team sessions, Fixed external literal in Rule Engine, Fixed Japanese Spotter phrases.)
+[7.4.0.0-dev]() (Early build for 7.4.0. Changes: New ideal line coaching mode, Fixed some commands in Russian grammars, Fixed some errors in Japanese grammars, Fixed some errors in Polish grammars, Special logging for team sessions, Added "Internal" compression tool.)
 
-Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7360) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-736) of this version and all the versions you might have skipped, before installing and using this version.
+Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7400) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-740) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation
 

@@ -3546,7 +3546,8 @@ runSpecialTargets(&buildProgress) {
 
 				SetWorkingDir(directory)
 
-				for ignore, file in getFileNames("*.sln", directory . "\") {
+				for ignore, file in concatenate(getFileNames("*.sln", directory . "\")
+											  , getFileNames("*.slnx", directory . "\")) {
 					SplitPath(file, , , , &solution)
 
 					showProgress({progress: ++buildProgress, message: translate("Compiling ") . solution . translate("...")})

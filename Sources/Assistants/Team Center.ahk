@@ -10041,7 +10041,7 @@ class TeamCenter extends ConfigurationItem {
 									dataFile := temporaryFileName("Race", "zip")
 
 									try {
-										compress(directory, "*.*", dataFile)
+										compress(directory, dataFile)
 
 										file := FileOpen(dataFile, "r-wd")
 
@@ -10072,7 +10072,7 @@ class TeamCenter extends ConfigurationItem {
 
 								dataFile := temporaryFileName("Race", "zip")
 
-								compress(directory, "*.*", dataFile)
+								compress(directory, dataFile)
 
 								FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 

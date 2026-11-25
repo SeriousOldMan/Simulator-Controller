@@ -2241,7 +2241,7 @@ class CallbacksEditor {
 
 					SplitPath(fileName, , &targetDirectory, , &name)
 
-					compress(directory, "*.*", targetDirectory . "\" . name . ".zip")
+					compress(directory, targetDirectory . "\" . name . ".zip")
 
 					FileMove(targetDirectory . "\" . name . ".zip", fileName, 1)
 				})

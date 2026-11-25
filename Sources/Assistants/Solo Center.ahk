@@ -4992,7 +4992,7 @@ class SoloCenter extends ConfigurationItem {
 						dataFile := temporaryFileName("Solo", "zip")
 
 						try {
-							compress(directory, "*.*", dataFile)
+							compress(directory, dataFile)
 
 							file := FileOpen(dataFile, "r-wd")
 
@@ -5023,7 +5023,7 @@ class SoloCenter extends ConfigurationItem {
 
 					dataFile := temporaryFileName("Solo", "zip")
 
-					compress(directory, "*.*", dataFile)
+					compress(directory, dataFile)
 
 					FileMove(dataFile, folder . "\" . fileName . ".data", 1)
 

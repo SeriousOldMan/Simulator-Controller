@@ -720,7 +720,7 @@ loadNews(urls) {
 					deleteDirectory(kTempDirectory . "News")
 			}
 
-			for ignore, method in ["Tar", "PowerShell"]
+			for ignore, method in ["Internal", "Tar", "PowerShell"]
 				try {
 					deleteDirectory(kTempDirectory . "News")
 

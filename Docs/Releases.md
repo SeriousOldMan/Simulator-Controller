@@ -55,6 +55,7 @@
       - Coach: Stop Ideal Line coaching after the start of the Straight
 	- A new controller action function ["startLineCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) lets you start ideal line coaching from scripts, rules or any other programmatic source.
     - A new icon has been added to the Stream Deck icon set, which can be used to represent the action to activate the new coaching mode.
+  - [Experts] A new compression and expansion method named "Internal" has been added. It is now the default method to ZIP archive files. The old methods "PowerShell" and "Tar" can still be activated using the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#archive-settings).
   
 # Release history
 

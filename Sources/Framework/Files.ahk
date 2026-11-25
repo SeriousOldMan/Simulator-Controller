@@ -194,20 +194,23 @@ deleteDirectory(directoryName, includeDirectory := true, recurse := true) {
 	}
 }
 
-compress(directory, pattern, archive) {
+compress(directory, archive, method := kUndefined) {
 	local curWorkingDir
 
-	static method := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini", kUserConfigDirectory, kConfigDirectory))
-									, "Archive", "Compressor", "Tar")
+	static defaultMethod := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
+																	, kUserConfigDirectory
+																	, kConfigDirectory))
+										   , "Archive", "Compressor", "Internal")
+
+	if (method == kUndefined)
+		method := defaultMethod
 
 	directory := normalizeDirectoryPath(directory)
 
-	if (method = "PowerShell") {
-		if (pattern = "*.*")
-			pattern := "*"
-
-		RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\" . pattern . "' -CompressionLevel Optimal -DestinationPath '" . archive . "'", , "Hide")
-	}
+	if (method = "Internal")
+		RunWait("`"" . kBinariesDirectory . "Tools\Compression.exe`" -Zip `"" . directory . "`" `"" . archive . "`"", , "Hide")
+	else if (method = "PowerShell")
+		RunWait("PowerShell.exe -Command Compress-Archive -Path '" . directory . "\*' -CompressionLevel Optimal -DestinationPath '" . archive . "'", , "Hide")
 	else {
 		curWorkingDir := A_WorkingDir
 
@@ -228,14 +231,16 @@ expand(archive, directory, method := kUndefined) {
 	static defaultMethod := getMultiMapValue(readMultiMap(getFileName("Core Settings.ini"
 																	, kUserConfigDirectory
 																	, kConfigDirectory))
-										   , "Archive", "Expander", "Tar")
+										   , "Archive", "Expander", "Internal")
 
 	if (method == kUndefined)
 		method := defaultMethod
 
 	directory := normalizeDirectoryPath(directory)
 
-	if (method = "PowerShell")
+	if (method = "Internal")
+		RunWait("`"" . kBinariesDirectory . "Tools\Compression.exe`" -Unzip `"" . archive . "`" `"" . directory . "`"", , "Hide")
+	else if (method = "PowerShell")
 		RunWait("PowerShell.exe -Command Expand-Archive -LiteralPath '" . archive . "' -DestinationPath '" . directory . "' -Force", , "Hide")
 	else {
 		curWorkingDir := A_WorkingDir

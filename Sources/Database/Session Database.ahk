@@ -3556,7 +3556,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			writeMultiMap(directory . "\Export.settings", settings)
 
-			compress(directory, "*.*", fileName . ".zip")
+			compress(directory, fileName . ".zip")
 
 			FileMove(fileName . ".zip", fileName, 1)
 		}
@@ -4986,7 +4986,7 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 			writeMultiMap(directory . "\Export.info", info)
 
-			compress(directory, "*.*", targetFileName . ".zip")
+			compress(directory, targetFileName . ".zip")
 
 			FileMove(targetFileName . ".zip", targetFileName, 1)
 		}

@@ -1,5 +1,58 @@
 # Latest stable release
 
+## 7.3.6.0
+
+#### Date: 11/27/26
+
+#### Fixes
+
+  - Fixed a redrawing problem in the logbook of the "Setup Workbench" when the window is resized.
+  - Fixed an error in the "Team Center" when a session is automatically restarted.
+  - Fixed a bug, that prevented the Engineer to welcome you back after a driver swap in a team session.
+  - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
+  - Fixed several Spotter phrases for the Japanese language.
+  - Fixed a bug in date/time comparison. This bug could cause numerous problems, among others a failure to load articles for the "News, tips & tricks" system, but also in the handling of automatic updates.
+  - Fxied the selection of the default units, when adding a new Startup Profile.
+  
+#### Changes
+
+  - 138 car models for *RaceRoom Racing Experience* have been added to the "Setup Workbench" by @inthebagbud UK. It is still not possible to edit setup files for this simulator using the "Setup Workbench", but you will now get car specific setup recommendations.
+  - The data-driven tyre wear prediction has been optimized. High tyre wear outside the standard distribution caused by spins, for example, is ignored now.
+  - The event editor for Assistant boosters now supports an additional pop-up editor for very long LLM instruction phrases. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for more information.
+  - The grammar postprocessor introduced with Release 7.3.4 has been extended for the Russian language.
+  - Added a new article for the tipps and tricks system about custom coaching modes.
+  - [Developer] Special logging has been implemented for knowledge and session state handover between different drivers in a team session. This logging can be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
+  
+# Upcoming release
+
+## 7.4.0.0
+
+#### Date: 12/04/26 (planned)
+
+#### Fixes
+
+  - Fixed several command grammars for the Russian language.
+  - Fixed some errors in the Polish grammars.
+  - Also fixed a few commands for the Japanese language.
+
+#### Changes
+
+  - The Driving Coach supports a new coaching mode, which helps you to position the car optimal on the track for a perfect entry into the next corner. This is comparable to the ideal line display offered by some simulators, though without those unsightly green markings on the track, which don’t exactly help with immersion, do they?
+    - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-the-ideal-line) has been added for the Driving Coach.
+	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
+	- The ideal line coaching mode can also be activated from the tray menu of the "Simulator Controller" process.
+	- And of course, it is also available as controller action for your Stream Deck, Button Box or your steering wheel.
+	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
+	- Several new settings are available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings), which can be used to fine-tune the ideal line coaching.
+      - Coach: Deviation from Ideal Line
+      - Coach: Start Ideal Line coaching before the start of the Corner
+      - Coach: Stop Ideal Line coaching after the start of the Straight
+	- A new controller action function ["startLineCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) lets you start ideal line coaching from scripts, rules or any other programmatic source.
+    - A new icon has been added to the Stream Deck icon set, which can be used to represent the action to activate the new coaching mode.
+  - [Experts] A new compression and expansion method named "Internal" has been added. It is now the default method to ZIP archive files. The old methods "PowerShell" and "Tar" can still be activated using the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#archive-settings).
+
+# Release history
+
 ## 7.3.5.0
 
 #### Date: 11/20/26
@@ -29,36 +82,6 @@
     - Le Mans Ultimate
 	  - BMW M4 GT3 (fixed the rear wing settings)
   
-# Upcoming release
-
-## 7.4.0.0
-
-#### Date: 12/04/26 (planned)
-
-#### Fixes
-
-  - Fixed several command grammars for the Russian language.
-  - Fixed some errors in the Polish grammars.
-  - Also fixed a few commands for the Japanese language.
-
-#### Changes
-
-  - The Driving Coach supports a new coaching mode, which helps you to position the car optimal on the track for a perfect entry into the next corner. This is comparable to the ideal line display offered by some simulators, though without those unsightly green markings on the track, which don’t exactly help with immersion, do they?
-    - [Documentation](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#practicing-the-ideal-line) has been added for the Driving Coach.
-	- A [new voice command](https://github.com/SeriousOldMan/Simulator-Controller/wiki/AI-Driving-Coach#list-of-all-voice-commands) has been added to activate this mode.
-	- The ideal line coaching mode can also be activated from the tray menu of the "Simulator Controller" process.
-	- And of course, it is also available as controller action for your Stream Deck, Button Box or your steering wheel.
-	- Lastly, it is available as [selectable function](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Using-Simulator-Controller#startup-profiles) for a Startup Profile.
-	- Several new settings are available in the ["Session Database"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Session-Settings#driving-coach-settings), which can be used to fine-tune the ideal line coaching.
-      - Coach: Deviation from Ideal Line
-      - Coach: Start Ideal Line coaching before the start of the Corner
-      - Coach: Stop Ideal Line coaching after the start of the Straight
-	- A new controller action function ["startLineCoaching"](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Action-Functions) lets you start ideal line coaching from scripts, rules or any other programmatic source.
-    - A new icon has been added to the Stream Deck icon set, which can be used to represent the action to activate the new coaching mode.
-  - [Experts] A new compression and expansion method named "Internal" has been added. It is now the default method to ZIP archive files. The old methods "PowerShell" and "Tar" can still be activated using the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#archive-settings).
-  
-# Release history
-
 ## 7.3.4.0
 
 #### Date: 11/13/26

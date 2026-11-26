@@ -3,15 +3,15 @@ Type=Development
 [Development]
 Version=7.4.0.0-dev
 Target=7.4.0.0-release
-Date=11/25/26
+Date=11/26/26
 Download=
 Changes=New ideal line coaching mode, Fixed some commands in Russian grammars, Fixed some errors in Japanese grammars, Fixed some errors in Polish grammars, Special logging for team sessions, Added "Internal" compression tool
 Components=Media->6.9.0,Configuration->7.4.0,Utilities->7.3.1
 [Release]
-Version=7.3.5.0-release
-Date=11/20/26
-Download=https://cutt.ly/yyA6pZyJ;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/Pd0QFns_?inline=true;https://www.dropbox.com/scl/fi/189acm8jg9k7qw4817new/Simulator-Controller-7.3.5.0-update.zip?rlkey=zixlixszzgxu88srrgleavrg2&st=8jo81wtm&dl=1;http://%master%/Releases/Simulator Controller 7.3.5.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.5.0-update.zip
-Changes=Migrated to AHK 2.1-alpha.39, Editable session names in logbook, Full session view in logbook, Fixed wing settings for M4 in LMU, Fixed active state of track sections, Suppress Strategist race review when muted, Fixed wrong number of tyre laps in "System Monitor", Fixed wrong number of tyre laps in SimHub plugin, Added setting value to chart in logbook, Fixed zoom factor in Telemetry Viewer, Updated documentation, Date column for session list in "Session Database", Fixed reference lap loading in "Driving Coach"
+Version=7.3.6.0-release
+Date=11/27/26
+Download=https://cutt.ly/ZyDV5UXv;https://fileshare.impresion3d.pro/filebrowser/api/public/dl/ZBS8Oxyj?inline=true;https://www.dropbox.com/scl/fi/jsb5sp963i419n0f2t1qz/Simulator-Controller-7.3.6.0-update.zip?rlkey=0wqe0qoussqulpj4qcykesrpi&st=gt53klxe&dl=1;http://%master%/Releases/Simulator Controller 7.3.6.0-update.zip;https://simulatorcontroller.s3.eu-central-1.amazonaws.com/Releases/Simulator+Controller+7.3.6.0-update.zip
+Changes=More Russian grammar correction, Improved data-driven tyre wear prediction, Fixed logbook resizing for recommendations, Phrase editor for Booster event phrases, Fixed session restart in Team Center, Fixed WelcomeBack message in team sessions, Special logging for team sessions, Fixed external literal in Rule Engine, Fixed Japanese Spotter phrases, Fixed default units in profile creation
 Components=Media->6.9.0,Configuration->7.3.1,Utilities->7.3.1
 [Components]
 Media.6.9.0.Path=Resources

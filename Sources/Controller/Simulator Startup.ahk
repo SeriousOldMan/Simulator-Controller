@@ -2320,7 +2320,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		local index, function
 
 		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", ""
-								, "Simulator", false, "Assistant.Autonomy", "Default")
+								, "Simulator", false, "Assistant.Autonomy", "Default"
+								, "Units", allUnits()[1])
 
 		for ignore, assistant in kRaceAssistants
 			profile[assistant] := "Default"

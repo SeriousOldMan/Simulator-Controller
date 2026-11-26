@@ -648,11 +648,13 @@ updateNews(availableNews := false, news := false) {
 	if !news
 		news := readMultiMap(kUserConfigDirectory . "NEWS")
 
-	if !getMultiMapValue(news, "General", "Version", false) {
+	if (!getMultiMapValue(news, "General", "Version", false)
+	 || !getMultiMapValue(news, "General", "Next", false)) {
 		setMultiMapValues(news, "Visited", getMultiMapValues(news, "News"))
 		removeMultiMapValues(news, "News")
 
 		setMultiMapValue(news, "General", "Version", "1.0")
+		setMultiMapValue(news, "General", "Next", A_Now)
 	}
 
 	loop {
@@ -662,6 +664,8 @@ updateNews(availableNews := false, news := false) {
 		setMultiMapValue(news, "News", getMultiMapValue(availableNews, "Names", A_Index)
 							 , A_Index . "|" . getMultiMapValue(availableNews, "News", A_Index))
 	}
+
+	setMultiMapValue(news, "General", "Next", DateAdd(A_Now, 1, "Days"))
 
 	writeMultiMap(kUserConfigDirectory . "NEWS", news)
 }
@@ -748,17 +752,9 @@ checkForNews() {
 	local welcome := false
 	local lastModified, ignore, url
 
-	if !check {
-		lastModified := FileGetTime(kUserConfigDirectory . "NEWS", "M")
-
-		if true
-			check := ((DateDiff(lastModified, A_Now, "Days") < 0) || isDebug())
-		else {
-			lastModified := DateAdd(lastModified, 1, "Days")
-
-			check := ((lastModified < A_Now) || isDebug())
-		}
-	}
+	if !check
+		check := ((DateDiff(getMultiMapValue(readMultiMap(kUserConfigDirectory . "NEWS")
+										   , "General", "Next", A_Now), A_Now, "Days") < 0) || isDebug())
 
 	if check {
 		try {
@@ -3605,7 +3601,7 @@ startSimulator() {
 				logMessage(kLogOff, "Checking for news...")
 
 			if (!FileExist(kUserConfigDirectory . "NEWS")
-			 || (getMultiMapValues(readMultiMap(kUserConfigDirectory . "NEWS"), "Visited").Count = 0))
+			 || !getMultiMapValue(readMultiMap(kUserConfigDirectory . "NEWS"), "General", "Next", false))
 				updateNews()
 
 			checkForNews()

@@ -720,7 +720,7 @@ loadNews(urls) {
 					deleteDirectory(kTempDirectory . "News")
 			}
 
-			for ignore, method in ["Tar", "PowerShell"]
+			for ignore, method in ["Internal", "Tar", "PowerShell"]
 				try {
 					deleteDirectory(kTempDirectory . "News")
 
@@ -1718,6 +1718,7 @@ availableFunctions(configuration, &hasTeamServer := false
 		functions.Push(Array("Driving Coach", "Performance Analysis"))
 		functions.Push(Array("Driving Coach", "Handling Analysis"))
 		functions.Push(Array("Driving Coach", "On-track Coaching"))
+		functions.Push(Array("Driving Coach", "Line Coaching"))
 		functions.Push(Array("Driving Coach", "Brake Coaching"))
 		functions.Push(Array("Driving Coach", "Race Motivation"))
 	}
@@ -2319,7 +2320,8 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 		local index, function
 
 		profile := CaseInsenseMap("Name", "", "Mode", "Solo", "Tools", ""
-								, "Simulator", false, "Assistant.Autonomy", "Default")
+								, "Simulator", false, "Assistant.Autonomy", "Default"
+								, "Units", allUnits()[1])
 
 		for ignore, assistant in kRaceAssistants
 			profile[assistant] := "Default"
@@ -2515,11 +2517,17 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 					if ((function = "Brake Coaching") && profile.Has("Function.On-Track Coaching"))
 						profile["Function.On-Track Coaching"] := false
 
+					if ((function = "Brake Coaching") && profile.Has("Function.Line Coaching"))
+						profile["Function.Line Coaching"] := false
+
 					if ((function = "Brake Coaching") && profile.Has("Function.Race Motivation"))
 						profile["Function.Race Motivation"] := false
 
 					if ((function = "On-Track Coaching") && profile.Has("Function.Brake Coaching"))
 						profile["Function.Brake Coaching"] := false
+
+					if ((function = "On-Track Coaching") && profile.Has("Function.Line Coaching"))
+						profile["Function.Line Coaching"] := false
 
 					if ((function = "On-Track Coaching") && profile.Has("Function.Race Motivation"))
 						profile["Function.Race Motivation"] := false
@@ -2527,8 +2535,20 @@ editStartupProfiles(launchPadOrCommand, arguments*) {
 					if ((function = "Race Motivation") && profile.Has("Function.On-Track Coaching"))
 						profile["Function.On-Track Coaching"] := false
 
+					if ((function = "Race Motivation") && profile.Has("Function.Line Coaching"))
+						profile["Function.Line Coaching"] := false
+
 					if ((function = "Race Motivation") && profile.Has("Function.Brake Coaching"))
 						profile["Function.Brake Coaching"] := false
+
+					if ((function = "Line Coaching") && profile.Has("Function.On-Track Coaching"))
+						profile["Function.On-Track Coaching"] := false
+
+					if ((function = "Line Coaching") && profile.Has("Function.Brake Coaching"))
+						profile["Function.Brake Coaching"] := false
+
+					if ((function = "Line Coaching") && profile.Has("Function.Race Motivation"))
+						profile["Function.Race Motivation"] := false
 				}
 			}
 			else

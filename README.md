@@ -47,7 +47,7 @@ Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Contr
 #### Current development build
 
 [7.4.0.0-dev]() (Early build for 7.4.0. Changes: New ideal line coaching mode, Fixed some commands in Russian grammars, Fixed some errors in Japanese grammars, Fixed some errors in Polish grammars, Special logging for team sessions, Added "Internal" compression tool.)
-
+s
 Please read the [Release Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Release-Notes#7400) and - sometimes even more important - the release specific [Update Notes](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Update-Notes#release-740) of this version and all the versions you might have skipped, before installing and using this version.
 
 ### Documentation

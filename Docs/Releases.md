@@ -1,5 +1,34 @@
 # Latest stable release
 
+## 7.3.6.0
+
+#### Date: 11/27/26
+
+#### Fixes
+
+  - Fixed a redrawing problem in the logbook of the "Setup Workbench" when the window is resized.
+  - Fixed an error in the "Team Center" when a session is automatically restarted.
+  - Fixed a bug, that prevented the Engineer to welcome you back after a driver swap in a team session.
+  - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
+  - Fixed several Spotter phrases for the Japanese language.
+  - Fixed a bug in date/time comparison. This bug could cause numerous problems, among others a failure to load articles for the "News, tips & tricks" system, but also in the handling of automatic updates.
+  - Fxied the selection of the default units, when adding a new Startup Profile.
+  
+#### Changes
+
+  - 138 car models for *RaceRoom Racing Experience* have been added to the "Setup Workbench" by @inthebagbud UK. It is still not possible to edit setup files for this simulator using the "Setup Workbench", but you will now get car specific setup recommendations.
+  - The data-driven tyre wear prediction has been optimized. High tyre wear outside the standard distribution caused by spins, for example, is ignored now.
+  - The event editor for Assistant boosters now supports an additional pop-up editor for very long LLM instruction phrases. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for more information.
+  - The grammar postprocessor introduced with Release 7.3.4 has been extended for the Russian language.
+  - Added a new article for the tipps and tricks system about custom coaching modes.
+  - [Developer] Special logging has been implemented for knowledge and session state handover between different drivers in a team session. This logging can be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
+  
+# Upcoming release
+
+Not yet planned...
+
+# Release history
+
 ## 7.3.5.0
 
 #### Date: 11/20/26
@@ -29,33 +58,6 @@
     - Le Mans Ultimate
 	  - BMW M4 GT3 (fixed the rear wing settings)
   
-# Upcoming release
-
-## 7.3.6.0
-
-#### Date: 11/27/26 (planned)
-
-#### Fixes
-
-  - Fixed a redrawing problem in the logbook of the "Setup Workbench" when the window is resized.
-  - Fixed an error in the "Team Center" when a session is automatically restarted.
-  - Fixed a bug, that prevented the Engineer to welcome you back after a driver swap in a team session.
-  - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
-  - Fixed several Spotter phrases for the Japanese language.
-  - Fixed a bug in date/time comparison. This bug could cause numerous problems, among others a failure to load articles for the "News, tips & tricks" system, but also in the handling of automatic updates.
-  - Fxied the selection of the default units, when adding a new Startup Profile.
-  
-#### Changes
-
-  - 138 car models for *RaceRoom Racing Experience* have been added to the "Setup Workbench" by @inthebagbud UK. It is still not possible to edit setup files for this simulator using the "Setup Workbench", but you will now get car specific setup recommendations.
-  - The data-driven tyre wear prediction has been optimized. High tyre wear outside the standard distribution caused by spins, for example, is ignored now.
-  - The event editor for Assistant boosters now supports an additional pop-up editor for very long LLM instruction phrases. See [here](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Customizing-Assistants#managing-events) for more information.
-  - The grammar postprocessor introduced with Release 7.3.4 has been extended for the Russian language.
-  - Added a new article for the tipps and tricks system about custom coaching modes.
-  - [Developer] Special logging has been implemented for knowledge and session state handover between different drivers in a team session. This logging can be enabled in the [core settings](https://github.com/SeriousOldMan/Simulator-Controller/wiki/Core-Settings#development-settings).
-  
-# Release history
-
 ## 7.3.4.0
 
 #### Date: 11/13/26

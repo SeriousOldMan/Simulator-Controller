@@ -1,5 +1,5 @@
 [Current]
-Type=Development
+Type=Release
 [Development]
 Version=7.3.6.0-release
 Target=7.3.6.0-release

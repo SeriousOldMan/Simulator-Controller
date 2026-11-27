@@ -650,11 +650,9 @@ updateNews(availableNews := false, news := false) {
 
 	if (!getMultiMapValue(news, "General", "Version", false)
 	 || !getMultiMapValue(news, "General", "Next", false)) {
-		setMultiMapValues(news, "Visited", getMultiMapValues(news, "News"))
 		removeMultiMapValues(news, "News")
 
 		setMultiMapValue(news, "General", "Version", "1.0")
-		setMultiMapValue(news, "General", "Next", A_Now)
 	}
 
 	loop {
@@ -665,7 +663,7 @@ updateNews(availableNews := false, news := false) {
 							 , A_Index . "|" . getMultiMapValue(availableNews, "News", A_Index))
 	}
 
-	setMultiMapValue(news, "General", "Next", DateAdd(A_Now, 1, "Days"))
+	setMultiMapValue(news, "General", "Next", A_Now)
 
 	writeMultiMap(kUserConfigDirectory . "NEWS", news)
 }

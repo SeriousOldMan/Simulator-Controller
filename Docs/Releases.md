@@ -12,7 +12,7 @@
   - Fixed external references using the "#" operator in the Rule Engine for global variables in the host language.
   - Fixed several Spotter phrases for the Japanese language.
   - Fixed a bug in date/time comparison. This bug could cause numerous problems, among others a failure to load articles for the "News, tips & tricks" system, but also in the handling of automatic updates.
-  - Fixed another bug related to the "News, tips & tricks" system, which prevented articels to pop up.
+  - With great support of @Timmermann, we could fix another bug related to the "News, tips & tricks" system, which also prevented articels to pop up.
   - Fxied the selection of the default units, when adding a new Startup Profile.
   
 #### Changes

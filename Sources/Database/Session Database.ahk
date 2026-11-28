@@ -530,7 +530,14 @@ class SessionDatabaseEditor extends ConfigurationItem {
 		}
 
 		chooseSimulator(*) {
-			editor.loadSimulator(editor.Control["simulatorDropDown"].Text)
+			editorGui.Block()
+
+			try {
+				editor.loadSimulator(editor.Control["simulatorDropDown"].Text)
+			}
+			finally {
+				editorGui.Unblock()
+			}
 		}
 
 		chooseCar(*) {
@@ -538,40 +545,68 @@ class SessionDatabaseEditor extends ConfigurationItem {
 			local carDropDown := editor.Control["carDropDown"].Text
 			local index, car
 
-			if (carDropDown = translate("All"))
-				editor.loadCar(true)
-			else
-				for index, car in editor.getCars(simulator)
-					if (carDropDown = editor.getCarName(simulator, car)) {
-						editor.loadCar(car)
+			editorGui.Block()
 
-						break
-					}
+			try {
+				if (carDropDown = translate("All"))
+					editor.loadCar(true)
+				else
+					for index, car in editor.getCars(simulator)
+						if (carDropDown = editor.getCarName(simulator, car)) {
+							editor.loadCar(car)
+
+							break
+						}
+			}
+			finally {
+				editorGui.Unblock()
+			}
 		}
 
 		chooseTrack(*) {
 			local trackDropDown := editor.Control["trackDropDown"].Text
 			local simulator, tracks, trackNames
 
-			if (trackDropDown = translate("All"))
-				editor.loadTrack(true)
-			else {
-				simulator := editor.SelectedSimulator
-				tracks := editor.getTracks(simulator, editor.SelectedCar)
-				trackNames := collect(tracks, ObjBindMethod(editor, "getTrackName", simulator))
+			editorGui.Block()
 
-				editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
+			try {
+				if (trackDropDown = translate("All"))
+					editor.loadTrack(true)
+				else {
+					simulator := editor.SelectedSimulator
+					tracks := editor.getTracks(simulator, editor.SelectedCar)
+					trackNames := collect(tracks, ObjBindMethod(editor, "getTrackName", simulator))
+
+					editor.loadTrack(tracks[inList(trackNames, trackDropDown)])
+				}
+			}
+			finally {
+				editorGui.Unblock()
 			}
 		}
 
 		chooseMode(*) {
-			editor.loadMode([true, "Solo", "Team"][editor.Control["modeDropDown"].Value])
+			editorGui.Block()
+
+			try {
+				editor.loadMode([true, "Solo", "Team"][editor.Control["modeDropDown"].Value])
+			}
+			finally {
+				editorGui.Unblock()
+			}
 		}
 
 		chooseWeather(*) {
 			local weatherDropDown := editor.Control["weatherDropDown"].Value
 
-			editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
+			editorGui.Block()
+
+			try {
+				editor.loadWeather((weatherDropDown == 1) ? true : kWeatherConditions[weatherDropDown - 1])
+			}
+			finally {
+				editorGui.Unblock()
+			}
 		}
 
 		updateNotes(*) {

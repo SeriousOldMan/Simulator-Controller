@@ -35,6 +35,7 @@
   - Fixed several command grammars for the Russian language.
   - Fixed some errors in the Polish grammars.
   - Also fixed a few commands for the Japanese language.
+  - Fixed a race condition in the "Session Database", when selecting car, track, and so on, that caused the reloading of the current data in the main list to be reloaded correctly.
 
 #### Changes
 

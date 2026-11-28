@@ -3700,6 +3700,13 @@ class SessionDatabaseEditor extends ConfigurationItem {
 
 		references := {Car: 0, AllCar: 0, Track: 0, AllTrack: 0, Weather: 0, AllWeather: 0}
 
+		if isDebug()
+			logMessage(kLogDebug, "Settings: " . values2String(", ", this.SelectedSimulator
+																   , this.SelectedCar["*"]
+																   , this.SelectedTrack["*"]
+																   , this.SelectedMode["*"]
+																   , this.SelectedWeather["*"]))
+
 		for ignore, setting in SettingsDatabase().readSettings(this.SelectedSimulator
 															 , this.SelectedCar["*"], this.SelectedTrack["*"]
 															 , this.SelectedMode["*"], this.SelectedWeather["*"]

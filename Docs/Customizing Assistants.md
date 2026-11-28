@@ -118,7 +118,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"SuspensionDamage": 0.0,
 				"LapTime": "110.1 Seconds",
 				"Track": {
-					"Temperature": 32,
+					"Temperature": "32 Celsius",
 					"Grip": "Green"
 				},
 				"Tyres": {
@@ -142,7 +142,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 						"10 Minutes": "Dry",
 						"30 Minutes": "Dry"
 					},
-					"Temperature": 25
+					"Temperature": "25 Celsius"
 				}
 			},
 			{
@@ -154,7 +154,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"SuspensionDamage": 0.0,
 				"LapTime": "108.4 Seconds",
 				"Track": {
-					"Temperature": 32,
+					"Temperature": "32 Celsius",
 					"Grip": "Green"
 				},
 				"Tyres": {
@@ -178,7 +178,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 						"10 Minutes": "Dry",
 						"30 Minutes": "Dry"
 					},
-					"Temperature": 25
+					"Temperature": "25 Celsius"
 				}
 			},
 			{
@@ -190,7 +190,7 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 				"SuspensionDamage": 3.099,
 				"LapTime": "113.7 Seconds",
 				"Track": {
-					"Temperature": 32,
+					"Temperature": "32 Celsius",
 					"Grip": "Green"
 				}
 				"Tyres": {
@@ -214,11 +214,11 @@ Here is an example of the knowledge supplied by the Race Engineer to the LLM:
 						"10 Minutes": "Dry",
 						"30 Minutes": "Dry"
 					},
-					"Temperature": 25
+					"Temperature": "25 Celsius"
 				}
 			},
 			{
-				"AirTemperature": 25,
+				"AirTemperature": "25 Celsius",
 				"BodyworkDamage": 22.90,
 				"EngineDamage": 0.0,
 				"FuelConsumption": "3 Liters",
